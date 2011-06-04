@@ -173,6 +173,9 @@ HFrame::resizeEvent( QResizeEvent* e )
     // Draw the saved pixmap into the new one.
     QPainter p(&this->fPixmap);
     p.drawPixmap(0, 0, tmp);
+
+    hugo_settextmode();
+    display_needs_repaint = true;
 }
 
 
