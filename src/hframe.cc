@@ -67,7 +67,7 @@ HFrame::HFrame( QWidget* parent )
       fUseItalicFont(false),
       fUseBoldFont(false),
       fFontMetrics(QFont()),
-      fPixmap(50, 50),
+      fPixmap(1, 1),
       fFlushXPos(0),
       fFlushYPos(0),
       fCursorPos(0, 0),
