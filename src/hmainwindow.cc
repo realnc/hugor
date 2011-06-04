@@ -5,6 +5,7 @@
 #include "hmainwindow.h"
 #include "happlication.h"
 #include "confdialog.h"
+#include "settings.h"
 
 class HMainWindow* hMainWin = 0;
 
@@ -96,6 +97,7 @@ HMainWindow::closeEvent( QCloseEvent* e )
 #endif
 
     if (msgBox->exec() == QMessageBox::Yes) {
+        hApp->settings()->saveToDisk();
         exit(0);
     } else {
         e->ignore();
