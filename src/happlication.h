@@ -34,11 +34,13 @@ class HApplication: public QApplication {
     fRunGame();
 
 #ifdef Q_WS_MAC
+    /*
   protected:
     // On the Mac, dropping a file on our application icon will generate a
     // FileOpen event, so we override this to be able to handle it.
     virtual bool
     event( QEvent* );
+    */
 #endif
 
   signals:

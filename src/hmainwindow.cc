@@ -1,6 +1,7 @@
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QCloseEvent>
+#include <QLayout>
 
 #include "hmainwindow.h"
 #include "happlication.h"
@@ -104,8 +105,8 @@ HMainWindow::fShowAbout()
     connect(this->fAboutDialog, SIGNAL(finished(int)), SLOT(fHideAbout()));
 #ifdef Q_WS_MAC
     // Similar bug to the config dialog one.  Again, 4 pixels higher fixes it.
-    this->fAboutDialog->layout()->activate();
-    this->fAboutDialog->setMinimumHeight(this->fAboutDialog->minimumHeight() + 4);
+    //this->fAboutDialog->layout()->activate();
+    //this->fAboutDialog->setMinimumHeight(this->fAboutDialog->minimumHeight() + 4);
 #endif
     this->fAboutDialog->show();
 }

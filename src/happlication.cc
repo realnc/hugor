@@ -176,6 +176,7 @@ HApplication::fRunGame()
 
 
 #ifdef Q_WS_MAC
+/*
 #include <QFileOpenEvent>
 bool
 HApplication::event( QEvent* e )
@@ -186,6 +187,7 @@ HApplication::event( QEvent* e )
     }
     return qWinGroup->handleFileOpenEvent(static_cast<QFileOpenEvent*>(e));
 }
+*/
 #endif
 
 
