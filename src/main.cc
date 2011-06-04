@@ -37,9 +37,9 @@ int main( int argc, char* argv[] )
 #if (MIX_MAJOR_VERSION > 1) \
     || ((MIX_MAJOR_VERSION == 1) && (MIX_MINOR_VERSION > 2)) \
     || ((MIX_MAJOR_VERSION == 1) && (MIX_MINOR_VERSION == 2) && (MIX_PATCHLEVEL > 9))
-    int sdlFormats = MIX_INIT_OGG;
+    int sdlFormats = MIX_INIT_MP3 | MIX_INIT_MOD;
     if (Mix_Init((sdlFormats & sdlFormats) != sdlFormats)) {
-        qWarning("Unable to load Ogg Vorbis support: %s", Mix_GetError());
+        qWarning("Unable to load MP3 and/or MOD audio formats: %s", Mix_GetError());
         return 1;
     }
 #endif
