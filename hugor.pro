@@ -42,7 +42,7 @@ QMAKE_CFLAGS_WARN_OFF =
     QMAKE_CFLAGS_WARN_ON += -Wno-unused-parameter
 }
 
-INCLUDEPATH += hugo
+INCLUDEPATH += src hugo
 OBJECTS_DIR = obj
 MOC_DIR = tmp
 UI_DIR = tmp
@@ -52,9 +52,11 @@ DEFINES += QT
 RESOURCES += resources.qrc
 
 FORMS += \
+    src/aboutdialog.ui \
     src/confdialog.ui
 
 HEADERS += \
+    src/aboutdialog.h \
     src/confdialog.h \
     src/happlication.h \
     src/hdispitem.h \
@@ -68,6 +70,7 @@ HEADERS += \
     hugo/htokens.h
 
 SOURCES += \
+    src/aboutdialog.cc \
     src/confdialog.cc \
     src/happlication.cc \
     src/heqt.cc \

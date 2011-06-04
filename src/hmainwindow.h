@@ -12,6 +12,7 @@ class HMainWindow: public QMainWindow {
 
   private:
     class ConfDialog* fConfDialog;
+    class AboutDialog* fAboutDialog;
 
   private slots:
     void
@@ -19,6 +20,12 @@ class HMainWindow: public QMainWindow {
 
     void
     fHideConfDialog();
+
+    void
+    fShowAbout();
+
+    void
+    fHideAbout();
 
   protected:
     virtual void

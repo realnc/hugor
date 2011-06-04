@@ -5,6 +5,7 @@
 #include "hmainwindow.h"
 #include "happlication.h"
 #include "confdialog.h"
+#include "aboutdialog.h"
 #include "settings.h"
 
 class HMainWindow* hMainWin = 0;
@@ -12,7 +13,8 @@ class HMainWindow* hMainWin = 0;
 
 HMainWindow::HMainWindow( QWidget* parent )
     : QMainWindow(parent),
-      fConfDialog(0)
+      fConfDialog(0),
+      fAboutDialog(0)
 {
     Q_ASSERT(hMainWin == 0);
 
@@ -33,6 +35,15 @@ HMainWindow::HMainWindow( QWidget* parent )
 #endif
     menu->addAction(act);
     connect(act, SIGNAL(triggered()), SLOT(fShowConfDialog()));
+
+    // "Help" menu.
+    menu = menuBar->addMenu(tr("&Help"));
+    act = new QAction(tr("A&bout Hugor"), this);
+#if QT_VERSION >= 0x040600
+    act->setIcon(QIcon::fromTheme(QString::fromAscii("help-about")));
+#endif
+    menu->addAction(act);
+    connect(act, SIGNAL(triggered()), SLOT(fShowAbout()));
 
     this->setMenuBar(menuBar);
 
@@ -75,6 +86,37 @@ HMainWindow::fHideConfDialog()
     if (this->fConfDialog != 0) {
         this->fConfDialog->deleteLater();
         this->fConfDialog = 0;
+    }
+}
+
+
+void
+HMainWindow::fShowAbout()
+{
+    // If the dialog is already open, simply activate and raise it.
+    if (this->fAboutDialog != 0) {
+        this->fAboutDialog->activateWindow();
+        this->fAboutDialog->raise();
+        return;
+    }
+
+    this->fAboutDialog = new AboutDialog(this);
+    connect(this->fAboutDialog, SIGNAL(finished(int)), SLOT(fHideAbout()));
+#ifdef Q_WS_MAC
+    // Similar bug to the config dialog one.  Again, 4 pixels higher fixes it.
+    this->fAboutDialog->layout()->activate();
+    this->fAboutDialog->setMinimumHeight(this->fAboutDialog->minimumHeight() + 4);
+#endif
+    this->fAboutDialog->show();
+}
+
+
+void
+HMainWindow::fHideAbout()
+{
+    if (this->fAboutDialog != 0) {
+        this->fAboutDialog->deleteLater();
+        this->fAboutDialog = 0;
     }
 }
 
