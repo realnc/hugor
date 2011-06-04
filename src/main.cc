@@ -70,7 +70,7 @@ int main( int argc, char* argv[] )
 
     if (gameFileName.isEmpty() and app->settings()->askForGameFile) {
         gameFileName = QFileDialog::getOpenFileName(0, QObject::tr("Choose the story file you wish to play"),
-                                                    QString::fromAscii(""),
+                                                    app->settings()->lastFileOpenDir,
                                                     QObject::tr("Hugo Games")
                                                     + QString::fromAscii("(*.hex *.Hex *.HEX)"));
     }

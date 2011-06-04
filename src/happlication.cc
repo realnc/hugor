@@ -82,6 +82,9 @@ HApplication::fRunGame()
         QFileInfo finfo(QFileInfo(this->fNextGame).absoluteFilePath());
         this->fNextGame.clear();
 
+        // Remember the directory of the game.
+        this->fSettings->lastFileOpenDir = finfo.absolutePath();
+
         // Change to the game file's directory.
         QDir::setCurrent(finfo.absolutePath());
 
