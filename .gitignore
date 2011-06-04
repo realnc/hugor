@@ -1,0 +1,6 @@
+*.[oa]
+/tmp/
+/obj/
+/Makefile
+/hugor
+/hugor.pro.user*
