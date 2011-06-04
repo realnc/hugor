@@ -201,4 +201,6 @@ HApplication::notifyPreferencesChange( const Settings* sett )
 {
     // Change the text cursor's height according to the new input font's height.
     //qFrame->gameWindow()->setCursorHeight(QFontMetrics(sett->inputFont).height());
+    display_needs_repaint = true;
+    hugo_settextmode();
 }

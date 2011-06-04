@@ -10,6 +10,16 @@ extern class HMainWindow* hMainWin;
 class HMainWindow: public QMainWindow {
     Q_OBJECT
 
+  private:
+    class ConfDialog* fConfDialog;
+
+  private slots:
+    void
+    fShowConfDialog();
+
+    void
+    fHideConfDialog();
+
   protected:
     virtual void
     closeEvent( QCloseEvent* e );

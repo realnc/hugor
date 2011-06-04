@@ -49,27 +49,35 @@ UI_DIR = tmp
 
 DEFINES += QT
 
+FORMS += \
+    src/confdialog.ui
+
 HEADERS += \
-    src/hframe.h \
-    src/hugodefs.h \
+    src/confdialog.h \
     src/happlication.h \
-    src/settings.h \
-    src/hmainwindow.h \
     src/hdispitem.h \
+    src/hframe.h \
+    src/hmainwindow.h \
+    src/hugodefs.h \
+    src/kcolorbutton.h \
+    src/settings.h \
     \
-    hugo/htokens.h \
-    hugo/heheader.h
+    hugo/heheader.h \
+    hugo/htokens.h
 
 SOURCES += \
-    src/main.cc \
-    src/hframe.cc \
-    src/heqt.cc \
+    src/confdialog.cc \
     src/happlication.cc \
-    src/settings.cc \
+    src/heqt.cc \
+    src/hframe.cc \
     src/hmainwindow.cc \
+    src/kcolorbutton.cc \
+    src/main.cc \
+    src/settings.cc \
     \
-    hugo/he.c \
     #hugo/heblank.c \
+    #hugo/iotest.c \
+    hugo/he.c \
     hugo/hebuffer.c \
     hugo/heexpr.c \
     hugo/hemisc.c \
@@ -78,5 +86,4 @@ SOURCES += \
     hugo/heres.c \
     hugo/herun.c \
     hugo/heset.c \
-    #hugo/iotest.c \
     hugo/stringfn.c

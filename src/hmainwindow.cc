@@ -1,20 +1,80 @@
+#include <QMenuBar>
 #include <QMessageBox>
 #include <QCloseEvent>
 
 #include "hmainwindow.h"
 #include "happlication.h"
+#include "confdialog.h"
 
 class HMainWindow* hMainWin = 0;
 
 
 HMainWindow::HMainWindow( QWidget* parent )
-    : QMainWindow(parent)
+    : QMainWindow(parent),
+      fConfDialog(0)
 {
+    Q_ASSERT(hMainWin == 0);
+
+    // We make our menu bar parentless so it will be shared by all our windows
+    // in Mac OS X.
+    QMenuBar* menuBar = new QMenuBar(0);
+
+    QMenu* menu;
+    QAction* act;
+
+    // "Edit" menu.
+    menu = menuBar->addMenu(tr("&Edit"));
+    act = new QAction(tr("&Open") + QString::fromAscii("..."), this);
+    act = new QAction(tr("&Preferences..."), this);
+#if QT_VERSION >= 0x040600
+    act->setIcon(QIcon::fromTheme(QString::fromAscii("configure")));
+    act->setShortcuts(QKeySequence::Preferences);
+#endif
+    menu->addAction(act);
+    connect(act, SIGNAL(triggered()), SLOT(fShowConfDialog()));
+
+    this->setMenuBar(menuBar);
+
     // Use a sane minimum size; by default Qt would allow us to be resized
     // to almost zero.
     this->setMinimumSize(240, 180);
 
     hMainWin = this;
+}
+
+
+void
+HMainWindow::fShowConfDialog()
+{
+    // If the dialog is already open, simply activate and raise it.
+    if (this->fConfDialog != 0) {
+        this->fConfDialog->activateWindow();
+        this->fConfDialog->raise();
+        return;
+    }
+    this->fConfDialog = new ConfDialog(this);
+    this->fConfDialog->setWindowTitle(tr("Hugor Preferences"));
+    connect(this->fConfDialog, SIGNAL(finished(int)), this, SLOT(fHideConfDialog()));
+#ifdef Q_WS_MAC
+    // There's a bug in Qt for OS X that results in a visual glitch with
+    // QFontComboBox widgets inside QFormLayouts.  Making the dialog 4 pixels
+    // higher fixes it.
+    //
+    // See: http://bugreports.qt.nokia.com/browse/QTBUG-10460
+    this->fConfDialog->layout()->activate();
+    this->fConfDialog->setMinimumHeight(this->fConfDialog->minimumHeight() + 4);
+#endif
+    this->fConfDialog->show();
+}
+
+
+void
+HMainWindow::fHideConfDialog()
+{
+    if (this->fConfDialog != 0) {
+        this->fConfDialog->deleteLater();
+        this->fConfDialog = 0;
+    }
 }
 
 
