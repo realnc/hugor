@@ -24,6 +24,40 @@ extern "C" {
 //char* history[HISTORY_SIZE];
 
 
+/* Helper routine. Converts a Hugo color to a Qt color.
+ */
+QColor
+hugoColorToQt( int color )
+{
+    QColor qtColor;
+    switch (color) {
+      case 16:                 qtColor = hApp->settings()->mainTextColor; break;
+      case 17:                 qtColor = hApp->settings()->mainBgColor; break;
+      case 18:                 qtColor = hApp->settings()->statusTextColor; break;
+      case 19:                 qtColor = hApp->settings()->statusBgColor; break;
+      case 20:                 color = fcolor; // Fall-through
+      case HUGO_BLACK:         qtColor.setRgb(0xff000000); break;
+      case HUGO_BLUE:          qtColor.setRgb(0xff00007f); break;
+      case HUGO_GREEN:         qtColor.setRgb(0xff007f00); break;
+      case HUGO_CYAN:          qtColor.setRgb(0xff007f7f); break;
+      case HUGO_RED:           qtColor.setRgb(0xff7f0000); break;
+      case HUGO_MAGENTA:       qtColor.setRgb(0xff7f007f); break;
+      case HUGO_BROWN:         qtColor.setRgb(0xff7f5f00); break;
+      case HUGO_WHITE:         qtColor.setRgb(0xffcfcfcf); break;
+      case HUGO_DARK_GRAY:     qtColor.setRgb(0xff3f3f3f); break;
+      case HUGO_LIGHT_BLUE:    qtColor.setRgb(0xff0000ff); break;
+      case HUGO_LIGHT_GREEN:   qtColor.setRgb(0xff00ff00); break;
+      case HUGO_LIGHT_CYAN:    qtColor.setRgb(0xff00ffff); break;
+      case HUGO_LIGHT_RED:     qtColor.setRgb(0xffff0000); break;
+      case HUGO_LIGHT_MAGENTA: qtColor.setRgb(0xffff00ff); break;
+      case HUGO_YELLOW:        qtColor.setRgb(0xffffff00); break;
+      case HUGO_BRIGHT_WHITE:  qtColor.setRgb(0xffffffff); break;
+      default:                 qtColor.setRgb(0xff000000);
+    }
+    return qtColor;
+}
+
+
 void*
 hugo_blockalloc( long num )
 {

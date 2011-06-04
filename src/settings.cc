@@ -4,6 +4,10 @@
 
 #include "settings.h"
 #include "hmainwindow.h"
+#include "hugodefs.h"
+extern "C" {
+#include "heheader.h"
+}
 
 
 void
@@ -24,10 +28,10 @@ Settings::loadFromDisk()
     sett.endGroup();
 
     sett.beginGroup(QString::fromAscii("colors"));
-    this->mainBgColor = sett.value(QString::fromAscii("mainbg"), QColor(Qt::darkBlue)).value<QColor>();
-    this->mainTextColor = sett.value(QString::fromAscii("maintext"), QColor(Qt::lightGray)).value<QColor>();
-    this->statusBgColor = sett.value(QString::fromAscii("bannerbg"), QColor(Qt::black)).value<QColor>();
-    this->statusTextColor = sett.value(QString::fromAscii("bannertext"), QColor(Qt::white)).value<QColor>();
+    this->mainBgColor = sett.value(QString::fromAscii("mainbg"), hugoColorToQt(DEF_BGCOLOR)).value<QColor>();
+    this->mainTextColor = sett.value(QString::fromAscii("maintext"), hugoColorToQt(DEF_FCOLOR)).value<QColor>();
+    this->statusBgColor = sett.value(QString::fromAscii("bannerbg"), hugoColorToQt(DEF_SLBGCOLOR)).value<QColor>();
+    this->statusTextColor = sett.value(QString::fromAscii("bannertext"), hugoColorToQt(DEF_SLFCOLOR)).value<QColor>();
     sett.endGroup();
 
 #ifdef Q_WS_MAC

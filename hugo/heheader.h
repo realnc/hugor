@@ -71,10 +71,10 @@ extern char *token[];
 #define MAXFILENAME     256
 #define MAXEXT          256
 
-#define DEF_FCOLOR      0
-#define DEF_BGCOLOR     15
+#define DEF_FCOLOR      7
+#define DEF_BGCOLOR     1
 #define DEF_SLFCOLOR	15
-#define DEF_SLBGCOLOR	1
+#define DEF_SLBGCOLOR	0
 
 #define MAXBUFFER 255
 #define MAXUNDO 1024

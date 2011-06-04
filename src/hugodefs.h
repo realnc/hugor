@@ -3,6 +3,7 @@
 
 extern "C" void hugo_stopmusic( void );
 extern "C" void hugo_stopsample( void );
+QColor hugoColorToQt( int color );
 
 // Defined Hugo colors.
 #define HUGO_BLACK         0
