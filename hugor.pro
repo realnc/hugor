@@ -49,6 +49,8 @@ UI_DIR = tmp
 
 DEFINES += QT
 
+RESOURCES += resources.qrc
+
 FORMS += \
     src/confdialog.ui
 

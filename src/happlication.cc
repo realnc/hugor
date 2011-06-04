@@ -50,6 +50,9 @@ HApplication::HApplication( int& argc, char* argv[], const char* appName, const 
     this->fFrameWin->show();
     //this->fGameWin->setFocus();
 
+    // Set application window icon.
+    this->setWindowIcon(QIcon(":/he_32-bit_48x48.png"));
+
     // Automatically quit the application when the last window has closed.
     connect(this, SIGNAL(lastWindowClosed()), this, SLOT(quit()));
 }

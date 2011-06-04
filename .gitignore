@@ -4,3 +4,4 @@
 /Makefile
 /hugor
 /hugor.pro.user*
+qrc_resources.cpp
