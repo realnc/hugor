@@ -52,8 +52,8 @@ int main( int argc, char* argv[] )
     }
     Mix_AllocateChannels(8);
 
-    HApplication* app = new HApplication(argc, argv, "HugoQt", "0.1",
-                                         "Nikos Chantziaras", "HugoQt.net");
+    HApplication* app = new HApplication(argc, argv, "Hugor", "0.1",
+                                         "Nikos Chantziaras", "");
     // Filename of the game to run.
     QString gameFileName;
 

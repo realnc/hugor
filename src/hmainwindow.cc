@@ -26,7 +26,7 @@ HMainWindow::closeEvent( QCloseEvent* e )
     }
 
     QMessageBox* msgBox = new QMessageBox(QMessageBox::Question,
-                                          tr("Quit Hugo"),
+                                          tr("Quit Hugor"),
                                           tr("A game is currently running. Abandon the game and quit the interpreter?"),
                                           QMessageBox::Yes | QMessageBox::Cancel, this);
     msgBox->setDefaultButton(QMessageBox::Cancel);
