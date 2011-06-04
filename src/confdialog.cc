@@ -19,6 +19,9 @@ ConfDialog::ConfDialog( HMainWindow* parent )
     Settings* sett = hApp->settings();
     sett->loadFromDisk();
 
+    ui->miscGroupBox->setEnabled(false);
+    ui->miscGroupBox->hide();
+
 #ifdef Q_WS_MAC
     // On the Mac, make the color selection buttons smaller so that they
     // become square instead of round.

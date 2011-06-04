@@ -74,9 +74,11 @@ int main( int argc, char* argv[] )
                                                     QObject::tr("Hugo Games")
                                                     + QString::fromAscii("(*.hex *.Hex *.HEX)"));
     }
-
-    QMetaObject::invokeMethod(app, "main", Qt::QueuedConnection, Q_ARG(QString, gameFileName));
-    int ret = app->exec();
+    int ret = 0;
+    if (not gameFileName.isNull()) {
+        QMetaObject::invokeMethod(app, "main", Qt::QueuedConnection, Q_ARG(QString, gameFileName));
+        ret = app->exec();
+    }
     delete app;
 
     // Shut down SDL and SDL_mixer.
