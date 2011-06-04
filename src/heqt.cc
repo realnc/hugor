@@ -183,10 +183,13 @@ hugo_getkey( void )
     //qDebug() << "getkey";
     //hFrame->moveCursorPos(QPoint(current_text_x, current_text_y));
     int c = hFrame->getNextKey();
-    if (c == '\0') {
-        c = 13;
+    if (c == 0) {
+        // It's a mouse click.
+        const QPoint& pos = hFrame->getNextClick();
+        display_pointer_x = (pos.x() - physical_windowleft) / FIXEDCHARWIDTH + 1;
+        display_pointer_y = (pos.y() - physical_windowtop) / FIXEDLINEHEIGHT + 1;
+        return 1;
     }
-    buffer[0] = c;
     return c;
 }
 

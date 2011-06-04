@@ -336,6 +336,17 @@ HFrame::singleKeyPressEvent( QKeyEvent* event )
 
 
 void
+HFrame::mousePressEvent( QMouseEvent* e )
+{
+    if (this->fInputMode == NoInput) {
+        this->fKeyQueue.append(0);
+        this->fClickQueue.append(e->pos());
+    }
+    e->accept();
+}
+
+
+void
 HFrame::getInput( char* buf, size_t buflen, int xPos, int yPos )
 {
     this->flushText();
@@ -386,6 +397,14 @@ HFrame::getNextKey()
         return -3;
     }
     return this->fKeyQueue.dequeue();
+}
+
+
+QPoint
+HFrame::getNextClick()
+{
+    Q_ASSERT(not this->fClickQueue.isEmpty());
+    return this->fClickQueue.dequeue();
 }
 
 

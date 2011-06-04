@@ -30,8 +30,12 @@ class HFrame: public QWidget {
     // We have a finished user input.
     bool fInputReady;
 
-    // Keypress input queue.
+    // Keypress input queue. If an element is 0, it means the input was
+    // a mouse click.
     QQueue<char> fKeyQueue;
+
+    // Mouse click input queue.
+    QQueue<QPoint> fClickQueue;
 
     // Input buffer.
     QString fInputBuf;
@@ -114,6 +118,9 @@ class HFrame: public QWidget {
     void
     singleKeyPressEvent( QKeyEvent* event );
 
+    void
+    mousePressEvent( QMouseEvent* e );
+
   signals:
     // Emitted when an input operation has finished successfully.
     void inputReady();
@@ -127,14 +134,17 @@ class HFrame: public QWidget {
 
     // Returns the next character waiting in the queue. If the queue is
     // empty, it will wait for a character to become available.
+    // Note: if this returns 0, it means the next "key" is a mouse click;
+    // call getNextClick() to get the position of the mouse click.
     int
     getNextKey();
 
+    QPoint
+    getNextClick();
+
     bool
     hasKeyInQueue()
-    {
-        return not this->fKeyQueue.isEmpty();
-    }
+    { return not this->fKeyQueue.isEmpty(); }
 
     // Clear a region of the window using the current background color.
     void
