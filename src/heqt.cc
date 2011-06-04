@@ -5,6 +5,7 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QTimer>
+#include <QFileDialog>
 
 #include "happlication.h"
 #include "hmainwindow.h"
@@ -115,32 +116,19 @@ hugo_makepath( char* path, char* drive, char* dir, char* fname, char* ext )
 void
 hugo_getfilename( char* a, char* b )
 {
-    unsigned int i, p;
+    Q_ASSERT(a != 0 and b != 0);
 
-    sprintf(line, "Enter path and filename %s.", a);
-
-    AP(line);
-
-    sprintf(line,"%c(Default is %s): \\;", NO_CONTROLCHAR, b);
-    AP(line);
-
-    p = var[prompt];
-    var[prompt] = 0;        /* null string */
-
-    RunInput();
-
-    var[prompt] = p;
-
-    remaining = 0;
-
-    strcpy(line, "");
-    if (words==0)
-        strcpy(line, b);
-    else
-    {
-        for (i=1; i<=(unsigned int)words; i++)
-            strcat(line, word[i]);
+    QString fname;
+    const QString& filter = QObject::tr("Hugo Saved Games")
+                            + QString::fromAscii(" (*.sav *.Sav *.SAV)");
+    if (QString::fromAscii(a).endsWith("save")) {
+        fname = QFileDialog::getSaveFileName(hMainWin, "Save current game", b, filter);
+    } else {
+        fname = QFileDialog::getOpenFileName(hMainWin, "Restore a saved game", b, filter);
     }
+
+    qstrcpy(line, fname.toLocal8Bit().constData());
+    return;
 }
 
 
@@ -154,21 +142,8 @@ hugo_getfilename( char* a, char* b )
 int
 hugo_overwrite( char* f )
 {
-    FILE *tempfile;
-
-    tempfile = fopen(f, "rb");
-    if (tempfile==NULL)                     /* if file doesn't exist */
-        return true;
-
-    fclose(tempfile);
-
-    sprintf(pbuffer, "Overwrite existing \"%s\" (Y or N)?", f);
-    RunInput();
-
-    if (words==1 && (!strcmp(strupr(word[1]), "Y") || !strcmp(strupr(word[1]), "YES")))
-        return true;
-
-    return false;
+    // We handle the overwrite confirmation in hugo_getfilename().
+    return true;
 }
 
 
