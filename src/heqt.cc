@@ -199,8 +199,10 @@ void
 hugo_getline( char* p )
 {
     hugo_print(p);
+    hFrame->setCursorVisible(true);
     hFrame->moveCursorPos(QPoint(current_text_x, current_text_y));
     hFrame->getInput(buffer, MAXBUFFER, current_text_x, current_text_y);
+    hFrame->setCursorVisible(true);
     hugo_print(const_cast<char*>("\r\n"));
 }
 

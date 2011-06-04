@@ -81,7 +81,7 @@ HFrame::HFrame( QWidget* parent )
 
     connect(this->fBlinkTimer, SIGNAL(timeout()), this, SLOT(fBlinkCursor()));
     this->resetCursorBlinking();
-    this->setCursorVisible(true);
+    //this->setCursorVisible(true);
 
     // Our initial height is the height of the current proportional font.
     this->fHeight = QFontMetrics(hApp->settings()->propFont).height();
