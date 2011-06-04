@@ -14,6 +14,7 @@ extern "C" {
 #include "hframe.h"
 #include "hwindow.h"
 #include "settings.h"
+#include "hugodefs.h"
 
 
 HApplication* hApp = 0;
@@ -203,4 +204,10 @@ HApplication::notifyPreferencesChange( const Settings* sett )
     //qFrame->gameWindow()->setCursorHeight(QFontMetrics(sett->inputFont).height());
     display_needs_repaint = true;
     hugo_settextmode();
+    if (not sett->enableMusic) {
+        hugo_stopmusic();
+    }
+    if (not sett->enableSoundEffects) {
+        hugo_stopsample();
+    }
 }

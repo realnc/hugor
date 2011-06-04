@@ -338,7 +338,9 @@ hugo_init_screen( void )
 int
 hugo_hasgraphics( void )
 {
-    return true;
+    if (hApp->settings()->enableGraphics)
+        return true;
+    return false;
 }
 
 
@@ -760,6 +762,11 @@ hugo_displaypicture( FILE* infile, long len )
 extern "C" int
 hugo_playmusic( HUGO_FILE infile, long reslength, char loop_flag )
 {
+    if (not hApp->settings()->enableMusic) {
+        fclose(infile);
+        return false;
+    }
+
     // We only play one music track at a time, so it's enough
     // to make these static.
     static QFile* file = 0;

@@ -1,6 +1,8 @@
 #ifndef HUGODEFS_H
 #define HUGODEFS_H
 
+extern "C" void hugo_stopmusic( void );
+extern "C" void hugo_stopsample( void );
 
 // Defined Hugo colors.
 #define HUGO_BLACK         0
