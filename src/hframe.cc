@@ -134,7 +134,7 @@ HFrame::resizeEvent( QResizeEvent* e )
     // Create a new pixmap, using the new size and fill it with
     // the default background color.
     this->fPixmap = QPixmap(e->size());
-    this->fPixmap.fill(this->fBgColor);
+    this->fPixmap.fill(hugoColorToQt(this->fBgColor));
 
     // Draw the saved pixmap into the new one.
     QPainter p(&this->fPixmap);
