@@ -1,6 +1,6 @@
 QT += core gui
 TEMPLATE = app
-CONFIG += warn_on
+CONFIG += warn_on silent
 VERSION = 0.1.0.99
 TARGET = hugor
 
