@@ -93,6 +93,13 @@
     </widget>
    </item>
    <item>
+    <widget class="QCheckBox" name="softScrollCheckBox">
+     <property name="text">
+      <string>Soft Text Scrolling</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <layout class="QHBoxLayout" name="horizontalLayout_3">
      <item>
       <widget class="QGroupBox" name="groupBox_2">
@@ -199,7 +206,7 @@
         <item>
          <widget class="QCheckBox" name="smoothScalingCheckBox">
           <property name="text">
-           <string>Use Smooth Image Scaling</string>
+           <string>Use Smooth &amp;Image Scaling</string>
           </property>
          </widget>
         </item>
@@ -214,6 +221,13 @@
          <widget class="QCheckBox" name="allowMusicCheckBox">
           <property name="text">
            <string>Enable &amp;Music</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="pauseSoundCheckBox">
+          <property name="text">
+           <string>Pa&amp;use Sound in Background</string>
           </property>
          </widget>
         </item>

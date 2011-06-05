@@ -18,6 +18,7 @@ class Settings {
     bool enableSoundEffects;
     bool enableMusic;
     bool useSmoothScaling;
+    bool pauseSoundInBackground;
 
     QColor mainTextColor;
     QColor mainBgColor;
@@ -26,6 +27,7 @@ class Settings {
 
     QFont propFont;
     QFont fixedFont;
+    bool softTextScrolling;
 
     bool askForGameFile;
     QString lastFileOpenDir;

@@ -72,7 +72,9 @@ void
 HFrame::fHandleFocusChange( QWidget* old, QWidget* now )
 {
     if (now == 0) {
-        Mix_PauseMusic();
+        if (hApp->settings()->pauseSoundInBackground) {
+            Mix_PauseMusic();
+        }
         // The application window lost focus.  Disable cursor blinking.
         this->fBlinkTimer->stop();
 #ifdef Q_WS_MAC
@@ -87,7 +89,9 @@ HFrame::fHandleFocusChange( QWidget* old, QWidget* now )
         }
 #endif
     } else if (old == 0 and now != 0) {
-        Mix_ResumeMusic();
+        if (hApp->settings()->pauseSoundInBackground) {
+            Mix_ResumeMusic();
+        }
         // The application window gained focus.  Reset cursor blinking.
         this->resetCursorBlinking();
     }
@@ -433,6 +437,10 @@ HFrame::scrollUp( int left, int top, int right, int bottom, int h )
     // Fill exposed region.
     const QRect& r = exp.boundingRect();
     this->clearRegion(r.left(), r.top(), r.left() + r.width(), r.top() + r.bottom());
+
+    if (hApp->settings()->softTextScrolling) {
+        hApp->advanceEventLoop();
+    }
 }
 
 

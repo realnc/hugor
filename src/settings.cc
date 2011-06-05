@@ -25,6 +25,7 @@ Settings::loadFromDisk()
     this->enableMusic = sett.value(QString::fromAscii("music"), false).toBool();
 #endif
     this->useSmoothScaling = sett.value(QString::fromAscii("smoothImageScaling"), true).toBool();
+    this->pauseSoundInBackground = sett.value(QString::fromAscii("pauseSoundInBackground"), true).toBool();
     sett.endGroup();
 
     sett.beginGroup(QString::fromAscii("colors"));
@@ -56,6 +57,7 @@ Settings::loadFromDisk()
     this->propFont.setKerning(true);
     this->fixedFont.fromString(sett.value(QString::fromAscii("fixed"), DEFAULT_MONO).toString());
     this->fixedFont.setKerning(true);
+    this->softTextScrolling = sett.value(QString::fromAscii("softTextScrolling"), true).toBool();
     sett.endGroup();
 
     sett.beginGroup(QString::fromAscii("misc"));
@@ -90,6 +92,7 @@ Settings::saveToDisk()
     sett.setValue(QString::fromAscii("sounds"), this->enableSoundEffects);
     sett.setValue(QString::fromAscii("music"), this->enableMusic);
     sett.setValue(QString::fromAscii("smoothImageScaling"), this->useSmoothScaling);
+    sett.setValue(QString::fromAscii("pauseSoundInBackground"), this->pauseSoundInBackground);
     sett.endGroup();
 
     sett.beginGroup(QString::fromAscii("colors"));
@@ -102,6 +105,7 @@ Settings::saveToDisk()
     sett.beginGroup(QString::fromAscii("fonts"));
     sett.setValue(QString::fromAscii("main"), this->propFont.toString());
     sett.setValue(QString::fromAscii("fixed"), this->fixedFont.toString());
+    sett.setValue(QString::fromAscii("softTextScrolling"), this->softTextScrolling);
     sett.endGroup();
 
     sett.beginGroup(QString::fromAscii("misc"));
