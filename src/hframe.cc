@@ -340,7 +340,6 @@ HFrame::getInput( char* buf, size_t buflen, int xPos, int yPos )
     qstrncpy(buf, this->fInputBuf.toAscii(), buflen);
     //qDebug() << this->fInputBuf;
     this->fInputBuf.clear();
-
 }
 
 
@@ -438,6 +437,8 @@ HFrame::scrollUp( int left, int top, int right, int bottom, int h )
 
     this->flushText();
     QRegion exposed;
+    ++right;
+    ++bottom;
 
 #if QT_VERSION < 0x040600
     // Qt versions prior to 4.6 lack the QPixmap::scroll() routine. For
