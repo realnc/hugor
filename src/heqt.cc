@@ -388,6 +388,7 @@ hugo_clearfullscreen( void )
     hFrame->clearRegion(0, 0, 0, 0);
     currentpos = 0;
     currentline = 1;
+    TB_Clear(0, 0, screenwidth, screenheight);
 }
 
 
@@ -402,6 +403,8 @@ hugo_clearwindow( void )
                         physical_windowright, physical_windowbottom);
     currentpos = 0;
     currentline = 1;
+    TB_Clear(physical_windowleft, physical_windowtop,
+             physical_windowright, physical_windowbottom);
 }
 
 
@@ -612,9 +615,7 @@ hugo_print( char* a )
         current_text_y -= lineheight;
         if (inwindow)
             --lineheight;
-        //tweaking_lineheight = true;
         hugo_scrollwindowup();
-        //tweaking_lineheight = false;
         lineheight = temp_lh;
     }
     hFrame->update();
@@ -626,8 +627,9 @@ hugo_print( char* a )
 void
 hugo_scrollwindowup()
 {
-    int h = hFrame->currentFontMetrics().height();
-    hFrame->scrollUp(physical_windowleft, physical_windowtop, physical_windowright, physical_windowbottom, h);
+    hFrame->scrollUp(physical_windowleft, physical_windowtop,
+                     physical_windowright, physical_windowbottom, lineheight);
+    TB_Scroll();
 }
 
 

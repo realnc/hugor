@@ -135,6 +135,9 @@ class HFrame: public QWidget {
     void
     mousePressEvent( QMouseEvent* e );
 
+    void
+    mouseDoubleClickEvent( QMouseEvent* e );
+
   signals:
     // Emitted when an input operation has finished successfully.
     void inputReady();

@@ -360,6 +360,30 @@ HFrame::mousePressEvent( QMouseEvent* e )
 
 
 void
+HFrame::mouseDoubleClickEvent( QMouseEvent* e )
+{
+    if (this->fInputMode != NormalInput) {
+        return;
+    }
+
+    // Get the word at the double click position.
+    QString word(TB_FindWord(e->x(), e->y()));
+    if (word.isEmpty()) {
+        // No word found.
+        return;
+    }
+
+    // Insert the word at the current command editing position. Append
+    // a space so it won't run together with what the user types next.
+    word.append(' ');
+    this->fInputBuf.insert(this->fInputCurrentChar, word);
+    this->fInputCurrentChar += word.length();
+    this->update();
+    this->updateCursorPos();
+}
+
+
+void
 HFrame::getInput( char* buf, size_t buflen, int xPos, int yPos )
 {
     this->flushText();

@@ -87,7 +87,7 @@ void printFatalError( char* a );
 #define FRONT_END
 #define GRAPHICS_SUPPORTED
 #define SOUND_SUPPORTED
-/*#define USE_TEXTBUFFER*/
+#define USE_TEXTBUFFER
 /*#define SCROLLBACK_DEFINED*/
 
 /*extern void PrintFatalError(char *a);*/
