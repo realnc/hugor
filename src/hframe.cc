@@ -91,9 +91,7 @@ HFrame::fHandleFocusChange( QWidget* old, QWidget* now )
         }
 #endif
     } else if (old == 0 and now != 0) {
-        if (hApp->settings()->muteSoundInBackground) {
-            muteSound(false);
-        }
+        muteSound(false);
         // The application window gained focus.  Reset cursor blinking.
         this->resetCursorBlinking();
     }
