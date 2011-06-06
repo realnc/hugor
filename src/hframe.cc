@@ -358,6 +358,7 @@ HFrame::getNextKey()
     }
 
     // Wait for at least a key to become available.
+    this->update();
     while (this->fKeyQueue.isEmpty() and hApp->gameRunning()) {
         hApp->advanceEventLoop(QEventLoop::WaitForMoreEvents | QEventLoop::AllEvents);
     }
