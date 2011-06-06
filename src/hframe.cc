@@ -447,7 +447,6 @@ HFrame::scrollUp( int left, int top, int right, int bottom, int h )
     QRect dest = scrRect & fPixmap.rect();
     QRect src = dest.translated(0, h) & dest;
     if (src.isEmpty()) {
-        exposed += dest;
         return;
     }
 
