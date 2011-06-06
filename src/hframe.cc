@@ -26,6 +26,8 @@ HFrame::HFrame( QWidget* parent )
       fInputStartX(0),
       fInputStartY(0),
       fInputCurrentChar(0),
+      fMaxHistCap(200),
+      fCurHistIndex(0),
       fFgColor(HUGO_BLACK),
       fBgColor(HUGO_WHITE),
       fUseFixedFont(false),
@@ -177,7 +179,22 @@ HFrame::keyPressEvent( QKeyEvent* e )
 #endif
         this->fInputReady = true;
         this->fInputMode = NoInput;
-        //this->fTadsBuffer->add_hist();
+        // If we're about to overflow the max history cap, delete the
+        // oldest command from the history.
+        if (this->fHistory.size() > this->fMaxHistCap) {
+            this->fHistory.removeFirst();
+        }
+        // If we were editing a recalled command (which means it's
+        // already in the history), just reset the current history
+        // index. Otherwise, if the command is not a duplicate of the
+        // latest one in the history and it's not empty, commit it.
+        if (this->fCurHistIndex > 0) {
+            this->fCurHistIndex = 0;
+        } else if (this->fHistory.isEmpty() or (this->fInputBuf != this->fHistory.last()
+                   and not this->fInputBuf.isEmpty()))
+        {
+            this->fHistory.append(this->fInputBuf);
+        }
         emit inputReady();
         return;
     } else if (e->matches(QKeySequence::Delete)) {
@@ -203,9 +220,37 @@ HFrame::keyPressEvent( QKeyEvent* e )
     } else if (e->matches(QKeySequence::MoveToNextWord)) {
         //this->fTadsBuffer->move_right(false, true);
     } else if (e->matches(QKeySequence::MoveToPreviousLine)) {
-        //this->fTadsBuffer->select_prev_hist();
+        // If we're already at the oldest command in the history, or
+        // the history list is empty, don't do anything.
+        if (this->fCurHistIndex == this->fHistory.size() or this->fHistory.isEmpty()) {
+            return;
+        }
+        // If the current command is new and not in the history yet,
+        // remember it so we can bring it back if the user recalls it.
+        if (this->fCurHistIndex == 0) {
+            this->fInputBufBackup = this->fInputBuf;
+        }
+        // Recall the previous command from the history.
+        this->fInputBuf = this->fHistory[this->fHistory.size() - 1 - this->fCurHistIndex];
+        ++this->fCurHistIndex;
+        this->fInputCurrentChar = this->fInputBuf.length();
     } else if (e->matches(QKeySequence::MoveToNextLine)) {
-        //this->fTadsBuffer->select_next_hist();
+        // If we're at the latest command, don't do anything.
+        if (this->fCurHistIndex == 0) {
+            return;
+        }
+        --this->fCurHistIndex;
+        // If the next command is the latest one, it means it's current
+        // new command we backed up previously. So restore it. If not,
+        // recall the next command from the history.
+        if (this->fCurHistIndex == 0) {
+            this->fInputBuf = this->fInputBufBackup;
+            this->fInputBufBackup.clear();
+        } else {
+            this->fInputBuf = this->fHistory[this->fHistory.size() - this->fCurHistIndex];
+            this->fInputCurrentChar = this->fInputBuf.length();
+        }
+        this->fInputCurrentChar = this->fInputBuf.length();
     } else if (e->matches(QKeySequence::SelectPreviousChar)) {
         //this->fTadsBuffer->move_left(true, false);
     } else if (e->matches(QKeySequence::SelectNextChar)) {

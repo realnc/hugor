@@ -48,6 +48,20 @@ class HFrame: public QWidget {
     // current input buffer string.
     int fInputCurrentChar;
 
+    // Command history buffer.
+    QList<QString> fHistory;
+
+    // Maximum history capacity.
+    int fMaxHistCap;
+
+    // Current command index in the history. 0 is the most recent one.
+    int fCurHistIndex;
+
+    // Backup of the current, yet to be committed to history, input line.
+    // We need this to back up the current input when the user recalls a
+    // previous command from the history.
+    QString fInputBufBackup;
+
     // Current colors.
     int fFgColor;
     int fBgColor;
