@@ -860,19 +860,90 @@ hugo_stopmusic( void )
 }
 
 extern "C" int
-hugo_playsample( HUGO_FILE infile, long /*reslength*/, char /*loop_flag*/ )
+hugo_playsample( HUGO_FILE infile, long reslength, char loop_flag )
 {
+    if (not hApp->settings()->enableSoundEffects) {
+        fclose(infile);
+        return false;
+    }
+
+    // We only play one sample at a time, so it's enough to make these
+    // static.
+    static QFile* file = 0;
+    static Mix_Chunk* chunk = 0;
+
+    // Any currently playing sample should be stopped before playing
+    // a new one.
+    Mix_HaltChannel(-1);
+
+    // If a file already exists from a previous call, delete it first.
+    if (file != 0) {
+        delete file;
+        file = 0;
+    }
+
+    // Open 'infile' as a QFile.
+    file = new QFile;
+    if (not file->open(infile, QIODevice::ReadOnly)) {
+        qWarning() << "ERROR: Can't open sample sound file";
+        file->close();
+        fclose(infile);
+        return false;
+    }
+
+    // Map the data into memory and create an RWops from that data.
+    SDL_RWops* rwops = SDL_RWFromConstMem(file->map(ftell(infile), reslength), reslength);
+    // Done with the file.
+    file->close();
     fclose(infile);
-    return true;    /* not an error */
+    if (rwops == 0) {
+        qWarning() << "ERROR:" << SDL_GetError();
+        return false;
+    }
+
+    // If a Mix_Chunk* already exists from a previous call, delete it first.
+    if (chunk != 0) {
+        Mix_FreeChunk(chunk);
+        chunk = 0;
+    }
+
+    // Create a Mix_Chunk* from the RWops. Tell Mix_LoadWAV_RW() to take
+    // ownership of the RWops so it will free it as necessary.
+    chunk = Mix_LoadWAV_RW(rwops, true);
+    if (chunk == 0) {
+        qWarning() << "ERROR:" << Mix_GetError();
+        return false;
+    }
+
+    // Start playing the sample. Loop forever if 'loop_flag' is true.
+    // Otherwise, just play it once.
+    if (Mix_PlayChannel(-1, chunk, loop_flag ? -1 : 0) < 0) {
+        qWarning() << "ERROR:" << Mix_GetError();
+        Mix_FreeChunk(chunk);
+        return false;
+    }
+    return true;
 }
 
 extern "C" void
 hugo_samplevolume( int vol )
-{ }
+{
+    if (vol < 0)
+        vol = 0;
+    else if (vol > 100)
+        vol = 100;
+
+    // Convert the Hugo volume range [0..100] to the SDL volume
+    // range [0..MIX_MAX_VOLUME].
+    vol = (vol * MIX_MAX_VOLUME) / 100;
+    Mix_Volume(-1, vol);
+}
 
 extern "C" void
 hugo_stopsample( void )
-{ }
+{
+    Mix_HaltChannel(-1);
+}
 
 
 #if !defined (COMPILE_V25)
