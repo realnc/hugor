@@ -1,6 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>he_32-bit_48x48.png</file>
-        <file>hugologo.bmp</file>
+        <file>hugologo.png</file>
     </qresource>
 </RCC>
