@@ -432,13 +432,43 @@ HFrame::printImage( const QImage& img, int x, int y )
 void
 HFrame::scrollUp( int left, int top, int right, int bottom, int h )
 {
-    this->flushText();
-    QRegion exp;
-    this->fPixmap.scroll(0, -h, left, top, right - left, bottom - top, &exp);
-    // Fill exposed region.
-    const QRect& r = exp.boundingRect();
-    this->clearRegion(r.left(), r.top(), r.left() + r.width(), r.top() + r.bottom());
+    if (h == 0) {
+        return;
+    }
 
+    this->flushText();
+    QRegion exposed;
+
+#if QT_VERSION < 0x040600
+    // Qt versions prior to 4.6 lack the QPixmap::scroll() routine. For
+    // those versions we implement a (slower) fallback, where we simply
+    // paint the contents from source to destination.
+    QRect scrRect(left, top, right - left, bottom - top);
+    QRect dest = scrRect & fPixmap.rect();
+    QRect src = dest.translated(0, h) & dest;
+    if (src.isEmpty()) {
+        exposed += dest;
+        return;
+    }
+
+    //this->fPixmap.detach();
+    QPixmap pix = this->fPixmap;
+    QPainter p(&pix);
+    p.setCompositionMode(QPainter::CompositionMode_Source);
+    p.drawPixmap(src.translated(0, -h), this->fPixmap, src);
+    p.end();
+    this->fPixmap = pix;
+
+    exposed += dest;
+    exposed -= src.translated(0, -h);
+#else
+    // Qt 4.6 and newer have scroll(), which is fast and nice.
+    this->fPixmap.scroll(0, -h, left, top, right - left, bottom - top, &exposed);
+#endif
+
+    // Fill exposed region.
+    const QRect& r = exposed.boundingRect();
+    this->clearRegion(r.left(), r.top(), r.left() + r.width(), r.top() + r.bottom());
     if (hApp->settings()->softTextScrolling) {
         hApp->advanceEventLoop();
     }
