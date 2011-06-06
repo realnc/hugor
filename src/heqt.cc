@@ -24,6 +24,12 @@ extern "C" {
 //char* history[HISTORY_SIZE];
 
 
+// Current music and sample volumes. Needed to restore the volumes
+// after muting them.
+int currentMusicVol = MIX_MAX_VOLUME;
+int currentSampleVol = MIX_MAX_VOLUME;
+
+
 /* Helper routine. Converts a Hugo color to a Qt color.
  */
 QColor
@@ -851,6 +857,7 @@ hugo_musicvolume( int vol )
     // range [0..MIX_MAX_VOLUME].
     vol = (vol * MIX_MAX_VOLUME) / 100;
     Mix_VolumeMusic(vol);
+    currentMusicVol = vol;
 }
 
 extern "C" void
@@ -858,6 +865,20 @@ hugo_stopmusic( void )
 {
     Mix_HaltMusic();
 }
+
+
+void
+muteSound( bool mute )
+{
+    if (mute) {
+        Mix_VolumeMusic(0);
+        Mix_Volume(-1, 0);
+    } else {
+        Mix_VolumeMusic(currentMusicVol);
+        Mix_Volume(-1, currentSampleVol);
+    }
+}
+
 
 extern "C" int
 hugo_playsample( HUGO_FILE infile, long reslength, char loop_flag )
@@ -937,6 +958,7 @@ hugo_samplevolume( int vol )
     // range [0..MIX_MAX_VOLUME].
     vol = (vol * MIX_MAX_VOLUME) / 100;
     Mix_Volume(-1, vol);
+    currentSampleVol = vol;
 }
 
 extern "C" void

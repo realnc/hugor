@@ -225,9 +225,9 @@
          </widget>
         </item>
         <item>
-         <widget class="QCheckBox" name="pauseSoundCheckBox">
+         <widget class="QCheckBox" name="muteSoundCheckBox">
           <property name="text">
-           <string>Pa&amp;use Sound in Background</string>
+           <string>M&amp;ute Sound in Background</string>
           </property>
          </widget>
         </item>

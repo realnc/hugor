@@ -36,7 +36,7 @@ ConfDialog::ConfDialog( HMainWindow* parent )
     ui->allowSoundEffectsCheckBox->setChecked(sett->enableSoundEffects);
     ui->allowMusicCheckBox->setChecked(sett->enableMusic);
     ui->smoothScalingCheckBox->setChecked(sett->useSmoothScaling);
-    ui->pauseSoundCheckBox->setChecked(sett->pauseSoundInBackground);
+    ui->muteSoundCheckBox->setChecked(sett->muteSoundInBackground);
 
     ui->mainBgColorButton->setColor(sett->mainBgColor);
     ui->mainTextColorButton->setColor(sett->mainTextColor);
@@ -107,7 +107,7 @@ ConfDialog::fMakeInstantApply()
     connect(ui->allowSoundEffectsCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
     connect(ui->allowMusicCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
     connect(ui->smoothScalingCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
-    connect(ui->pauseSoundCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
+    connect(ui->muteSoundCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
     connect(ui->mainTextColorButton, SIGNAL(changed(QColor)), this, SLOT(fApplySettings()));
     connect(ui->mainBgColorButton, SIGNAL(changed(QColor)), this, SLOT(fApplySettings()));
     connect(ui->bannerTextColorButton, SIGNAL(changed(QColor)), this, SLOT(fApplySettings()));
@@ -125,7 +125,7 @@ ConfDialog::fApplySettings()
     sett->enableSoundEffects = ui->allowSoundEffectsCheckBox->isChecked();
     sett->enableMusic = ui->allowMusicCheckBox->isChecked();
     sett->useSmoothScaling = ui->smoothScalingCheckBox->isChecked();
-    sett->pauseSoundInBackground = ui->pauseSoundCheckBox->isChecked();
+    sett->muteSoundInBackground = ui->muteSoundCheckBox->isChecked();
     sett->mainBgColor = ui->mainBgColorButton->color();
     sett->mainTextColor = ui->mainTextColorButton->color();
     sett->statusBgColor = ui->bannerBgColorButton->color();
