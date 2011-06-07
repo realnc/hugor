@@ -408,6 +408,19 @@ hugo_clearwindow( void )
 }
 
 
+void
+calcFontDimensions()
+{
+    const QFontMetrics& curMetr = hFrame->currentFontMetrics();
+    const QFontMetrics fixedMetr(hApp->settings()->fixedFont);
+
+    FIXEDCHARWIDTH = fixedMetr.averageCharWidth();
+    FIXEDLINEHEIGHT = fixedMetr.height();
+
+    charwidth = curMetr.averageCharWidth();
+    lineheight = curMetr.height();
+}
+
 /* This function does whatever is necessary to set the system up for
    a standard text display */
 
@@ -442,15 +455,7 @@ hugo_clearwindow( void )
 void
 hugo_settextmode( void )
 {
-    const QFontMetrics& curMetr = hFrame->currentFontMetrics();
-    const QFontMetrics fixedMetr(hApp->settings()->fixedFont);
-
-    FIXEDCHARWIDTH = fixedMetr.averageCharWidth();
-    FIXEDLINEHEIGHT = fixedMetr.height();
-
-    charwidth = curMetr.averageCharWidth();
-    lineheight = curMetr.height();
-
+    calcFontDimensions();
     SCREENWIDTH = hFrame->width();
     SCREENHEIGHT = hFrame->height();
 

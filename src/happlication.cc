@@ -209,6 +209,9 @@ HApplication::main( QString gameFileName )
 void
 HApplication::notifyPreferencesChange( const Settings* sett )
 {
+    // Recalculate font dimensions, in case font settings have changed.
+    calcFontDimensions();
+
     // Change the text cursor's height according to the new input font's height.
     //qFrame->gameWindow()->setCursorHeight(QFontMetrics(sett->inputFont).height());
     display_needs_repaint = true;
