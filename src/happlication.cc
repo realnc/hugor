@@ -23,7 +23,10 @@ HApplication* hApp = 0;
 
 HApplication::HApplication( int& argc, char* argv[], const char* appName, const char* appVersion,
                                   const char* orgName, const char* orgDomain )
-: QApplication(argc, argv), fFrameWin(0), fGameRunning(false)
+    : QApplication(argc, argv),
+      fFrameWin(0),
+      fGameRunning(false),
+      fHugoCodec(QTextCodec::codecForName("Windows-1252"))
 {
     //qDebug() << Q_FUNC_INFO;
     Q_ASSERT(hApp == 0);

@@ -29,6 +29,9 @@ class HApplication: public QApplication {
     // The game we should try to run after the current one ends.
     QString fNextGame;
 
+    // Text codec used by the Hugo engine.
+    QTextCodec* fHugoCodec;
+
     // Run the game file contained in fNextGame.
     void
     fRunGame();
@@ -155,6 +158,11 @@ class HApplication: public QApplication {
         this->sendPostedEvents();
         working = false;
     }
+
+    // Text codec used by Hugo.
+    QTextCodec*
+    hugoCodec()
+    { return this->fHugoCodec; }
 };
 
 

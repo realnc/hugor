@@ -194,7 +194,7 @@ class HFrame: public QWidget {
     // The Text is might not be printed immediately; call flushText()
     // to flush the accumulated text to the screen.
     void
-    printText( const char* str, int x, int y );
+    printText( const QString& str, int x, int y );
 
     // Print an image to the screen. The image is printed immediately
     // (no buffering is performed.)

@@ -6,6 +6,7 @@
 #include <QFileInfo>
 #include <QTimer>
 #include <QFileDialog>
+#include <QTextCodec>
 
 #include "happlication.h"
 #include "hmainwindow.h"
@@ -565,7 +566,7 @@ hugo_print( char* a )
 {
     //const QFontMetrics& m = hFrame->currentFontMetrics();
     uint len = qstrlen(a);
-    QByteArray ac;
+    QString ac;
 
     for (uint i = 0; i < len; ++i) {
         // If we've passed the bottom of the window, align to the bottom edge.
@@ -600,7 +601,7 @@ hugo_print( char* a )
             break;
 
           default: {
-            ac += a[i];
+            ac += hApp->hugoCodec()->toUnicode(a + i, 1);
             //hFrame->printText(QString(QChar(a[i])).toAscii().constData(), current_text_x, current_text_y);
             //hFrame->flushText();
             //current_text_x += hugo_charwidth(a[i]);
@@ -608,8 +609,8 @@ hugo_print( char* a )
         }
     }
 
-    hFrame->printText(ac.constData(), current_text_x, current_text_y);
-    current_text_x += hFrame->currentFontMetrics().width(QString::fromAscii(ac.constData()));
+    hFrame->printText(ac, current_text_x, current_text_y);
+    current_text_x += hFrame->currentFontMetrics().width(ac);
     //qDebug() << printBuf;
 
     // Check again after printing.
@@ -699,7 +700,7 @@ int
 hugo_textwidth( char* a )
 {
     size_t slen = qstrlen(a);
-    QByteArray str;
+    QString str;
 
     // Construct a string that contains only printable characters.
     for (size_t i = 0; i < slen; ++i) {
@@ -708,9 +709,9 @@ hugo_textwidth( char* a )
         else if (a[i] == FONT_CHANGE)
                 ++i;
         else
-            str += a[i];
+            str += hApp->hugoCodec()->toUnicode(a + i, 1);
     }
-    return hFrame->currentFontMetrics().width(QString::fromAscii(str));
+    return hFrame->currentFontMetrics().width(str);
 }
 
 

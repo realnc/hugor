@@ -494,13 +494,13 @@ HFrame::setFontType( int hugoFont )
 
 
 void
-HFrame::printText( const char* str, int x, int y )
+HFrame::printText( const QString& str, int x, int y )
 {
     if (this->fPrintBuffer.isEmpty()) {
         this->fFlushXPos = x;
         this->fFlushYPos = y;
     }
-    this->fPrintBuffer += QString::fromAscii(str);
+    this->fPrintBuffer += str;
 }
 
 
