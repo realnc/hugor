@@ -28,7 +28,6 @@ HMainWindow::HMainWindow( QWidget* parent )
 
     // "Edit" menu.
     menu = menuBar->addMenu(tr("&Edit"));
-    act = new QAction(tr("&Open") + QString::fromAscii("..."), this);
     act = new QAction(tr("&Preferences..."), this);
 #if QT_VERSION >= 0x040600
     act->setIcon(QIcon::fromTheme(QString::fromAscii("configure")));
