@@ -179,11 +179,6 @@ HFrame::keyPressEvent( QKeyEvent* e )
 #endif
         this->fInputReady = true;
         this->fInputMode = NoInput;
-        // If we're about to overflow the max history cap, delete the
-        // oldest command from the history.
-        if (this->fHistory.size() > this->fMaxHistCap) {
-            this->fHistory.removeFirst();
-        }
         // The current command only needs to be appended to the history
         // if one of the following is true (in that order):
         //
@@ -208,7 +203,12 @@ HFrame::keyPressEvent( QKeyEvent* e )
                                                              - this->fCurHistIndex))
                 or (this->fHistory.isEmpty() and not this->fInputBuf.isEmpty()))
         {
-                this->fHistory.append(this->fInputBuf);
+            this->fHistory.append(this->fInputBuf);
+            // If we're about to overflow the max history cap, delete the
+            // oldest command from the history.
+            if (this->fHistory.size() > 3) {
+                this->fHistory.removeFirst();
+            }
         }
         this->fCurHistIndex = 0;
         emit inputReady();
