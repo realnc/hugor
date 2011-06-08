@@ -206,7 +206,7 @@ HFrame::keyPressEvent( QKeyEvent* e )
             this->fHistory.append(this->fInputBuf);
             // If we're about to overflow the max history cap, delete the
             // oldest command from the history.
-            if (this->fHistory.size() > 3) {
+            if (this->fHistory.size() > this->fMaxHistCap) {
                 this->fHistory.removeFirst();
             }
         }
