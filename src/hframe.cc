@@ -184,17 +184,33 @@ HFrame::keyPressEvent( QKeyEvent* e )
         if (this->fHistory.size() > this->fMaxHistCap) {
             this->fHistory.removeFirst();
         }
-        // If we were editing a recalled command (which means it's
-        // already in the history), just reset the current history
-        // index. Otherwise, if the command is not a duplicate of the
-        // latest one in the history and it's not empty, commit it.
-        if (this->fCurHistIndex > 0) {
-            this->fCurHistIndex = 0;
-        } else if (this->fHistory.isEmpty() or (this->fInputBuf != this->fHistory.last()
-                   and not this->fInputBuf.isEmpty()))
+        // The current command only needs to be appended to the history
+        // if one of the following is true (in that order):
+        //
+        //  * We are not currently editing a previous command recalled
+        //    from history and the command is not empty and is not equal
+        //    to the previous command in the history.
+        //
+        //  * We are currently editing a previous command but have
+        //    modified it.
+        //
+        //  * The history is empty and the current command is not empty.
+        //
+        // This gotta be the most awkward if-statement ever. :-P
+        if (
+                (this->fCurHistIndex == 0
+                 and not this->fInputBuf.isEmpty()
+                 and (not this->fHistory.isEmpty()
+                      and this->fInputBuf != this->fHistory.last()))
+
+                or (this->fCurHistIndex > 0
+                    and this->fInputBuf != this->fHistory.at(this->fHistory.size()
+                                                             - this->fCurHistIndex))
+                or (this->fHistory.isEmpty() and not this->fInputBuf.isEmpty()))
         {
-            this->fHistory.append(this->fInputBuf);
+                this->fHistory.append(this->fInputBuf);
         }
+        this->fCurHistIndex = 0;
         emit inputReady();
         return;
     } else if (e->matches(QKeySequence::Delete)) {
