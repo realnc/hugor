@@ -1,4 +1,3 @@
-#include <SDL_mixer.h>
 #include <QDebug>
 #include <QHBoxLayout>
 #include <QKeyEvent>

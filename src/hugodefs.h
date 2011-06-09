@@ -1,9 +1,16 @@
 #ifndef HUGODEFS_H
 #define HUGODEFS_H
 
+#ifdef SOUND_FMOD
+#include <fmod.hpp>
+extern FMOD::System* fmSystem;
+#endif
+
 extern "C" void hugo_stopmusic( void );
 extern "C" void hugo_stopsample( void );
 QColor hugoColorToQt( int color );
+void initSoundEngine();
+void closeSoundEngine();
 void muteSound( bool mute );
 void calcFontDimensions();
 
