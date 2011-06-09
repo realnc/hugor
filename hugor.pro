@@ -5,7 +5,7 @@ VERSION = 0.1.0.99
 TARGET = hugor
 
 !sound_sdl:!sound_fmod {
-    #error("Use CONFIG+=sound_sdl or CONFIG+=sound_fmod to select a sound engine")
+    error("Use CONFIG+=sound_sdl or CONFIG+=sound_fmod to select a sound engine")
 }
 sound_sdl {
     DEFINES += SOUND_SDL
