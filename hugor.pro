@@ -54,7 +54,7 @@ macx {
 }
 win32 {
     sound_sdl {
-        LIBS += -lvorbisfile -lvorbis -logg
+        LIBS += -lmad -lmikmod
     }
     TARGET = Hugor
 }
