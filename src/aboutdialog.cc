@@ -17,6 +17,12 @@ AboutDialog::AboutDialog( QWidget* parent )
     QString str("<p>Hugo engine v");
     str += QString::number(HEVERSION) + "." + QString::number(HEREVISION)
            + HEINTERIM + "</p>";
+
+    // FMOD license requirement.
+#ifdef SOUND_FMOD
+    str += "<p>Audio engine: FMOD Sound System by Firelight Technologies</p>";
+#endif
+
     ui->label->setText(ui->label->text() + str);
 }
 
