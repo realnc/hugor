@@ -5,6 +5,7 @@
 #include <QTimer>
 #include <QFileDialog>
 #include <QTextCodec>
+#include <QMessageBox>
 
 #include "happlication.h"
 #include "hmainwindow.h"
@@ -152,14 +153,37 @@ hugo_getfilename( char* a, char* b )
     Q_ASSERT(a != 0 and b != 0);
 
     QString fname;
-    const QString& filter = QObject::tr("Hugo Saved Games")
-                            + QString::fromAscii(" (*.sav *.Sav *.SAV)");
-    if (QString::fromAscii(a).endsWith("save")) {
-        fname = QFileDialog::getSaveFileName(hMainWin, "Save current game", b, filter);
-    } else {
-        fname = QFileDialog::getOpenFileName(hMainWin, "Restore a saved game", b, filter);
+    QString filter;
+    // Fallback message in case we won't recognize the 'a' string.
+    QString caption("Select a file");
+    // Assume save mode. We do this in order to get a confirmation dialog
+    // on existing files, in case we won't recognize the 'a' string.
+    bool saveMode = true;
+
+    if (QString::fromAscii(a).endsWith("to save")) {
+        filter = QObject::tr("Hugo Saved Games") + QString::fromAscii(" (*.sav)");
+        caption = "Save current game position";
+    } else if (QString::fromAscii(a).endsWith("to restore")) {
+        filter = QObject::tr("Hugo Saved Games") + QString::fromAscii(" (*.sav *.Sav *.SAV)");
+        caption = "Restore a saved game position";
+        saveMode = false;
+    } else if (QString::fromAscii(a).endsWith("for command recording")) {
+        filter = QObject::tr("Hugo recording files") + QString::fromAscii(" (*.rec)");
+        caption = "Record commands to a file";
+    } else if (QString::fromAscii(a).endsWith("for command playback")) {
+        filter = QObject::tr("Hugo recording files") + QString::fromAscii(" (*.rec *.Rec *.REC)");
+        caption = "Play recorded commands from a file";
+        saveMode = false;
+    } else if (QString::fromAscii(a).endsWith("transcription (or printer name)")) {
+        filter = QObject::tr("Transcription files") + QString::fromAscii(" (*.txt)");
+        caption = "Save transcript to a file";
     }
 
+    if (saveMode) {
+        fname = QFileDialog::getSaveFileName(hMainWin, caption, b, filter);
+    } else {
+        fname = QFileDialog::getOpenFileName(hMainWin, caption, b, filter);
+    }
     qstrcpy(line, fname.toLocal8Bit().constData());
     return;
 }
@@ -175,7 +199,7 @@ hugo_getfilename( char* a, char* b )
 int
 hugo_overwrite( char* f )
 {
-    // We handle the overwrite confirmation in hugo_getfilename().
+    // We handle this in hugo_getfilename().
     return true;
 }
 
