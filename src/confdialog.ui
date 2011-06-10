@@ -93,11 +93,22 @@
     </widget>
    </item>
    <item>
-    <widget class="QCheckBox" name="softScrollCheckBox">
-     <property name="text">
-      <string>Soft Text Scrolling</string>
-     </property>
-    </widget>
+    <layout class="QHBoxLayout" name="horizontalLayout_5">
+     <item>
+      <widget class="QCheckBox" name="softScrollCheckBox">
+       <property name="text">
+        <string>Soft Text Scrolling</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="smartFormattingCheckBox">
+       <property name="text">
+        <string>Smart Formatting</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_3">

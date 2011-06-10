@@ -58,6 +58,7 @@ Settings::loadFromDisk()
     this->fixedFont.fromString(sett.value(QString::fromAscii("fixed"), DEFAULT_MONO).toString());
     this->fixedFont.setKerning(true);
     this->softTextScrolling = sett.value(QString::fromAscii("softTextScrolling"), true).toBool();
+    this->smartFormatting = sett.value(QString::fromAscii("smartFormatting"), true).toBool();
     sett.endGroup();
 
     sett.beginGroup(QString::fromAscii("misc"));
@@ -106,6 +107,7 @@ Settings::saveToDisk()
     sett.setValue(QString::fromAscii("main"), this->propFont.toString());
     sett.setValue(QString::fromAscii("fixed"), this->fixedFont.toString());
     sett.setValue(QString::fromAscii("softTextScrolling"), this->softTextScrolling);
+    sett.setValue(QString::fromAscii("smartFormatting"), this->smartFormatting);
     sett.endGroup();
 
     sett.beginGroup(QString::fromAscii("misc"));

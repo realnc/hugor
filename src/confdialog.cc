@@ -48,6 +48,7 @@ ConfDialog::ConfDialog( HMainWindow* parent )
     ui->mainFontBox->setCurrentFont(sett->propFont);
     ui->fixedFontBox->setCurrentFont(sett->fixedFont);
     ui->softScrollCheckBox->setChecked(sett->softTextScrolling);
+    ui->smartFormattingCheckBox->setChecked(sett->smartFormatting);
 
     ui->askForGameFileCheckBox->setChecked(sett->askForGameFile);
 
@@ -103,6 +104,7 @@ ConfDialog::fMakeInstantApply()
     connect(ui->mainFontSizeSpinBox, SIGNAL(valueChanged(int)), this, SLOT(fApplySettings()));
     connect(ui->fixedFontSizeSpinBox, SIGNAL(valueChanged(int)), this, SLOT(fApplySettings()));
     connect(ui->softScrollCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
+    connect(ui->smartFormattingCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
     connect(ui->allowGraphicsCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
     connect(ui->allowSoundEffectsCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
     connect(ui->allowMusicCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
@@ -135,6 +137,7 @@ ConfDialog::fApplySettings()
     sett->propFont.setPointSize(ui->mainFontSizeSpinBox->value());
     sett->fixedFont.setPointSize(ui->fixedFontSizeSpinBox->value());
     sett->softTextScrolling = ui->softScrollCheckBox->isChecked();
+    sett->smartFormatting = ui->smartFormattingCheckBox->isChecked();
     sett->askForGameFile = ui->askForGameFileCheckBox->isChecked();
 
     // Notify the application that preferences have changed.

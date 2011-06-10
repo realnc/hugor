@@ -40,6 +40,9 @@ HApplication::HApplication( int& argc, char* argv[], const char* appName, const 
     this->fSettings = new Settings;
     this->fSettings->loadFromDisk();
 
+    // Apply the smart formatting setting.
+    smartformatting = this->fSettings->smartFormatting;
+
     // Set our global pointer.
     hApp = this;
 
@@ -212,6 +215,8 @@ HApplication::main( QString gameFileName )
 void
 HApplication::notifyPreferencesChange( const Settings* sett )
 {
+    smartformatting = sett->smartFormatting;
+
     // Recalculate font dimensions, in case font settings have changed.
     calcFontDimensions();
 

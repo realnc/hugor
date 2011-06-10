@@ -28,6 +28,7 @@ class Settings {
     QFont propFont;
     QFont fixedFont;
     bool softTextScrolling;
+    bool smartFormatting;
 
     bool askForGameFile;
     QString lastFileOpenDir;
