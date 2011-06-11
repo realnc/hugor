@@ -178,29 +178,12 @@ HFrame::keyPressEvent( QKeyEvent* e )
 #endif
         this->fInputReady = true;
         this->fInputMode = NoInput;
-        // The current command only needs to be appended to the history
-        // if one of the following is true (in that order):
-        //
-        //  * We are not currently editing a previous command recalled
-        //    from history and the command is not empty and is not equal
-        //    to the previous command in the history.
-        //
-        //  * We are currently editing a previous command but have
-        //    modified it.
-        //
-        //  * The history is empty and the current command is not empty.
-        //
-        // This gotta be the most awkward if-statement ever. :-P
-        if (
-                (this->fCurHistIndex == 0
-                 and not this->fInputBuf.isEmpty()
-                 and (not this->fHistory.isEmpty()
-                      and this->fInputBuf != this->fHistory.last()))
-
-                or (this->fCurHistIndex > 0
-                    and this->fInputBuf != this->fHistory.at(this->fHistory.size()
-                                                             - this->fCurHistIndex))
-                or (this->fHistory.isEmpty() and not this->fInputBuf.isEmpty()))
+        // The current command only needs to be appended to the history if
+        // it's not empty and differs from the previous command in the history.
+        if ((this->fHistory.isEmpty() and not this->fInputBuf.isEmpty())
+            or (not this->fHistory.isEmpty()
+                and not this->fInputBuf.isEmpty()
+                and this->fInputBuf != this->fHistory.last()))
         {
             this->fHistory.append(this->fInputBuf);
             // If we're about to overflow the max history cap, delete the
