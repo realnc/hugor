@@ -53,10 +53,15 @@ Settings::loadFromDisk()
 #endif
 #endif
     sett.beginGroup(QString::fromAscii("fonts"));
-    this->propFont.fromString(sett.value(QString::fromAscii("main"), DEFAULT_PROP).toString());
-    this->propFont.setKerning(true);
-    this->fixedFont.fromString(sett.value(QString::fromAscii("fixed"), DEFAULT_MONO).toString());
-    this->fixedFont.setKerning(true);
+    this->propFont.setStyleStrategy(QFont::StyleStrategy(QFont::PreferOutline | QFont::PreferQuality));
+    QFont tmp;
+    tmp.fromString(sett.value(QString::fromAscii("main"), DEFAULT_PROP).toString());
+    this->propFont.setFamily(tmp.family());
+    this->propFont.setPointSize(tmp.pointSize());
+    this->fixedFont.setStyleStrategy(QFont::StyleStrategy(QFont::PreferOutline | QFont::PreferQuality));
+    tmp.fromString(sett.value(QString::fromAscii("fixed"), DEFAULT_MONO).toString());
+    this->fixedFont.setFamily(tmp.family());
+    this->fixedFont.setPointSize(tmp.pointSize());
     this->softTextScrolling = sett.value(QString::fromAscii("softTextScrolling"), true).toBool();
     this->smartFormatting = sett.value(QString::fromAscii("smartFormatting"), true).toBool();
     sett.endGroup();
