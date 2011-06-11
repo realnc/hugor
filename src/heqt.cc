@@ -727,6 +727,13 @@ hugo_charwidth( char a )
 int
 hugo_textwidth( char* a )
 {
+    // With a fixed-width font, we know the width of the string is equal
+    // to its length times the width of a character (all chars have the
+    // same width.)
+    if (not (currentfont & PROP_FONT)) {
+        return hugo_strlen(a) * FIXEDCHARWIDTH;
+    }
+
     size_t slen = qstrlen(a);
     QString str;
 
