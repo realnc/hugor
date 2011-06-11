@@ -258,7 +258,14 @@ hugo_getkey( void )
 void
 hugo_getline( char* p )
 {
+    // Print the prompt in normal text colors.
+    hugo_settextcolor(fcolor);
+    hugo_setbackcolor(bgcolor);
     hugo_print(p);
+
+    // Switch to input color.
+    hugo_settextcolor(icolor);
+
     hFrame->setCursorVisible(true);
     hFrame->moveCursorPos(QPoint(current_text_x, current_text_y));
     hFrame->getInput(buffer, MAXBUFFER, current_text_x, current_text_y);
