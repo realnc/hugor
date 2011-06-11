@@ -271,6 +271,11 @@ hugo_getline( char* p )
     hFrame->getInput(buffer, MAXBUFFER, current_text_x, current_text_y);
     hFrame->setCursorVisible(false);
     hugo_print(const_cast<char*>("\r\n"));
+
+    // Also copy the input to the script file, if there is one.
+    if (script != 0) {
+        fprintf(script, "%s%s\n", p, buffer);
+    }
 }
 
 
