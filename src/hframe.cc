@@ -489,6 +489,9 @@ HFrame::setFontType( int hugoFont )
     f.setItalic(this->fUseItalicFont);
     f.setBold(this->fUseBoldFont);
     this->fFontMetrics = QFontMetrics(f, &this->fPixmap);
+
+    // Adjust text caret for new font.
+    this->setCursorHeight(this->fFontMetrics.height());
 }
 
 
