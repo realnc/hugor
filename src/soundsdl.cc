@@ -1,7 +1,5 @@
-#ifdef SOUND_SDL
-#   include <SDL.h>
-#   include <SDL_mixer.h>
-#endif
+#include <SDL.h>
+#include <SDL_mixer.h>
 #include <QDebug>
 #include <QFile>
 

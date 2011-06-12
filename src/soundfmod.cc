@@ -1,7 +1,5 @@
-#ifdef SOUND_FMOD
-#   include <fmod.hpp>
-#   include <fmod_errors.h>
-#endif
+#include <fmod.hpp>
+#include <fmod_errors.h>
 
 #include <QDebug>
 #include <QFile>
