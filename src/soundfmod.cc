@@ -52,16 +52,10 @@ void closeSoundEngine()
 
 
 static bool
-loadAndPlaySound( HUGO_FILE infile, long reslength, char loop_flag, QFile*& file,
+loadAndPlaySound( HUGO_FILE infile, long reslength, char loop_flag,
                   FMOD::Sound*& sound, FMOD_CREATESOUNDEXINFO& info,
                   FMOD::Channel*& channel, float volume )
 {
-    // If a file already exists, delete it first.
-    if (file != 0) {
-        delete file;
-        file = 0;
-    }
-
     // If an FMOD::Sound* already exists, delete it first. This will
     // also stop the music if it's currently playing.
     if (sound != 0) {
@@ -69,23 +63,14 @@ loadAndPlaySound( HUGO_FILE infile, long reslength, char loop_flag, QFile*& file
         sound = 0;
     }
 
-    // Open 'infile' as a QFile.
-    file = new QFile;
-    if (not file->open(infile, QIODevice::ReadOnly)) {
-        qWarning() << "ERROR: Can't open game music file";
-        file->close();
-        fclose(infile);
-        return false;
-    }
-
+    info.fileoffset = ftell(infile);
     info.length = static_cast<unsigned>(reslength);
-    FMOD_RESULT res;
-    res = fmSystem->createStream(reinterpret_cast<char*>(file->map(ftell(infile), reslength)),
-                                 FMOD_LOOP_NORMAL | FMOD_2D | FMOD_HARDWARE | FMOD_OPENMEMORY,
-                                 &info, &sound);
     // Done with the file.
-    file->close();
     fclose(infile);
+    FMOD_RESULT res;
+    res = fmSystem->createStream(loaded_filename,
+                                 FMOD_LOOP_NORMAL | FMOD_2D | FMOD_HARDWARE,
+                                 &info, &sound);
     if (res != FMOD_OK) {
         qWarning() << "createStream:" << FMOD_ErrorString(res);
         return false;
@@ -117,12 +102,11 @@ hugo_playmusic( HUGO_FILE infile, long reslength, char loop_flag )
 
     // We only play one music track at a time, so it's enough
     // to make these static.
-    static QFile* file = 0;
     static FMOD::Sound* music = 0;
     static FMOD_CREATESOUNDEXINFO info;
     info.cbsize = sizeof(FMOD_CREATESOUNDEXINFO);
 
-    return loadAndPlaySound(infile, reslength, loop_flag, file, music,
+    return loadAndPlaySound(infile, reslength, loop_flag, music,
                             info, musicChan, musicVol);
 }
 
@@ -171,12 +155,11 @@ hugo_playsample( HUGO_FILE infile, long reslength, char loop_flag )
 
     // We only play one sample at a time, so it's enough
     // to make these static.
-    static QFile* file = 0;
     static FMOD::Sound* sample = 0;
     static FMOD_CREATESOUNDEXINFO info;
     info.cbsize = sizeof(FMOD_CREATESOUNDEXINFO);
 
-    return loadAndPlaySound(infile, reslength, loop_flag, file, sample,
+    return loadAndPlaySound(infile, reslength, loop_flag, sample,
                             info, sampleChan, sampleVol);
 }
 
