@@ -4,18 +4,22 @@ CONFIG += warn_on silent
 VERSION = 0.1.0.99
 TARGET = hugor
 
+
 !sound_sdl:!sound_fmod {
     error("Use CONFIG+=sound_sdl or CONFIG+=sound_fmod to select a sound engine")
 }
-sound_sdl {
-    DEFINES += SOUND_SDL
-}
-sound_fmod {
-    DEFINES += SOUND_FMOD
-}
+
+sound_sdl:DEFINES += SOUND_SDL
+sound_fmod:DEFINES += SOUND_FMOD
 
 macx {
+    TARGET = Hugor
     QMAKE_INFO_PLIST = Info.plist
+    QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.5
+    QMAKE_MAC_SDK = /Developer/SDKs/MacOSX10.5.sdk
+    QMAKE_CFLAGS += -fvisibility=hidden -fomit-frame-pointer
+    QMAKE_CXXFLAGS += -fvisibility=hidden -fomit-frame-pointer
+    QMAKE_LFLAGS += -dead_strip
 
     sound_sdl {
         QMAKE_LFLAGS += -F./Frameworks
@@ -27,21 +31,13 @@ macx {
     }
 
     sound_fmod {
-        LIBS += -lfmodex
+        LIBS += -L./fmod/api/lib -lfmodex
         INCLUDEPATH += ./fmod/api/inc
     }
-
-    QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.5
-    QMAKE_MAC_SDK=/Developer/SDKs/MacOSX10.5.sdk
-    TARGET = Hugor
 } else {
     sound_sdl {
         CONFIG += link_pkgconfig
-        PKGCONFIG += sdl
-        # Normally we would use pkg-config for SDL_mixer too, but it has
-        # to appear in the linker flags before SDL_sound, which lacks
-        # pkg-config support, or else we crash.
-        LIBS += -lSDL_mixer
+        PKGCONFIG += sdl SDL_mixer
     }
 
     sound_fmod {
@@ -52,12 +48,21 @@ macx {
         }
     }
 }
+
 win32 {
-    sound_sdl {
-        LIBS += -lmad -lmodplug
-    }
     TARGET = Hugor
+
+    *-g++* {
+        QMAKE_CFLAGS += -mtune=generic -march=i686
+        QMAKE_CXXFLAGS += -mtune=generic -march=i686
+
+        # Dead code stripping (requires patched binutils).
+        QMAKE_CFLAGS += -fdata-sections -ffunction-sections
+        QMAKE_CXXFLAGS += -fdata-sections -ffunction-sections
+        QMAKE_LFLAGS += -Wl,--gc-sections
+    }
 }
+
 
 # We use warn_off to allow only default warnings, not to supress them all.
 QMAKE_CXXFLAGS_WARN_OFF =
@@ -120,9 +125,5 @@ SOURCES += \
     hugo/heset.c \
     hugo/stringfn.c
 
-sound_sdl {
-    SOURCES += src/soundsdl.cc
-}
-sound_fmod {
-    SOURCES += src/soundfmod.cc
-}
+sound_sdl:SOURCES += src/soundsdl.cc
+sound_fmod:SOURCES += src/soundfmod.cc
