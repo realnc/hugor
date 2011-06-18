@@ -1,6 +1,10 @@
 #ifndef HUGODEFS_H
 #define HUGODEFS_H
 
+#include <QColor>
+
+#define HUGOR_VERSION "0.7"
+
 #ifdef SOUND_FMOD
 #include <fmod.hpp>
 extern FMOD::System* fmSystem;
