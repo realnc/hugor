@@ -95,85 +95,62 @@ HApplication::fRunGame()
         // Change to the game file's directory.
         QDir::setCurrent(finfo.absolutePath());
 
-        if (true) {
-            // Delete the current game window.
-            //if (this->fGameWin != 0) {
-                //delete this->fGameWin;
-            //}
-
-            // Recreate them.
-            //this->fGameWin = new CHtmlSysWinInputQt(this->fFormatter, qWinGroup->centralWidget());
-            //this->fGameWin->resize(qWinGroup->centralWidget()->size());
-            //this->fGameWin->show();
-            //this->fGameWin->setFocus();
-
-            // Set the application's window title to contain the filename of
-            // the game we're running. The game is free to change that later on.
+        // Set the application's window title to contain the filename of
+        // the game we're running. The game is free to change that later on.
 #ifdef Q_WS_MAC
-            // Just use the filename on OS X.  Seems to be the norm there.
-            //qWinGroup->setWindowTitle(finfo.fileName());
+        // Just use the filename on OS X.  Seems to be the norm there.
+        //qWinGroup->setWindowTitle(finfo.fileName());
 #else
-            // On all other systems, also append the application name.
-            //qWinGroup->setWindowTitle(finfo.fileName() + QString::fromAscii(" - ") + qFrame->applicationName());
+        // On all other systems, also append the application name.
+        //qWinGroup->setWindowTitle(finfo.fileName() + QString::fromAscii(" - ") + qFrame->applicationName());
 #endif
 
-            // Add the game file to our "recent games" list.
-            QStringList& gamesList = this->fSettings->recentGamesList;
-            int recentIdx = gamesList.indexOf(finfo.absoluteFilePath());
-            if (recentIdx > 0) {
-                // It's already in the list and it's not the first item.  Make
-                // it the first item so that it becomes the most recent entry.
-                gamesList.move(recentIdx, 0);
-            } else if (recentIdx < 0) {
-                // We didn't find it in the list by absoluteFilePath(). Try to
-                // find it by canonicalFilePath() instead. This way, we avoid
-                // listing the same game twice if the user opened it through a
-                // different path (through a symlink that leads to the same
-                // file, for instance.)
-                bool found = false;
-                const QString& canonPath = finfo.canonicalFilePath();
-                for (recentIdx = 0; recentIdx < gamesList.size() and not found; ++recentIdx) {
-                    if (QFileInfo(gamesList.at(recentIdx)).canonicalFilePath() == canonPath) {
-                        found = true;
-                    }
-                }
-                if (found) {
-                    gamesList.move(recentIdx - 1, 0);
-                } else {
-                    // It's not in the list.  Prepend it as the most recent item
-                    // and, if the list is full, delete the oldest one.
-                    if (gamesList.size() >= this->fSettings->recentGamesCapacity) {
-                        gamesList.removeLast();
-                    }
-                    gamesList.prepend(finfo.absoluteFilePath());
+        // Add the game file to our "recent games" list.
+        QStringList& gamesList = this->fSettings->recentGamesList;
+        int recentIdx = gamesList.indexOf(finfo.absoluteFilePath());
+        if (recentIdx > 0) {
+            // It's already in the list and it's not the first item.  Make
+            // it the first item so that it becomes the most recent entry.
+            gamesList.move(recentIdx, 0);
+        } else if (recentIdx < 0) {
+            // We didn't find it in the list by absoluteFilePath(). Try to
+            // find it by canonicalFilePath() instead. This way, we avoid
+            // listing the same game twice if the user opened it through a
+            // different path (through a symlink that leads to the same
+            // file, for instance.)
+            bool found = false;
+            const QString& canonPath = finfo.canonicalFilePath();
+            for (recentIdx = 0; recentIdx < gamesList.size() and not found; ++recentIdx) {
+                if (QFileInfo(gamesList.at(recentIdx)).canonicalFilePath() == canonPath) {
+                    found = true;
                 }
             }
-            //this->fMainWin->updateRecentGames();
-            this->fSettings->saveToDisk();
-
-            // Run the Hugo engine.
-            this->fGameRunning = true;
-            this->fGameFile = finfo.absoluteFilePath();
-            char argv0[] = "hugor";
-            char* argv1 = new char[this->fGameFile.toLocal8Bit().size() + 1];
-            strcpy(argv1, this->fGameFile.toLocal8Bit().constData());
-            char* argv[2] = {argv0, argv1};
-            emit gameStarting();
-            he_main(2, argv);
-            this->fGameRunning = false;
-            this->fGameFile.clear();
-            emit gameHasQuit();
-
-            // Flush any pending output and cancel all sounds and animations.
-            //this->flush_txtbuf(true, false);
-
-            // Display a "game has ended" message.
-            //QString endMsg(QString::fromAscii("<p><br><font face=tads-serif size=-1>(The game has ended.)</font></p>"));
-            //this->display_output(endMsg.toUtf8().constData(), endMsg.length());
-            //this->flush_txtbuf(true, false);
-        } else {
-            //QMessageBox::critical(this->fMainWin, tr("Open Game"), finfo.fileName() + tr(" is not a TADS game file."));
+            if (found) {
+                gamesList.move(recentIdx - 1, 0);
+            } else {
+                // It's not in the list.  Prepend it as the most recent item
+                // and, if the list is full, delete the oldest one.
+                if (gamesList.size() >= this->fSettings->recentGamesCapacity) {
+                    gamesList.removeLast();
+                }
+                gamesList.prepend(finfo.absoluteFilePath());
+            }
         }
+        //this->fMainWin->updateRecentGames();
+        this->fSettings->saveToDisk();
+
+        // Run the Hugo engine.
+        this->fGameRunning = true;
+        this->fGameFile = finfo.absoluteFilePath();
+        char argv0[] = "hugor";
+        char* argv1 = new char[this->fGameFile.toLocal8Bit().size() + 1];
+        strcpy(argv1, this->fGameFile.toLocal8Bit().constData());
+        char* argv[2] = {argv0, argv1};
+        emit gameStarting();
+        he_main(2, argv);
+        this->fGameRunning = false;
+        this->fGameFile.clear();
+        emit gameHasQuit();
     }
     hApp->quit();
 
