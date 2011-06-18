@@ -197,7 +197,7 @@ hugo_getfilename( char* a, char* b )
     Again, it may be preferable to replace this with something fancier.
 */
 int
-hugo_overwrite( char* f )
+hugo_overwrite( char* )
 {
     // We handle this in hugo_getfilename().
     return true;
@@ -834,7 +834,7 @@ hugo_stopvideo( void )
 { }
 
 extern "C" int
-hugo_playvideo( HUGO_FILE infile, long reslength, char loop_flag )
+hugo_playvideo( HUGO_FILE infile, long, char )
 {
     fclose(infile);
     return true;    /* not an error */
