@@ -9,6 +9,10 @@ TARGET = hugor
     error("Use CONFIG+=sound_sdl or CONFIG+=sound_fmod to select a sound engine")
 }
 
+sound_sdl:sound_fmod {
+    error("Choose either sound_sdl or sound_fmod, but not both")
+}
+
 sound_sdl:DEFINES += SOUND_SDL
 sound_fmod:DEFINES += SOUND_FMOD
 
