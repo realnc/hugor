@@ -154,7 +154,7 @@ HApplication::fRunGame()
             // Run the Hugo engine.
             this->fGameRunning = true;
             this->fGameFile = finfo.absoluteFilePath();
-            char argv0[] = "heqt";
+            char argv0[] = "hugor";
             char* argv1 = new char[this->fGameFile.toLocal8Bit().size() + 1];
             strcpy(argv1, this->fGameFile.toLocal8Bit().constData());
             char* argv[2] = {argv0, argv1};

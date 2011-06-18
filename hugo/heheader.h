@@ -61,7 +61,7 @@ extern char *token[];
 
 #define PORTER_NAME "Nikos Chantziaras"
 #define PORT_NAME "Qt"
-#define PROGRAM_NAME "heqt"
+#define PROGRAM_NAME "hugor"
 
 #define DEF_PRN ""
 
