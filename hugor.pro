@@ -92,6 +92,7 @@ HEADERS += \
     src/aboutdialog.h \
     src/confdialog.h \
     src/happlication.h \
+    src/heqtheader.h \
     src/hframe.h \
     src/hmainwindow.h \
     src/hugodefs.h \
