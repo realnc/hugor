@@ -53,9 +53,10 @@ HApplication::HApplication( int& argc, char* argv[], const char* appName, const 
 
     this->fFrameWin = new HFrame(hMainWin);
     this->fMainWin->setCentralWidget(this->fFrameWin);
-    //this->fGameWin->resize(qWinGroup->centralWidget()->size());
+
+    // Restore the application's size.
+    this->fMainWin->resize(this->fSettings->appSize);
     this->fFrameWin->show();
-    //this->fGameWin->setFocus();
 
     // Set application window icon.
     this->setWindowIcon(QIcon(":/he_32-bit_48x48.png"));
@@ -178,8 +179,6 @@ HApplication::event( QEvent* e )
 void
 HApplication::main( QString gameFileName )
 {
-    // Restore the application's size.
-    this->fMainWin->resize(this->fSettings->appSize);
     this->fMainWin->show();
 
     // If a game file was specified, try to run it.
