@@ -80,7 +80,7 @@ OBJECTS_DIR = obj
 MOC_DIR = tmp
 UI_DIR = tmp
 
-DEFINES += QT
+DEFINES += HUGOR
 
 RESOURCES += resources.qrc
 

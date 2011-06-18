@@ -45,22 +45,22 @@ extern char *token[];
 	RISCOS
 	WIN32     (Microsoft Visual C++)
 	WXWINDOWS (wxWindows for Mac or Gtk)
-	QT        (Qt for Linux, Mac, Windows)
+	HUGOR     (Hugor for Linux, Mac, Unix, Windows)
 
    (although this is typically done in the makefile)
 */
 
 
 /*---------------------------------------------------------------------------
-	Definitions for Qt, using any compiler.
+	Definitions for Hugor, using any compiler supported by Qt.
 
 	by Nikos Chantziaras
 ---------------------------------------------------------------------------*/
 
-#if defined (QT)
+#if defined (HUGOR)
 
 #define PORTER_NAME "Nikos Chantziaras"
-#define PORT_NAME "Qt"
+#define PORT_NAME "Hugor"
 #define PROGRAM_NAME "hugor"
 
 #define DEF_PRN ""
@@ -94,7 +94,7 @@ void printFatalError( char* a );
 /*extern void PrintFatalError(char *a);*/
 /*#define PRINTFATALERROR(a) PrintFatalError(a);*/
 
-#endif  /* defined (QT) */
+#endif  /* defined (HUGOR) */
 
 
 /*---------------------------------------------------------------------------
@@ -537,7 +537,7 @@ extern FILE *hugo_fopen (char *filename, char *mode);
 	by Kent Tessman
 ---------------------------------------------------------------------------*/
 
-#if defined (WIN32) && !defined (WXWINDOWS) && !defined (QT)
+#if defined (WIN32) && !defined (WXWINDOWS) && !defined (HUGOR)
 
 #ifdef UNDER_CE
 #define PORT_NAME "WinCE"
