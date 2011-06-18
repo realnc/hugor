@@ -73,8 +73,7 @@ QMAKE_CXXFLAGS_WARN_OFF =
 QMAKE_CFLAGS_WARN_OFF =
 
 *-g++* {
-    # Avoid a flood of "unused parameter" warnings.
-    QMAKE_CXXFLAGS_WARN_ON += -Wno-unused-parameter
+    # Avoid "unused parameter" warnings with C code.
     QMAKE_CFLAGS_WARN_ON += -Wno-unused-parameter
 }
 
