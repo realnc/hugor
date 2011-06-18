@@ -79,7 +79,13 @@ extern char *token[];
 #define MAXBUFFER 255
 #define MAXUNDO 1024
 
+#if __STDC_VERSION__ >= 199901L
+/* We're using a C99 compiler, meaning 'inline' is supported. */
+#define HUGO_INLINE static inline
+#else
+/* Most other compilers support __inline with mostly the same semantics. */
 #define HUGO_INLINE static __inline
+#endif
 
 #define PRINTFATALERROR printFatalError
 void printFatalError( char* a );
@@ -90,9 +96,6 @@ void printFatalError( char* a );
 #define USE_TEXTBUFFER
 #define USE_SMARTFORMATTING
 /*#define SCROLLBACK_DEFINED*/
-
-/*extern void PrintFatalError(char *a);*/
-/*#define PRINTFATALERROR(a) PrintFatalError(a);*/
 
 #endif  /* defined (HUGOR) */
 
