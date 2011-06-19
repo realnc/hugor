@@ -1,7 +1,11 @@
+#include <QDebug>
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QCloseEvent>
 #include <QLayout>
+#include <QPlainTextEdit>
+#include <QTextCodec>
+#include <QScrollBar>
 
 #include "hmainwindow.h"
 #include "happlication.h"
@@ -15,7 +19,8 @@ class HMainWindow* hMainWin = 0;
 HMainWindow::HMainWindow( QWidget* parent )
     : QMainWindow(parent),
       fConfDialog(0),
-      fAboutDialog(0)
+      fAboutDialog(0),
+      fScrollbackSize(0)
 {
     Q_ASSERT(hMainWin == 0);
 
@@ -36,6 +41,10 @@ HMainWindow::HMainWindow( QWidget* parent )
     menu->addAction(act);
     connect(act, SIGNAL(triggered()), SLOT(fShowConfDialog()));
 
+    act = new QAction(tr("&Scrollback Window"), this);
+    menu->addAction(act);
+    connect(act, SIGNAL(triggered()), SLOT(fShowScrollback()));
+
     // "Help" menu.
     menu = menuBar->addMenu(tr("&Help"));
     act = new QAction(tr("A&bout Hugor"), this);
@@ -46,6 +55,15 @@ HMainWindow::HMainWindow( QWidget* parent )
     connect(act, SIGNAL(triggered()), SLOT(fShowAbout()));
 
     this->setMenuBar(menuBar);
+
+    this->fScrollbackWindow = new QPlainTextEdit(this);
+    this->fScrollbackWindow->setWindowFlags(Qt::Window);
+    this->fScrollbackWindow->setWindowTitle("Hugor Scrollback");
+    this->fScrollbackWindow->setReadOnly(true);
+    this->fScrollbackWindow->setUndoRedoEnabled(false);
+    this->fScrollbackWindow->setTextInteractionFlags(Qt::TextSelectableByMouse);
+    this->fScrollbackWindow->setFrameStyle(QFrame::NoFrame | QFrame::Plain);
+    this->fScrollbackWindow->resize(600,440);
 
     // Use a sane minimum size; by default Qt would allow us to be resized
     // to almost zero.
@@ -122,6 +140,18 @@ HMainWindow::fHideAbout()
 
 
 void
+HMainWindow::fShowScrollback()
+{
+    if (this->fScrollbackWindow->isHidden()) {
+        this->fScrollbackWindow->show();
+    } else {
+        this->fScrollbackWindow->activateWindow();
+        this->fScrollbackWindow->raise();
+    }
+}
+
+
+void
 HMainWindow::closeEvent( QCloseEvent* e )
 {
     if (not hApp->gameRunning()) {
@@ -144,5 +174,27 @@ HMainWindow::closeEvent( QCloseEvent* e )
         exit(0);
     } else {
         e->ignore();
+    }
+}
+
+
+void
+HMainWindow::appendToScrollback( const QByteArray& str )
+{
+    if (str.isEmpty()) {
+        return;
+    }
+
+    this->fScrollbackWindow->moveCursor(QTextCursor::End);
+    const QString& tmp = hApp->hugoCodec()->toUnicode(str);
+    this->fScrollbackSize += tmp.size();
+    this->fScrollbackWindow->insertPlainText(tmp);
+    this->fScrollbackWindow->verticalScrollBar()->triggerAction(QScrollBar::SliderToMaximum);
+
+    // Don't allow the scrollbuffer to grow forever. When it exceeds
+    // 1.2MB, trim it back to 1MB.
+    if (this->fScrollbackSize > 1200000) {
+        this->fScrollbackWindow->setPlainText(this->fScrollbackWindow->toPlainText().right(1000000));
+        this->fScrollbackSize = 1000000;
     }
 }

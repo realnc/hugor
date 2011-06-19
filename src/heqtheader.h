@@ -38,7 +38,7 @@ void printFatalError( char* a );
 #define SOUND_SUPPORTED
 #define USE_TEXTBUFFER
 #define USE_SMARTFORMATTING
-/*#define SCROLLBACK_DEFINED*/
+#define SCROLLBACK_DEFINED
 
 
 #endif /* HEQTHEADER_H */

@@ -223,6 +223,26 @@ hugo_closefiles()
 }
 
 
+static QByteArray scrollbackBuf;
+
+static void
+flushScrollback()
+{
+    hMainWin->appendToScrollback(scrollbackBuf);
+    scrollbackBuf.clear();
+}
+
+/* hugo_sendtoscrollback
+
+   Stores a given line in the scrollback buffer (optional).
+*/
+void
+hugo_sendtoscrollback( char* a )
+{
+    scrollbackBuf.append(a);
+}
+
+
 /* hugo_getkey
 
     Returns the next keystroke waiting in the keyboard buffer.  It is
@@ -237,6 +257,7 @@ hugo_closefiles()
 int
 hugo_getkey( void )
 {
+    flushScrollback();
     //qDebug() << "getkey";
     //hFrame->moveCursorPos(QPoint(current_text_x, current_text_y));
     int c = hFrame->getNextKey();
@@ -258,6 +279,9 @@ hugo_getkey( void )
 void
 hugo_getline( char* p )
 {
+    hugo_sendtoscrollback(p);
+    flushScrollback();
+
     // Print the prompt in normal text colors.
     hugo_settextcolor(fcolor);
     hugo_setbackcolor(bgcolor);
@@ -276,18 +300,10 @@ hugo_getline( char* p )
     if (script != 0) {
         fprintf(script, "%s%s\n", p, buffer);
     }
+
+    hugo_sendtoscrollback(buffer);
+    hugo_sendtoscrollback(const_cast<char*>("\n"));
 }
-
-
-/* hugo_sendtoscrollback
-
-   Stores a given line in the scrollback buffer (optional).
-*/
-/*
-void
-hugo_sendtoscrollback( char* a )
-{ }
-*/
 
 
 /* hugo_waitforkey

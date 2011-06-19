@@ -13,6 +13,8 @@ class HMainWindow: public QMainWindow {
   private:
     class ConfDialog* fConfDialog;
     class AboutDialog* fAboutDialog;
+    class QPlainTextEdit* fScrollbackWindow;
+    unsigned int fScrollbackSize;
 
   private slots:
     void
@@ -27,12 +29,18 @@ class HMainWindow: public QMainWindow {
     void
     fHideAbout();
 
+    void
+    fShowScrollback();
+
   protected:
     virtual void
     closeEvent( QCloseEvent* e );
 
   public:
     HMainWindow( QWidget* parent );
+
+    void
+    appendToScrollback( const QByteArray& str );
 };
 
 
