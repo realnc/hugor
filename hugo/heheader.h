@@ -695,8 +695,10 @@ int LoadGameData(char reload);
 /* To be used with caution; obviously, not all non-zero values are "true"
    in this usage.
 */
+#ifndef __cplusplus
 #define true 1
 #define false 0
+#endif
 
 /* These static values are not changeable--they depend largely on internals
    of the Engine.
