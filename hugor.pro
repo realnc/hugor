@@ -41,7 +41,7 @@ macx {
 } else {
     sound_sdl {
         CONFIG += link_pkgconfig
-        PKGCONFIG += sdl SDL_mixer
+        PKGCONFIG += SDL_mixer
     }
 
     sound_fmod {
