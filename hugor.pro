@@ -116,8 +116,6 @@ SOURCES += \
     src/main.cc \
     src/settings.cc \
     \
-    #hugo/heblank.c \
-    #hugo/iotest.c \
     hugo/he.c \
     hugo/hebuffer.c \
     hugo/heexpr.c \
