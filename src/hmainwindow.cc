@@ -187,8 +187,6 @@ HMainWindow::appendToScrollback( const QByteArray& str )
     }
 
     this->fScrollbackWindow->moveCursor(QTextCursor::End);
-    const QString& tmp = hApp->hugoCodec()->toUnicode(str);
-    this->fScrollbackSize += tmp.size();
-    this->fScrollbackWindow->insertPlainText(tmp);
+    this->fScrollbackWindow->insertPlainText(hApp->hugoCodec()->toUnicode(str));
     this->fScrollbackWindow->verticalScrollBar()->triggerAction(QScrollBar::SliderToMaximum);
 }
