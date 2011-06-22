@@ -41,6 +41,7 @@ HMainWindow::HMainWindow( QWidget* parent )
     connect(act, SIGNAL(triggered()), SLOT(fShowConfDialog()));
 
     act = new QAction(tr("&Scrollback Window"), this);
+    act->setMenuRole(QAction::ApplicationSpecificRole);
     menu->addAction(act);
     connect(act, SIGNAL(triggered()), SLOT(fShowScrollback()));
 
