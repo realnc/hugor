@@ -19,8 +19,7 @@ class HMainWindow* hMainWin = 0;
 HMainWindow::HMainWindow( QWidget* parent )
     : QMainWindow(parent),
       fConfDialog(0),
-      fAboutDialog(0),
-      fScrollbackSize(0)
+      fAboutDialog(0)
 {
     Q_ASSERT(hMainWin == 0);
 
@@ -63,6 +62,8 @@ HMainWindow::HMainWindow( QWidget* parent )
     this->fScrollbackWindow->setUndoRedoEnabled(false);
     this->fScrollbackWindow->setTextInteractionFlags(Qt::TextSelectableByMouse);
     this->fScrollbackWindow->setFrameStyle(QFrame::NoFrame | QFrame::Plain);
+    // Don't allow the scrollbuffer to grow forever; limit it to 7.000 lines.
+    this->fScrollbackWindow->document()->setMaximumBlockCount(7000);
     this->fScrollbackWindow->resize(600,440);
 
     // Use a sane minimum size; by default Qt would allow us to be resized
@@ -190,11 +191,4 @@ HMainWindow::appendToScrollback( const QByteArray& str )
     this->fScrollbackSize += tmp.size();
     this->fScrollbackWindow->insertPlainText(tmp);
     this->fScrollbackWindow->verticalScrollBar()->triggerAction(QScrollBar::SliderToMaximum);
-
-    // Don't allow the scrollbuffer to grow forever. When it exceeds
-    // 1.2MB, trim it back to 1MB.
-    if (this->fScrollbackSize > 1200000) {
-        this->fScrollbackWindow->setPlainText(this->fScrollbackWindow->toPlainText().right(1000000));
-        this->fScrollbackSize = 1000000;
-    }
 }
