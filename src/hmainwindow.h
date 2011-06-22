@@ -13,7 +13,7 @@ class HMainWindow: public QMainWindow {
   private:
     class ConfDialog* fConfDialog;
     class AboutDialog* fAboutDialog;
-    class QPlainTextEdit* fScrollbackWindow;
+    class QTextEdit* fScrollbackWindow;
     unsigned int fScrollbackSize;
 
   private slots:

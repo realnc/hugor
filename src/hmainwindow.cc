@@ -3,7 +3,7 @@
 #include <QMessageBox>
 #include <QCloseEvent>
 #include <QLayout>
-#include <QPlainTextEdit>
+#include <QTextEdit>
 #include <QTextCodec>
 #include <QScrollBar>
 
@@ -56,7 +56,7 @@ HMainWindow::HMainWindow( QWidget* parent )
 
     this->setMenuBar(menuBar);
 
-    this->fScrollbackWindow = new QPlainTextEdit(this);
+    this->fScrollbackWindow = new QTextEdit(this);
     this->fScrollbackWindow->setWindowFlags(Qt::Window);
     this->fScrollbackWindow->setWindowTitle("Hugor Scrollback");
     this->fScrollbackWindow->setReadOnly(true);
