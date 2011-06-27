@@ -734,7 +734,7 @@ hugo_charwidth( char a )
         return 0;
     }
     if (currentfont & PROP_FONT) {
-        return hFrame->currentFontMetrics().width(a);
+        return hFrame->currentFontMetrics().width(hApp->hugoCodec()->toUnicode(&a, 1));
     }
     return FIXEDCHARWIDTH;
 }
