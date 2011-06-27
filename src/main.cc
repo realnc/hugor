@@ -3,6 +3,7 @@
 #include <QStringList>
 #include <QFile>
 #include <QFileDialog>
+#include <QtPlugin>
 #include <cstdlib>
 
 extern "C" {
@@ -24,6 +25,14 @@ extern "C" {
 #ifdef main
 #  undef main
 #endif
+#endif
+
+
+#if defined(Q_WS_MAC) || defined(Q_WS_WIN)
+Q_IMPORT_PLUGIN(qcncodecs)
+Q_IMPORT_PLUGIN(qjpcodecs)
+Q_IMPORT_PLUGIN(qtwcodecs)
+Q_IMPORT_PLUGIN(qkrcodecs)
 #endif
 
 

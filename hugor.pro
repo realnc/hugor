@@ -16,6 +16,12 @@ sound_sdl:sound_fmod {
 sound_sdl:DEFINES += SOUND_SDL
 sound_fmod:DEFINES += SOUND_FMOD
 
+# On Windows and OS X we build static binaries, so we need to explicitly
+# include the text codec plugins.
+win32|macx {
+    QTPLUGIN += qcncodecs qjpcodecs qtwcodecs qkrcodecs
+}
+
 macx {
     TARGET = Hugor
     QMAKE_INFO_PLIST = Info.plist
