@@ -179,7 +179,11 @@ HApplication::event( QEvent* e )
 void
 HApplication::main( QString gameFileName )
 {
-    this->fMainWin->show();
+    if (this->fSettings->isMaximized) {
+        this->fMainWin->showMaximized();
+    } else {
+        this->fMainWin->show();
+    }
 
     // If a game file was specified, try to run it.
     if (not gameFileName.isEmpty()) {

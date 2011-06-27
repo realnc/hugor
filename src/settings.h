@@ -37,6 +37,7 @@ class Settings {
     static const int recentGamesCapacity = 10;
 
     QSize appSize;
+    bool isMaximized;
 };
 
 

@@ -84,7 +84,10 @@ Settings::loadFromDisk()
     }
     sett.endGroup();
 
-    this->appSize = sett.value(QString::fromAscii("geometry/size"), QSize(800, 600)).toSize();
+    sett.beginGroup(QString::fromAscii("geometry"));
+    this->appSize = sett.value(QString::fromAscii("size"), QSize(800, 600)).toSize();
+    this->isMaximized = sett.value(QString::fromAscii("maximized"), false).toBool();
+    sett.endGroup();
 }
 
 
@@ -124,6 +127,9 @@ Settings::saveToDisk()
     sett.setValue(QString::fromAscii("games"), this->recentGamesList);
     sett.endGroup();
 
-    sett.setValue(QString::fromAscii("geometry/size"), hMainWin->size());
+    sett.beginGroup(QString::fromAscii("geometry"));
+    sett.setValue(QString::fromAscii("size"), hMainWin->size());
+    sett.setValue(QString::fromAscii("maximized"), hMainWin->isMaximized());
+    sett.endGroup();
     sett.sync();
 }
