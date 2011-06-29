@@ -48,6 +48,9 @@ ConfDialog::ConfDialog( HMainWindow* parent )
     ui->mainFontBox->setCurrentFont(sett->propFont);
     ui->fixedFontBox->setCurrentFont(sett->fixedFont);
     ui->softScrollCheckBox->setChecked(sett->softTextScrolling);
+    ui->butterCheckBox->setChecked(sett->extraButter);
+    ui->butterCheckBox->setEnabled(sett->softTextScrolling);
+    connect(ui->softScrollCheckBox, SIGNAL(toggled(bool)), ui->butterCheckBox, SLOT(setEnabled(bool)));
     ui->smartFormattingCheckBox->setChecked(sett->smartFormatting);
 
     ui->askForGameFileCheckBox->setChecked(sett->askForGameFile);
@@ -104,6 +107,7 @@ ConfDialog::fMakeInstantApply()
     connect(ui->mainFontSizeSpinBox, SIGNAL(valueChanged(int)), this, SLOT(fApplySettings()));
     connect(ui->fixedFontSizeSpinBox, SIGNAL(valueChanged(int)), this, SLOT(fApplySettings()));
     connect(ui->softScrollCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
+    connect(ui->butterCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
     connect(ui->smartFormattingCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
     connect(ui->allowGraphicsCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
     connect(ui->allowSoundEffectsCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
@@ -137,6 +141,7 @@ ConfDialog::fApplySettings()
     sett->propFont.setPointSize(ui->mainFontSizeSpinBox->value());
     sett->fixedFont.setPointSize(ui->fixedFontSizeSpinBox->value());
     sett->softTextScrolling = ui->softScrollCheckBox->isChecked();
+    sett->extraButter = ui->butterCheckBox->isChecked();
     sett->smartFormatting = ui->smartFormattingCheckBox->isChecked();
     sett->askForGameFile = ui->askForGameFileCheckBox->isChecked();
 

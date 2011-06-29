@@ -102,6 +102,13 @@
       </widget>
      </item>
      <item>
+      <widget class="QCheckBox" name="butterCheckBox">
+       <property name="text">
+        <string>Extra Butter</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QCheckBox" name="smartFormattingCheckBox">
        <property name="text">
         <string>Smart Formatting</string>

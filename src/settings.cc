@@ -63,6 +63,7 @@ Settings::loadFromDisk()
     this->fixedFont.setFamily(tmp.family());
     this->fixedFont.setPointSize(tmp.pointSize());
     this->softTextScrolling = sett.value(QString::fromAscii("softTextScrolling"), true).toBool();
+    this->extraButter = sett.value(QString::fromAscii("extraButter"), true).toBool();
     this->smartFormatting = sett.value(QString::fromAscii("smartFormatting"), true).toBool();
     sett.endGroup();
 
@@ -115,6 +116,7 @@ Settings::saveToDisk()
     sett.setValue(QString::fromAscii("main"), this->propFont.toString());
     sett.setValue(QString::fromAscii("fixed"), this->fixedFont.toString());
     sett.setValue(QString::fromAscii("softTextScrolling"), this->softTextScrolling);
+    sett.setValue(QString::fromAscii("extraButter"), this->extraButter);
     sett.setValue(QString::fromAscii("smartFormatting"), this->smartFormatting);
     sett.endGroup();
 

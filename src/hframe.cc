@@ -540,7 +540,11 @@ HFrame::scrollUp( int left, int top, int right, int bottom, int h )
     const QRect& r = exposed.boundingRect();
     this->clearRegion(r.left(), r.top(), r.left() + r.width(), r.top() + r.bottom());
     if (hApp->settings()->softTextScrolling) {
-        hApp->advanceEventLoop();
+        if (hApp->settings()->extraButter) {
+            hugo_timewait(59);
+        } else {
+            hApp->advanceEventLoop();
+        }
     }
 }
 
