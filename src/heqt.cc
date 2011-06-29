@@ -99,10 +99,10 @@ hugo_blockfree( void* block )
 void
 hugo_splitpath( char* path, char* drive, char* dir, char* fname, char* ext )
 {
-    qstrcpy(drive, "");
-    qstrcpy(dir, "");
-    qstrcpy(fname, "");
-    qstrcpy(ext, "");
+    drive[0] = '\0';
+    dir[0] = '\0';
+    fname[0] = '\0';
+    ext[0] = '\0';
 
     QFileInfo inf(QString::fromLocal8Bit(path));
     qstrcpy(ext, inf.suffix().toLocal8Bit().constData());
