@@ -334,7 +334,7 @@ int
 hugo_timewait( int n )
 {
     if (not hApp->gameRunning() or n < 1) {
-        return false;
+        return true;
     }
 
     QEventLoop idleLoop;
