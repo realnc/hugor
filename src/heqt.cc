@@ -112,29 +112,21 @@ hugo_splitpath( char* path, char* drive, char* dir, char* fname, char* ext )
     return;
 }
 
+
 void
 hugo_makepath( char* path, char* drive, char* dir, char* fname, char* ext )
 {
-    if (*ext == '.') ext++;
-    strcpy(path,drive);
-    strcat(path,dir);
-    switch (*(path+strlen(path)))
-    {
-    case '/':
-    case ':':
-        /*        case 0: */
-        break;
-    default:
-        if (strcmp(path, "")) strcat(path,"/");
-        break;
+    QByteArray result(drive);
+    result += dir;
+    if (not result.endsWith('/')) {
+        result += '/';
     }
-    strcat(path,fname);
-    if (strcmp(ext, "")) strcat(path,".");
-    char* tmp = new char[strlen(ext)];
-    strcpy(tmp, ext);
-    strcat(path,strlwr(tmp));
-    delete[] tmp;
-    //qDebug() << "result:" << path;
+    result += fname;
+    if (ext[0] != '\0') {
+        result += '.';
+        result += QByteArray(ext).toLower();
+    }
+    qstrcpy(path, result.constData());
 }
 
 
