@@ -1,0 +1,25 @@
+Hugor - A portable Hugo engine
+Written and maintained by Nikos Chantziaras <realnc@gmail.com>
+
+Hugor is a "Hugo Runner", meaning a program in which you can load and play
+adventure games created with Kent Tessman’s Hugo authoring system:
+
+  http://www.generalcoffee.com
+
+Hugor supports all graphics, sound and music formats of the Hugo engine.
+Video, however, is not (yet?) supported.
+
+It runs on all current major operating systems (Linux, Mac OS X and
+Microsoft Windows).  You can find up to date, ready to run binaries at:
+
+  http://ifwiki.org/index.php/Hugor
+
+The source code is hosted at the following Git repository:
+
+  http://www.assembla.com/spaces/hugor
+
+If you wish to build from source, you will need the development packages
+for the Qt library (version 4.4 or later), SDL and SDL_mixer, or FMOD.
+However, building from source and using the SDL_mixer sound backend is not
+recommended, since Hugor uses a customized version of the SDL_mixer
+library (which is bundled with the binary.)

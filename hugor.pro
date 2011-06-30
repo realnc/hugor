@@ -135,3 +135,7 @@ SOURCES += \
 
 sound_sdl:SOURCES += src/soundsdl.cc
 sound_fmod:SOURCES += src/soundfmod.cc
+
+OTHER_FILES += \
+    README \
+    README.linux-bin
