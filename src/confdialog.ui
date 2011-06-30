@@ -96,6 +96,9 @@
     <layout class="QHBoxLayout" name="horizontalLayout_5">
      <item>
       <widget class="QCheckBox" name="softScrollCheckBox">
+       <property name="toolTip">
+        <string>&lt;p&gt;Scrolls-in new text line by line instead of all at once.&lt;/p&gt;</string>
+       </property>
        <property name="text">
         <string>Soft Text Scrolling</string>
        </property>
@@ -103,6 +106,9 @@
      </item>
      <item>
       <widget class="QCheckBox" name="butterCheckBox">
+       <property name="toolTip">
+        <string>&lt;p&gt;Softer scrolling for fast systems where the default soft scrolling is still too fast.&lt;/p&gt;</string>
+       </property>
        <property name="text">
         <string>Extra Butter</string>
        </property>
@@ -110,6 +116,9 @@
      </item>
      <item>
       <widget class="QCheckBox" name="smartFormattingCheckBox">
+       <property name="toolTip">
+        <string>&lt;p&gt;Converts ASCII quotes and dashes to typographical ones.&lt;/p&gt;</string>
+       </property>
        <property name="text">
         <string>Smart Formatting</string>
        </property>
@@ -223,6 +232,9 @@
         </item>
         <item>
          <widget class="QCheckBox" name="smoothScalingCheckBox">
+          <property name="toolTip">
+           <string>&lt;p&gt;Applies a bilinear filter when scaling images in order to avoid scaling artifacts (pixelization and distortion.)&lt;/p&gt;</string>
+          </property>
           <property name="text">
            <string>Use Smooth &amp;Image Scaling</string>
           </property>
@@ -244,6 +256,9 @@
         </item>
         <item>
          <widget class="QCheckBox" name="muteSoundCheckBox">
+          <property name="toolTip">
+           <string>&lt;p&gt;Mutes all sound when the application window loses focus.&lt;/p&gt;</string>
+          </property>
           <property name="text">
            <string>M&amp;ute Sound in Background</string>
           </property>
