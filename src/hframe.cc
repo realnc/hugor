@@ -279,25 +279,6 @@ HFrame::keyPressEvent( QKeyEvent* e )
             i = buf.length();
         }
         i = buf.length();
-    } else if (e->matches(QKeySequence::SelectPreviousChar)) {
-        //this->fTadsBuffer->move_left(true, false);
-    } else if (e->matches(QKeySequence::SelectNextChar)) {
-        //this->fTadsBuffer->move_right(true, false);
-    } else if (e->matches(QKeySequence::SelectPreviousWord)) {
-        //this->fTadsBuffer->move_left(true, true);
-    } else if (e->matches(QKeySequence::SelectNextWord)) {
-        //this->fTadsBuffer->move_right(true, true);
-    } else if (e->matches(QKeySequence::SelectStartOfLine) or e->matches(QKeySequence::SelectStartOfBlock)) {
-        //this->fTadsBuffer->start_of_line(true);
-    } else if (e->matches(QKeySequence::SelectEndOfLine) or e->matches(QKeySequence::SelectEndOfBlock)) {
-        //this->fTadsBuffer->end_of_line(true);
-    } else if (e->matches(QKeySequence::SelectAll)) {
-        //this->fTadsBuffer->start_of_line(false);
-        //this->fTadsBuffer->end_of_line(true);
-    } else if (e->matches(QKeySequence::Undo)) {
-        //this->fTadsBuffer->undo();
-    } else if (e->matches(QKeySequence::Copy)) {
-        return;
     } else if (e->key() == Qt::Key_Backspace) {
         if (i > 0 and not buf.isEmpty()) {
             buf.remove(i - 1, 1);
