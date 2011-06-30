@@ -40,7 +40,7 @@ int main( int argc, char* argv[] )
 {
     initSoundEngine();
 
-    HApplication* app = new HApplication(argc, argv, "Hugor", "0.1",
+    HApplication* app = new HApplication(argc, argv, "Hugor", HUGOR_VERSION,
                                          "Nikos Chantziaras", "");
     // Filename of the game to run.
     QString gameFileName;

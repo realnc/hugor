@@ -3,7 +3,7 @@
 
 #include <QColor>
 
-#define HUGOR_VERSION "0.7"
+#define HUGOR_VERSION "0.8"
 
 #ifdef SOUND_FMOD
 #include <fmod.hpp>
