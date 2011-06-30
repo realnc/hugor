@@ -15,7 +15,7 @@
       </sizepolicy>
      </property>
      <property name="text">
-      <string>&lt;h3&gt;&lt;img src=&quot;:/hugologo.png&quot; /&gt;
+      <string>&lt;h3&gt;&lt;a href=&quot;http://www.generalcoffee.com&quot;&gt;&lt;img src=&quot;:/hugologo.png&quot; /&gt;&lt;/a&gt;
 &lt;br&gt;Hugor - A Portable Hugo Engine&lt;/h3&gt;
 
 &lt;p&gt;
