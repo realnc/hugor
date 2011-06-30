@@ -167,10 +167,14 @@ HFrame::keyPressEvent( QKeyEvent* e )
         return;
     }
 
+    // Just for having shorter identifiers.
+    int& i = this->fInputCurrentChar;
+    QString& buf = this->fInputBuf;
+
     if (e->matches(QKeySequence::MoveToStartOfLine) or e->matches(QKeySequence::MoveToStartOfBlock)) {
-        this->fInputCurrentChar = 0;
+        i = 0;
     } else if (e->matches(QKeySequence::MoveToEndOfLine) or e->matches(QKeySequence::MoveToEndOfBlock)) {
-        this->fInputCurrentChar = this->fInputBuf.length();
+        i = buf.length();
 #if QT_VERSION >= 0x040500
     } else if (e->matches(QKeySequence::InsertParagraphSeparator)) {
 #else
@@ -180,12 +184,12 @@ HFrame::keyPressEvent( QKeyEvent* e )
         this->fInputMode = NoInput;
         // The current command only needs to be appended to the history if
         // it's not empty and differs from the previous command in the history.
-        if ((this->fHistory.isEmpty() and not this->fInputBuf.isEmpty())
+        if ((this->fHistory.isEmpty() and not buf.isEmpty())
             or (not this->fHistory.isEmpty()
-                and not this->fInputBuf.isEmpty()
-                and this->fInputBuf != this->fHistory.last()))
+                and not buf.isEmpty()
+                and buf != this->fHistory.last()))
         {
-            this->fHistory.append(this->fInputBuf);
+            this->fHistory.append(buf);
             // If we're about to overflow the max history cap, delete the
             // oldest command from the history.
             if (this->fHistory.size() > this->fMaxHistCap) {
@@ -196,27 +200,53 @@ HFrame::keyPressEvent( QKeyEvent* e )
         emit inputReady();
         return;
     } else if (e->matches(QKeySequence::Delete)) {
-        //this->fTadsBuffer->del_right();
-        if (this->fInputCurrentChar < this->fInputBuf.length()) {
-            this->fInputBuf.remove(this->fInputCurrentChar, 1);
+        if (i < buf.length()) {
+            buf.remove(i, 1);
         }
     } else if (e->matches(QKeySequence::DeleteEndOfWord)) {
-        //this->fTadsBuffer->move_right(true, true);
-        //this->fTadsBuffer->del_selection();
+        // Delete all non-alphanumerics first.
+        while (i < buf.length() and not buf.at(i).isLetterOrNumber()) {
+            buf.remove(i, 1);
+        }
+        // Delete all alphanumerics.
+        while (i < buf.length() and buf.at(i).isLetterOrNumber()) {
+            buf.remove(i, 1);
+        }
     } else if (e->matches(QKeySequence::DeleteStartOfWord)) {
-        //this->fTadsBuffer->move_left(true, true);
-        //this->fTadsBuffer->del_selection();
+        // Delete all non-alphanumerics first.
+        while (i > 0 and not buf.at(i - 1).isLetterOrNumber()) {
+            buf.remove(i - 1, 1);
+            --i;
+        }
+        // Delete all alphanumerics.
+        while (i > 0 and buf.at(i - 1).isLetterOrNumber()) {
+            buf.remove(i - 1, 1);
+            --i;
+        }
     } else if (e->matches(QKeySequence::MoveToPreviousChar)) {
-        if (this->fInputCurrentChar > 0)
-            --this->fInputCurrentChar;
+        if (i > 0)
+            --i;
     } else if (e->matches(QKeySequence::MoveToNextChar)) {
-        //this->fTadsBuffer->move_right(false, false);
-        if (this->fInputCurrentChar < this->fInputBuf.length())
-            ++this->fInputCurrentChar;
+        if (i < buf.length())
+            ++i;
     } else if (e->matches(QKeySequence::MoveToPreviousWord)) {
-        //this->fTadsBuffer->move_left(false, true);
+        // Skip all non-alphanumerics first.
+        while (i > 0 and not buf.at(i - 1).isLetterOrNumber()) {
+            --i;
+        }
+        // Skip all alphanumerics.
+        while (i > 0 and buf.at(i - 1).isLetterOrNumber()) {
+            --i;
+        }
     } else if (e->matches(QKeySequence::MoveToNextWord)) {
-        //this->fTadsBuffer->move_right(false, true);
+        // Skip all non-alphanumerics first.
+        while (i < buf.length() and not buf.at(i).isLetterOrNumber()) {
+            ++i;
+        }
+        // Skip all alphanumerics.
+        while (i < buf.length() and buf.at(i).isLetterOrNumber()) {
+            ++i;
+        }
     } else if (e->matches(QKeySequence::MoveToPreviousLine)) {
         // If we're already at the oldest command in the history, or
         // the history list is empty, don't do anything.
@@ -226,12 +256,12 @@ HFrame::keyPressEvent( QKeyEvent* e )
         // If the current command is new and not in the history yet,
         // remember it so we can bring it back if the user recalls it.
         if (this->fCurHistIndex == 0) {
-            this->fInputBufBackup = this->fInputBuf;
+            this->fInputBufBackup = buf;
         }
         // Recall the previous command from the history.
-        this->fInputBuf = this->fHistory[this->fHistory.size() - 1 - this->fCurHistIndex];
+        buf = this->fHistory[this->fHistory.size() - 1 - this->fCurHistIndex];
         ++this->fCurHistIndex;
-        this->fInputCurrentChar = this->fInputBuf.length();
+        i = buf.length();
     } else if (e->matches(QKeySequence::MoveToNextLine)) {
         // If we're at the latest command, don't do anything.
         if (this->fCurHistIndex == 0) {
@@ -242,13 +272,13 @@ HFrame::keyPressEvent( QKeyEvent* e )
         // new command we backed up previously. So restore it. If not,
         // recall the next command from the history.
         if (this->fCurHistIndex == 0) {
-            this->fInputBuf = this->fInputBufBackup;
+            buf = this->fInputBufBackup;
             this->fInputBufBackup.clear();
         } else {
-            this->fInputBuf = this->fHistory[this->fHistory.size() - this->fCurHistIndex];
-            this->fInputCurrentChar = this->fInputBuf.length();
+            buf = this->fHistory[this->fHistory.size() - this->fCurHistIndex];
+            i = buf.length();
         }
-        this->fInputCurrentChar = this->fInputBuf.length();
+        i = buf.length();
     } else if (e->matches(QKeySequence::SelectPreviousChar)) {
         //this->fTadsBuffer->move_left(true, false);
     } else if (e->matches(QKeySequence::SelectNextChar)) {
@@ -269,10 +299,9 @@ HFrame::keyPressEvent( QKeyEvent* e )
     } else if (e->matches(QKeySequence::Copy)) {
         return;
     } else if (e->key() == Qt::Key_Backspace) {
-        if (this->fInputCurrentChar > 0 and not this->fInputBuf.isEmpty()) {
-            //this->fCursorPos.setX(this->fCursorPos.x() - metr.width(this->fInputBuf.at(this->fInputCurrentChar - 1)));
-            this->fInputBuf.remove(this->fInputCurrentChar - 1, 1);
-            --this->fInputCurrentChar;
+        if (i > 0 and not buf.isEmpty()) {
+            buf.remove(i - 1, 1);
+            --i;
         }
     } else {
         QString strToAdd = e->text();
@@ -282,8 +311,8 @@ HFrame::keyPressEvent( QKeyEvent* e )
             QWidget::keyPressEvent(e);
             return;
         }
-        this->fInputBuf.insert(this->fInputCurrentChar, strToAdd);
-        this->fInputCurrentChar += strToAdd.length();
+        buf.insert(i, strToAdd);
+        i += strToAdd.length();
     }
     this->updateCursorPos();
     this->update();
