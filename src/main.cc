@@ -45,6 +45,18 @@ int main( int argc, char* argv[] )
     // Filename of the game to run.
     QString gameFileName;
 
+    // Check if a game file with the same basename as ours exists in our
+    // directory.  If yes, we will run it.
+    gameFileName = app->applicationDirPath();
+    if (not gameFileName.endsWith('/')) {
+        gameFileName += '/';
+    }
+    gameFileName += QFileInfo(app->applicationFilePath()).baseName();
+    gameFileName += ".hex";
+    if (not QFileInfo(gameFileName).exists()) {
+        gameFileName.clear();
+    }
+
     const QStringList& args = app->arguments();
     if (args.size() == 2) {
         if (QFile::exists(args.at(1))) {
