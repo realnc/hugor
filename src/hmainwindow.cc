@@ -162,9 +162,10 @@ HMainWindow::closeEvent( QCloseEvent* e )
 
     QMessageBox* msgBox = new QMessageBox(QMessageBox::Question,
                                           tr("Quit Hugor"),
-                                          tr("A game is currently running. Abandon the game and quit the interpreter?"),
+                                          tr("Abandon the story and quit the application?"),
                                           QMessageBox::Yes | QMessageBox::Cancel, this);
     msgBox->setDefaultButton(QMessageBox::Cancel);
+    msgBox->setInformativeText(tr("Any unsaved progress in the story will be lost."));
 #ifdef Q_WS_MAC
     msgBox->setIconPixmap(QPixmap(":/he_32-bit_72x72.png"));
     // This presents the dialog as a sheet in OS X.
