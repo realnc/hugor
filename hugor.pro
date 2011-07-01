@@ -4,6 +4,7 @@ CONFIG += warn_on silent
 VERSION = 0.8.0.0
 TARGET = hugor
 ICON = mac_icon.icns
+RC_FILE += hugor.rc
 
 
 !sound_sdl:!sound_fmod {
