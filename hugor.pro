@@ -3,6 +3,7 @@ TEMPLATE = app
 CONFIG += warn_on silent
 VERSION = 0.8.0.0
 TARGET = hugor
+ICON = mac_icon.icns
 
 
 !sound_sdl:!sound_fmod {
