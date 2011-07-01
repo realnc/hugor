@@ -166,7 +166,7 @@ HMainWindow::closeEvent( QCloseEvent* e )
                                           QMessageBox::Yes | QMessageBox::Cancel, this);
     msgBox->setDefaultButton(QMessageBox::Cancel);
 #ifdef Q_WS_MAC
-    msgBox->setIconPixmap(QPixmap(":/he_32-bit_48x48.png"));
+    msgBox->setIconPixmap(QPixmap(":/he_32-bit_72x72.png"));
     // This presents the dialog as a sheet in OS X.
     msgBox->setWindowModality(Qt::WindowModal);
 #endif
