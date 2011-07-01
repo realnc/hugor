@@ -58,8 +58,11 @@ HApplication::HApplication( int& argc, char* argv[], const char* appName, const 
     this->fMainWin->resize(this->fSettings->appSize);
     this->fFrameWin->show();
 
-    // Set application window icon.
+    // Set application window icon, unless we're on OS X where the bundle
+    // icon is used.
+#ifndef Q_WS_MAC
     this->setWindowIcon(QIcon(":/he_32-bit_48x48.png"));
+#endif
 
     // Automatically quit the application when the last window has closed.
     connect(this, SIGNAL(lastWindowClosed()), this, SLOT(quit()));
