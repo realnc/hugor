@@ -3,8 +3,6 @@
 
 #include <QColor>
 
-#define HUGOR_VERSION "0.8"
-
 #ifdef SOUND_FMOD
 #include <fmod.hpp>
 extern FMOD::System* fmSystem;

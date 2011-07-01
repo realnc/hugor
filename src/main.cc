@@ -12,6 +12,7 @@ extern "C" {
 #include "happlication.h"
 #include "settings.h"
 #include "hugodefs.h"
+#include "version.h"
 
 
 #ifdef SOUND_SDL

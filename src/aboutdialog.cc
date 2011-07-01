@@ -1,7 +1,7 @@
 extern "C" {
 #include "heheader.h"
 }
-#include "hugodefs.h"
+#include "version.h"
 #include "aboutdialog.h"
 #include "ui_aboutdialog.h"
 

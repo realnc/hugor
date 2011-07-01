@@ -109,6 +109,7 @@ HEADERS += \
     src/hugodefs.h \
     src/kcolorbutton.h \
     src/settings.h \
+    src/version.h \
     \
     hugo/heheader.h \
     hugo/htokens.h
