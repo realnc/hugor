@@ -1,16 +1,6 @@
-The binaries provided in this package use SDL_mixer for music, which in
-turn uses libmad and libmodplug.  All of these are included in this
-package.  The reason for bundling these libraries is due to most Linux
-distros not providing the latest version of SDL_mixer, and those who do
-have it configured in an manner that is not fully compatible with Hugor.
-If you decide to delete the bundled libraries, the distribution supplied
-versions will be used, but you will most likely not be able to hear all
-of the music in some games and probably experience sound glitches like
-loud, random noise at the beginning of music tracks.
-
-What is not included, but still needed, are the following
-packages, which you'll need to install using your Linux distribution's
-package manager:
+In order to be able to run Hugor on your system, you will need to have the
+following libraries installed.  You can install them using your Linux
+distribution's package manager:
 
   * Qt 4 GUI library
   * SDL library
@@ -19,3 +9,7 @@ If you're using KDE, you have Qt already installed.  If not, the package
 is usually called something like "libqt4" or "libqt4-gui".  Likewise, the
 SDL package is most likely called "libsdl", "libsdl1.2" or
 "libsdl1.2debian".
+
+If you have a system where you compiled SDL yourself, make sure that it
+was built with audio and timers support.  (Anything else, like video, is
+not needed.)
