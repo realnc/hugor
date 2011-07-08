@@ -72,6 +72,10 @@ win32 {
         QMAKE_CFLAGS += -fdata-sections -ffunction-sections
         QMAKE_CXXFLAGS += -fdata-sections -ffunction-sections
         QMAKE_LFLAGS += -Wl,--gc-sections
+
+        # Don't dead-strip the resource section (it contains the icon,
+        # version strings, etc.)  We use a linker script to do that.
+        QMAKE_LFLAGS += $$PWD/w32_linkscript
     }
 }
 
@@ -141,4 +145,5 @@ sound_fmod:SOURCES += src/soundfmod.cc
 
 OTHER_FILES += \
     README \
-    README.linux-bin
+    README.linux-bin \
+    w32_linkscript
