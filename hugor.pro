@@ -65,8 +65,8 @@ win32 {
     TARGET = Hugor
 
     *-g++* {
-        QMAKE_CFLAGS += -mtune=generic -march=i686
-        QMAKE_CXXFLAGS += -mtune=generic -march=i686
+        QMAKE_CFLAGS += -march=i686 -mtune=generic
+        QMAKE_CXXFLAGS += -march=i686 -mtune=generic
 
         # Dead code stripping (requires patched binutils).
         QMAKE_CFLAGS += -fdata-sections -ffunction-sections
