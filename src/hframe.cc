@@ -64,8 +64,8 @@ void
 HFrame::fBlinkCursor()
 {
     this->fBlinkVisible = not this->fBlinkVisible;
-    this->update(this->fCursorPos.x(), this->fCursorPos.y(), this->fCursorPos.x() + 2,
-                 this->fCursorPos.y() + this->fHeight + 1);
+    this->update(this->fCursorPos.x(), this->fCursorPos.y() + 1, this->fCursorPos.x() + 2,
+                 this->fCursorPos.y() + this->fHeight + 2);
 }
 
 
@@ -122,8 +122,8 @@ HFrame::paintEvent( QPaintEvent* )
     // Likewise, the input caret needs to be painted on top of the input text.
     if (this->fCursorVisible and this->fBlinkVisible) {
         p.setPen(hugoColorToQt(this->fFgColor));
-        p.drawLine(this->fCursorPos.x(), this->fCursorPos.y(),
-                   this->fCursorPos.x(), this->fCursorPos.y() + this->fHeight);
+        p.drawLine(this->fCursorPos.x(), this->fCursorPos.y() + 1,
+                   this->fCursorPos.x(), this->fCursorPos.y() + 1 + this->fHeight);
     }
 }
 
