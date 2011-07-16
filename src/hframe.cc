@@ -116,7 +116,7 @@ HFrame::paintEvent( QPaintEvent* )
         p.setPen(hugoColorToQt(this->fFgColor));
         p.setBackgroundMode(Qt::OpaqueMode);
         p.setBackground(QBrush(hugoColorToQt(this->fBgColor)));
-        p.drawText(this->fInputStartX, this->fInputStartY + m.ascent(), this->fInputBuf);
+        p.drawText(this->fInputStartX, this->fInputStartY + m.ascent() + 1, this->fInputBuf);
     }
 
     // Likewise, the input caret needs to be painted on top of the input text.
@@ -581,7 +581,7 @@ HFrame::flushText()
         this->fFlushXPos += m.width(this->fPrintBuffer.at(i));
     }
     */
-    p.drawText(this->fFlushXPos, this->fFlushYPos + m.ascent(), this->fPrintBuffer);
+    p.drawText(this->fFlushXPos, this->fFlushYPos + m.ascent() + 1, this->fPrintBuffer);
     //qDebug() << this->fPrintBuffer;
     this->fPrintBuffer.clear();
 }
