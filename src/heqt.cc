@@ -104,6 +104,9 @@ hugo_splitpath( char* path, char* drive, char* dir, char* fname, char* ext )
     fname[0] = '\0';
     ext[0] = '\0';
 
+    if (path[0] == '\0')
+        return;
+
     QFileInfo inf(QString::fromLocal8Bit(path));
     qstrcpy(ext, inf.suffix().toLocal8Bit().constData());
     qstrcpy(fname, inf.completeBaseName().toLocal8Bit().constData());
