@@ -27,9 +27,7 @@ initSoundEngine()
     // This will preload the needed codecs now instead of constantly loading
     // and unloading them each time a sound is played/stopped.  This is only
     // available in SDL_Mixer 1.2.10 and newer.
-#if (MIX_MAJOR_VERSION > 1) \
-    || ((MIX_MAJOR_VERSION == 1) && (MIX_MINOR_VERSION > 2)) \
-    || ((MIX_MAJOR_VERSION == 1) && (MIX_MINOR_VERSION == 2) && (MIX_PATCHLEVEL > 9))
+#if QT_VERSION_CHECK(MIX_MAJOR_VERSION, MIX_MINOR_VERSION, MIX_PATCHLEVEL) > 0x010209
     int sdlFormats = MIX_INIT_MP3 | MIX_INIT_MOD;
     if (Mix_Init((sdlFormats & sdlFormats) != sdlFormats)) {
         qWarning("Unable to load MP3 and/or MOD audio formats: %s", Mix_GetError());
@@ -110,9 +108,35 @@ hugo_playmusic( HUGO_FILE infile, long reslength, char loop_flag )
         music = 0;
     }
 
-    // Create a Mix_Music* from the RWops. Mix_LoadMUS_RW() takes ownership
-    // of the RWops; it will free it as necessary.
+    // SDL_mixer's auto-detection doesn't always work reliably. It's very
+    // common for example to have broken headers in MP3s that otherwise play
+    // just fine. So we use Mix_LoadMUSType_RW() without auto-detection.
+    //
+#ifndef SOUND_SDL_VANILLA
+    Mix_MusicType musType;
+    switch (resource_type) {
+    case MIDI_R:
+        musType = MUS_MID;
+        break;
+    case XM_R:
+    case S3M_R:
+    case MOD_R:
+        musType = MUS_MOD;
+        break;
+    case MP3_R:
+        musType = MUS_MP3;
+        break;
+    default:
+        qWarning() << "ERROR: Unknown music resource type";
+        return false;
+    }
+
+    // Create a Mix_Music* from the RWops. Mix_LoadMUSType_RW() takes
+    // ownership of the RWops; it will free it as necessary.
+    music = Mix_LoadMUSType_RW(rwops, musType);
+#else
     music = Mix_LoadMUS_RW(rwops);
+#endif
     if (music == 0) {
         qWarning() << "ERROR:" << Mix_GetError();
         return false;
