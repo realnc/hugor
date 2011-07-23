@@ -6,17 +6,17 @@ TARGET = hugor
 ICON = mac_icon.icns
 RC_FILE += hugor.rc
 
-
-!sound_sdl:!sound_fmod {
-    error("Use CONFIG+=sound_sdl or CONFIG+=sound_fmod to select a sound engine")
+!count(SOUND, 1) {
+    error("Use SOUND=sdl, sdl_vanilla or fmod to select a sound engine")
+} else:!contains(SOUND, sdl):!contains(SOUND, sdl_vanilla):!contains(SOUND, fmod) {
+    error("SOUND argument not recognized")
 }
 
-sound_sdl:sound_fmod {
-    error("Choose either sound_sdl or sound_fmod, but not both")
-}
+CONFIG += $$SOUND
 
-sound_sdl:DEFINES += SOUND_SDL
-sound_fmod:DEFINES += SOUND_FMOD
+sdl:DEFINES += SOUND_SDL
+sdl_vanilla:DEFINES += SOUND_SDL_VANILLA
+fmod:DEFINES += SOUND_FMOD
 
 # On Windows and OS X we build static binaries, so we need to explicitly
 # include the text codec plugins.
@@ -33,22 +33,22 @@ macx {
     QMAKE_CXXFLAGS += -fvisibility=hidden -fomit-frame-pointer
     QMAKE_LFLAGS += -dead_strip
 
-    sound_sdl {
+    sdl|sdl_vanilla {
         CONFIG += link_pkgconfig
         PKGCONFIG += SDL_mixer
     }
 
-    sound_fmod {
+    fmod {
         LIBS += -L./fmod/api/lib -lfmodex
         INCLUDEPATH += ./fmod/api/inc
     }
 } else {
-    sound_sdl {
+    sdl|sdl_vanilla {
         CONFIG += link_pkgconfig
         PKGCONFIG += SDL_mixer
     }
 
-    sound_fmod {
+    fmod {
         contains(QMAKE_HOST.arch, x86_64) {
             LIBS += -lfmodex64
         } else {
@@ -136,8 +136,8 @@ SOURCES += \
     hugo/heset.c \
     hugo/stringfn.c
 
-sound_sdl:SOURCES += src/soundsdl.cc
-sound_fmod:SOURCES += src/soundfmod.cc
+sdl|sdl_vanilla:SOURCES += src/soundsdl.cc
+fmod:SOURCES += src/soundfmod.cc
 
 OTHER_FILES += \
     README \
