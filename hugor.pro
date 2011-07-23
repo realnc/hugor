@@ -34,12 +34,8 @@ macx {
     QMAKE_LFLAGS += -dead_strip
 
     sound_sdl {
-        QMAKE_LFLAGS += -F./Frameworks
-        LIBS += -framework SDL_mixer -framework SDL
-        INCLUDEPATH += \
-            ./Frameworks/SDL.framework/Headers \
-            ./Frameworks/SDL_mixer.framework/Headers \
-            ./Frameworks/smpeg.framework/Headers
+        CONFIG += link_pkgconfig
+        PKGCONFIG += SDL_mixer
     }
 
     sound_fmod {
