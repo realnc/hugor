@@ -112,6 +112,8 @@ hugo_playmusic( HUGO_FILE infile, long reslength, char loop_flag )
     // common for example to have broken headers in MP3s that otherwise play
     // just fine. So we use Mix_LoadMUSType_RW() without auto-detection.
     //
+    // However, Mix_LoadMUSType_RW() has not been accepted upstream yet, so
+    // we can't use it with vanilla SDL_mixer.
 #ifndef SOUND_SDL_VANILLA
     Mix_MusicType musType;
     switch (resource_type) {
