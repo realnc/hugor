@@ -12,6 +12,7 @@
 #include "confdialog.h"
 #include "aboutdialog.h"
 #include "settings.h"
+#include "hugodefs.h"
 
 class HMainWindow* hMainWin = 0;
 
@@ -174,6 +175,7 @@ HMainWindow::closeEvent( QCloseEvent* e )
 
     if (msgBox->exec() == QMessageBox::Yes) {
         hApp->settings()->saveToDisk();
+        closeSoundEngine();
         exit(0);
     } else {
         e->ignore();
