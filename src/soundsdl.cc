@@ -111,10 +111,6 @@ hugo_playmusic( HUGO_FILE infile, long reslength, char loop_flag )
     // SDL_mixer's auto-detection doesn't always work reliably. It's very
     // common for example to have broken headers in MP3s that otherwise play
     // just fine. So we use Mix_LoadMUSType_RW() without auto-detection.
-    //
-    // However, Mix_LoadMUSType_RW() has not been accepted upstream yet, so
-    // we can't use it with vanilla SDL_mixer.
-#ifndef SOUND_SDL_VANILLA
     Mix_MusicType musType;
     switch (resource_type) {
     case MIDI_R:
@@ -133,12 +129,9 @@ hugo_playmusic( HUGO_FILE infile, long reslength, char loop_flag )
         return false;
     }
 
-    // Create a Mix_Music* from the RWops. Mix_LoadMUSType_RW() takes
-    // ownership of the RWops; it will free it as necessary.
-    music = Mix_LoadMUSType_RW(rwops, musType);
-#else
-    music = Mix_LoadMUS_RW(rwops);
-#endif
+    // Create a Mix_Music* from the RWops. Let Mix_LoadMUSType_RW() free
+    // the rwops automatically when its done with it.
+    music = Mix_LoadMUSType_RW(rwops, musType, true);
     if (music == 0) {
         qWarning() << "ERROR:" << Mix_GetError();
         return false;

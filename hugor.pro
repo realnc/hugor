@@ -7,15 +7,14 @@ ICON = mac_icon.icns
 RC_FILE += hugor.rc
 
 !count(SOUND, 1) {
-    error("Use SOUND=sdl, sdl_vanilla or fmod to select a sound engine")
-} else:!contains(SOUND, sdl):!contains(SOUND, sdl_vanilla):!contains(SOUND, fmod) {
+    error("Use SOUND=sdl or SOUND=fmod to select a sound engine")
+} else:!contains(SOUND, sdl):!contains(SOUND, fmod) {
     error("SOUND argument not recognized")
 }
 
 CONFIG += $$SOUND
 
 sdl:DEFINES += SOUND_SDL
-sdl_vanilla:DEFINES += SOUND_SDL_VANILLA
 fmod:DEFINES += SOUND_FMOD
 
 # On Windows and OS X we build static binaries, so we need to explicitly
@@ -33,7 +32,7 @@ macx {
     QMAKE_CXXFLAGS += -fvisibility=hidden -fomit-frame-pointer
     QMAKE_LFLAGS += -dead_strip
 
-    sdl|sdl_vanilla {
+    sdl {
         CONFIG += link_pkgconfig
         PKGCONFIG += SDL_mixer
     }
@@ -43,7 +42,7 @@ macx {
         INCLUDEPATH += ./fmod/api/inc
     }
 } else {
-    sdl|sdl_vanilla {
+    sdl {
         CONFIG += link_pkgconfig
         PKGCONFIG += SDL_mixer
     }
@@ -136,7 +135,7 @@ SOURCES += \
     hugo/heset.c \
     hugo/stringfn.c
 
-sdl|sdl_vanilla:SOURCES += src/soundsdl.cc
+sdl:SOURCES += src/soundsdl.cc
 fmod:SOURCES += src/soundfmod.cc
 
 OTHER_FILES += \
