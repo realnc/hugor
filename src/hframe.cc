@@ -10,7 +10,6 @@ extern "C" {
 }
 #include "hframe.h"
 #include "happlication.h"
-#include "hwindow.h"
 #include "hugodefs.h"
 #include "settings.h"
 
