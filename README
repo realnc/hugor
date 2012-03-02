@@ -19,7 +19,7 @@ The source code is hosted at the following Git repository:
   http://www.assembla.com/spaces/hugor
 
 If you wish to build from source, you will need the development packages
-for the Qt library (version 4.4 or later), SDL and SDL_mixer, or FMOD.
-However, building from source and using the SDL_mixer sound backend is not
-recommended, since Hugor uses a customized version of the SDL_mixer
-library (which is bundled with the binary.)
+for the Qt library (version 4.4 or later) and SDL_mixer or FMOD.  SDL_mixer
+is recommended and you'll need at least version 1.2.12.  To get correct
+support for MOD and MP3 music, SDL_mixer needs to have been built with
+modplug and libmad support.
