@@ -25,15 +25,12 @@ initSoundEngine()
     }
 
     // This will preload the needed codecs now instead of constantly loading
-    // and unloading them each time a sound is played/stopped.  This is only
-    // available in SDL_Mixer 1.2.10 and newer.
-#if QT_VERSION_CHECK(MIX_MAJOR_VERSION, MIX_MINOR_VERSION, MIX_PATCHLEVEL) > 0x010209
+    // and unloading them each time a sound is played/stopped.
     int sdlFormats = MIX_INIT_MP3 | MIX_INIT_MOD;
     if (Mix_Init((sdlFormats & sdlFormats) != sdlFormats)) {
         qWarning("Unable to load MP3 and/or MOD audio formats: %s", Mix_GetError());
         exit(1);
     }
-#endif
 
     // Initialize the mixer. 44.1kHz, default sample format,
     // 2 channels (stereo) and a 4k chunk size.
