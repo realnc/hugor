@@ -17,9 +17,8 @@ CONFIG += $$SOUND
 sdl:DEFINES += SOUND_SDL
 fmod:DEFINES += SOUND_FMOD
 
-# On Windows and OS X we build static binaries, so we need to explicitly
-# include the text codec plugins.
-win32|macx {
+# Static OS X builds need to explicitly include the text codec plugins.
+macx {
     QTPLUGIN += qcncodecs qjpcodecs qtwcodecs qkrcodecs
 }
 
