@@ -48,11 +48,8 @@ macx {
     }
 
     fmod {
-        contains(QMAKE_HOST.arch, x86_64) {
-            LIBS += -lfmodex64
-        } else {
-            LIBS += -lfmodex32
-        }
+        LIBS += -L/opt/fmodex/api/lib -lfmodex
+        INCLUDEPATH += /opt/fmodex/api/inc
     }
 }
 
