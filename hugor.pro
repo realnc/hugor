@@ -25,8 +25,12 @@ macx {
 macx {
     TARGET = Hugor
     QMAKE_INFO_PLIST = Info.plist
-    QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.5
-    QMAKE_MAC_SDK = /Developer/SDKs/MacOSX10.5.sdk
+    exists(/Developer/SDKs/MacOSX10.5.sdk) {
+        QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.5
+        QMAKE_MAC_SDK = /Developer/SDKs/MacOSX10.5.sdk
+    } else {
+        warning("OS X 10.5 SDK not found. Will use Qt defaults.")
+    }
     QMAKE_CFLAGS += -fvisibility=hidden -fomit-frame-pointer
     QMAKE_CXXFLAGS += -fvisibility=hidden -fomit-frame-pointer
     QMAKE_LFLAGS += -dead_strip
