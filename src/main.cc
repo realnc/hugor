@@ -28,12 +28,14 @@ extern "C" {
 #endif
 
 // Static OS X builds need the Qt codec plugins.
-#if defined(Q_WS_MAC)
-#include <QtPlugin>
-Q_IMPORT_PLUGIN(qcncodecs)
-Q_IMPORT_PLUGIN(qjpcodecs)
-Q_IMPORT_PLUGIN(qtwcodecs)
-Q_IMPORT_PLUGIN(qkrcodecs)
+#ifndef NO_STATIC_TEXTCODEC_PLUGINS
+#  if defined(Q_WS_MAC)
+#    include <QtPlugin>
+     Q_IMPORT_PLUGIN(qcncodecs)
+     Q_IMPORT_PLUGIN(qjpcodecs)
+     Q_IMPORT_PLUGIN(qtwcodecs)
+     Q_IMPORT_PLUGIN(qkrcodecs)
+#  endif
 #endif
 
 
