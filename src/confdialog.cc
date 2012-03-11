@@ -1,14 +1,12 @@
 #include <QColorDialog>
 #include <QSignalMapper>
 #include <QPushButton>
-//#include <QTextCodec>
 
 #include "confdialog.h"
 #include "ui_confdialog.h"
 #include "settings.h"
 #include "happlication.h"
 #include "hmainwindow.h"
-//#include "syswingroup.h"
 
 
 ConfDialog::ConfDialog( HMainWindow* parent )

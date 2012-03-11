@@ -64,8 +64,8 @@ class HApplication: public QApplication {
     main( QString gameFileName );
 
   public:
-    HApplication( int& argc, char* argv[], const char* appName, const char* appVersion, const char* orgName,
-                     const char* orgDomain );
+    HApplication( int& argc, char* argv[], const char* appName, const char* appVersion,
+                  const char* orgName, const char* orgDomain );
 
     virtual
     ~HApplication();

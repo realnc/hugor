@@ -17,11 +17,6 @@ extern "C" {
 #include "heheader.h"
 }
 
-/* Since we provide our own command history: */
-//#define HISTORY_SIZE 16
-//int hcount = 0;
-//char* history[HISTORY_SIZE];
-
 
 /* Helper routine. Converts a Hugo color to a Qt color.
  */
@@ -252,8 +247,6 @@ int
 hugo_getkey( void )
 {
     flushScrollback();
-    //qDebug() << "getkey";
-    //hFrame->moveCursorPos(QPoint(current_text_x, current_text_y));
     int c = hFrame->getNextKey();
     if (c == 0) {
         // It's a mouse click.

@@ -21,8 +21,9 @@ extern "C" {
 HApplication* hApp = 0;
 
 
-HApplication::HApplication( int& argc, char* argv[], const char* appName, const char* appVersion,
-                                  const char* orgName, const char* orgDomain )
+HApplication::HApplication( int& argc, char* argv[], const char* appName,
+                            const char* appVersion, const char* orgName,
+                            const char* orgDomain )
     : QApplication(argc, argv),
       fFrameWin(0),
       fGameRunning(false),
@@ -49,7 +50,6 @@ HApplication::HApplication( int& argc, char* argv[], const char* appName, const 
     // Create our main application window.
     this->fMainWin = new HMainWindow(0);
     this->fMainWin->setWindowTitle(QString::fromAscii(appName));
-    //this->fMainWin->updateRecentGames();
 
     this->fFrameWin = new HFrame(hMainWin);
     this->fMainWin->setCentralWidget(this->fFrameWin);
@@ -137,7 +137,6 @@ HApplication::fRunGame()
                 gamesList.prepend(finfo.absoluteFilePath());
             }
         }
-        //this->fMainWin->updateRecentGames();
         this->fSettings->saveToDisk();
 
         // Run the Hugo engine.
@@ -153,9 +152,6 @@ HApplication::fRunGame()
         this->fGameFile.clear();
         emit gameHasQuit();
     }
-
-    // Reset application window title.
-    //qWinGroup->setWindowTitle(qFrame->applicationName());
 }
 
 
