@@ -1,8 +1,7 @@
 #include <QDebug>
 #include <QString>
 #include <QStringList>
-#include <QFile>
-#include <QFileDialog>
+#include <QFileInfo>
 #include <cstdlib>
 
 extern "C" {
@@ -71,17 +70,9 @@ int main( int argc, char* argv[] )
         }
     }
 
-    if (gameFileName.isEmpty() and app->settings()->askForGameFile) {
-        gameFileName = QFileDialog::getOpenFileName(0, QObject::tr("Choose the story file you wish to play"),
-                                                    app->settings()->lastFileOpenDir,
-                                                    QObject::tr("Hugo Games")
-                                                    + QString::fromAscii("(*.hex *.Hex *.HEX)"));
-    }
     int ret = 0;
-    if (not gameFileName.isNull()) {
-        QMetaObject::invokeMethod(app, "main", Qt::QueuedConnection, Q_ARG(QString, gameFileName));
-        ret = app->exec();
-    }
+    QMetaObject::invokeMethod(app, "main", Qt::QueuedConnection, Q_ARG(QString, gameFileName));
+    ret = app->exec();
     delete app;
     closeSoundEngine();
     return ret;

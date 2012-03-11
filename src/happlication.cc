@@ -6,6 +6,7 @@
 #include <QDir>
 #include <QTextCodec>
 #include <QMessageBox>
+#include <QFileDialog>
 
 extern "C" {
 #include "heheader.h"
@@ -62,9 +63,6 @@ HApplication::HApplication( int& argc, char* argv[], const char* appName, const 
 #ifndef Q_WS_MAC
     this->setWindowIcon(QIcon(":/he_32-bit_48x48.png"));
 #endif
-
-    // Automatically quit the application when the last window has closed.
-    connect(this, SIGNAL(lastWindowClosed()), this, SLOT(quit()));
 }
 
 
@@ -155,7 +153,6 @@ HApplication::fRunGame()
         this->fGameFile.clear();
         emit gameHasQuit();
     }
-    hApp->quit();
 
     // Reset application window title.
     //qWinGroup->setWindowTitle(qFrame->applicationName());
@@ -163,34 +160,62 @@ HApplication::fRunGame()
 
 
 #ifdef Q_WS_MAC
-/*
 #include <QFileOpenEvent>
 bool
 HApplication::event( QEvent* e )
 {
-    // We only handle the FileOpen event.
-    if (e->type() != QEvent::FileOpen) {
+    // We only handle the FileOpen event and only when no game
+    // is currently running.
+    if (e->type() != QEvent::FileOpen or this->fGameRunning) {
         return QApplication::event(e);
     }
-    return qWinGroup->handleFileOpenEvent(static_cast<QFileOpenEvent*>(e));
+    QFileOpenEvent* fOpenEv = static_cast<QFileOpenEvent*>(e);
+    if (fOpenEv->file().isEmpty()) {
+        return QApplication::event(e);
+    }
+    this->fNextGame = fOpenEv->file();
+    e->accept();
+    return true;
 }
-*/
 #endif
 
 
 void
 HApplication::main( QString gameFileName )
 {
-    if (this->fSettings->isMaximized) {
-        this->fMainWin->showMaximized();
-    } else {
-        this->fMainWin->show();
+    // Process pending events in case we have a FileOpen event. Freeze user
+    // input while doing so; we don't want to leave a way to mess with the
+    // GUI when we don't have a game running yet.  We do this a bunch of
+    // times to make sure the FileOpen event can propagate properly.
+    for (int i = 0; i < 100; ++i) {
+        this->advanceEventLoop(QEventLoop::ExcludeUserInputEvents);
     }
 
-    // If a game file was specified, try to run it.
-    if (not gameFileName.isEmpty()) {
-        this->setNextGame(gameFileName);
+    if (this->fNextGame.isEmpty()) {
+        this->fNextGame = gameFileName;
     }
+
+    // If we still don't have a filename, prompt for one.
+    if (this->fNextGame.isEmpty() and this->fSettings->askForGameFile) {
+        this->fNextGame = QFileDialog::getOpenFileName(0, QObject::tr("Choose the story file you wish to play"),
+                                                       this->fSettings->lastFileOpenDir,
+                                                       QObject::tr("Hugo Games")
+                                                       + QString::fromAscii("(*.hex *.Hex *.HEX)"));
+    }
+
+    // Automatically quit the application when the last window has closed.
+    connect(this, SIGNAL(lastWindowClosed()), this, SLOT(quit()));
+
+    // If we have a filename, load it.
+    if (not this->fNextGame.isEmpty()) {
+        if (this->fSettings->isMaximized) {
+            this->fMainWin->showMaximized();
+        } else {
+            this->fMainWin->show();
+        }
+        this->fRunGame();
+    }
+    this->fMainWin->close();
 }
 
 

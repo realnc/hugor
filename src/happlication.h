@@ -37,13 +37,11 @@ class HApplication: public QApplication {
     fRunGame();
 
 #ifdef Q_WS_MAC
-    /*
   protected:
     // On the Mac, dropping a file on our application icon will generate a
     // FileOpen event, so we override this to be able to handle it.
     virtual bool
     event( QEvent* );
-    */
 #endif
 
   signals:
@@ -94,19 +92,6 @@ class HApplication: public QApplication {
         this->fGameRunning = f;
         if (f == false) {
             emit gameQuitting();
-        }
-    }
-
-    void
-    setNextGame( const QString& fname )
-    {
-        this->fNextGame = fname;
-        // If no game is currently executing, run it now. Otherwise, end the
-        // current game.
-        if (not this->fGameRunning) {
-            this->fRunGame();
-        } else {
-            this->setGameRunning(false);
         }
     }
 

@@ -153,7 +153,7 @@ HMainWindow::fShowScrollback()
     }
 }
 
-
+#include <QFileDialog>
 void
 HMainWindow::closeEvent( QCloseEvent* e )
 {
