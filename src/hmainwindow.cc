@@ -153,6 +153,7 @@ void
 HMainWindow::closeEvent( QCloseEvent* e )
 {
     if (not hApp->gameRunning()) {
+        QMainWindow::closeEvent(e);
         return;
     }
 
