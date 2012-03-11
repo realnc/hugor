@@ -157,10 +157,6 @@ HMainWindow::fShowScrollback()
 void
 HMainWindow::closeEvent( QCloseEvent* e )
 {
-    if (not hApp->gameRunning()) {
-        return;
-    }
-
     QMessageBox* msgBox = new QMessageBox(QMessageBox::Question,
                                           tr("Quit Hugor"),
                                           tr("Abandon the story and quit the application?"),
