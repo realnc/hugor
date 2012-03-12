@@ -55,14 +55,20 @@ Settings::loadFromDisk()
     sett.beginGroup(QString::fromAscii("fonts"));
     this->propFont.setStyleStrategy(QFont::StyleStrategy(QFont::PreferOutline
                                                          | QFont::PreferQuality
-                                                         | QFont::ForceIntegerMetrics));
+#if QT_VERSION >= 0x040700
+                                                         | QFont::ForceIntegerMetrics
+#endif
+                                                         ));
     QFont tmp;
     tmp.fromString(sett.value(QString::fromAscii("main"), DEFAULT_PROP).toString());
     this->propFont.setFamily(tmp.family());
     this->propFont.setPointSize(tmp.pointSize());
     this->fixedFont.setStyleStrategy(QFont::StyleStrategy(QFont::PreferOutline
                                                           | QFont::PreferQuality
-                                                          | QFont::ForceIntegerMetrics));
+#if QT_VERSION >= 0x040700
+                                                          | QFont::ForceIntegerMetrics
+#endif
+                                                          ));
     tmp.fromString(sett.value(QString::fromAscii("fixed"), DEFAULT_MONO).toString());
     this->fixedFont.setFamily(tmp.family());
     this->fixedFont.setPointSize(tmp.pointSize());
