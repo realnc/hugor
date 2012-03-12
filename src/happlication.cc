@@ -7,6 +7,7 @@
 #include <QTextCodec>
 #include <QMessageBox>
 #include <QFileDialog>
+#include <QStackedWidget>
 
 extern "C" {
 #include "heheader.h"
@@ -25,7 +26,7 @@ HApplication::HApplication( int& argc, char* argv[], const char* appName,
                             const char* appVersion, const char* orgName,
                             const char* orgDomain )
     : QApplication(argc, argv),
-      fFrameWin(0),
+      fBottomMarginSize(5),
       fGameRunning(false),
       fHugoCodec(QTextCodec::codecForName("Windows-1252"))
 {
@@ -51,8 +52,15 @@ HApplication::HApplication( int& argc, char* argv[], const char* appName,
     this->fMainWin = new HMainWindow(0);
     this->fMainWin->setWindowTitle(QString::fromAscii(appName));
 
-    this->fFrameWin = new HFrame(hMainWin);
-    this->fMainWin->setCentralWidget(this->fFrameWin);
+    // This widget provides margins for fFrameWin.
+    this->fMarginWidget = new QStackedWidget(this->fMainWin);
+    this->fMarginWidget->setBackgroundRole(QPalette::Window);
+    this->fMarginWidget->setAutoFillBackground(true);
+
+    this->fFrameWin = new HFrame(this->fMarginWidget);
+    this->fMarginWidget->addWidget(this->fFrameWin);
+    this->updateMargins(::bgcolor);
+    this->fMainWin->setCentralWidget(this->fMarginWidget);
 
     // Restore the application's size.
     this->fMainWin->resize(this->fSettings->appSize);
@@ -155,6 +163,19 @@ HApplication::fRunGame()
 }
 
 
+void
+HApplication::updateMargins( int color )
+{
+    int marginSize = this->fSettings->marginSize;
+    this->fMarginWidget->setContentsMargins(marginSize, 0, marginSize,
+                                            this->fBottomMarginSize);
+
+    QPalette palette = this->fMarginWidget->palette();
+    palette.setColor(QPalette::Window, hugoColorToQt(color));
+    this->fMarginWidget->setPalette(palette);
+}
+
+
 #ifdef Q_WS_MAC
 #include <QFileOpenEvent>
 bool
@@ -219,6 +240,9 @@ void
 HApplication::notifyPreferencesChange( const Settings* sett )
 {
     smartformatting = sett->smartFormatting;
+
+    // 'bgcolor' is a Hugo engine global.
+    this->updateMargins(::bgcolor);
 
     // Recalculate font dimensions, in case font settings have changed.
     calcFontDimensions();

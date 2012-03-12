@@ -50,6 +50,7 @@ ConfDialog::ConfDialog( HMainWindow* parent )
     ui->butterCheckBox->setEnabled(sett->softTextScrolling);
     connect(ui->softScrollCheckBox, SIGNAL(toggled(bool)), ui->butterCheckBox, SLOT(setEnabled(bool)));
     ui->smartFormattingCheckBox->setChecked(sett->smartFormatting);
+    ui->marginSizeSpinBox->setValue(sett->marginSize);
 
     ui->askForGameFileCheckBox->setChecked(sett->askForGameFile);
 
@@ -107,6 +108,7 @@ ConfDialog::fMakeInstantApply()
     connect(ui->softScrollCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
     connect(ui->butterCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
     connect(ui->smartFormattingCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
+    connect(ui->marginSizeSpinBox, SIGNAL(valueChanged(int)), this, SLOT(fApplySettings()));
     connect(ui->allowGraphicsCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
     connect(ui->allowSoundEffectsCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
     connect(ui->allowMusicCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
@@ -141,6 +143,7 @@ ConfDialog::fApplySettings()
     sett->softTextScrolling = ui->softScrollCheckBox->isChecked();
     sett->extraButter = ui->butterCheckBox->isChecked();
     sett->smartFormatting = ui->smartFormattingCheckBox->isChecked();
+    sett->marginSize = ui->marginSizeSpinBox->value();
     sett->askForGameFile = ui->askForGameFileCheckBox->isChecked();
 
     // Notify the application that preferences have changed.

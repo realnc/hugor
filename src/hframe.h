@@ -6,6 +6,8 @@
 #include <QList>
 #include <QFontMetrics>
 
+#include "happlication.h"
+
 
 extern class HFrame* hFrame;
 
@@ -181,6 +183,7 @@ class HFrame: public QWidget {
     {
         this->flushText();
         this->fBgColor = color;
+        hApp->updateMargins(this->fBgColor);
     }
 
     void

@@ -20,6 +20,11 @@ class HApplication: public QApplication {
     // Frame widget containing all subwindows.
     class HFrame* fFrameWin;
 
+    // Parent of fFrameWin, provides margins.
+    class QStackedWidget* fMarginWidget;
+
+    const int fBottomMarginSize;
+
     // Are we currently executing a game?
     bool fGameRunning;
 
@@ -69,6 +74,9 @@ class HApplication: public QApplication {
 
     virtual
     ~HApplication();
+
+    void
+    updateMargins( int color );
 
     class Settings*
     settings()

@@ -124,6 +124,23 @@
        </property>
       </widget>
      </item>
+     <item>
+      <widget class="QSpinBox" name="marginSizeSpinBox">
+       <property name="suffix">
+        <string>px</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="marginSizeLabel">
+       <property name="text">
+        <string>Margin Size</string>
+       </property>
+       <property name="buddy">
+        <cstring>marginSizeSpinBox</cstring>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
    <item>
