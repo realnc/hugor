@@ -44,7 +44,7 @@ HMainWindow::HMainWindow( QWidget* parent )
     act = new QAction(tr("&Scrollback Window"), this);
     act->setMenuRole(QAction::ApplicationSpecificRole);
     menu->addAction(act);
-    connect(act, SIGNAL(triggered()), SLOT(fShowScrollback()));
+    connect(act, SIGNAL(triggered()), SLOT(showScrollback()));
 
     // "Help" menu.
     menu = menuBar->addMenu(tr("&Help"));
@@ -138,7 +138,7 @@ HMainWindow::fHideAbout()
 
 
 void
-HMainWindow::fShowScrollback()
+HMainWindow::showScrollback()
 {
     if (this->fScrollbackWindow->isHidden()) {
         this->fScrollbackWindow->show();

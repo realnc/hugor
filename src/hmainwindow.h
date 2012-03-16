@@ -28,9 +28,6 @@ class HMainWindow: public QMainWindow {
     void
     fHideAbout();
 
-    void
-    fShowScrollback();
-
   protected:
     virtual void
     closeEvent( QCloseEvent* e );
@@ -40,6 +37,10 @@ class HMainWindow: public QMainWindow {
 
     void
     appendToScrollback( const QByteArray& str );
+
+  public slots:
+    void
+    showScrollback();
 };
 
 

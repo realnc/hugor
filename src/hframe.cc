@@ -10,6 +10,7 @@ extern "C" {
 }
 #include "hframe.h"
 #include "happlication.h"
+#include "hmainwindow.h"
 #include "hugodefs.h"
 #include "settings.h"
 
@@ -54,6 +55,10 @@ HFrame::HFrame( QWidget* parent )
 
     // We need to check whether the application lost focus.
     connect(qApp, SIGNAL(focusChanged(QWidget*,QWidget*)), SLOT(fHandleFocusChange(QWidget*,QWidget*)));
+
+    // Requesting scrollback simply triggers the scrollback window.
+    // Since focus is lost, subsequent scrolling/paging events will work as expected.
+    connect(this, SIGNAL(requestScrollback()), hMainWin, SLOT(showScrollback()));
 
     hFrame = this;
 }
@@ -278,6 +283,8 @@ HFrame::keyPressEvent( QKeyEvent* e )
             i = buf.length();
         }
         i = buf.length();
+    } else if (e->matches(QKeySequence::MoveToPreviousPage)) {
+        this->requestScrollback();
     } else if (e->key() == Qt::Key_Backspace) {
         if (i > 0 and not buf.isEmpty()) {
             buf.remove(i - 1, 1);
@@ -389,6 +396,16 @@ HFrame::mouseDoubleClickEvent( QMouseEvent* e )
     this->fInputCurrentChar += word.length();
     this->update();
     this->updateCursorPos();
+}
+
+
+void
+HFrame::wheelEvent( QWheelEvent* e )
+{
+    if (e->delta() > 0) {
+        requestScrollback();
+    }
+    e->accept();
 }
 
 
