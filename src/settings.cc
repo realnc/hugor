@@ -97,6 +97,7 @@ Settings::loadFromDisk()
 
     sett.beginGroup(QString::fromAscii("geometry"));
     this->appSize = sett.value(QString::fromAscii("size"), QSize(800, 600)).toSize();
+    this->overlayScrollback = sett.value(QString::fromAscii("overlayScrollback"), false).toBool();
     this->isMaximized = sett.value(QString::fromAscii("maximized"), false).toBool();
     this->marginSize = sett.value(QString::fromAscii("marginSize"), 0).toInt();
     sett.endGroup();
@@ -142,6 +143,7 @@ Settings::saveToDisk()
 
     sett.beginGroup(QString::fromAscii("geometry"));
     sett.setValue(QString::fromAscii("size"), hMainWin->size());
+    sett.setValue(QString::fromAscii("overlayScrollback"), this->overlayScrollback);
     sett.setValue(QString::fromAscii("maximized"), hMainWin->isMaximized());
     sett.setValue(QString::fromAscii("marginSize"), this->marginSize);
     sett.endGroup();

@@ -125,6 +125,13 @@
       </widget>
      </item>
      <item>
+      <widget class="QCheckBox" name="overlayScrollbackCheckBox">
+       <property name="text">
+        <string>Overlay Scrollback</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QSpinBox" name="marginSizeSpinBox">
        <property name="suffix">
         <string>px</string>

@@ -51,6 +51,7 @@ ConfDialog::ConfDialog( HMainWindow* parent )
     connect(ui->softScrollCheckBox, SIGNAL(toggled(bool)), ui->butterCheckBox, SLOT(setEnabled(bool)));
     ui->smartFormattingCheckBox->setChecked(sett->smartFormatting);
     ui->marginSizeSpinBox->setValue(sett->marginSize);
+    ui->overlayScrollbackCheckBox->setChecked(sett->overlayScrollback);
 
     ui->askForGameFileCheckBox->setChecked(sett->askForGameFile);
 
@@ -114,6 +115,7 @@ ConfDialog::fMakeInstantApply()
     connect(ui->allowMusicCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
     connect(ui->smoothScalingCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
     connect(ui->muteSoundCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
+    connect(ui->overlayScrollbackCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
     connect(ui->mainTextColorButton, SIGNAL(changed(QColor)), this, SLOT(fApplySettings()));
     connect(ui->mainBgColorButton, SIGNAL(changed(QColor)), this, SLOT(fApplySettings()));
     connect(ui->bannerTextColorButton, SIGNAL(changed(QColor)), this, SLOT(fApplySettings()));
@@ -143,6 +145,7 @@ ConfDialog::fApplySettings()
     sett->softTextScrolling = ui->softScrollCheckBox->isChecked();
     sett->extraButter = ui->butterCheckBox->isChecked();
     sett->smartFormatting = ui->smartFormattingCheckBox->isChecked();
+    sett->overlayScrollback = ui->overlayScrollbackCheckBox->isChecked();
     sett->marginSize = ui->marginSizeSpinBox->value();
     sett->askForGameFile = ui->askForGameFileCheckBox->isChecked();
 

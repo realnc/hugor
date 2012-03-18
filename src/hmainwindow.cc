@@ -131,6 +131,9 @@ HMainWindow::fHideAbout()
 void
 HMainWindow::showScrollback()
 {
+    if (hApp->settings()->overlayScrollback) {
+        this->fScrollbackWindow->setGeometry(this->geometry());
+    }
     if (this->fScrollbackWindow->isHidden()) {
         this->fScrollbackWindow->show();
     } else {

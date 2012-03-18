@@ -39,6 +39,7 @@ class Settings {
 
     QSize appSize;
     bool isMaximized;
+    bool overlayScrollback;
     int marginSize;
 };
 
