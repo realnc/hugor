@@ -10,6 +10,34 @@ extern "C" {
 }
 
 
+#if QT_VERSION < 0x040700
+static int
+qtRuntimeVersion()
+{
+    const QList<QByteArray> verList(QByteArray(qVersion()).split('.'));
+    if (verList.size() < 3) {
+        // Something isn't right. The Qt version string should have
+        // at least three fields.
+        return 0;
+    }
+    bool ok;
+    int major = verList.at(0).toInt(&ok);
+    if (not ok) {
+        return 0;
+    }
+    int minor = verList.at(1).toInt(&ok);
+    if (not ok) {
+        return 0;
+    }
+    int patch = verList.at(2).toInt(&ok);
+    if (not ok) {
+        return 0;
+    }
+    return QT_VERSION_CHECK(major, minor, patch);
+}
+#endif
+
+
 void
 Settings::loadFromDisk()
 {
@@ -53,22 +81,26 @@ Settings::loadFromDisk()
 #endif
 #endif
     sett.beginGroup(QString::fromAscii("fonts"));
-    this->propFont.setStyleStrategy(QFont::StyleStrategy(QFont::PreferOutline
-                                                         | QFont::PreferQuality
+    QFont::StyleStrategy strat;
 #if QT_VERSION >= 0x040700
-                                                         | QFont::ForceIntegerMetrics
+    // We're building with a recent enough Qt; use ForceIntegerMetrics directly.
+    strat = QFont::StyleStrategy(QFont::PreferOutline | QFont::PreferQuality | QFont::ForceIntegerMetrics);
+#else
+    // We're building with a Qt version that does not offer ForceIntegerMetrics.
+    // If we're running on a recent enough Qt, use the ForceIntegerMetrics enum
+    // value directly.
+    if (qtRuntimeVersion() >= 0x040700) {
+        strat = QFont::StyleStrategy(QFont::PreferOutline | QFont::PreferQuality | 0x0400);
+    } else {
+        strat = QFont::StyleStrategy(QFont::PreferOutline | QFont::PreferQuality);
+    }
 #endif
-                                                         ));
+    this->propFont.setStyleStrategy(strat);
     QFont tmp;
     tmp.fromString(sett.value(QString::fromAscii("main"), DEFAULT_PROP).toString());
     this->propFont.setFamily(tmp.family());
     this->propFont.setPointSize(tmp.pointSize());
-    this->fixedFont.setStyleStrategy(QFont::StyleStrategy(QFont::PreferOutline
-                                                          | QFont::PreferQuality
-#if QT_VERSION >= 0x040700
-                                                          | QFont::ForceIntegerMetrics
-#endif
-                                                          ));
+    this->fixedFont.setStyleStrategy(strat);
     tmp.fromString(sett.value(QString::fromAscii("fixed"), DEFAULT_MONO).toString());
     this->fixedFont.setFamily(tmp.family());
     this->fixedFont.setPointSize(tmp.pointSize());
