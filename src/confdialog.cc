@@ -17,9 +17,6 @@ ConfDialog::ConfDialog( HMainWindow* parent )
     Settings* sett = hApp->settings();
     sett->loadFromDisk();
 
-    ui->miscGroupBox->setEnabled(false);
-    ui->miscGroupBox->hide();
-
 #ifdef Q_WS_MAC
     // On the Mac, make the color selection buttons smaller so that they
     // become square instead of round.
@@ -52,8 +49,6 @@ ConfDialog::ConfDialog( HMainWindow* parent )
     ui->smartFormattingCheckBox->setChecked(sett->smartFormatting);
     ui->marginSizeSpinBox->setValue(sett->marginSize);
     ui->overlayScrollbackCheckBox->setChecked(sett->overlayScrollback);
-
-    ui->askForGameFileCheckBox->setChecked(sett->askForGameFile);
 
 #ifdef Q_WS_MAC
     // On Mac OS X, the dialog should not have any buttons, and settings
@@ -120,7 +115,6 @@ ConfDialog::fMakeInstantApply()
     connect(ui->mainBgColorButton, SIGNAL(changed(QColor)), this, SLOT(fApplySettings()));
     connect(ui->bannerTextColorButton, SIGNAL(changed(QColor)), this, SLOT(fApplySettings()));
     connect(ui->bannerBgColorButton, SIGNAL(changed(QColor)), this, SLOT(fApplySettings()));
-    connect(ui->askForGameFileCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
 }
 
 
@@ -147,7 +141,6 @@ ConfDialog::fApplySettings()
     sett->smartFormatting = ui->smartFormattingCheckBox->isChecked();
     sett->overlayScrollback = ui->overlayScrollbackCheckBox->isChecked();
     sett->marginSize = ui->marginSizeSpinBox->value();
-    sett->askForGameFile = ui->askForGameFileCheckBox->isChecked();
 
     // Notify the application that preferences have changed.
     hApp->notifyPreferencesChange(sett);
