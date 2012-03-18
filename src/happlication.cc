@@ -7,13 +7,13 @@
 #include <QTextCodec>
 #include <QMessageBox>
 #include <QFileDialog>
-#include <QStackedWidget>
 
 extern "C" {
 #include "heheader.h"
 }
 #include "happlication.h"
 #include "hmainwindow.h"
+#include "hmarginwidget.h"
 #include "hframe.h"
 #include "settings.h"
 #include "hugodefs.h"
@@ -53,9 +53,7 @@ HApplication::HApplication( int& argc, char* argv[], const char* appName,
     this->fMainWin->setWindowTitle(QString::fromAscii(appName));
 
     // This widget provides margins for fFrameWin.
-    this->fMarginWidget = new QStackedWidget(this->fMainWin);
-    this->fMarginWidget->setBackgroundRole(QPalette::Window);
-    this->fMarginWidget->setAutoFillBackground(true);
+    this->fMarginWidget = new HMarginWidget(this->fMainWin);
 
     this->fFrameWin = new HFrame(this->fMarginWidget);
     this->fMarginWidget->addWidget(this->fFrameWin);

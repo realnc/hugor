@@ -140,9 +140,6 @@ class HFrame: public QWidget {
     void
     mouseDoubleClickEvent( QMouseEvent* e );
 
-    void
-    wheelEvent( QWheelEvent* e );
-
   signals:
     // Emitted when an input operation has finished successfully.
     void inputReady();

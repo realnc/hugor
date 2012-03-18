@@ -400,16 +400,6 @@ HFrame::mouseDoubleClickEvent( QMouseEvent* e )
 
 
 void
-HFrame::wheelEvent( QWheelEvent* e )
-{
-    if (e->delta() > 0) {
-        requestScrollback();
-    }
-    e->accept();
-}
-
-
-void
 HFrame::getInput( char* buf, size_t buflen, int xPos, int yPos )
 {
     this->flushText();
