@@ -9,6 +9,7 @@
 
 #include "hmainwindow.h"
 #include "happlication.h"
+#include "hscrollback.h"
 #include "confdialog.h"
 #include "aboutdialog.h"
 #include "settings.h"
@@ -56,17 +57,7 @@ HMainWindow::HMainWindow( QWidget* parent )
     connect(act, SIGNAL(triggered()), SLOT(fShowAbout()));
 
     this->setMenuBar(menuBar);
-
-    this->fScrollbackWindow = new QTextEdit(this);
-    this->fScrollbackWindow->setWindowFlags(Qt::Window);
-    this->fScrollbackWindow->setWindowTitle("Hugor Scrollback");
-    this->fScrollbackWindow->setReadOnly(true);
-    this->fScrollbackWindow->setUndoRedoEnabled(false);
-    this->fScrollbackWindow->setTextInteractionFlags(Qt::TextSelectableByMouse);
-    this->fScrollbackWindow->setFrameStyle(QFrame::NoFrame | QFrame::Plain);
-    // Don't allow the scrollbuffer to grow forever; limit it to 7.000 lines.
-    this->fScrollbackWindow->document()->setMaximumBlockCount(7000);
-    this->fScrollbackWindow->resize(600,440);
+    this->fScrollbackWindow = new HScrollbackWindow(this);
 
     // Use a sane minimum size; by default Qt would allow us to be resized
     // to almost zero.

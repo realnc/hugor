@@ -105,6 +105,7 @@ HEADERS += \
     src/heqtheader.h \
     src/hframe.h \
     src/hmainwindow.h \
+    src/hscrollback.h \
     src/hugodefs.h \
     src/kcolorbutton.h \
     src/settings.h \
@@ -120,6 +121,7 @@ SOURCES += \
     src/heqt.cc \
     src/hframe.cc \
     src/hmainwindow.cc \
+    src/hscrollback.cc \
     src/kcolorbutton.cc \
     src/main.cc \
     src/settings.cc \
