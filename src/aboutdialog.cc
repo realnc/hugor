@@ -5,14 +5,19 @@ extern "C" {
 #include "aboutdialog.h"
 #include "ui_aboutdialog.h"
 
+
 AboutDialog::AboutDialog( QWidget* parent )
-    : QDialog(parent, Qt::WindowTitleHint | Qt::WindowSystemMenuHint),
+    : QDialog(parent, Qt::MSWindowsFixedSizeDialogHint | Qt::CustomizeWindowHint | Qt::WindowTitleHint
+#if QT_VERSION >= 0x040500
+              | Qt::WindowCloseButtonHint
+#endif
+             ),
       ui(new Ui::AboutDialog)
 {
     ui->setupUi(this);
 
     // Make the dialog fixed-size.
-    this->setMaximumSize(this->minimumSize());
+    this->layout()->setSizeConstraint(QLayout::SetFixedSize);
 
     // Construct a string holding all version info.
     QString str("<p>Hugor v");
