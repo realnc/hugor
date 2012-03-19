@@ -33,7 +33,7 @@ AboutDialog::AboutDialog( QWidget* parent )
     str += "<p>For bug reports or any other form of feedback, you can send email"
             " to <a href=\"mailto:realnc@gmail.com\">realnc@gmail.com</a></p>";
 
-    ui->label->setText(ui->label->text() + str);
+    ui->aboutLabel->setText(ui->aboutLabel->text() + str);
 }
 
 
