@@ -21,7 +21,7 @@ class HApplication: public QApplication {
     class HFrame* fFrameWin;
 
     // Parent of fFrameWin, provides margins.
-    class QStackedWidget* fMarginWidget;
+    class HMarginWidget* fMarginWidget;
 
     const int fBottomMarginSize;
 
@@ -75,6 +75,8 @@ class HApplication: public QApplication {
     virtual
     ~HApplication();
 
+    /* Passing a negative value as 'color' will keep the current margin color.
+     */
     void
     updateMargins( int color );
 
@@ -85,6 +87,10 @@ class HApplication: public QApplication {
     class HFrame*
     frameWindow()
     { return this->fFrameWin; }
+
+    class HMarginWidget*
+    marginWidget()
+    { return this->fMarginWidget; }
 
     bool
     gameRunning()

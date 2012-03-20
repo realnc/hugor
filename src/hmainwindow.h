@@ -41,6 +41,9 @@ class HMainWindow: public QMainWindow {
   public slots:
     void
     showScrollback();
+
+    void
+    hideScrollback();
 };
 
 

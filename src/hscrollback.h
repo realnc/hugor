@@ -14,6 +14,9 @@ class HScrollbackWindow: public QTextEdit {
     virtual void
     keyPressEvent( QKeyEvent* e );
 
+    virtual void
+    closeEvent( QCloseEvent* e );
+
   private:
     int fMaximumBlockCount;
     int fInitialWidth;

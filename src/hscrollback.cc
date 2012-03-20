@@ -10,7 +10,6 @@ HScrollbackWindow::HScrollbackWindow( QWidget* parent )
       fInitialWidth(600),
       fInitialHeight(440)
 {
-    this->setWindowFlags(Qt::Window);
     this->setWindowTitle("Hugor Scrollback");
     this->setReadOnly(true);
     this->setUndoRedoEnabled(false);
@@ -33,4 +32,12 @@ HScrollbackWindow::keyPressEvent( QKeyEvent* e )
     } else {
         QTextEdit::keyPressEvent(e);
     }
+}
+
+
+void
+HScrollbackWindow::closeEvent( QCloseEvent* e )
+{
+    QTextEdit::closeEvent(e);
+    hMainWin->hideScrollback();
 }

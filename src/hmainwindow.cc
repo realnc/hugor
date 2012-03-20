@@ -9,7 +9,9 @@
 
 #include "hmainwindow.h"
 #include "happlication.h"
+#include "hframe.h"
 #include "hscrollback.h"
+#include "hmarginwidget.h"
 #include "confdialog.h"
 #include "aboutdialog.h"
 #include "settings.h"
@@ -57,7 +59,7 @@ HMainWindow::HMainWindow( QWidget* parent )
     connect(act, SIGNAL(triggered()), SLOT(fShowAbout()));
 
     this->setMenuBar(menuBar);
-    this->fScrollbackWindow = new HScrollbackWindow(this);
+    this->fScrollbackWindow = new HScrollbackWindow(0);
 
     // Use a sane minimum size; by default Qt would allow us to be resized
     // to almost zero.
@@ -131,14 +133,45 @@ HMainWindow::fHideAbout()
 void
 HMainWindow::showScrollback()
 {
+    // If we need to overlay the scrollback, remove the game window from
+    // view and replace it with the scrollback window if we haven't already
+    // done so.
     if (hApp->settings()->overlayScrollback) {
-        this->fScrollbackWindow->setGeometry(this->geometry());
+        if (hApp->marginWidget()->currentWidget() != this->fScrollbackWindow) {
+            this->fScrollbackWindow->setWindowFlags(Qt::Widget);
+            hApp->marginWidget()->removeWidget(hFrame);
+            hApp->marginWidget()->setContentsMargins(0, 0, 0, 0);
+            hApp->marginWidget()->addWidget(this->fScrollbackWindow);
+            hFrame->hide();
+            this->fScrollbackWindow->show();
+            this->fScrollbackWindow->setFocus();
+        }
+        return;
     }
-    if (this->fScrollbackWindow->isHidden()) {
-        this->fScrollbackWindow->show();
-    } else {
-        this->fScrollbackWindow->activateWindow();
-        this->fScrollbackWindow->raise();
+
+    // No overlay was requsted.  If the scrollback is currently in its
+    // overlay mode, make it a regular window again.
+    if (this->fScrollbackWindow->windowType() == Qt::Widget) {
+        this->hideScrollback();
+        this->fScrollbackWindow->setParent(0);
+        this->fScrollbackWindow->setWindowFlags(Qt::Window);
+    }
+    this->fScrollbackWindow->show();
+    this->fScrollbackWindow->activateWindow();
+    this->fScrollbackWindow->raise();
+}
+
+
+void
+HMainWindow::hideScrollback()
+{
+    if (hApp->marginWidget()->currentWidget() == this->fScrollbackWindow) {
+        hApp->marginWidget()->removeWidget(this->fScrollbackWindow);
+        this->fScrollbackWindow->hide();
+        hApp->updateMargins(-1);
+        hApp->marginWidget()->addWidget(hFrame);
+        hFrame->show();
+        hFrame->setFocus();
     }
 }
 

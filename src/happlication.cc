@@ -167,10 +167,11 @@ HApplication::updateMargins( int color )
     int marginSize = this->fSettings->marginSize;
     this->fMarginWidget->setContentsMargins(marginSize, 0, marginSize,
                                             this->fBottomMarginSize);
-
-    QPalette palette = this->fMarginWidget->palette();
-    palette.setColor(QPalette::Window, hugoColorToQt(color));
-    this->fMarginWidget->setPalette(palette);
+    if (color >= 0) {
+        QPalette palette = this->fMarginWidget->palette();
+        palette.setColor(QPalette::Window, hugoColorToQt(color));
+        this->fMarginWidget->setPalette(palette);
+    }
 }
 
 
@@ -239,8 +240,12 @@ HApplication::notifyPreferencesChange( const Settings* sett )
 {
     smartformatting = sett->smartFormatting;
 
-    // 'bgcolor' is a Hugo engine global.
-    this->updateMargins(::bgcolor);
+    // Do not update the margins if we're currently displaying scrollback
+    // as an overlay.
+    if (this->fMarginWidget->currentWidget() == this->fFrameWin) {
+        // 'bgcolor' is a Hugo engine global.
+        this->updateMargins(::bgcolor);
+    }
 
     // Recalculate font dimensions, in case font settings have changed.
     calcFontDimensions();
