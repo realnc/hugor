@@ -20,7 +20,7 @@ void
 HMarginWidget::wheelEvent( QWheelEvent* e )
 {
     if (e->delta() > 0) {
-        requestScrollback();
+        emit requestScrollback();
     }
     e->accept();
 }
