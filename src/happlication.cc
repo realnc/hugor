@@ -242,7 +242,7 @@ HApplication::notifyPreferencesChange( const Settings* sett )
 
     // Do not update the margins if we're currently displaying scrollback
     // as an overlay.
-    if (this->fMarginWidget->currentWidget() == this->fFrameWin) {
+    if (this->fMarginWidget->layout()->indexOf(this->fFrameWin) >= 0) {
         // 'bgcolor' is a Hugo engine global.
         this->updateMargins(::bgcolor);
     }
