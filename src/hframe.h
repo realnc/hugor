@@ -166,7 +166,10 @@ class HFrame: public QWidget {
 
     bool
     hasKeyInQueue()
-    { return not this->fKeyQueue.isEmpty(); }
+    {
+        this->flushText();
+        return not this->fKeyQueue.isEmpty();
+    }
 
     // Clear a region of the window using the current background color.
     void

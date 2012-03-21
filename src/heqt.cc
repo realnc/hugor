@@ -316,7 +316,6 @@ hugo_waitforkey( void )
 int
 hugo_iskeywaiting( void )
 {
-    hApp->advanceEventLoop();
     return hFrame->hasKeyInQueue();
 }
 
