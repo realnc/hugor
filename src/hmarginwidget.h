@@ -7,10 +7,6 @@
 class HMarginWidget: public QWidget {
     Q_OBJECT
 
-  signals:
-    // Emitted when scrolling.
-    void requestScrollback();
-
   private:
     QWidget* fBannerWidget;
     class QVBoxLayout* fLayout;

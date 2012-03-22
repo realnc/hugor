@@ -15,10 +15,6 @@ HMarginWidget::HMarginWidget( QWidget* parent )
     this->setLayout(this->fLayout);
     this->setBackgroundRole(QPalette::Window);
     this->setAutoFillBackground(true);
-
-    // Requesting scrollback simply triggers the scrollback window.
-    // Since focus is lost, subsequent scrolling/paging events will work as expected.
-    connect(this, SIGNAL(requestScrollback()), hMainWin, SLOT(showScrollback()));
 }
 
 
@@ -26,7 +22,7 @@ void
 HMarginWidget::wheelEvent( QWheelEvent* e )
 {
     if (e->delta() > 0) {
-        emit requestScrollback();
+        hMainWin->showScrollback();
     }
     e->accept();
 }
