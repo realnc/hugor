@@ -17,6 +17,9 @@
 #include "aboutdialog.h"
 #include "settings.h"
 #include "hugodefs.h"
+extern "C" {
+#include "heheader.h"
+}
 
 class HMainWindow* hMainWin = 0;
 
@@ -143,6 +146,7 @@ HMainWindow::showScrollback()
             hApp->marginWidget()->removeWidget(hFrame);
             hApp->marginWidget()->setContentsMargins(0, 0, 0, 0);
             hApp->marginWidget()->addWidget(this->fScrollbackWindow);
+            hApp->marginWidget()->setPalette(QApplication::palette(hApp->marginWidget()));
 
             // Add a banner at the top so the user knows how to exit
             // scrollback mode.
@@ -192,7 +196,7 @@ HMainWindow::hideScrollback()
     hApp->marginWidget()->setBannerWidget(0);
     hApp->marginWidget()->removeWidget(this->fScrollbackWindow);
     this->fScrollbackWindow->hide();
-    hApp->updateMargins(-1);
+    hApp->updateMargins(::bgcolor);
     hApp->marginWidget()->addWidget(hFrame);
     hFrame->show();
     hFrame->setFocus();
