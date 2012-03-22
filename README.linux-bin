@@ -5,10 +5,10 @@ distribution's package manager:
   * Qt 4 GUI library
   * SDL library
 
-If you're using KDE, you have Qt already installed.  If not, the package
-is usually called something like "libqt4" or "libqt4-gui".  Likewise, the
-SDL package is most likely called "libsdl", "libsdl1.2" or
-"libsdl1.2debian".
+If you're using Ubuntu 11.10 or newer, or have KDE installed, you have Qt
+already installed.  If If not, the package is usually called something like
+"libqt4" or "libqt4-gui".  Likewise, the SDL package is most likely called
+"libsdl", "libsdl1.2" or "libsdl1.2debian".
 
 If you have a system where you compiled SDL yourself, make sure that it
 was built with audio and timers support.  (Anything else, like video, is
