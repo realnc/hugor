@@ -168,7 +168,7 @@ HMainWindow::showScrollback()
         return;
     }
 
-    // No overlay was requsted.  If the scrollback is currently in its
+    // No overlay was requested.  If the scrollback is currently in its
     // overlay mode, make it a regular window again.
     if (this->fScrollbackWindow->windowType() == Qt::Widget) {
         this->hideScrollback();

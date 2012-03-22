@@ -134,10 +134,10 @@ class HFrame: public QWidget {
     void
     singleKeyPressEvent( QKeyEvent* event );
 
-    void
+    virtual void
     mousePressEvent( QMouseEvent* e );
 
-    void
+    virtual void
     mouseDoubleClickEvent( QMouseEvent* e );
 
   signals:

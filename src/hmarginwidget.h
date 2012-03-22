@@ -32,7 +32,7 @@ class HMarginWidget: public QWidget {
     removeWidget( QWidget* w );
 
   protected:
-    void
+    virtual void
     wheelEvent( QWheelEvent* e );
 };
 
