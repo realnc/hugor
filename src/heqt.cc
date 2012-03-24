@@ -247,6 +247,9 @@ int
 hugo_getkey( void )
 {
     flushScrollback();
+    if (::script != NULL) {
+        fflush(::script);
+    }
     int c = hFrame->getNextKey();
     if (c == 0) {
         // It's a mouse click.
@@ -268,6 +271,9 @@ hugo_getline( char* p )
 {
     hugo_sendtoscrollback(p);
     flushScrollback();
+    if (::script != NULL) {
+        fflush(::script);
+    }
 
     // Print the prompt in normal text colors.
     hugo_settextcolor(fcolor);
