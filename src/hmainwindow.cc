@@ -150,10 +150,7 @@ HMainWindow::showScrollback()
 
             // Add a banner at the top so the user knows how to exit
             // scrollback mode.
-            QString bannerText("Scrollback (Esc or ");
-            bannerText += QKeySequence(QKeySequence::Close).toString(QKeySequence::NativeText)
-                       +  " to exit)";
-            QLabel* banner = new QLabel(bannerText, this->fScrollbackWindow);
+            QLabel* banner = new QLabel(this->fScrollbackWindow);
             banner->setAlignment(Qt::AlignCenter);
             banner->setContentsMargins(0, 3, 0, 3);
 
@@ -164,6 +161,17 @@ HMainWindow::showScrollback()
             pal.setBrush(QPalette::WindowText, this->fScrollbackWindow->palette().color(QPalette::Base));
             banner->setPalette(pal);
             banner->setAutoFillBackground(true);
+
+            // Make the informational message clickable by displaying it as a
+            // link that closes the scrollback when clicked.
+            QString bannerText("<html><style>a {text-decoration: none; color: ");
+            bannerText += pal.color(QPalette::WindowText).name()
+                       +  ";}</style><body>Scrollback (<a href='close'>Esc, "
+                       +  QKeySequence(QKeySequence::Close).toString(QKeySequence::NativeText)
+                       +  " or click here to exit</a>)</body></html>";
+            banner->setText(bannerText);
+            connect(banner, SIGNAL(linkActivated(QString)), SLOT(hideScrollback()));
+
             hApp->marginWidget()->setBannerWidget(banner);
             hFrame->hide();
             this->fScrollbackWindow->show();
