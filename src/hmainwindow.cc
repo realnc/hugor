@@ -205,8 +205,8 @@ HMainWindow::hideScrollback()
     hApp->marginWidget()->setBannerWidget(0);
     hApp->marginWidget()->removeWidget(this->fScrollbackWindow);
     this->fScrollbackWindow->hide();
-    hApp->updateMargins(::bgcolor);
     hApp->marginWidget()->addWidget(hFrame);
+    hApp->updateMargins(::bgcolor);
     hFrame->show();
     hFrame->setFocus();
 }

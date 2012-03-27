@@ -164,6 +164,11 @@ HApplication::fRunGame()
 void
 HApplication::updateMargins( int color )
 {
+    // Do not update the margins if we're currently displaying scrollback
+    // as an overlay.
+    if (this->fMarginWidget->layout()->indexOf(this->fFrameWin) < 0)
+        return;
+
     int marginSize = this->fSettings->marginSize;
     this->fMarginWidget->setContentsMargins(marginSize, 0, marginSize,
                                             this->fBottomMarginSize);
@@ -240,12 +245,8 @@ HApplication::notifyPreferencesChange( const Settings* sett )
 {
     smartformatting = sett->smartFormatting;
 
-    // Do not update the margins if we're currently displaying scrollback
-    // as an overlay.
-    if (this->fMarginWidget->layout()->indexOf(this->fFrameWin) >= 0) {
-        // 'bgcolor' is a Hugo engine global.
-        this->updateMargins(::bgcolor);
-    }
+    // 'bgcolor' is a Hugo engine global.
+    this->updateMargins(::bgcolor);
 
     // Recalculate font dimensions, in case font settings have changed.
     calcFontDimensions();
