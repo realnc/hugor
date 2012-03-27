@@ -271,14 +271,15 @@ hugo_getline( char* p )
 {
     hugo_sendtoscrollback(p);
     flushScrollback();
-    if (::script != NULL) {
-        fflush(::script);
-    }
 
     // Print the prompt in normal text colors.
     hugo_settextcolor(fcolor);
     hugo_setbackcolor(bgcolor);
     hugo_print(p);
+    if (::script != NULL) {
+        fprintf(::script, "%s", p);
+        fflush(::script);
+    }
 
     // Switch to input color.
     hugo_settextcolor(icolor);
@@ -290,8 +291,9 @@ hugo_getline( char* p )
     hugo_print(const_cast<char*>("\r\n"));
 
     // Also copy the input to the script file, if there is one.
-    if (script != 0) {
-        fprintf(script, "%s%s\n", p, buffer);
+    if (script != NULL) {
+        fprintf(::script, "%s\n", buffer);
+        fflush(::script);
     }
 
     hugo_sendtoscrollback(buffer);
