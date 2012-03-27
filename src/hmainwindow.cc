@@ -137,59 +137,60 @@ HMainWindow::fHideAbout()
 void
 HMainWindow::showScrollback()
 {
-    // If we need to overlay the scrollback, remove the game window from
-    // view and replace it with the scrollback window if we haven't already
-    // done so.
-    if (hApp->settings()->overlayScrollback) {
-        if (hApp->marginWidget()->layout()->indexOf(this->fScrollbackWindow) < 0) {
-            this->fScrollbackWindow->setWindowFlags(Qt::Widget);
-            hApp->marginWidget()->removeWidget(hFrame);
-            hApp->marginWidget()->setContentsMargins(0, 0, 0, 0);
-            hApp->marginWidget()->addWidget(this->fScrollbackWindow);
-            hApp->marginWidget()->setPalette(QApplication::palette(hApp->marginWidget()));
-
-            // Add a banner at the top so the user knows how to exit
-            // scrollback mode.
-            QLabel* banner = new QLabel(this->fScrollbackWindow);
-            banner->setAlignment(Qt::AlignCenter);
-            banner->setContentsMargins(0, 3, 0, 3);
-
-            // Display the banner in reverse colors so that it's visible
-            // regardless of the desktop's color theme.
-            QPalette pal = banner->palette();
-            pal.setColor(QPalette::Window, this->fScrollbackWindow->palette().color(QPalette::WindowText));
-            pal.setBrush(QPalette::WindowText, this->fScrollbackWindow->palette().color(QPalette::Base));
-            banner->setPalette(pal);
-            banner->setAutoFillBackground(true);
-
-            // Make the informational message clickable by displaying it as a
-            // link that closes the scrollback when clicked.
-            QString bannerText("<html><style>a {text-decoration: none; color: ");
-            bannerText += pal.color(QPalette::WindowText).name()
-                       +  ";}</style><body>Scrollback (<a href='close'>Esc, "
-                       +  QKeySequence(QKeySequence::Close).toString(QKeySequence::NativeText)
-                       +  " or click here to exit</a>)</body></html>";
-            banner->setText(bannerText);
-            connect(banner, SIGNAL(linkActivated(QString)), SLOT(hideScrollback()));
-
-            hApp->marginWidget()->setBannerWidget(banner);
-            hFrame->hide();
-            this->fScrollbackWindow->show();
-            this->fScrollbackWindow->setFocus();
+    // If no overlay was requested and the scrollback is currently in its
+    // overlay mode, make it a regular window again.
+    if (not hApp->settings()->overlayScrollback) {
+        if (this->fScrollbackWindow->windowType() == Qt::Widget) {
+            this->hideScrollback();
+            this->fScrollbackWindow->setParent(0);
+            this->fScrollbackWindow->setWindowFlags(Qt::Window);
         }
+        this->fScrollbackWindow->show();
+        this->fScrollbackWindow->activateWindow();
+        this->fScrollbackWindow->raise();
         return;
     }
 
-    // No overlay was requested.  If the scrollback is currently in its
-    // overlay mode, make it a regular window again.
-    if (this->fScrollbackWindow->windowType() == Qt::Widget) {
-        this->hideScrollback();
-        this->fScrollbackWindow->setParent(0);
-        this->fScrollbackWindow->setWindowFlags(Qt::Window);
-    }
+    // If the overlay is already visible, no need to do anything.
+    if (hApp->marginWidget()->layout()->indexOf(this->fScrollbackWindow) >= 0)
+        return;
+
+    // We need to overlay the scrollback. Remove the game window from view and
+    // replace it with the scrollback window if we haven't already done so.
+    this->fScrollbackWindow->setWindowFlags(Qt::Widget);
+    hApp->marginWidget()->removeWidget(hFrame);
+    hApp->marginWidget()->setContentsMargins(0, 0, 0, 0);
+    hApp->marginWidget()->addWidget(this->fScrollbackWindow);
+    hApp->marginWidget()->setPalette(QApplication::palette(hApp->marginWidget()));
+
+    // Add a banner at the top so the user knows how to exit
+    // scrollback mode.
+    QLabel* banner = new QLabel(this->fScrollbackWindow);
+    banner->setAlignment(Qt::AlignCenter);
+    banner->setContentsMargins(0, 3, 0, 3);
+
+    // Display the banner in reverse colors so that it's visible
+    // regardless of the desktop's color theme.
+    QPalette pal = banner->palette();
+    pal.setColor(QPalette::Window, this->fScrollbackWindow->palette().color(QPalette::WindowText));
+    pal.setBrush(QPalette::WindowText, this->fScrollbackWindow->palette().color(QPalette::Base));
+    banner->setPalette(pal);
+    banner->setAutoFillBackground(true);
+
+    // Make the informational message clickable by displaying it as a
+    // link that closes the scrollback when clicked.
+    QString bannerText("<html><style>a {text-decoration: none; color: ");
+    bannerText += pal.color(QPalette::WindowText).name()
+               +  ";}</style><body>Scrollback (<a href='close'>Esc, "
+               +  QKeySequence(QKeySequence::Close).toString(QKeySequence::NativeText)
+               +  " or click here to exit</a>)</body></html>";
+    banner->setText(bannerText);
+    connect(banner, SIGNAL(linkActivated(QString)), SLOT(hideScrollback()));
+
+    hApp->marginWidget()->setBannerWidget(banner);
+    hFrame->hide();
     this->fScrollbackWindow->show();
-    this->fScrollbackWindow->activateWindow();
-    this->fScrollbackWindow->raise();
+    this->fScrollbackWindow->setFocus();
 }
 
 
