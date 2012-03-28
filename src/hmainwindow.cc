@@ -53,12 +53,18 @@ HMainWindow::HMainWindow( QWidget* parent )
     menu->addAction(act);
     connect(act, SIGNAL(triggered()), SLOT(fShowConfDialog()));
 
+    // "View" menu.
+    menu = menuBar->addMenu(tr("&View"));
     act = new QAction(tr("Show &Scrollback"), this);
-    act->setMenuRole(QAction::ApplicationSpecificRole);
     menu->addAction(act);
     connect(act, SIGNAL(triggered()), SLOT(showScrollback()));
 
+#ifdef Q_WS_MAC
+    act = new QAction(tr("Enter &Full Screen"), this);
+#else
     act = new QAction(tr("&Fullscreen Mode"), this);
+    act->setCheckable(true);
+#endif
 #if QT_VERSION >= 0x040600
     act->setIcon(this->fFullscreenEnterIcon);
 #endif
@@ -80,9 +86,8 @@ HMainWindow::HMainWindow( QWidget* parent )
 #endif
     act->setShortcuts(keySeqList);
     act->setShortcutContext(Qt::ApplicationShortcut);
-    act->setCheckable(true);
     menu->addAction(act);
-    connect(act, SIGNAL(triggered(bool)), SLOT(setFullscreen(bool)));
+    connect(act, SIGNAL(triggered()), SLOT(toggleFullscreen()));
     this->fFullscreenAction = act;
 
     // "Help" menu.
@@ -102,6 +107,31 @@ HMainWindow::HMainWindow( QWidget* parent )
     this->setMinimumSize(240, 180);
 
     hMainWin = this;
+}
+
+
+void
+HMainWindow::fUpdateFullscreenAction()
+{
+    if (this->isFullScreen()) {
+#if QT_VERSION >= 0x040600
+        this->fFullscreenAction->setIcon(this->fFullscreenExitIcon);
+#endif
+#ifdef Q_WS_MAC
+        this->fFullscreenAction->setText("Exit Full Screen");
+#else
+        this->fFullscreenAction->setChecked(true);
+#endif
+    } else {
+#if QT_VERSION >= 0x040600
+        this->fFullscreenAction->setIcon(this->fFullscreenEnterIcon);
+#endif
+#ifdef Q_WS_MAC
+        this->fFullscreenAction->setText("Enter Full Screen");
+#else
+           this->fFullscreenAction->setChecked(false);
+#endif
+    }
 }
 
 
@@ -245,22 +275,17 @@ HMainWindow::hideScrollback()
 
 
 void
-HMainWindow::setFullscreen( bool f )
+HMainWindow::toggleFullscreen()
 {
-    if (f and not this->isFullScreen()) {
+    if (this->isFullScreen()) {
+        this->showNormal();
+    } else {
         // Remember our windowed size in case we quit while in fullscreen.
         hApp->settings()->appSize = this->size();
         hApp->settings()->saveToDisk();
         this->showFullScreen();
-#if QT_VERSION >= 0x040600
-        this->fFullscreenAction->setIcon(this->fFullscreenExitIcon);
-#endif
-    } else if (not f and this->isFullScreen()) {
-        this->showNormal();
-#if QT_VERSION >= 0x040600
-        this->fFullscreenAction->setIcon(this->fFullscreenEnterIcon);
-#endif
     }
+    this->fUpdateFullscreenAction();
 }
 
 
@@ -303,14 +328,12 @@ HMainWindow::changeEvent( QEvent* e )
     }
 
     // Window state was changed by the environment. Check whether we're
-    // going fullscreen and update our fullscreen action accordingly.
+    // changing to/from fullscreen and update our fullscreen action if so.
     QWindowStateChangeEvent* chEv = static_cast<QWindowStateChangeEvent*>(e);
-    if (chEv->oldState().testFlag(Qt::WindowFullScreen) and not this->isFullScreen()) {
-        // We exited fullscreen mode.
-        this->fFullscreenAction->setChecked(false);
-    } else if (not chEv->oldState().testFlag(Qt::WindowFullScreen) and this->isFullScreen()) {
-        // We entered fullscreen mode.
-        this->fFullscreenAction->setChecked(true);
+    if ((chEv->oldState().testFlag(Qt::WindowFullScreen) and not this->isFullScreen())
+        or (not chEv->oldState().testFlag(Qt::WindowFullScreen) and this->isFullScreen()))
+    {
+        this->fUpdateFullscreenAction();
     }
     e->accept();
 }

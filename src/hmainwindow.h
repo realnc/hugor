@@ -20,6 +20,9 @@ class HMainWindow: public QMainWindow {
     QIcon fFullscreenExitIcon;
 #endif
 
+    void
+    fUpdateFullscreenAction();
+
   private slots:
     void
     fShowConfDialog();
@@ -54,7 +57,7 @@ class HMainWindow: public QMainWindow {
     hideScrollback();
 
     void
-    setFullscreen( bool f );
+    toggleFullscreen();
 };
 
 
