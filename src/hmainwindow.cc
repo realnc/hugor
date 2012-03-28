@@ -129,6 +129,7 @@ HMainWindow::fUpdateFullscreenAction()
         this->fFullscreenAction->setText("Exit Full Screen");
 #else
         this->fFullscreenAction->setChecked(true);
+        this->menuBar()->hide();
 #endif
     } else {
 #if QT_VERSION >= 0x040600
@@ -137,7 +138,8 @@ HMainWindow::fUpdateFullscreenAction()
 #ifdef Q_WS_MAC
         this->fFullscreenAction->setText("Enter Full Screen");
 #else
-           this->fFullscreenAction->setChecked(false);
+        this->fFullscreenAction->setChecked(false);
+        this->menuBar()->show();
 #endif
     }
 }
