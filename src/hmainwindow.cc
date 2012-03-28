@@ -39,6 +39,9 @@ HMainWindow::HMainWindow( QWidget* parent )
     // We make our menu bar parentless so it will be shared by all our windows
     // in Mac OS X.
     QMenuBar* menuBar = new QMenuBar(0);
+#ifndef Q_WS_MAC
+    this->setMenuBar(menuBar);
+#endif
 
     QMenu* menu;
     QAction* act;
@@ -102,7 +105,6 @@ HMainWindow::HMainWindow( QWidget* parent )
     menu->addAction(act);
     connect(act, SIGNAL(triggered()), SLOT(fShowAbout()));
 
-    this->setMenuBar(menuBar);
     this->fScrollbackWindow = new HScrollbackWindow(0);
 
     // Use a sane minimum size; by default Qt would allow us to be resized
