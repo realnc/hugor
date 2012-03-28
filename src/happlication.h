@@ -37,6 +37,9 @@ class HApplication: public QApplication {
     // Text codec used by the Hugo engine.
     QTextCodec* fHugoCodec;
 
+    // Are we running in Gnome?
+    bool fDesktopIsGnome;
+
     // Run the game file contained in fNextGame.
     void
     fRunGame();
@@ -162,6 +165,10 @@ class HApplication: public QApplication {
     QTextCodec*
     hugoCodec()
     { return this->fHugoCodec; }
+
+    bool
+    desktopIsGnome()
+    { return this->fDesktopIsGnome; }
 };
 
 

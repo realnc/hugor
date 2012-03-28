@@ -7,6 +7,7 @@
 #include <QTextCodec>
 #include <QScrollBar>
 #include <QLabel>
+#include <QWindowStateChangeEvent>
 
 #include "hmainwindow.h"
 #include "happlication.h"
@@ -28,6 +29,10 @@ HMainWindow::HMainWindow( QWidget* parent )
     : QMainWindow(parent),
       fConfDialog(0),
       fAboutDialog(0)
+#if (QT_VERSION >= 0x040600)
+    , fFullscreenEnterIcon(QIcon::fromTheme(QString::fromAscii("view-fullscreen"))),
+      fFullscreenExitIcon(QIcon::fromTheme(QString::fromAscii("view-restore")))
+#endif
 {
     Q_ASSERT(hMainWin == 0);
 
@@ -52,6 +57,33 @@ HMainWindow::HMainWindow( QWidget* parent )
     act->setMenuRole(QAction::ApplicationSpecificRole);
     menu->addAction(act);
     connect(act, SIGNAL(triggered()), SLOT(showScrollback()));
+
+    act = new QAction(tr("&Fullscreen Mode"), this);
+#if QT_VERSION >= 0x040600
+    act->setIcon(this->fFullscreenEnterIcon);
+#endif
+    QList<QKeySequence> keySeqList;
+#ifdef Q_WS_MAC
+    keySeqList.append(QKeySequence("Meta+Ctrl+F"));
+#elif defined(Q_WS_WIN)
+    keySeqList.append(QKeySequence("F11"));
+    keySeqList.append(QKeySequence("Alt+Return"));
+    keySeqList.append(QKeySequence("Alt+Enter"));
+#else
+    if (hApp->desktopIsGnome()) {
+        keySeqList.append(QKeySequence("Ctrl+F11"));
+    } else {
+        // Assume KDE.
+        keySeqList.append(QKeySequence("F11"));
+        keySeqList.append(QKeySequence("Shift+Ctrl+F"));
+    }
+#endif
+    act->setShortcuts(keySeqList);
+    act->setShortcutContext(Qt::ApplicationShortcut);
+    act->setCheckable(true);
+    menu->addAction(act);
+    connect(act, SIGNAL(triggered(bool)), SLOT(setFullscreen(bool)));
+    this->fFullscreenAction = act;
 
     // "Help" menu.
     menu = menuBar->addMenu(tr("&Help"));
@@ -213,6 +245,26 @@ HMainWindow::hideScrollback()
 
 
 void
+HMainWindow::setFullscreen( bool f )
+{
+    if (f and not this->isFullScreen()) {
+        // Remember our windowed size in case we quit while in fullscreen.
+        hApp->settings()->appSize = this->size();
+        hApp->settings()->saveToDisk();
+        this->showFullScreen();
+#if QT_VERSION >= 0x040600
+        this->fFullscreenAction->setIcon(this->fFullscreenExitIcon);
+#endif
+    } else if (not f and this->isFullScreen()) {
+        this->showNormal();
+#if QT_VERSION >= 0x040600
+        this->fFullscreenAction->setIcon(this->fFullscreenEnterIcon);
+#endif
+    }
+}
+
+
+void
 HMainWindow::closeEvent( QCloseEvent* e )
 {
     if (not hApp->gameRunning()) {
@@ -239,6 +291,28 @@ HMainWindow::closeEvent( QCloseEvent* e )
     } else {
         e->ignore();
     }
+}
+
+
+void
+HMainWindow::changeEvent( QEvent* e )
+{
+    if (e->type() != QEvent::WindowStateChange or not e->spontaneous()) {
+        QMainWindow::changeEvent(e);
+        return;
+    }
+
+    // Window state was changed by the environment. Check whether we're
+    // going fullscreen and update our fullscreen action accordingly.
+    QWindowStateChangeEvent* chEv = static_cast<QWindowStateChangeEvent*>(e);
+    if (chEv->oldState().testFlag(Qt::WindowFullScreen) and not this->isFullScreen()) {
+        // We exited fullscreen mode.
+        this->fFullscreenAction->setChecked(false);
+    } else if (not chEv->oldState().testFlag(Qt::WindowFullScreen) and this->isFullScreen()) {
+        // We entered fullscreen mode.
+        this->fFullscreenAction->setChecked(true);
+    }
+    e->accept();
 }
 
 

@@ -56,9 +56,7 @@ ConfDialog::ConfDialog( HMainWindow* parent )
     this->fMakeInstantApply();
     ui->buttonBox->setStandardButtons(QDialogButtonBox::NoButton);
 #else
-    QDialogButtonBox::ButtonLayout layoutPolicy
-        = QDialogButtonBox::ButtonLayout(ui->buttonBox->style()->styleHint(QStyle::SH_DialogButtonLayout));
-    if (layoutPolicy == QDialogButtonBox::GnomeLayout) {
+    if (hApp->desktopIsGnome()) {
         // On Gnome (and other Gtk-based environments, like XFCE), we follow
         // Gnome standards. We only provide a "Close" button and settings
         // changes should apply instantly.

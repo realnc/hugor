@@ -174,7 +174,11 @@ Settings::saveToDisk()
     sett.endGroup();
 
     sett.beginGroup(QString::fromAscii("geometry"));
-    sett.setValue(QString::fromAscii("size"), hMainWin->size());
+    // Do not save application size if we're in fullscreen mode, since we
+    // need to restore the windowed, non-fullscreen size next time we run.
+    if (not hMainWin->isFullScreen()) {
+        sett.setValue(QString::fromAscii("size"), hMainWin->size());
+    }
     sett.setValue(QString::fromAscii("overlayScrollback"), this->overlayScrollback);
     sett.setValue(QString::fromAscii("maximized"), hMainWin->isMaximized());
     sett.setValue(QString::fromAscii("marginSize"), this->marginSize);

@@ -14,6 +14,11 @@ class HMainWindow: public QMainWindow {
     class ConfDialog* fConfDialog;
     class AboutDialog* fAboutDialog;
     class HScrollbackWindow* fScrollbackWindow;
+    class QAction* fFullscreenAction;
+#if QT_VERSION >= 0x040600
+    QIcon fFullscreenEnterIcon;
+    QIcon fFullscreenExitIcon;
+#endif
 
   private slots:
     void
@@ -32,6 +37,9 @@ class HMainWindow: public QMainWindow {
     virtual void
     closeEvent( QCloseEvent* e );
 
+    virtual void
+    changeEvent( QEvent* e );
+
   public:
     HMainWindow( QWidget* parent );
 
@@ -44,6 +52,9 @@ class HMainWindow: public QMainWindow {
 
     void
     hideScrollback();
+
+    void
+    setFullscreen( bool f );
 };
 
 

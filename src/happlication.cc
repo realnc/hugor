@@ -7,6 +7,8 @@
 #include <QTextCodec>
 #include <QMessageBox>
 #include <QFileDialog>
+#include <QDialogButtonBox>
+#include <QStyle>
 
 extern "C" {
 #include "heheader.h"
@@ -28,7 +30,8 @@ HApplication::HApplication( int& argc, char* argv[], const char* appName,
     : QApplication(argc, argv),
       fBottomMarginSize(5),
       fGameRunning(false),
-      fHugoCodec(QTextCodec::codecForName("Windows-1252"))
+      fHugoCodec(QTextCodec::codecForName("Windows-1252")),
+      fDesktopIsGnome(false)
 {
     //qDebug() << Q_FUNC_INFO;
     Q_ASSERT(hApp == 0);
@@ -68,6 +71,17 @@ HApplication::HApplication( int& argc, char* argv[], const char* appName,
     // icon is used.
 #ifndef Q_WS_MAC
     this->setWindowIcon(QIcon(":/he_32-bit_48x48.png"));
+#endif
+
+#ifdef Q_WS_X11
+    // Detect whether we're running in Gnome.
+    QDialogButtonBox::ButtonLayout layoutPolicy
+        = QDialogButtonBox::ButtonLayout(QApplication::style()->styleHint(QStyle::SH_DialogButtonLayout));
+    if (layoutPolicy == QDialogButtonBox::GnomeLayout) {
+        this->fDesktopIsGnome = true;
+    } else {
+        this->fDesktopIsGnome = false;
+    }
 #endif
 }
 
