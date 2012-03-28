@@ -51,12 +51,14 @@ HMainWindow::HMainWindow( QWidget* parent )
     act->setShortcuts(QKeySequence::Preferences);
 #endif
     menu->addAction(act);
+    this->addAction(act);
     connect(act, SIGNAL(triggered()), SLOT(fShowConfDialog()));
 
     // "View" menu.
     menu = menuBar->addMenu(tr("&View"));
     act = new QAction(tr("Show &Scrollback"), this);
     menu->addAction(act);
+    this->addAction(act);
     connect(act, SIGNAL(triggered()), SLOT(showScrollback()));
 
 #ifdef Q_WS_MAC
@@ -87,6 +89,7 @@ HMainWindow::HMainWindow( QWidget* parent )
     act->setShortcuts(keySeqList);
     act->setShortcutContext(Qt::ApplicationShortcut);
     menu->addAction(act);
+    this->addAction(act);
     connect(act, SIGNAL(triggered()), SLOT(toggleFullscreen()));
     this->fFullscreenAction = act;
 
@@ -105,6 +108,9 @@ HMainWindow::HMainWindow( QWidget* parent )
     // Use a sane minimum size; by default Qt would allow us to be resized
     // to almost zero.
     this->setMinimumSize(240, 180);
+
+    // Use the actions we added above as our context menu.
+    this->setContextMenuPolicy(Qt::ActionsContextMenu);
 
     hMainWin = this;
 }
