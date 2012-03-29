@@ -271,6 +271,9 @@
           <property name="suffix">
            <string>px</string>
           </property>
+          <property name="maximum">
+           <number>9999</number>
+          </property>
          </widget>
         </item>
         <item row="0" column="1">
@@ -295,7 +298,7 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="1" colspan="2">
+      <item row="1" column="1">
        <widget class="QCheckBox" name="overlayScrollbackCheckBox">
         <property name="toolTip">
          <string>&lt;p&gt;Make the scrollback window the same size as the game window and position it exactly over it.&lt;/p&gt;</string>
@@ -304,6 +307,36 @@
          <string>Overlay Scrollback</string>
         </property>
        </widget>
+      </item>
+      <item row="1" column="2">
+       <layout class="QFormLayout" name="formLayout_6">
+        <item row="0" column="0">
+         <widget class="QSpinBox" name="fullscreenWidthSpinBox">
+          <property name="specialValueText">
+           <string>No limit</string>
+          </property>
+          <property name="suffix">
+           <string>px</string>
+          </property>
+          <property name="maximum">
+           <number>9999</number>
+          </property>
+          <property name="singleStep">
+           <number>100</number>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLabel" name="label_3">
+          <property name="text">
+           <string>Fullscreen Width</string>
+          </property>
+          <property name="buddy">
+           <cstring>marginSizeSpinBox</cstring>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
      </layout>
     </widget>

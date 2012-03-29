@@ -49,6 +49,7 @@ ConfDialog::ConfDialog( HMainWindow* parent )
     ui->smartFormattingCheckBox->setChecked(sett->smartFormatting);
     ui->marginSizeSpinBox->setValue(sett->marginSize);
     ui->overlayScrollbackCheckBox->setChecked(sett->overlayScrollback);
+    ui->fullscreenWidthSpinBox->setValue(sett->fullscreenWidth);
 
 #ifdef Q_WS_MAC
     // On Mac OS X, the dialog should not have any buttons, and settings
@@ -103,6 +104,7 @@ ConfDialog::fMakeInstantApply()
     connect(ui->butterCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
     connect(ui->smartFormattingCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
     connect(ui->marginSizeSpinBox, SIGNAL(valueChanged(int)), this, SLOT(fApplySettings()));
+    connect(ui->fullscreenWidthSpinBox, SIGNAL(valueChanged(int)), this, SLOT(fApplySettings()));
     connect(ui->allowGraphicsCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
     connect(ui->allowSoundEffectsCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
     connect(ui->allowMusicCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
@@ -139,6 +141,7 @@ ConfDialog::fApplySettings()
     sett->smartFormatting = ui->smartFormattingCheckBox->isChecked();
     sett->overlayScrollback = ui->overlayScrollbackCheckBox->isChecked();
     sett->marginSize = ui->marginSizeSpinBox->value();
+    sett->fullscreenWidth = ui->fullscreenWidthSpinBox->value();
 
     // Notify the application that preferences have changed.
     hApp->notifyPreferencesChange(sett);

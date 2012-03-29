@@ -44,6 +44,9 @@ class HApplication: public QApplication {
     void
     fRunGame();
 
+    void
+    fUpdateMarginColor( int color );
+
 #ifdef Q_WS_MAC
   protected:
     // On the Mac, dropping a file on our application icon will generate a

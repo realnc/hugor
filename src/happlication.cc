@@ -176,8 +176,31 @@ HApplication::fRunGame()
 
 
 void
+HApplication::fUpdateMarginColor( int color )
+{
+    if (color < 0)
+        return;
+
+    QPalette palette = this->fMarginWidget->palette();
+    palette.setColor(QPalette::Window, hugoColorToQt(color));
+    this->fMarginWidget->setPalette(palette);
+}
+
+
+void
 HApplication::updateMargins( int color )
 {
+    if (hMainWin->isFullScreen() and this->fSettings->fullscreenWidth > 0) {
+        // Calculate how big the margin should be to get the specified
+        // width.
+        int targetWidth = qMin(this->fSettings->fullscreenWidth, this->fMarginWidget->width());
+        int margin = (this->fMarginWidget->width() - targetWidth) / 2;
+        this->fMarginWidget->setContentsMargins(margin, 0, margin,
+                                                this->fBottomMarginSize);
+        this->fUpdateMarginColor(color);
+        return;
+    }
+
     // Do not update the margins if we're currently displaying scrollback
     // as an overlay.
     if (this->fMarginWidget->layout()->indexOf(this->fFrameWin) < 0)
@@ -186,11 +209,7 @@ HApplication::updateMargins( int color )
     int marginSize = this->fSettings->marginSize;
     this->fMarginWidget->setContentsMargins(marginSize, 0, marginSize,
                                             this->fBottomMarginSize);
-    if (color >= 0) {
-        QPalette palette = this->fMarginWidget->palette();
-        palette.setColor(QPalette::Window, hugoColorToQt(color));
-        this->fMarginWidget->setPalette(palette);
-    }
+    this->fUpdateMarginColor(color);
 }
 
 

@@ -132,6 +132,7 @@ Settings::loadFromDisk()
     this->overlayScrollback = sett.value(QString::fromAscii("overlayScrollback"), true).toBool();
     this->isMaximized = sett.value(QString::fromAscii("maximized"), false).toBool();
     this->marginSize = sett.value(QString::fromAscii("marginSize"), 0).toInt();
+    this->fullscreenWidth = sett.value(QString::fromAscii("fullscreenWidth"), 0).toInt();
     sett.endGroup();
 }
 
@@ -182,6 +183,7 @@ Settings::saveToDisk()
     sett.setValue(QString::fromAscii("overlayScrollback"), this->overlayScrollback);
     sett.setValue(QString::fromAscii("maximized"), hMainWin->isMaximized());
     sett.setValue(QString::fromAscii("marginSize"), this->marginSize);
+    sett.setValue(QString::fromAscii("fullscreenWidth"), this->fullscreenWidth);
     sett.endGroup();
     sett.sync();
 }

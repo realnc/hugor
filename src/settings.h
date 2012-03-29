@@ -41,6 +41,7 @@ class Settings {
     bool isMaximized;
     bool overlayScrollback;
     int marginSize;
+    int fullscreenWidth;
 };
 
 
