@@ -4,6 +4,7 @@
 #include <QClipboard>
 #include <QPainter>
 #include <QTimer>
+#include <QTextCodec>
 
 extern "C" {
 #include "heheader.h"
@@ -61,6 +62,7 @@ HFrame::HFrame( QWidget* parent )
     // Since focus is lost, subsequent scrolling/paging events will work as expected.
     connect(this, SIGNAL(requestScrollback()), hMainWin, SLOT(showScrollback()));
 
+    this->setAttribute(Qt::WA_InputMethodEnabled);
     hFrame = this;
 }
 
@@ -321,13 +323,20 @@ HFrame::inputMethodEvent( QInputMethodEvent* e )
         return;
     }
 
+    // Enable mouse tracking when hiding the cursor so that we can
+    // restore it when the mouse is moved.
+    hApp->marginWidget()->setCursor(Qt::BlankCursor);
+    this->setMouseTracking(true);
+    hApp->marginWidget()->setMouseTracking(true);
+
+    const QByteArray& bytes = hApp->hugoCodec()->fromUnicode(e->commitString());
     // If the keypress doesn't correspond to exactly one character, ignore
     // it.
-    if (e->commitString().size() != 1) {
+    if (bytes.size() != 1) {
         QWidget::inputMethodEvent(e);
         return;
     }
-    this->fKeyQueue.enqueue(e->commitString().at(0).toAscii());
+    this->fKeyQueue.enqueue(bytes[0]);
 }
 
 
