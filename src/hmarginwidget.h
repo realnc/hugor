@@ -30,6 +30,9 @@ class HMarginWidget: public QWidget {
   protected:
     virtual void
     wheelEvent( QWheelEvent* e );
+
+    virtual void
+    mouseMoveEvent( QMouseEvent* e );
 };
 
 

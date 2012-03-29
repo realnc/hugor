@@ -11,6 +11,7 @@ extern "C" {
 #include "hframe.h"
 #include "happlication.h"
 #include "hmainwindow.h"
+#include "hmarginwidget.h"
 #include "hugodefs.h"
 #include "settings.h"
 
@@ -174,6 +175,12 @@ HFrame::keyPressEvent( QKeyEvent* e )
     // Just for having shorter identifiers.
     int& i = this->fInputCurrentChar;
     QString& buf = this->fInputBuf;
+
+    // Enable mouse tracking when hiding the cursor so that we can
+    // restore it when the mouse is moved.
+    hApp->marginWidget()->setCursor(Qt::BlankCursor);
+    this->setMouseTracking(true);
+    hApp->marginWidget()->setMouseTracking(true);
 
     if (e->matches(QKeySequence::MoveToStartOfLine) or e->matches(QKeySequence::MoveToStartOfBlock)) {
         i = 0;
@@ -396,6 +403,17 @@ HFrame::mouseDoubleClickEvent( QMouseEvent* e )
     this->fInputCurrentChar += word.length();
     this->update();
     this->updateCursorPos();
+}
+
+
+void
+HFrame::mouseMoveEvent( QMouseEvent* e )
+{
+    if (this->cursor().shape() == Qt::BlankCursor) {
+        this->setMouseTracking(false);
+    }
+    // Pass it on to our parent.
+    e->ignore();
 }
 
 

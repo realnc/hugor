@@ -29,6 +29,17 @@ HMarginWidget::wheelEvent( QWheelEvent* e )
 
 
 void
+HMarginWidget::mouseMoveEvent( QMouseEvent* e )
+{
+    if (this->cursor().shape() == Qt::BlankCursor) {
+        this->unsetCursor();
+        this->setMouseTracking(false);
+    }
+    QWidget::mouseMoveEvent(e);
+}
+
+
+void
 HMarginWidget::setBannerWidget( QWidget* w )
 {
     // If a banner widget is already set, delete it first.
