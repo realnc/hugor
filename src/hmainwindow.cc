@@ -119,7 +119,7 @@ HMainWindow::HMainWindow( QWidget* parent )
 
 
 void
-HMainWindow::fUpdateFullscreenAction()
+HMainWindow::fFullscreenAdjust()
 {
     if (this->isFullScreen()) {
 #if QT_VERSION >= 0x040600
@@ -295,7 +295,7 @@ HMainWindow::toggleFullscreen()
         hApp->settings()->saveToDisk();
         this->showFullScreen();
     }
-    this->fUpdateFullscreenAction();
+    this->fFullscreenAdjust();
 }
 
 
@@ -343,7 +343,7 @@ HMainWindow::changeEvent( QEvent* e )
     if ((chEv->oldState().testFlag(Qt::WindowFullScreen) and not this->isFullScreen())
         or (not chEv->oldState().testFlag(Qt::WindowFullScreen) and this->isFullScreen()))
     {
-        this->fUpdateFullscreenAction();
+        this->fFullscreenAdjust();
     }
     e->accept();
 }

@@ -21,7 +21,7 @@ class HMainWindow: public QMainWindow {
 #endif
 
     void
-    fUpdateFullscreenAction();
+    fFullscreenAdjust();
 
   private slots:
     void
