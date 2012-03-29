@@ -41,6 +41,17 @@ HApplication::HApplication( int& argc, char* argv[], const char* appName,
     this->setOrganizationName(QString::fromAscii(orgName));
     this->setOrganizationDomain(QString::fromAscii(orgDomain));
 
+#ifdef Q_WS_X11
+    // Detect whether we're running in Gnome.
+    QDialogButtonBox::ButtonLayout layoutPolicy
+        = QDialogButtonBox::ButtonLayout(QApplication::style()->styleHint(QStyle::SH_DialogButtonLayout));
+    if (layoutPolicy == QDialogButtonBox::GnomeLayout) {
+        this->fDesktopIsGnome = true;
+    } else {
+        this->fDesktopIsGnome = false;
+    }
+#endif
+
     // Load our persistent settings.
     this->fSettings = new Settings;
     this->fSettings->loadFromDisk();
@@ -71,17 +82,6 @@ HApplication::HApplication( int& argc, char* argv[], const char* appName,
     // icon is used.
 #ifndef Q_WS_MAC
     this->setWindowIcon(QIcon(":/he_32-bit_48x48.png"));
-#endif
-
-#ifdef Q_WS_X11
-    // Detect whether we're running in Gnome.
-    QDialogButtonBox::ButtonLayout layoutPolicy
-        = QDialogButtonBox::ButtonLayout(QApplication::style()->styleHint(QStyle::SH_DialogButtonLayout));
-    if (layoutPolicy == QDialogButtonBox::GnomeLayout) {
-        this->fDesktopIsGnome = true;
-    } else {
-        this->fDesktopIsGnome = false;
-    }
 #endif
 }
 
