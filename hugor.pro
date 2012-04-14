@@ -1,4 +1,5 @@
 QT += core gui
+contains(QT_MAJOR_VERSION, 5):QT += widgets
 TEMPLATE = app
 CONFIG += warn_on silent
 VERSION = 0.9.0.0
