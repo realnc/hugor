@@ -2,130 +2,18 @@
 #include <SDL_mixer.h>
 #include <QDebug>
 #include <QFile>
-#include <cerrno>
-#include <cstring>
 
 extern "C" {
 #include "heheader.h"
 }
 #include "happlication.h"
 #include "settings.h"
-
-// Our custom RWops type id. Not strictly needed, but it helps catching bugs
-// if somehow we end up trying to delete a different type of RWops.
-#define HUGO_MEDIA_RWOPS_TYPE 3819859
+#include "rwopsbundle.h"
 
 // Current music and sample volumes. Needed to restore the volumes
 // after muting them.
 static int currentMusicVol = MIX_MAX_VOLUME;
 static int currentSampleVol = MIX_MAX_VOLUME;
-
-// Media resource information for our custom RWops implementation. Media
-// resources are embedded inside media bundle files. They begin at 'startPos'
-// and end at 'endPos' inside the 'file' bundle.
-struct HugoMediaFileInfo {
-    HUGO_FILE file;
-    long startPos;
-    long endPos;
-};
-
-
-/* RWops seek callback. We apply offsets to make all seek operations relative
- * to the start/end of the media resource embedded inside the media bundle
- * file.
- *
- * Must return the new current SEET_SET position.
- */
-static int RWOpsSeekFunc( SDL_RWops* rwops, int offset, int whence )
-{
-    HugoMediaFileInfo* info = static_cast<HugoMediaFileInfo*>(rwops->hidden.unknown.data1);
-    int seekRet;
-    errno = 0;
-    if (whence == SEEK_CUR) {
-        seekRet = fseek(info->file, offset, SEEK_CUR);
-    } else if (whence == SEEK_SET) {
-        seekRet = fseek(info->file, info->startPos + offset, SEEK_SET);
-    } else {
-        Q_ASSERT(whence == SEEK_END);
-        Q_ASSERT(offset < 1);
-        seekRet = fseek(info->file, info->endPos + offset, SEEK_SET);
-    }
-    if (seekRet != 0) {
-        qWarning().nospace() << "ERROR: Could not fseek() in media bundle ("
-                             << (errno != 0 ? strerror(errno) : "unknown error") << ")";
-        return -1;
-    }
-    return ftell(info->file) - info->startPos;
-}
-
-
-/* RWops read callback. We don't allow reading past the end of the media
- * resource embedded inside the media bundle file.
- *
- * Must return the number of elements (not bytes) that have been read.
- */
-static int RWOpsReadFunc( SDL_RWops* rwops, void* ptr, int size, int maxnum )
-{
-    HugoMediaFileInfo* info = static_cast<HugoMediaFileInfo*>(rwops->hidden.unknown.data1);
-    long bytesToRead = size * maxnum;
-    long curPos = ftell(info->file);
-    // Make sure we don't read past the end of the embedded media resource.
-    if (curPos + bytesToRead > info->endPos) {
-        bytesToRead = info->endPos - curPos;
-        maxnum = bytesToRead / size;
-    }
-    return fread(ptr, size, maxnum, info->file);
-}
-
-
-/* RWops write callback. This is a NOOP for us, since we never write to media
- * bundle files.
- */
-static int RWOpsWriteFunc( SDL_RWops*, const void*, int, int )
-{
-    return 0;
-}
-
-
-/* RWops close callback. Frees the RWops as well as our custom data.
- */
-static int RWOpsCloseFunc( SDL_RWops* rwops )
-{
-    if (rwops->type != HUGO_MEDIA_RWOPS_TYPE) {
-        SDL_SetError("RWOpsCloseFunc() called with unrecognized RWops type %u", rwops->type);
-        return -1;
-    }
-    HugoMediaFileInfo* info = static_cast<HugoMediaFileInfo*>(rwops->hidden.unknown.data1);
-    fclose(info->file);
-    delete info;
-    SDL_FreeRW(rwops);
-    return 0;
-}
-
-
-/* Create a custom RWops for the given file and media resource length.
- */
-static SDL_RWops*
-RWFromHugoMediaFile( HUGO_FILE infile, long reslength )
-{
-    SDL_RWops* rwops = SDL_AllocRW();
-    if (rwops == NULL) {
-        return NULL;
-    }
-
-    HugoMediaFileInfo* info = new HugoMediaFileInfo;
-    info->file = infile;
-    info->startPos = ftell(infile);
-    info->endPos = info->startPos + reslength;
-
-    rwops->hidden.unknown.data1 = info;
-    rwops->seek = RWOpsSeekFunc;
-    rwops->read = RWOpsReadFunc;
-    rwops->write = RWOpsWriteFunc;
-    rwops->close = RWOpsCloseFunc;
-    rwops->type = HUGO_MEDIA_RWOPS_TYPE;
-    return rwops;
-}
 
 
 void
@@ -193,7 +81,7 @@ hugo_playmusic( HUGO_FILE infile, long reslength, char loop_flag )
     }
 
     // Create an RWops for the embedded media resource.
-    SDL_RWops* rwops = RWFromHugoMediaFile(infile, reslength);
+    SDL_RWops* rwops = RWFromMediaBundle(infile, reslength);
     if (rwops == 0) {
         qWarning() << "ERROR:" << SDL_GetError();
         fclose(infile);

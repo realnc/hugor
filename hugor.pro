@@ -140,7 +140,14 @@ SOURCES += \
     hugo/heset.c \
     hugo/stringfn.c
 
-sdl:SOURCES += src/soundsdl.cc
+sdl {
+    HEADERS += src/rwopsbundle.h
+
+    SOURCES += \
+        src/soundsdl.cc \
+        src/rwopsbundle.c
+}
+
 fmod:SOURCES += src/soundfmod.cc
 
 OTHER_FILES += \
