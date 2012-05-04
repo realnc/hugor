@@ -2,6 +2,8 @@
 #include <SDL_mixer.h>
 #include <QDebug>
 #include <QFile>
+#include <cerrno>
+#include <cstring>
 
 extern "C" {
 #include "heheader.h"
@@ -37,14 +39,21 @@ struct HugoMediaFileInfo {
 static int RWOpsSeekFunc( SDL_RWops* rwops, int offset, int whence )
 {
     HugoMediaFileInfo* info = static_cast<HugoMediaFileInfo*>(rwops->hidden.unknown.data1);
+    int seekRet;
+    errno = 0;
     if (whence == SEEK_CUR) {
-        fseek(info->file, offset, SEEK_CUR);
+        seekRet = fseek(info->file, offset, SEEK_CUR);
     } else if (whence == SEEK_SET) {
-        fseek(info->file, info->startPos + offset, SEEK_SET);
+        seekRet = fseek(info->file, info->startPos + offset, SEEK_SET);
     } else {
         Q_ASSERT(whence == SEEK_END);
         Q_ASSERT(offset < 1);
-        fseek(info->file, info->endPos + offset, SEEK_SET);
+        seekRet = fseek(info->file, info->endPos + offset, SEEK_SET);
+    }
+    if (seekRet != 0) {
+        qWarning().nospace() << "ERROR: Could not fseek() in media bundle ("
+                             << (errno != 0 ? strerror(errno) : "unknown error") << ")";
+        return -1;
     }
     return ftell(info->file) - info->startPos;
 }
