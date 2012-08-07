@@ -25,11 +25,6 @@ hugoColorToQt( int color )
 {
     QColor qtColor;
     switch (color) {
-      case 16:                 qtColor = hApp->settings()->mainTextColor; break;
-      case 17:                 qtColor = hApp->settings()->mainBgColor; break;
-      case 18:                 qtColor = hApp->settings()->statusTextColor; break;
-      case 19:                 qtColor = hApp->settings()->statusBgColor; break;
-      case 20:                 color = fcolor; // Fall-through
       case HUGO_BLACK:         qtColor.setRgb(0x000000); break;
       case HUGO_BLUE:          qtColor.setRgb(0x00007f); break;
       case HUGO_GREEN:         qtColor.setRgb(0x007f00); break;
@@ -46,6 +41,11 @@ hugoColorToQt( int color )
       case HUGO_LIGHT_MAGENTA: qtColor.setRgb(0xff00ff); break;
       case HUGO_YELLOW:        qtColor.setRgb(0xffff00); break;
       case HUGO_BRIGHT_WHITE:  qtColor.setRgb(0xffffff); break;
+      case 16:                 qtColor = hApp->settings()->mainTextColor; break;
+      case 17:                 qtColor = hApp->settings()->mainBgColor; break;
+      case 18:                 qtColor = hApp->settings()->statusTextColor; break;
+      case 19:                 qtColor = hApp->settings()->statusBgColor; break;
+      case 20:                 qtColor = hApp->settings()->mainTextColor; break;
       default:                 qtColor.setRgb(0x000000);
     }
     return qtColor;
