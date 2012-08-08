@@ -209,6 +209,9 @@ HMainWindow::fHideAbout()
 void
 HMainWindow::showScrollback()
 {
+    // Make sure the mouse cursor is visible.
+    hApp->marginWidget()->unsetCursor();
+
     // If no overlay was requested and the scrollback is currently in its
     // overlay mode, make it a regular window again.
     if (not hApp->settings()->overlayScrollback) {
