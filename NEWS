@@ -1,0 +1,43 @@
+1.0 - 2012-08-15
+================
+
+  (No record has been kept for versions older than 1.0.  The below are the
+  changes since version 0.9.)
+
+  - Fullscreen mode is now supported.  The maximum width of game output when
+    in fullscreen is configurable (useful for widescreen displays.)  Switching
+    to fullscreen and back can be done through the "View" menu, or by a
+    platform-specific keyboard shortcut:
+
+        KDE:      F11 or Shift+Ctrl+F
+        Gnome:    Ctrl+F11
+        Mac OS X: Ctrl+Command+F
+        Windows:  F11 or Alt+Enter or Alt+Return
+
+  - External tools that rely on real-time transcript updates (like Trizbort)
+    should now work correctly.
+
+  - The mouse cursor is now hidden when typing and brought back when moving the
+    mouse.
+
+  - Memory usage when playing music has been reduced.  Previously, the whole
+    music file was mapped into memory as it was playing, increasing memory usage
+    over time during playback.  Now the music is streamed as needed and memory
+    usage stays constant over time.
+
+  - When the "Mute Sound in Background" option was enabled, the sound would
+    sometimes stay muted during very quick window focus changes (this can happen
+    when launching Hugor through external scripts.)  This has (hopefully) been
+    fixed.
+
+  - Games that make use of MATCH_FOREGROUND for input would get a wrong color
+    during text input.  This has been fixed.
+
+  - The game window now has a context menu.  It simply provides quick access to
+    the various main menu entries.
+
+  - The scrollback window can now also be closed by clicking on its banner
+    text.
+
+  - Margins and their colors would sometimes display incorrectly after the
+    scrollback window was displayed.  This has been fixed.
