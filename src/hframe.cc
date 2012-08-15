@@ -167,9 +167,12 @@ HFrame::resizeEvent( QResizeEvent* e )
     // Save a copy of the current pixmap.
     const QPixmap& tmp = this->fPixmap.copy();
 
+    // Adjust the margins so that we get our final size.
+    hApp->updateMargins(-1);
+
     // Create a new pixmap, using the new size and fill it with
     // the default background color.
-    QPixmap newPixmap(e->size());
+    QPixmap newPixmap(this->size());
     newPixmap.fill(hugoColorToQt(this->fBgColor));
 
     // Draw the saved pixmap into the new one and use it as our new
