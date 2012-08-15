@@ -14,6 +14,7 @@ extern "C" {
 // after muting them.
 static int currentMusicVol = MIX_MAX_VOLUME;
 static int currentSampleVol = MIX_MAX_VOLUME;
+static bool isMuted = false;
 
 
 void
@@ -139,7 +140,9 @@ hugo_musicvolume( int vol )
     // Convert the Hugo volume range [0..100] to the SDL volume
     // range [0..MIX_MAX_VOLUME].
     vol = (vol * MIX_MAX_VOLUME) / 100;
-    Mix_VolumeMusic(vol);
+    if (not isMuted) {
+        Mix_VolumeMusic(vol);
+    }
     currentMusicVol = vol;
 }
 
@@ -154,12 +157,14 @@ hugo_stopmusic( void )
 void
 muteSound( bool mute )
 {
-    if (mute) {
+    if (mute and not isMuted) {
         Mix_VolumeMusic(0);
         Mix_Volume(-1, 0);
-    } else {
+        isMuted = true;
+    } else if (not mute and isMuted) {
         Mix_VolumeMusic(currentMusicVol);
         Mix_Volume(-1, currentSampleVol);
+        isMuted = false;
     }
 }
 
@@ -242,7 +247,9 @@ hugo_samplevolume( int vol )
     // Convert the Hugo volume range [0..100] to the SDL volume
     // range [0..MIX_MAX_VOLUME].
     vol = (vol * MIX_MAX_VOLUME) / 100;
-    Mix_Volume(-1, vol);
+    if (not isMuted) {
+        Mix_Volume(-1, vol);
+    }
     currentSampleVol = vol;
 }
 

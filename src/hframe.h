@@ -108,10 +108,17 @@ class HFrame: public QWidget {
     // Text cursor blink timer.
     class QTimer* fBlinkTimer;
 
+    // Mute timer.
+    class QTimer* fMuteTimer;
+
   private slots:
     // Called by the timer to blink the text cursor.
     void
     fBlinkCursor();
+
+    // Mute the sound backend.
+    void
+    fMuteSound();
 
     // We need to know when the application loses focus entirely so that we
     // can disable keyboard cursor blinking when we lose focus.
