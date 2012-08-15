@@ -157,6 +157,13 @@ HFrame::paintEvent( QPaintEvent* )
 void
 HFrame::resizeEvent( QResizeEvent* e )
 {
+    // Ignore invalid resizes.  No idea why that happens sometimes, but it
+    // does (we get negative values for width or height.)
+    if (not e->size().isValid()) {
+        e->ignore();
+        return;
+    }
+
     // Save a copy of the current pixmap.
     const QPixmap& tmp = this->fPixmap.copy();
 
