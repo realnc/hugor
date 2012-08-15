@@ -34,7 +34,12 @@ following commands (substitute "sdl" for "fmod" if you want to use the
 FMOD sound backend):
 
   qmake SOUND=sdl
-  make
+  make -jN
+
+Substitute the 'N' in '-jN' with the amount of CPUs or cores in your
+system in order to utilize all of them for a faster compilation process.
+If you are not GNU Make, then the -j option might not be supported.  If
+that's the case, simply omit that option altogether.
 
 If all goes well, you will find an executable in the current directory
 which you can copy somewhere else and run it however you want.
