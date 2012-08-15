@@ -142,6 +142,7 @@ HMainWindow::fFullscreenAdjust()
         this->menuBar()->show();
 #endif
     }
+    hApp->updateMargins(-1);
 }
 
 
