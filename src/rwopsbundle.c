@@ -5,13 +5,13 @@
 
 #include "rwopsbundle.h"
 
-// Our custom RWops type id. Not strictly needed, but it helps catching bugs
-// if somehow we end up trying to delete a different type of RWops.
+/* Our custom RWops type id. Not strictly needed, but it helps catching bugs
+ * if somehow we end up trying to delete a different type of RWops. */
 #define CUSTOM_RWOPS_TYPE 3819859
 
-// Media resource information for our custom RWops implementation. Media
-// resources are embedded inside media bundle files. They begin at 'startPos'
-// and end at 'endPos' inside the 'file' bundle.
+/* Media resource information for our custom RWops implementation. Media
+ * resources are embedded inside media bundle files. They begin at 'startPos'
+ * and end at 'endPos' inside the 'file' bundle. */
 typedef struct {
     FILE* file;
     long startPos;
@@ -59,7 +59,7 @@ RWOpsReadFunc( SDL_RWops* rwops, void* ptr, int size, int maxnum )
     long bytesToRead = size * maxnum;
     long curPos = ftell(info->file);
     size_t itemsRead;
-    // Make sure we don't read past the end of the embedded media resource.
+    /* Make sure we don't read past the end of the embedded media resource. */
     if (curPos + bytesToRead > info->endPos) {
         bytesToRead = info->endPos - curPos;
         maxnum = bytesToRead / size;
@@ -89,12 +89,12 @@ RWOpsWriteFunc( SDL_RWops* rwops, const void* ptr, int size, int num )
 static int
 RWOpsCloseFunc( SDL_RWops* rwops )
 {
+    BundleFileInfo* info = rwops->hidden.unknown.data1;
     if (rwops->type != CUSTOM_RWOPS_TYPE) {
         SDL_SetError("RWOpsCloseFunc() called with unrecognized RWops type %u",
                      rwops->type);
         return -1;
     }
-    BundleFileInfo* info = rwops->hidden.unknown.data1;
     fclose(info->file);
     SDL_free(info);
     SDL_FreeRW(rwops);
@@ -105,13 +105,13 @@ RWOpsCloseFunc( SDL_RWops* rwops )
 SDL_RWops*
 RWFromMediaBundle( FILE* mediaBundle, long resLength )
 {
+    BundleFileInfo* info = SDL_malloc(sizeof *info);
     SDL_RWops* rwops = SDL_AllocRW();
     if (rwops == NULL) {
         return NULL;
     }
 
     errno = 0;
-    BundleFileInfo* info = SDL_malloc(sizeof *info);
     if (info == NULL) {
         SDL_SetError(errno != 0 ? strerror(errno) : "Cannot allocate memory");
         SDL_FreeRW(rwops);
