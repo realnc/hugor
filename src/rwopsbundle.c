@@ -19,6 +19,19 @@ typedef struct {
 } BundleFileInfo;
 
 
+/* Helper routine.  Checks whether the 'rwops' is of our own type.
+ */
+static SDL_bool
+RWOpsCheck( SDL_RWops* rwops )
+{
+    if (rwops->type != CUSTOM_RWOPS_TYPE) {
+        SDL_SetError("Unrecognized RWops type %u", rwops->type);
+        return SDL_FALSE;
+    }
+    return SDL_TRUE;
+}
+
+
 /* RWops seek callback. We apply offsets to make all seek operations relative
  * to the start/end of the media resource embedded inside the media bundle
  * file.
@@ -28,8 +41,11 @@ typedef struct {
 static int
 RWOpsSeekFunc( SDL_RWops* rwops, int offset, int whence )
 {
-    BundleFileInfo* info = rwops->hidden.unknown.data1;
+    BundleFileInfo* info;
     int seekRet;
+    if (!RWOpsCheck(rwops))
+        return -1;
+    info = rwops->hidden.unknown.data1;
     errno = 0;
     if (whence == SEEK_CUR) {
         seekRet = fseek(info->file, offset, SEEK_CUR);
@@ -55,10 +71,14 @@ RWOpsSeekFunc( SDL_RWops* rwops, int offset, int whence )
 static int
 RWOpsReadFunc( SDL_RWops* rwops, void* ptr, int size, int maxnum )
 {
-    BundleFileInfo* info = rwops->hidden.unknown.data1;
+    BundleFileInfo* info;
     long bytesToRead = size * maxnum;
-    long curPos = ftell(info->file);
+    long curPos;
     size_t itemsRead;
+    if (!RWOpsCheck(rwops))
+        return -1;
+    info = rwops->hidden.unknown.data1;
+    curPos = ftell(info->file);
     /* Make sure we don't read past the end of the embedded media resource. */
     if (curPos + bytesToRead > info->endPos) {
         bytesToRead = info->endPos - curPos;
@@ -79,6 +99,8 @@ RWOpsReadFunc( SDL_RWops* rwops, void* ptr, int size, int maxnum )
 static int
 RWOpsWriteFunc( SDL_RWops* rwops, const void* ptr, int size, int num )
 {
+    if (!RWOpsCheck(rwops))
+        return -1;
     SDL_SetError("Media bundle files are not supposed to be written to");
     return -1;
 }
@@ -89,12 +111,10 @@ RWOpsWriteFunc( SDL_RWops* rwops, const void* ptr, int size, int num )
 static int
 RWOpsCloseFunc( SDL_RWops* rwops )
 {
-    BundleFileInfo* info = rwops->hidden.unknown.data1;
-    if (rwops->type != CUSTOM_RWOPS_TYPE) {
-        SDL_SetError("RWOpsCloseFunc() called with unrecognized RWops type %u",
-                     rwops->type);
+    BundleFileInfo* info;
+    if (!RWOpsCheck(rwops))
         return -1;
-    }
+    info = rwops->hidden.unknown.data1;
     fclose(info->file);
     SDL_free(info);
     SDL_FreeRW(rwops);
