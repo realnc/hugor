@@ -105,13 +105,14 @@ RWOpsCloseFunc( SDL_RWops* rwops )
 SDL_RWops*
 RWFromMediaBundle( FILE* mediaBundle, long resLength )
 {
-    BundleFileInfo* info = SDL_malloc(sizeof *info);
+    BundleFileInfo* info;
     SDL_RWops* rwops = SDL_AllocRW();
     if (rwops == NULL) {
         return NULL;
     }
 
     errno = 0;
+    info = SDL_malloc(sizeof *info);
     if (info == NULL) {
         SDL_SetError(errno != 0 ? strerror(errno) : "Cannot allocate memory");
         SDL_FreeRW(rwops);
