@@ -404,7 +404,7 @@ HFrame::singleKeyPressEvent( QKeyEvent* event )
             QWidget::keyPressEvent(event);
             return;
         }
-        this->fKeyQueue.enqueue(event->text().at(0).toAscii());
+        this->fKeyQueue.enqueue(event->text().at(0).toLatin1());
     }
 }
 
@@ -474,9 +474,9 @@ HFrame::getInput( char* buf, size_t buflen, int xPos, int yPos )
     }
 
     // Make the input text part of the display pixmap.
-    this->printText(this->fInputBuf.toAscii().constData(), this->fInputStartX, this->fInputStartY);
+    this->printText(this->fInputBuf.toLatin1().constData(), this->fInputStartX, this->fInputStartY);
 
-    qstrncpy(buf, this->fInputBuf.toAscii(), buflen);
+    qstrncpy(buf, this->fInputBuf.toLatin1(), buflen);
     //qDebug() << this->fInputBuf;
     this->fInputBuf.clear();
 }

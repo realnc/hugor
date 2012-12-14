@@ -30,8 +30,8 @@ HMainWindow::HMainWindow( QWidget* parent )
       fConfDialog(0),
       fAboutDialog(0)
 #if (QT_VERSION >= 0x040600)
-    , fFullscreenEnterIcon(QIcon::fromTheme(QString::fromAscii("view-fullscreen"))),
-      fFullscreenExitIcon(QIcon::fromTheme(QString::fromAscii("view-restore")))
+    , fFullscreenEnterIcon(QIcon::fromTheme(QString::fromLatin1("view-fullscreen"))),
+      fFullscreenExitIcon(QIcon::fromTheme(QString::fromLatin1("view-restore")))
 #endif
 {
     Q_ASSERT(hMainWin == 0);
@@ -50,7 +50,7 @@ HMainWindow::HMainWindow( QWidget* parent )
     menu = menuBar->addMenu(tr("&Edit"));
     act = new QAction(tr("&Preferences..."), this);
 #if QT_VERSION >= 0x040600
-    act->setIcon(QIcon::fromTheme(QString::fromAscii("configure")));
+    act->setIcon(QIcon::fromTheme(QString::fromLatin1("configure")));
     act->setShortcuts(QKeySequence::Preferences);
 #endif
     menu->addAction(act);
@@ -100,7 +100,7 @@ HMainWindow::HMainWindow( QWidget* parent )
     menu = menuBar->addMenu(tr("&Help"));
     act = new QAction(tr("A&bout Hugor"), this);
 #if QT_VERSION >= 0x040600
-    act->setIcon(QIcon::fromTheme(QString::fromAscii("help-about")));
+    act->setIcon(QIcon::fromTheme(QString::fromLatin1("help-about")));
 #endif
     menu->addAction(act);
     connect(act, SIGNAL(triggered()), SLOT(fShowAbout()));

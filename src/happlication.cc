@@ -36,10 +36,10 @@ HApplication::HApplication( int& argc, char* argv[], const char* appName,
     //qDebug() << Q_FUNC_INFO;
     Q_ASSERT(hApp == 0);
 
-    this->setApplicationName(QString::fromAscii(appName));
-    this->setApplicationVersion(QString::fromAscii(appVersion));
-    this->setOrganizationName(QString::fromAscii(orgName));
-    this->setOrganizationDomain(QString::fromAscii(orgDomain));
+    this->setApplicationName(QString::fromLatin1(appName));
+    this->setApplicationVersion(QString::fromLatin1(appVersion));
+    this->setOrganizationName(QString::fromLatin1(orgName));
+    this->setOrganizationDomain(QString::fromLatin1(orgDomain));
 
 #ifdef Q_WS_X11
     // Detect whether we're running in Gnome.
@@ -64,7 +64,7 @@ HApplication::HApplication( int& argc, char* argv[], const char* appName,
 
     // Create our main application window.
     this->fMainWin = new HMainWindow(0);
-    this->fMainWin->setWindowTitle(QString::fromAscii(appName));
+    this->fMainWin->setWindowTitle(QString::fromLatin1(appName));
 
     // This widget provides margins for fFrameWin.
     this->fMarginWidget = new HMarginWidget(this->fMainWin);
@@ -123,7 +123,7 @@ HApplication::fRunGame()
         //qWinGroup->setWindowTitle(finfo.fileName());
 #else
         // On all other systems, also append the application name.
-        //qWinGroup->setWindowTitle(finfo.fileName() + QString::fromAscii(" - ") + qFrame->applicationName());
+        //qWinGroup->setWindowTitle(finfo.fileName() + QString::fromLatin1(" - ") + qFrame->applicationName());
 #endif
 
         // Add the game file to our "recent games" list.
@@ -254,7 +254,7 @@ HApplication::main( QString gameFileName )
         this->fNextGame = QFileDialog::getOpenFileName(0, QObject::tr("Choose the story file you wish to play"),
                                                        this->fSettings->lastFileOpenDir,
                                                        QObject::tr("Hugo Games")
-                                                       + QString::fromAscii("(*.hex *.Hex *.HEX)"));
+                                                       + QString::fromLatin1("(*.hex *.Hex *.HEX)"));
     }
 
     // Automatically quit the application when the last window has closed.

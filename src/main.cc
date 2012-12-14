@@ -63,8 +63,8 @@ int main( int argc, char* argv[] )
     if (args.size() == 2) {
         if (QFile::exists(args.at(1))) {
             gameFileName = args.at(1);
-        } else if (QFile::exists(args.at(1) + QString::fromAscii(".hex"))) {
-            gameFileName = args.at(1) + QString::fromAscii(".hex");
+        } else if (QFile::exists(args.at(1) + QString::fromLatin1(".hex"))) {
+            gameFileName = args.at(1) + QString::fromLatin1(".hex");
         } else {
             qWarning() << "File" << args.at(1) << "not found.";
         }

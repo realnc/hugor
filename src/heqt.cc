@@ -149,22 +149,22 @@ hugo_getfilename( char* a, char* b )
     // on existing files, in case we won't recognize the 'a' string.
     bool saveMode = true;
 
-    if (QString::fromAscii(a).endsWith("to save")) {
-        filter = QObject::tr("Hugo Saved Games") + QString::fromAscii(" (*.sav)");
+    if (QString::fromLatin1(a).endsWith("to save")) {
+        filter = QObject::tr("Hugo Saved Games") + QString::fromLatin1(" (*.sav)");
         caption = "Save current game position";
-    } else if (QString::fromAscii(a).endsWith("to restore")) {
-        filter = QObject::tr("Hugo Saved Games") + QString::fromAscii(" (*.sav *.Sav *.SAV)");
+    } else if (QString::fromLatin1(a).endsWith("to restore")) {
+        filter = QObject::tr("Hugo Saved Games") + QString::fromLatin1(" (*.sav *.Sav *.SAV)");
         caption = "Restore a saved game position";
         saveMode = false;
-    } else if (QString::fromAscii(a).endsWith("for command recording")) {
-        filter = QObject::tr("Hugo recording files") + QString::fromAscii(" (*.rec)");
+    } else if (QString::fromLatin1(a).endsWith("for command recording")) {
+        filter = QObject::tr("Hugo recording files") + QString::fromLatin1(" (*.rec)");
         caption = "Record commands to a file";
-    } else if (QString::fromAscii(a).endsWith("for command playback")) {
-        filter = QObject::tr("Hugo recording files") + QString::fromAscii(" (*.rec *.Rec *.REC)");
+    } else if (QString::fromLatin1(a).endsWith("for command playback")) {
+        filter = QObject::tr("Hugo recording files") + QString::fromLatin1(" (*.rec *.Rec *.REC)");
         caption = "Play recorded commands from a file";
         saveMode = false;
-    } else if (QString::fromAscii(a).endsWith("transcription (or printer name)")) {
-        filter = QObject::tr("Transcription files") + QString::fromAscii(" (*.txt)");
+    } else if (QString::fromLatin1(a).endsWith("transcription (or printer name)")) {
+        filter = QObject::tr("Transcription files") + QString::fromLatin1(" (*.txt)");
         caption = "Save transcript to a file";
     }
 
@@ -640,7 +640,7 @@ hugo_print( char* a )
 
           default: {
             ac += hApp->hugoCodec()->toUnicode(a + i, 1);
-            //hFrame->printText(QString(QChar(a[i])).toAscii().constData(), current_text_x, current_text_y);
+            //hFrame->printText(QString(QChar(a[i])).toLatin1().constData(), current_text_x, current_text_y);
             //hFrame->flushText();
             //current_text_x += hugo_charwidth(a[i]);
           }

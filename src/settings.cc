@@ -43,44 +43,44 @@ Settings::loadFromDisk()
 {
     QSettings sett;
 
-    sett.beginGroup(QString::fromAscii("media"));
-    this->enableGraphics = sett.value(QString::fromAscii("graphics"), true).toBool();
+    sett.beginGroup(QString::fromLatin1("media"));
+    this->enableGraphics = sett.value(QString::fromLatin1("graphics"), true).toBool();
 #ifndef Q_WS_ANDROID
-    this->enableSoundEffects = sett.value(QString::fromAscii("sounds"), true).toBool();
-    this->enableMusic = sett.value(QString::fromAscii("music"), true).toBool();
+    this->enableSoundEffects = sett.value(QString::fromLatin1("sounds"), true).toBool();
+    this->enableMusic = sett.value(QString::fromLatin1("music"), true).toBool();
 #else
-    this->enableSoundEffects = sett.value(QString::fromAscii("sounds"), false).toBool();
-    this->enableMusic = sett.value(QString::fromAscii("music"), false).toBool();
+    this->enableSoundEffects = sett.value(QString::fromLatin1("sounds"), false).toBool();
+    this->enableMusic = sett.value(QString::fromLatin1("music"), false).toBool();
 #endif
-    this->useSmoothScaling = sett.value(QString::fromAscii("smoothImageScaling"), true).toBool();
-    this->muteSoundInBackground = sett.value(QString::fromAscii("pauseSoundInBackground"), true).toBool();
+    this->useSmoothScaling = sett.value(QString::fromLatin1("smoothImageScaling"), true).toBool();
+    this->muteSoundInBackground = sett.value(QString::fromLatin1("pauseSoundInBackground"), true).toBool();
     sett.endGroup();
 
-    sett.beginGroup(QString::fromAscii("colors"));
-    this->mainBgColor = sett.value(QString::fromAscii("mainbg"), hugoColorToQt(DEF_BGCOLOR)).value<QColor>();
-    this->mainTextColor = sett.value(QString::fromAscii("maintext"), hugoColorToQt(DEF_FCOLOR)).value<QColor>();
-    this->statusBgColor = sett.value(QString::fromAscii("bannerbg"), hugoColorToQt(DEF_SLBGCOLOR)).value<QColor>();
-    this->statusTextColor = sett.value(QString::fromAscii("bannertext"), hugoColorToQt(DEF_SLFCOLOR)).value<QColor>();
+    sett.beginGroup(QString::fromLatin1("colors"));
+    this->mainBgColor = sett.value(QString::fromLatin1("mainbg"), hugoColorToQt(DEF_BGCOLOR)).value<QColor>();
+    this->mainTextColor = sett.value(QString::fromLatin1("maintext"), hugoColorToQt(DEF_FCOLOR)).value<QColor>();
+    this->statusBgColor = sett.value(QString::fromLatin1("bannerbg"), hugoColorToQt(DEF_SLBGCOLOR)).value<QColor>();
+    this->statusTextColor = sett.value(QString::fromLatin1("bannertext"), hugoColorToQt(DEF_SLFCOLOR)).value<QColor>();
     sett.endGroup();
 
 #ifdef Q_WS_MAC
-    const QString& DEFAULT_PROP = QString::fromAscii("Georgia,15");
-    const QString& DEFAULT_MONO = QString::fromAscii("Andale Mono,15");
+    const QString& DEFAULT_PROP = QString::fromLatin1("Georgia,15");
+    const QString& DEFAULT_MONO = QString::fromLatin1("Andale Mono,15");
 #else
 #ifdef Q_WS_WIN
-    const QString& DEFAULT_PROP = QString::fromAscii("Times New Roman,12");
-    const QString& DEFAULT_MONO = QString::fromAscii("Courier New,12");
+    const QString& DEFAULT_PROP = QString::fromLatin1("Times New Roman,12");
+    const QString& DEFAULT_MONO = QString::fromLatin1("Courier New,12");
 #else
 #ifdef Q_WS_ANDROID
-    const QString& DEFAULT_PROP = QString::fromAscii("Droid Serif");
-    const QString& DEFAULT_MONO = QString::fromAscii("Droid Sans Mono");
+    const QString& DEFAULT_PROP = QString::fromLatin1("Droid Serif");
+    const QString& DEFAULT_MONO = QString::fromLatin1("Droid Sans Mono");
 #else
-    const QString& DEFAULT_PROP = QString::fromAscii("serif");
-    const QString& DEFAULT_MONO = QString::fromAscii("monospace");
+    const QString& DEFAULT_PROP = QString::fromLatin1("serif");
+    const QString& DEFAULT_MONO = QString::fromLatin1("monospace");
 #endif
 #endif
 #endif
-    sett.beginGroup(QString::fromAscii("fonts"));
+    sett.beginGroup(QString::fromLatin1("fonts"));
     QFont::StyleStrategy strat;
 #if QT_VERSION >= 0x040700
     // We're building with a recent enough Qt; use ForceIntegerMetrics directly.
@@ -97,25 +97,25 @@ Settings::loadFromDisk()
 #endif
     this->propFont.setStyleStrategy(strat);
     QFont tmp;
-    tmp.fromString(sett.value(QString::fromAscii("main"), DEFAULT_PROP).toString());
+    tmp.fromString(sett.value(QString::fromLatin1("main"), DEFAULT_PROP).toString());
     this->propFont.setFamily(tmp.family());
     this->propFont.setPointSize(tmp.pointSize());
     this->fixedFont.setStyleStrategy(strat);
-    tmp.fromString(sett.value(QString::fromAscii("fixed"), DEFAULT_MONO).toString());
+    tmp.fromString(sett.value(QString::fromLatin1("fixed"), DEFAULT_MONO).toString());
     this->fixedFont.setFamily(tmp.family());
     this->fixedFont.setPointSize(tmp.pointSize());
-    this->softTextScrolling = sett.value(QString::fromAscii("softTextScrolling"), true).toBool();
-    this->extraButter = sett.value(QString::fromAscii("extraButter"), false).toBool();
-    this->smartFormatting = sett.value(QString::fromAscii("smartFormatting"), true).toBool();
+    this->softTextScrolling = sett.value(QString::fromLatin1("softTextScrolling"), true).toBool();
+    this->extraButter = sett.value(QString::fromLatin1("extraButter"), false).toBool();
+    this->smartFormatting = sett.value(QString::fromLatin1("smartFormatting"), true).toBool();
     sett.endGroup();
 
-    sett.beginGroup(QString::fromAscii("misc"));
-    this->askForGameFile = sett.value(QString::fromAscii("askforfileatstart"), true).toBool();
-    this->lastFileOpenDir = sett.value(QString::fromAscii("lastFileOpenDir"), QString::fromAscii("")).toString();
+    sett.beginGroup(QString::fromLatin1("misc"));
+    this->askForGameFile = sett.value(QString::fromLatin1("askforfileatstart"), true).toBool();
+    this->lastFileOpenDir = sett.value(QString::fromLatin1("lastFileOpenDir"), QString::fromLatin1("")).toString();
     sett.endGroup();
 
-    sett.beginGroup(QString::fromAscii("recent"));
-    this->recentGamesList = sett.value(QString::fromAscii("games"), QStringList()).toStringList();
+    sett.beginGroup(QString::fromLatin1("recent"));
+    this->recentGamesList = sett.value(QString::fromLatin1("games"), QStringList()).toStringList();
     Q_ASSERT(this->recentGamesList.size() <= this->recentGamesCapacity);
     // Remove any files that don't exist or aren't readable.
     for (int i = 0; i < this->recentGamesList.size(); ++i) {
@@ -127,12 +127,12 @@ Settings::loadFromDisk()
     }
     sett.endGroup();
 
-    sett.beginGroup(QString::fromAscii("geometry"));
-    this->appSize = sett.value(QString::fromAscii("size"), QSize(800, 600)).toSize();
-    this->overlayScrollback = sett.value(QString::fromAscii("overlayScrollback"), true).toBool();
-    this->isMaximized = sett.value(QString::fromAscii("maximized"), false).toBool();
-    this->marginSize = sett.value(QString::fromAscii("marginSize"), 0).toInt();
-    this->fullscreenWidth = sett.value(QString::fromAscii("fullscreenWidth"), 0).toInt();
+    sett.beginGroup(QString::fromLatin1("geometry"));
+    this->appSize = sett.value(QString::fromLatin1("size"), QSize(800, 600)).toSize();
+    this->overlayScrollback = sett.value(QString::fromLatin1("overlayScrollback"), true).toBool();
+    this->isMaximized = sett.value(QString::fromLatin1("maximized"), false).toBool();
+    this->marginSize = sett.value(QString::fromLatin1("marginSize"), 0).toInt();
+    this->fullscreenWidth = sett.value(QString::fromLatin1("fullscreenWidth"), 0).toInt();
     sett.endGroup();
 }
 
@@ -142,48 +142,48 @@ Settings::saveToDisk()
 {
     QSettings sett;
 
-    sett.beginGroup(QString::fromAscii("media"));
-    sett.setValue(QString::fromAscii("graphics"), this->enableGraphics);
-    sett.setValue(QString::fromAscii("sounds"), this->enableSoundEffects);
-    sett.setValue(QString::fromAscii("music"), this->enableMusic);
-    sett.setValue(QString::fromAscii("smoothImageScaling"), this->useSmoothScaling);
-    sett.setValue(QString::fromAscii("pauseSoundInBackground"), this->muteSoundInBackground);
+    sett.beginGroup(QString::fromLatin1("media"));
+    sett.setValue(QString::fromLatin1("graphics"), this->enableGraphics);
+    sett.setValue(QString::fromLatin1("sounds"), this->enableSoundEffects);
+    sett.setValue(QString::fromLatin1("music"), this->enableMusic);
+    sett.setValue(QString::fromLatin1("smoothImageScaling"), this->useSmoothScaling);
+    sett.setValue(QString::fromLatin1("pauseSoundInBackground"), this->muteSoundInBackground);
     sett.endGroup();
 
-    sett.beginGroup(QString::fromAscii("colors"));
-    sett.setValue(QString::fromAscii("mainbg"), this->mainBgColor);
-    sett.setValue(QString::fromAscii("maintext"), this->mainTextColor);
-    sett.setValue(QString::fromAscii("bannerbg"), this->statusBgColor);
-    sett.setValue(QString::fromAscii("bannertext"), this->statusTextColor);
+    sett.beginGroup(QString::fromLatin1("colors"));
+    sett.setValue(QString::fromLatin1("mainbg"), this->mainBgColor);
+    sett.setValue(QString::fromLatin1("maintext"), this->mainTextColor);
+    sett.setValue(QString::fromLatin1("bannerbg"), this->statusBgColor);
+    sett.setValue(QString::fromLatin1("bannertext"), this->statusTextColor);
     sett.endGroup();
 
-    sett.beginGroup(QString::fromAscii("fonts"));
-    sett.setValue(QString::fromAscii("main"), this->propFont.toString());
-    sett.setValue(QString::fromAscii("fixed"), this->fixedFont.toString());
-    sett.setValue(QString::fromAscii("softTextScrolling"), this->softTextScrolling);
-    sett.setValue(QString::fromAscii("extraButter"), this->extraButter);
-    sett.setValue(QString::fromAscii("smartFormatting"), this->smartFormatting);
+    sett.beginGroup(QString::fromLatin1("fonts"));
+    sett.setValue(QString::fromLatin1("main"), this->propFont.toString());
+    sett.setValue(QString::fromLatin1("fixed"), this->fixedFont.toString());
+    sett.setValue(QString::fromLatin1("softTextScrolling"), this->softTextScrolling);
+    sett.setValue(QString::fromLatin1("extraButter"), this->extraButter);
+    sett.setValue(QString::fromLatin1("smartFormatting"), this->smartFormatting);
     sett.endGroup();
 
-    sett.beginGroup(QString::fromAscii("misc"));
-    sett.setValue(QString::fromAscii("askforfileatstart"), this->askForGameFile);
-    sett.setValue(QString::fromAscii("lastFileOpenDir"), this->lastFileOpenDir);
+    sett.beginGroup(QString::fromLatin1("misc"));
+    sett.setValue(QString::fromLatin1("askforfileatstart"), this->askForGameFile);
+    sett.setValue(QString::fromLatin1("lastFileOpenDir"), this->lastFileOpenDir);
     sett.endGroup();
 
-    sett.beginGroup(QString::fromAscii("recent"));
-    sett.setValue(QString::fromAscii("games"), this->recentGamesList);
+    sett.beginGroup(QString::fromLatin1("recent"));
+    sett.setValue(QString::fromLatin1("games"), this->recentGamesList);
     sett.endGroup();
 
-    sett.beginGroup(QString::fromAscii("geometry"));
+    sett.beginGroup(QString::fromLatin1("geometry"));
     // Do not save application size if we're in fullscreen mode, since we
     // need to restore the windowed, non-fullscreen size next time we run.
     if (not hMainWin->isFullScreen()) {
-        sett.setValue(QString::fromAscii("size"), hMainWin->size());
+        sett.setValue(QString::fromLatin1("size"), hMainWin->size());
     }
-    sett.setValue(QString::fromAscii("overlayScrollback"), this->overlayScrollback);
-    sett.setValue(QString::fromAscii("maximized"), hMainWin->isMaximized());
-    sett.setValue(QString::fromAscii("marginSize"), this->marginSize);
-    sett.setValue(QString::fromAscii("fullscreenWidth"), this->fullscreenWidth);
+    sett.setValue(QString::fromLatin1("overlayScrollback"), this->overlayScrollback);
+    sett.setValue(QString::fromLatin1("maximized"), hMainWin->isMaximized());
+    sett.setValue(QString::fromLatin1("marginSize"), this->marginSize);
+    sett.setValue(QString::fromLatin1("fullscreenWidth"), this->fullscreenWidth);
     sett.endGroup();
     sett.sync();
 }
