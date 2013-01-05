@@ -47,12 +47,12 @@ RWOpsSeekFunc( SDL_RWops* rwops, int offset, int whence )
         return -1;
     info = rwops->hidden.unknown.data1;
     errno = 0;
-    if (whence == SEEK_CUR) {
-        seekRet = fseek(info->file, offset, SEEK_CUR);
-    } else if (whence == SEEK_SET) {
-        seekRet = fseek(info->file, info->startPos + offset, SEEK_SET);
+    if (whence == RW_SEEK_CUR) {
+        seekRet = fseek(info->file, offset, RW_SEEK_CUR);
+    } else if (whence == RW_SEEK_SET) {
+        seekRet = fseek(info->file, info->startPos + offset, RW_SEEK_SET);
     } else {
-        seekRet = fseek(info->file, info->endPos + offset, SEEK_SET);
+        seekRet = fseek(info->file, info->endPos + offset, RW_SEEK_SET);
     }
     if (seekRet != 0) {
         SDL_SetError("Could not fseek() in media bundle (%s)",
