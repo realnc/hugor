@@ -844,7 +844,7 @@ hugo_stopvideo( void )
 { }
 
 extern "C" int
-hugo_playvideo( HUGO_FILE infile, long, char )
+hugo_playvideo( HUGO_FILE infile, long, char, char, int )
 {
     fclose(infile);
     return true;    /* not an error */
