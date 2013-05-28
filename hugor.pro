@@ -111,6 +111,7 @@ HEADERS += \
     src/hugodefs.h \
     src/kcolorbutton.h \
     src/settings.h \
+    src/settingsoverrides.h \
     src/version.h \
     \
     hugo/heheader.h \
@@ -128,6 +129,7 @@ SOURCES += \
     src/kcolorbutton.cc \
     src/main.cc \
     src/settings.cc \
+    src/settingsoverrides.cc \
     \
     hugo/he.c \
     hugo/hebuffer.c \

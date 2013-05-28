@@ -9,6 +9,7 @@
 #include <QFileDialog>
 #include <QDialogButtonBox>
 #include <QStyle>
+#include <QMenuBar>
 
 extern "C" {
 #include "heheader.h"
@@ -18,6 +19,7 @@ extern "C" {
 #include "hmarginwidget.h"
 #include "hframe.h"
 #include "settings.h"
+#include "settingsoverrides.h"
 #include "hugodefs.h"
 
 
@@ -36,9 +38,30 @@ HApplication::HApplication( int& argc, char* argv[], const char* appName,
     //qDebug() << Q_FUNC_INFO;
     Q_ASSERT(hApp == 0);
 
-    this->setApplicationName(QString::fromLatin1(appName));
+    // Load overrides from a hugor.ini, if there is one.
+    SettingsOverrides sett("hugor.ini");
+
+    // Make sure that appName and authorName are either both set or unset.
+    // This avoids mixing up the system file/registry paths for the settings
+    // with our default ones.
+    if ((sett.appName.isEmpty() and not sett.authorName.isEmpty())
+        or (sett.authorName.isEmpty() and not sett.appName.isEmpty()))
+    {
+        sett.appName.clear();
+        sett.authorName.clear();
+    }
+
+    if (sett.appName.isEmpty()) {
+        this->setApplicationName(QString::fromLatin1(appName));
+    } else {
+        this->setApplicationName(sett.appName);
+    }
     this->setApplicationVersion(QString::fromLatin1(appVersion));
-    this->setOrganizationName(QString::fromLatin1(orgName));
+    if (sett.authorName.isEmpty()) {
+        this->setOrganizationName(QString::fromLatin1(orgName));
+    } else {
+        this->setOrganizationName(sett.authorName);
+    }
     this->setOrganizationDomain(QString::fromLatin1(orgDomain));
 
 #ifdef Q_WS_X11
@@ -55,6 +78,11 @@ HApplication::HApplication( int& argc, char* argv[], const char* appName,
     // Load our persistent settings.
     this->fSettings = new Settings;
     this->fSettings->loadFromDisk();
+
+    // Apply any custom overrides.
+    if (sett.fullscreenWidth > 0) {
+        this->fSettings->fullscreenWidth = sett.fullscreenWidth;
+    }
 
     // Apply the smart formatting setting.
     smartformatting = this->fSettings->smartFormatting;
@@ -74,8 +102,16 @@ HApplication::HApplication( int& argc, char* argv[], const char* appName,
     this->updateMargins(::bgcolor);
     this->fMainWin->setCentralWidget(this->fMarginWidget);
 
+
+    if (sett.hideMenuBar) {
+        this->fMainWin->menuBar()->hide();
+    }
+
     // Restore the application's size.
     this->fMainWin->resize(this->fSettings->appSize);
+    if (sett.fullscreen) {
+        this->fMainWin->showFullScreen();
+    }
     this->fFrameWin->show();
 
     // Set application window icon, unless we're on OS X where the bundle

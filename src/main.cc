@@ -8,7 +8,6 @@ extern "C" {
 #include "heheader.h"
 }
 #include "happlication.h"
-#include "settings.h"
 #include "hugodefs.h"
 #include "version.h"
 
