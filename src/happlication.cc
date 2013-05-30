@@ -105,6 +105,10 @@ HApplication::HApplication( int& argc, char* argv[], const char* appName,
     // Create our main application window.
     this->fMainWin = new HMainWindow(0);
     this->fMainWin->setWindowTitle(this->applicationName());
+    // Disable screen updates until we're actually ready to run a game. This
+    // prevents screen flicker due to the resizing and background color changes
+    // if we're starting in fullscreen mode.
+    this->fMainWin->setUpdatesEnabled(false);
 
     // This widget provides margins for fFrameWin.
     this->fMarginWidget = new HMarginWidget(this->fMainWin);
@@ -215,6 +219,7 @@ HApplication::fRunGame()
         char* argv1 = new char[this->fGameFile.toLocal8Bit().size() + 1];
         strcpy(argv1, this->fGameFile.toLocal8Bit().constData());
         char* argv[2] = {argv0, argv1};
+        this->fMainWin->setUpdatesEnabled(true);
         emit gameStarting();
         he_main(2, argv);
         this->fGameRunning = false;
