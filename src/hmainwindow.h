@@ -15,6 +15,7 @@ class HMainWindow: public QMainWindow {
     class AboutDialog* fAboutDialog;
     class HScrollbackWindow* fScrollbackWindow;
     class QAction* fFullscreenAction;
+    bool fMenuBarVisible;
 #if QT_VERSION >= 0x040600
     QIcon fFullscreenEnterIcon;
     QIcon fFullscreenExitIcon;
@@ -48,6 +49,12 @@ class HMainWindow: public QMainWindow {
 
     void
     appendToScrollback( const QByteArray& str );
+
+    void
+    hideMenuBar();
+
+    void
+    showMenuBar();
 
   public slots:
     void

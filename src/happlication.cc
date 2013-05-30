@@ -38,31 +38,48 @@ HApplication::HApplication( int& argc, char* argv[], const char* appName,
     //qDebug() << Q_FUNC_INFO;
     Q_ASSERT(hApp == 0);
 
-    // Load overrides from a hugor.ini, if there is one.
-    SettingsOverrides sett("hugor.ini");
-
-    // Make sure that appName and authorName are either both set or unset.
-    // This avoids mixing up the system file/registry paths for the settings
-    // with our default ones.
-    if ((sett.appName.isEmpty() and not sett.authorName.isEmpty())
-        or (sett.authorName.isEmpty() and not sett.appName.isEmpty()))
-    {
-        sett.appName.clear();
-        sett.authorName.clear();
+    // Check if a config file with the same basename as ours exists in our
+    // directory.  If yes, we will override default settings from it.
+    QString cfgFname = QApplication::applicationDirPath();
+    if (not cfgFname.endsWith('/')) {
+        cfgFname += '/';
     }
-
-    if (sett.appName.isEmpty()) {
-        this->setApplicationName(QString::fromLatin1(appName));
+    cfgFname += QFileInfo(QApplication::applicationFilePath()).baseName();
+    cfgFname += ".cfg";
+    if (not QFileInfo(cfgFname).exists()) {
+        cfgFname.clear();
+    }
+    SettingsOverrides* settOvr;
+    if (cfgFname.isEmpty()) {
+        settOvr = 0;
     } else {
-        this->setApplicationName(sett.appName);
+        settOvr = new SettingsOverrides(cfgFname);
     }
+
+    this->setApplicationName(QString::fromLatin1(appName));
     this->setApplicationVersion(QString::fromLatin1(appVersion));
-    if (sett.authorName.isEmpty()) {
-        this->setOrganizationName(QString::fromLatin1(orgName));
-    } else {
-        this->setOrganizationName(sett.authorName);
-    }
+    this->setOrganizationName(QString::fromLatin1(orgName));
     this->setOrganizationDomain(QString::fromLatin1(orgDomain));
+
+    // Possibly override application and organization names.
+    if (settOvr) {
+        // Make sure that appName and authorName are either both set or unset.
+        // This avoids mixing up the system file/registry paths for the settings
+        // with our default ones.
+        if ((settOvr->appName.isEmpty() and not settOvr->authorName.isEmpty())
+            or (settOvr->authorName.isEmpty() and not settOvr->appName.isEmpty()))
+        {
+            settOvr->appName.clear();
+            settOvr->authorName.clear();
+        }
+
+        if (not settOvr->appName.isEmpty()) {
+            this->setApplicationName(settOvr->appName);
+        }
+        if (not settOvr->authorName.isEmpty()) {
+            this->setOrganizationName(settOvr->authorName);
+        }
+    }
 
 #ifdef Q_WS_X11
     // Detect whether we're running in Gnome.
@@ -77,12 +94,7 @@ HApplication::HApplication( int& argc, char* argv[], const char* appName,
 
     // Load our persistent settings.
     this->fSettings = new Settings;
-    this->fSettings->loadFromDisk();
-
-    // Apply any custom overrides.
-    if (sett.fullscreenWidth > 0) {
-        this->fSettings->fullscreenWidth = sett.fullscreenWidth;
-    }
+    this->fSettings->loadFromDisk(settOvr);
 
     // Apply the smart formatting setting.
     smartformatting = this->fSettings->smartFormatting;
@@ -92,7 +104,7 @@ HApplication::HApplication( int& argc, char* argv[], const char* appName,
 
     // Create our main application window.
     this->fMainWin = new HMainWindow(0);
-    this->fMainWin->setWindowTitle(QString::fromLatin1(appName));
+    this->fMainWin->setWindowTitle(this->applicationName());
 
     // This widget provides margins for fFrameWin.
     this->fMarginWidget = new HMarginWidget(this->fMainWin);
@@ -103,14 +115,14 @@ HApplication::HApplication( int& argc, char* argv[], const char* appName,
     this->fMainWin->setCentralWidget(this->fMarginWidget);
 
 
-    if (sett.hideMenuBar) {
-        this->fMainWin->menuBar()->hide();
+    if (settOvr and settOvr->hideMenuBar) {
+        this->fMainWin->hideMenuBar();
     }
 
     // Restore the application's size.
     this->fMainWin->resize(this->fSettings->appSize);
-    if (sett.fullscreen) {
-        this->fMainWin->showFullScreen();
+    if (settOvr and settOvr->fullscreen) {
+        this->fMainWin->toggleFullscreen();
     }
     this->fFrameWin->show();
 
@@ -119,6 +131,7 @@ HApplication::HApplication( int& argc, char* argv[], const char* appName,
 #ifndef Q_WS_MAC
     this->setWindowIcon(QIcon(":/he_32-bit_48x48.png"));
 #endif
+    delete settOvr;
 }
 
 

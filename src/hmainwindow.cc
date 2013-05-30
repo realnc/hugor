@@ -28,7 +28,8 @@ class HMainWindow* hMainWin = 0;
 HMainWindow::HMainWindow( QWidget* parent )
     : QMainWindow(parent),
       fConfDialog(0),
-      fAboutDialog(0)
+      fAboutDialog(0),
+      fMenuBarVisible(true)
 #if (QT_VERSION >= 0x040600)
     , fFullscreenEnterIcon(QIcon::fromTheme(QString::fromLatin1("view-fullscreen"))),
       fFullscreenExitIcon(QIcon::fromTheme(QString::fromLatin1("view-restore")))
@@ -139,7 +140,9 @@ HMainWindow::fFullscreenAdjust()
         this->fFullscreenAction->setText("Enter Full Screen");
 #else
         this->fFullscreenAction->setChecked(false);
-        this->menuBar()->show();
+        if (this->fMenuBarVisible) {
+            this->menuBar()->show();
+        }
 #endif
     }
     hApp->updateMargins(-1);
@@ -156,7 +159,7 @@ HMainWindow::fShowConfDialog()
         return;
     }
     this->fConfDialog = new ConfDialog(this);
-    this->fConfDialog->setWindowTitle(tr("Hugor Preferences"));
+    this->fConfDialog->setWindowTitle(hApp->applicationName() + ' ' + tr("Preferences"));
     connect(this->fConfDialog, SIGNAL(finished(int)), this, SLOT(fHideConfDialog()));
 #ifdef Q_WS_MAC
     // There's a bug in Qt for OS X that results in a visual glitch with
@@ -312,7 +315,7 @@ HMainWindow::closeEvent( QCloseEvent* e )
     }
 
     QMessageBox* msgBox = new QMessageBox(QMessageBox::Question,
-                                          tr("Quit Hugor"),
+                                          tr("Quit") + ' ' + hApp->applicationName(),
                                           tr("Abandon the story and quit the application?"),
                                           QMessageBox::Yes | QMessageBox::Cancel, this);
     msgBox->setDefaultButton(QMessageBox::Cancel);
@@ -363,4 +366,20 @@ HMainWindow::appendToScrollback( const QByteArray& str )
     this->fScrollbackWindow->moveCursor(QTextCursor::End);
     this->fScrollbackWindow->insertPlainText(hApp->hugoCodec()->toUnicode(str));
     this->fScrollbackWindow->verticalScrollBar()->triggerAction(QScrollBar::SliderToMaximum);
+}
+
+
+void
+HMainWindow::hideMenuBar()
+{
+    this->fMenuBarVisible = false;
+    this->menuBar()->hide();
+}
+
+
+void
+HMainWindow::showMenuBar()
+{
+    this->fMenuBarVisible = true;
+    this->menuBar()->show();
 }

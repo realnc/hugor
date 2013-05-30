@@ -1,6 +1,7 @@
 #include <QKeyEvent>
 
 #include "hscrollback.h"
+#include "happlication.h"
 #include "hmainwindow.h"
 
 
@@ -10,7 +11,7 @@ HScrollbackWindow::HScrollbackWindow( QWidget* parent )
       fInitialWidth(600),
       fInitialHeight(440)
 {
-    this->setWindowTitle("Hugor Scrollback");
+    this->setWindowTitle(hApp->applicationName() + ' ' + "Scrollback");
     this->setReadOnly(true);
     this->setUndoRedoEnabled(false);
     this->setTextInteractionFlags(Qt::TextSelectableByMouse);

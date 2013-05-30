@@ -9,7 +9,7 @@
 class Settings {
   public:
     void
-    loadFromDisk();
+    loadFromDisk( class SettingsOverrides* ovr = 0 );
 
     void
     saveToDisk();

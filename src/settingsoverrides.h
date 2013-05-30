@@ -5,17 +5,19 @@
 
 
 class SettingsOverrides {
-  private:
-    class QSettings* fSett;
-
   public:
     SettingsOverrides( const QString& filename );
 
     QString appName;
     QString authorName;
     bool fullscreen;
-    bool hideMenuBar;
     int fullscreenWidth;
+    bool hideMenuBar;
+    int marginSize;
+    int propFontSize;
+    int fixedFontSize;
+    bool imageSmoothing;
+    bool pauseAudio;
 };
 
 

@@ -8,6 +8,7 @@
 extern "C" {
 #include "heheader.h"
 }
+#include "settingsoverrides.h"
 
 
 #if QT_VERSION < 0x040700
@@ -38,29 +39,59 @@ qtRuntimeVersion()
 #endif
 
 
+#define SETT_MEDIA_GRP QString::fromLatin1("media")
+#define SETT_COLORS_GRP QString::fromLatin1("colors")
+#define SETT_FONTS_GRP QString::fromLatin1("fonts")
+#define SETT_RECENT_GRP QString::fromLatin1("recent")
+#define SETT_MISC_GRP QString::fromLatin1("misc")
+#define SETT_GEOMETRY_GRP QString::fromLatin1("geometry")
+#define SETT_GRAPHICS QString::fromLatin1("graphics")
+#define SETT_SOUNDS QString::fromLatin1("sounds")
+#define SETT_MUSIC QString::fromLatin1("music")
+#define SETT_SMOOTH_IMAGES QString::fromLatin1("smoothImageScaling")
+#define SETT_PAUSE_SOUND QString::fromLatin1("pauseSoundInBackground")
+#define SETT_MAIN_BG_COLOR QString::fromLatin1("mainbg")
+#define SETT_MAIN_TXT_COLOR QString::fromLatin1("maintext")
+#define SETT_STATUS_BG_COLOR QString::fromLatin1("bannerbg")
+#define SETT_STATUS_TXT_COLOR QString::fromLatin1("bannertext")
+#define SETT_MAIN_FONT QString::fromLatin1("main")
+#define SETT_FIXED_FONT QString::fromLatin1("fixed")
+#define SETT_SOFT_SCROLL QString::fromLatin1("softTextScrolling")
+#define SETT_EXTRA_BUTTER QString::fromLatin1("extraButter")
+#define SETT_SMART_FORMATTING QString::fromLatin1("smartFormatting")
+#define SETT_ASK_FILE QString::fromLatin1("askforfileatstart")
+#define SETT_LAST_OPEN_DIR QString::fromLatin1("lastFileOpenDir")
+#define SETT_GAMES_LIST QString::fromLatin1("games")
+#define SETT_APP_SIZE QString::fromLatin1("size")
+#define SETT_OVERLAY_SCROLL QString::fromLatin1("overlayScrollback")
+#define SETT_MAXIMIZED QString::fromLatin1("maximized")
+#define SETT_MARGIN_SIZE QString::fromLatin1("marginSize")
+#define SETT_FULLSCREEN_WIDTH QString::fromLatin1("fullscreenWidth")
+
+
 void
-Settings::loadFromDisk()
+Settings::loadFromDisk( SettingsOverrides* ovr )
 {
     QSettings sett;
 
-    sett.beginGroup(QString::fromLatin1("media"));
-    this->enableGraphics = sett.value(QString::fromLatin1("graphics"), true).toBool();
+    sett.beginGroup(SETT_MEDIA_GRP);
+    this->enableGraphics = sett.value(SETT_GRAPHICS, true).toBool();
 #ifndef Q_WS_ANDROID
-    this->enableSoundEffects = sett.value(QString::fromLatin1("sounds"), true).toBool();
-    this->enableMusic = sett.value(QString::fromLatin1("music"), true).toBool();
+    this->enableSoundEffects = sett.value(SETT_SOUNDS, true).toBool();
+    this->enableMusic = sett.value(SETT_MUSIC, true).toBool();
 #else
-    this->enableSoundEffects = sett.value(QString::fromLatin1("sounds"), false).toBool();
-    this->enableMusic = sett.value(QString::fromLatin1("music"), false).toBool();
+    this->enableSoundEffects = sett.value(SETT_SOUNDS, false).toBool();
+    this->enableMusic = sett.value(SETT_MUSIC, false).toBool();
 #endif
-    this->useSmoothScaling = sett.value(QString::fromLatin1("smoothImageScaling"), true).toBool();
-    this->muteSoundInBackground = sett.value(QString::fromLatin1("pauseSoundInBackground"), true).toBool();
+    this->useSmoothScaling = sett.value(SETT_SMOOTH_IMAGES, true).toBool();
+    this->muteSoundInBackground = sett.value(SETT_PAUSE_SOUND, true).toBool();
     sett.endGroup();
 
-    sett.beginGroup(QString::fromLatin1("colors"));
-    this->mainBgColor = sett.value(QString::fromLatin1("mainbg"), hugoColorToQt(DEF_BGCOLOR)).value<QColor>();
-    this->mainTextColor = sett.value(QString::fromLatin1("maintext"), hugoColorToQt(DEF_FCOLOR)).value<QColor>();
-    this->statusBgColor = sett.value(QString::fromLatin1("bannerbg"), hugoColorToQt(DEF_SLBGCOLOR)).value<QColor>();
-    this->statusTextColor = sett.value(QString::fromLatin1("bannertext"), hugoColorToQt(DEF_SLFCOLOR)).value<QColor>();
+    sett.beginGroup(SETT_COLORS_GRP);
+    this->mainBgColor = sett.value(SETT_MAIN_BG_COLOR, hugoColorToQt(DEF_BGCOLOR)).value<QColor>();
+    this->mainTextColor = sett.value(SETT_MAIN_TXT_COLOR, hugoColorToQt(DEF_FCOLOR)).value<QColor>();
+    this->statusBgColor = sett.value(SETT_STATUS_BG_COLOR, hugoColorToQt(DEF_SLBGCOLOR)).value<QColor>();
+    this->statusTextColor = sett.value(SETT_STATUS_TXT_COLOR, hugoColorToQt(DEF_SLFCOLOR)).value<QColor>();
     sett.endGroup();
 
 #ifdef Q_WS_MAC
@@ -80,7 +111,7 @@ Settings::loadFromDisk()
 #endif
 #endif
 #endif
-    sett.beginGroup(QString::fromLatin1("fonts"));
+    sett.beginGroup(SETT_FONTS_GRP);
     QFont::StyleStrategy strat;
 #if QT_VERSION >= 0x040700
     // We're building with a recent enough Qt; use ForceIntegerMetrics directly.
@@ -97,25 +128,25 @@ Settings::loadFromDisk()
 #endif
     this->propFont.setStyleStrategy(strat);
     QFont tmp;
-    tmp.fromString(sett.value(QString::fromLatin1("main"), DEFAULT_PROP).toString());
+    tmp.fromString(sett.value(SETT_MAIN_FONT, DEFAULT_PROP).toString());
     this->propFont.setFamily(tmp.family());
     this->propFont.setPointSize(tmp.pointSize());
     this->fixedFont.setStyleStrategy(strat);
-    tmp.fromString(sett.value(QString::fromLatin1("fixed"), DEFAULT_MONO).toString());
+    tmp.fromString(sett.value(SETT_FIXED_FONT, DEFAULT_MONO).toString());
     this->fixedFont.setFamily(tmp.family());
     this->fixedFont.setPointSize(tmp.pointSize());
-    this->softTextScrolling = sett.value(QString::fromLatin1("softTextScrolling"), true).toBool();
-    this->extraButter = sett.value(QString::fromLatin1("extraButter"), false).toBool();
-    this->smartFormatting = sett.value(QString::fromLatin1("smartFormatting"), true).toBool();
+    this->softTextScrolling = sett.value(SETT_SOFT_SCROLL, true).toBool();
+    this->extraButter = sett.value(SETT_EXTRA_BUTTER, false).toBool();
+    this->smartFormatting = sett.value(SETT_SMART_FORMATTING, true).toBool();
     sett.endGroup();
 
-    sett.beginGroup(QString::fromLatin1("misc"));
-    this->askForGameFile = sett.value(QString::fromLatin1("askforfileatstart"), true).toBool();
-    this->lastFileOpenDir = sett.value(QString::fromLatin1("lastFileOpenDir"), QString::fromLatin1("")).toString();
+    sett.beginGroup(SETT_MISC_GRP);
+    this->askForGameFile = sett.value(SETT_ASK_FILE, true).toBool();
+    this->lastFileOpenDir = sett.value(SETT_LAST_OPEN_DIR, QString::fromLatin1("")).toString();
     sett.endGroup();
 
-    sett.beginGroup(QString::fromLatin1("recent"));
-    this->recentGamesList = sett.value(QString::fromLatin1("games"), QStringList()).toStringList();
+    sett.beginGroup(SETT_RECENT_GRP);
+    this->recentGamesList = sett.value(SETT_GAMES_LIST, QStringList()).toStringList();
     Q_ASSERT(this->recentGamesList.size() <= this->recentGamesCapacity);
     // Remove any files that don't exist or aren't readable.
     for (int i = 0; i < this->recentGamesList.size(); ++i) {
@@ -127,13 +158,43 @@ Settings::loadFromDisk()
     }
     sett.endGroup();
 
-    sett.beginGroup(QString::fromLatin1("geometry"));
-    this->appSize = sett.value(QString::fromLatin1("size"), QSize(800, 600)).toSize();
-    this->overlayScrollback = sett.value(QString::fromLatin1("overlayScrollback"), true).toBool();
-    this->isMaximized = sett.value(QString::fromLatin1("maximized"), false).toBool();
-    this->marginSize = sett.value(QString::fromLatin1("marginSize"), 0).toInt();
-    this->fullscreenWidth = sett.value(QString::fromLatin1("fullscreenWidth"), 0).toInt();
+    sett.beginGroup(SETT_GEOMETRY_GRP);
+    this->appSize = sett.value(SETT_APP_SIZE, QSize(800, 600)).toSize();
+    this->overlayScrollback = sett.value(SETT_OVERLAY_SCROLL, true).toBool();
+    this->isMaximized = sett.value(SETT_MAXIMIZED, false).toBool();
+    this->marginSize = sett.value(SETT_MARGIN_SIZE, 0).toInt();
+    this->fullscreenWidth = sett.value(SETT_FULLSCREEN_WIDTH, 0).toInt();
     sett.endGroup();
+
+    // Apply overrides for non-existent settings.
+    if (ovr) {
+        sett.beginGroup(SETT_GEOMETRY_GRP);
+        if (not sett.contains(SETT_FULLSCREEN_WIDTH)) {
+            this->fullscreenWidth = ovr->fullscreenWidth;
+        }
+        if (not sett.contains(SETT_MARGIN_SIZE)) {
+            this->marginSize = ovr->marginSize;
+        }
+        sett.endGroup();
+
+        sett.beginGroup(SETT_FONTS_GRP);
+        if (not sett.contains(SETT_MAIN_FONT)) {
+            this->propFont.setPointSize(ovr->propFontSize);
+        }
+        if (not sett.contains(SETT_FIXED_FONT)) {
+            this->fixedFont.setPointSize(ovr->fixedFontSize);
+        }
+        sett.endGroup();
+
+        sett.beginGroup(SETT_MEDIA_GRP);
+        if (not sett.contains(SETT_SMOOTH_IMAGES)) {
+            this->useSmoothScaling = ovr->imageSmoothing;
+        }
+        if (not sett.contains(SETT_PAUSE_SOUND)) {
+            this->muteSoundInBackground = ovr->pauseAudio;
+        }
+        sett.endGroup();
+    }
 }
 
 
@@ -142,48 +203,48 @@ Settings::saveToDisk()
 {
     QSettings sett;
 
-    sett.beginGroup(QString::fromLatin1("media"));
-    sett.setValue(QString::fromLatin1("graphics"), this->enableGraphics);
-    sett.setValue(QString::fromLatin1("sounds"), this->enableSoundEffects);
-    sett.setValue(QString::fromLatin1("music"), this->enableMusic);
-    sett.setValue(QString::fromLatin1("smoothImageScaling"), this->useSmoothScaling);
-    sett.setValue(QString::fromLatin1("pauseSoundInBackground"), this->muteSoundInBackground);
+    sett.beginGroup(SETT_MEDIA_GRP);
+    sett.setValue(SETT_GRAPHICS, this->enableGraphics);
+    sett.setValue(SETT_SOUNDS, this->enableSoundEffects);
+    sett.setValue(SETT_MUSIC, this->enableMusic);
+    sett.setValue(SETT_SMOOTH_IMAGES, this->useSmoothScaling);
+    sett.setValue(SETT_PAUSE_SOUND, this->muteSoundInBackground);
     sett.endGroup();
 
-    sett.beginGroup(QString::fromLatin1("colors"));
-    sett.setValue(QString::fromLatin1("mainbg"), this->mainBgColor);
-    sett.setValue(QString::fromLatin1("maintext"), this->mainTextColor);
-    sett.setValue(QString::fromLatin1("bannerbg"), this->statusBgColor);
-    sett.setValue(QString::fromLatin1("bannertext"), this->statusTextColor);
+    sett.beginGroup(SETT_COLORS_GRP);
+    sett.setValue(SETT_MAIN_BG_COLOR, this->mainBgColor);
+    sett.setValue(SETT_MAIN_TXT_COLOR, this->mainTextColor);
+    sett.setValue(SETT_STATUS_BG_COLOR, this->statusBgColor);
+    sett.setValue(SETT_STATUS_TXT_COLOR, this->statusTextColor);
     sett.endGroup();
 
-    sett.beginGroup(QString::fromLatin1("fonts"));
-    sett.setValue(QString::fromLatin1("main"), this->propFont.toString());
-    sett.setValue(QString::fromLatin1("fixed"), this->fixedFont.toString());
-    sett.setValue(QString::fromLatin1("softTextScrolling"), this->softTextScrolling);
-    sett.setValue(QString::fromLatin1("extraButter"), this->extraButter);
-    sett.setValue(QString::fromLatin1("smartFormatting"), this->smartFormatting);
+    sett.beginGroup(SETT_FONTS_GRP);
+    sett.setValue(SETT_MAIN_FONT, this->propFont.toString());
+    sett.setValue(SETT_FIXED_FONT, this->fixedFont.toString());
+    sett.setValue(SETT_SOFT_SCROLL, this->softTextScrolling);
+    sett.setValue(SETT_EXTRA_BUTTER, this->extraButter);
+    sett.setValue(SETT_SMART_FORMATTING, this->smartFormatting);
     sett.endGroup();
 
-    sett.beginGroup(QString::fromLatin1("misc"));
-    sett.setValue(QString::fromLatin1("askforfileatstart"), this->askForGameFile);
-    sett.setValue(QString::fromLatin1("lastFileOpenDir"), this->lastFileOpenDir);
+    sett.beginGroup(SETT_MISC_GRP);
+    sett.setValue(SETT_ASK_FILE, this->askForGameFile);
+    sett.setValue(SETT_LAST_OPEN_DIR, this->lastFileOpenDir);
     sett.endGroup();
 
-    sett.beginGroup(QString::fromLatin1("recent"));
-    sett.setValue(QString::fromLatin1("games"), this->recentGamesList);
+    sett.beginGroup(SETT_RECENT_GRP);
+    sett.setValue(SETT_GAMES_LIST, this->recentGamesList);
     sett.endGroup();
 
-    sett.beginGroup(QString::fromLatin1("geometry"));
+    sett.beginGroup(SETT_GEOMETRY_GRP);
     // Do not save application size if we're in fullscreen mode, since we
     // need to restore the windowed, non-fullscreen size next time we run.
     if (not hMainWin->isFullScreen()) {
-        sett.setValue(QString::fromLatin1("size"), hMainWin->size());
+        sett.setValue(SETT_APP_SIZE, hMainWin->size());
     }
-    sett.setValue(QString::fromLatin1("overlayScrollback"), this->overlayScrollback);
-    sett.setValue(QString::fromLatin1("maximized"), hMainWin->isMaximized());
-    sett.setValue(QString::fromLatin1("marginSize"), this->marginSize);
-    sett.setValue(QString::fromLatin1("fullscreenWidth"), this->fullscreenWidth);
+    sett.setValue(SETT_OVERLAY_SCROLL, this->overlayScrollback);
+    sett.setValue(SETT_MAXIMIZED, hMainWin->isMaximized());
+    sett.setValue(SETT_MARGIN_SIZE, this->marginSize);
+    sett.setValue(SETT_FULLSCREEN_WIDTH, this->fullscreenWidth);
     sett.endGroup();
     sett.sync();
 }
