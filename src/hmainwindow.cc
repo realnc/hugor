@@ -8,6 +8,7 @@
 #include <QScrollBar>
 #include <QLabel>
 #include <QWindowStateChangeEvent>
+#include <QErrorMessage>
 
 #include "hmainwindow.h"
 #include "happlication.h"
@@ -31,7 +32,7 @@ HMainWindow::HMainWindow( QWidget* parent )
       fAboutDialog(0),
       fMenuBarVisible(true)
 #if (QT_VERSION >= 0x040600)
-    , fFullscreenEnterIcon(QIcon::fromTheme(QString::fromLatin1("view-fullscreen"))),
+      , fFullscreenEnterIcon(QIcon::fromTheme(QString::fromLatin1("view-fullscreen"))),
       fFullscreenExitIcon(QIcon::fromTheme(QString::fromLatin1("view-restore")))
 #endif
 {
@@ -114,6 +115,9 @@ HMainWindow::HMainWindow( QWidget* parent )
 
     // Use the actions we added above as our context menu.
     this->setContextMenuPolicy(Qt::ActionsContextMenu);
+
+    fErrorMsg = new QErrorMessage(this);
+    fErrorMsg->setWindowTitle(hApp->applicationName());
 
     hMainWin = this;
 }

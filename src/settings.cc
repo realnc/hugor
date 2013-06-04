@@ -46,6 +46,7 @@ qtRuntimeVersion()
 #define SETT_MISC_GRP QString::fromLatin1("misc")
 #define SETT_GEOMETRY_GRP QString::fromLatin1("geometry")
 #define SETT_GRAPHICS QString::fromLatin1("graphics")
+#define SETT_VIDEO QString::fromLatin1("video")
 #define SETT_SOUNDS QString::fromLatin1("sounds")
 #define SETT_MUSIC QString::fromLatin1("music")
 #define SETT_SMOOTH_IMAGES QString::fromLatin1("smoothImageScaling")
@@ -77,6 +78,7 @@ Settings::loadFromDisk( SettingsOverrides* ovr )
 
     sett.beginGroup(SETT_MEDIA_GRP);
     this->enableGraphics = sett.value(SETT_GRAPHICS, true).toBool();
+    this->enableVideo = sett.value(SETT_VIDEO, true).toBool();
 #ifndef Q_WS_ANDROID
     this->enableSoundEffects = sett.value(SETT_SOUNDS, true).toBool();
     this->enableMusic = sett.value(SETT_MUSIC, true).toBool();
@@ -207,6 +209,7 @@ Settings::saveToDisk()
 
     sett.beginGroup(SETT_MEDIA_GRP);
     sett.setValue(SETT_GRAPHICS, this->enableGraphics);
+    sett.setValue(SETT_VIDEO, this->enableVideo);
     sett.setValue(SETT_SOUNDS, this->enableSoundEffects);
     sett.setValue(SETT_MUSIC, this->enableMusic);
     sett.setValue(SETT_SMOOTH_IMAGES, this->useSmoothScaling);

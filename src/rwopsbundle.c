@@ -126,8 +126,10 @@ SDL_RWops*
 RWFromMediaBundle( FILE* mediaBundle, long resLength )
 {
     BundleFileInfo* info;
+    errno = 0;
     SDL_RWops* rwops = SDL_AllocRW();
     if (rwops == NULL) {
+        SDL_SetError(errno != 0 ? strerror(errno) : "Cannot allocate memory");
         return NULL;
     }
 

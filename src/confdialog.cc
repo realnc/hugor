@@ -28,6 +28,7 @@ ConfDialog::ConfDialog( HMainWindow* parent )
 #endif
 
     ui->allowGraphicsCheckBox->setChecked(sett->enableGraphics);
+    ui->allowVideoCheckBox->setChecked(sett->enableVideo);
     ui->allowSoundEffectsCheckBox->setChecked(sett->enableSoundEffects);
     ui->allowMusicCheckBox->setChecked(sett->enableMusic);
     ui->smoothScalingCheckBox->setChecked(sett->useSmoothScaling);
@@ -106,6 +107,7 @@ ConfDialog::fMakeInstantApply()
     connect(ui->marginSizeSpinBox, SIGNAL(valueChanged(int)), this, SLOT(fApplySettings()));
     connect(ui->fullscreenWidthSpinBox, SIGNAL(valueChanged(int)), this, SLOT(fApplySettings()));
     connect(ui->allowGraphicsCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
+    connect(ui->allowVideoCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
     connect(ui->allowSoundEffectsCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
     connect(ui->allowMusicCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
     connect(ui->smoothScalingCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
@@ -124,6 +126,7 @@ ConfDialog::fApplySettings()
     Settings* sett = hApp->settings();
 
     sett->enableGraphics = ui->allowGraphicsCheckBox->isChecked();
+    sett->enableVideo = ui->allowVideoCheckBox->isChecked();
     sett->enableSoundEffects = ui->allowSoundEffectsCheckBox->isChecked();
     sett->enableMusic = ui->allowMusicCheckBox->isChecked();
     sett->useSmoothScaling = ui->smoothScalingCheckBox->isChecked();

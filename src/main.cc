@@ -2,14 +2,18 @@
 #include <QString>
 #include <QStringList>
 #include <QFileInfo>
+#include <QMessageBox>
 #include <cstdlib>
+#include <QGst/Init>
+#include <QGlib/Error>
 
 extern "C" {
 #include "heheader.h"
 }
-#include "happlication.h"
 #include "hugodefs.h"
 #include "version.h"
+#include "happlication.h"
+#include "settings.h"
 
 
 #ifdef SOUND_SDL
@@ -40,9 +44,28 @@ extern "C" {
 int main( int argc, char* argv[] )
 {
     initSoundEngine();
+    QString gstErr;
+    bool gstException = false;
+    try {
+        QGst::init(&argc, &argv);
+    } catch (const QGlib::Error& e) {
+        gstErr = e.message();
+        gstException = true;
+    }
 
     HApplication* app = new HApplication(argc, argv, "Hugor", HUGOR_VERSION,
                                          "Nikos Chantziaras", "");
+
+    if (gstException) {
+        QString errMsg(QObject::tr("Unable to use GStreamer. Video support will be "
+                                   "disabled."));
+        if (not gstErr.isEmpty()) {
+            errMsg += QObject::tr("The GStreamer error was: ") + gstErr;
+        }
+        QMessageBox::critical(0, app->applicationName(), errMsg);
+        app->settings()->videoSysError = true;
+    }
+
     // Filename of the game to run.
     QString gameFileName;
 

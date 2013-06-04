@@ -11,6 +11,7 @@ class HMainWindow: public QMainWindow {
     Q_OBJECT
 
   private:
+    class QErrorMessage* fErrorMsg;
     class ConfDialog* fConfDialog;
     class AboutDialog* fAboutDialog;
     class HScrollbackWindow* fScrollbackWindow;
@@ -55,6 +56,10 @@ class HMainWindow: public QMainWindow {
 
     void
     showMenuBar();
+
+    QErrorMessage*
+    errorMsgObj()
+    { return this->fErrorMsg; }
 
   public slots:
     void

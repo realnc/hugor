@@ -8,6 +8,10 @@
 
 class Settings {
   public:
+    Settings()
+        : videoSysError(false)
+    { }
+
     void
     loadFromDisk( class SettingsOverrides* ovr = 0 );
 
@@ -15,6 +19,7 @@ class Settings {
     saveToDisk();
 
     bool enableGraphics;
+    bool enableVideo;
     bool enableSoundEffects;
     bool enableMusic;
     bool useSmoothScaling;
@@ -43,6 +48,10 @@ class Settings {
     bool overlayScrollback;
     int marginSize;
     int fullscreenWidth;
+
+    // These are not saved. Used for temporary overrides that only apply
+    // to the current session.
+    bool videoSysError;
 };
 
 

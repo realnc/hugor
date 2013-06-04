@@ -1,11 +1,13 @@
 QT += core gui
 contains(QT_MAJOR_VERSION, 5):QT += widgets
 TEMPLATE = app
-CONFIG += warn_on silent
+CONFIG += warn_on link_pkgconfig exceptions
 VERSION = 1.0.0.0
 TARGET = hugor
 ICON = mac_icon.icns
 RC_FILE += hugor.rc
+
+PKGCONFIG += QtGStreamer-0.10 QtGStreamerUi-0.10 QtGStreamerUtils-0.10
 
 !count(SOUND, 1) {
     error("Use SOUND=sdl or SOUND=fmod to select a sound engine")
@@ -37,7 +39,6 @@ macx {
     QMAKE_LFLAGS += -dead_strip
 
     sdl {
-        CONFIG += link_pkgconfig
         PKGCONFIG += SDL_mixer
     }
 
@@ -47,7 +48,6 @@ macx {
     }
 } else {
     sdl {
-        CONFIG += link_pkgconfig
         PKGCONFIG += SDL_mixer
     }
 
@@ -113,6 +113,8 @@ HEADERS += \
     src/settings.h \
     src/settingsoverrides.h \
     src/version.h \
+    src/gstvideoplayer.h \
+    src/rwopsappsrc.h \
     \
     hugo/heheader.h \
     hugo/htokens.h
@@ -130,6 +132,8 @@ SOURCES += \
     src/main.cc \
     src/settings.cc \
     src/settingsoverrides.cc \
+    src/gstvideoplayer.cc \
+    src/rwopsappsrc.cc \
     \
     hugo/he.c \
     hugo/hebuffer.c \
