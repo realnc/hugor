@@ -65,6 +65,7 @@ qtRuntimeVersion()
 #define SETT_APP_SIZE QString::fromLatin1("size")
 #define SETT_OVERLAY_SCROLL QString::fromLatin1("overlayScrollback")
 #define SETT_MAXIMIZED QString::fromLatin1("maximized")
+#define SETT_FULLSCREEN QString::fromLatin1("fullscreen")
 #define SETT_MARGIN_SIZE QString::fromLatin1("marginSize")
 #define SETT_FULLSCREEN_WIDTH QString::fromLatin1("fullscreenWidth")
 
@@ -162,6 +163,7 @@ Settings::loadFromDisk( SettingsOverrides* ovr )
     this->appSize = sett.value(SETT_APP_SIZE, QSize(800, 600)).toSize();
     this->overlayScrollback = sett.value(SETT_OVERLAY_SCROLL, true).toBool();
     this->isMaximized = sett.value(SETT_MAXIMIZED, false).toBool();
+    this->isFullscreen = sett.value(SETT_FULLSCREEN, false).toBool();
     this->marginSize = sett.value(SETT_MARGIN_SIZE, 0).toInt();
     this->fullscreenWidth = sett.value(SETT_FULLSCREEN_WIDTH, 0).toInt();
     sett.endGroup();
@@ -243,6 +245,7 @@ Settings::saveToDisk()
     }
     sett.setValue(SETT_OVERLAY_SCROLL, this->overlayScrollback);
     sett.setValue(SETT_MAXIMIZED, hMainWin->isMaximized());
+    sett.setValue(SETT_FULLSCREEN, hMainWin->isFullScreen());
     sett.setValue(SETT_MARGIN_SIZE, this->marginSize);
     sett.setValue(SETT_FULLSCREEN_WIDTH, this->fullscreenWidth);
     sett.endGroup();

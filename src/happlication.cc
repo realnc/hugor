@@ -125,7 +125,7 @@ HApplication::HApplication( int& argc, char* argv[], const char* appName,
 
     // Restore the application's size.
     this->fMainWin->resize(this->fSettings->appSize);
-    if (settOvr and settOvr->fullscreen) {
+    if ((settOvr and settOvr->fullscreen) or fSettings->isFullscreen) {
         this->fMainWin->toggleFullscreen();
     }
     this->fFrameWin->show();
