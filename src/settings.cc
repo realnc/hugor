@@ -111,8 +111,8 @@ Settings::loadFromDisk( SettingsOverrides* ovr )
     const QString& DEFAULT_PROP = QString::fromLatin1("Droid Serif");
     const QString& DEFAULT_MONO = QString::fromLatin1("Droid Sans Mono");
 #else
-    const QString& DEFAULT_PROP = QString::fromLatin1("serif");
-    const QString& DEFAULT_MONO = QString::fromLatin1("monospace");
+    const QString& DEFAULT_PROP = QString::fromLatin1("serif,12");
+    const QString& DEFAULT_MONO = QString::fromLatin1("monospace,12");
 #endif
 #endif
 #endif
@@ -167,7 +167,7 @@ Settings::loadFromDisk( SettingsOverrides* ovr )
     this->appSize = sett.value(SETT_APP_SIZE, QSize(800, 600)).toSize();
     this->overlayScrollback = sett.value(SETT_OVERLAY_SCROLL, true).toBool();
     this->isMaximized = sett.value(SETT_MAXIMIZED, false).toBool();
-    this->isFullscreen = sett.value(SETT_FULLSCREEN, false).toBool();
+    this->isFullscreen = sett.value(SETT_FULLSCREEN, true).toBool();
     this->marginSize = sett.value(SETT_MARGIN_SIZE, 0).toInt();
     // If fullscreen width is not set, use one that results in a 4:3 ratio.
     int scrWidth = QApplication::desktop()->screenGeometry().width();
