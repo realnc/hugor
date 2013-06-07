@@ -1,6 +1,8 @@
 #include <QSettings>
 #include <QDebug>
 #include <QFileInfo>
+#include <QApplication>
+#include <QDesktopWidget>
 
 #include "settings.h"
 #include "hmainwindow.h"
@@ -167,7 +169,10 @@ Settings::loadFromDisk( SettingsOverrides* ovr )
     this->isMaximized = sett.value(SETT_MAXIMIZED, false).toBool();
     this->isFullscreen = sett.value(SETT_FULLSCREEN, false).toBool();
     this->marginSize = sett.value(SETT_MARGIN_SIZE, 0).toInt();
-    this->fullscreenWidth = sett.value(SETT_FULLSCREEN_WIDTH, 0).toInt();
+    // If fullscreen width is not set, use one that results in a 4:3 ratio.
+    int scrWidth = QApplication::desktop()->screenGeometry().width();
+    this->fullscreenWidth = sett.value(SETT_FULLSCREEN_WIDTH,
+                                       (double)scrWidth / (4.0 / 3.0)).toInt();
     sett.endGroup();
 
     // Apply overrides for non-existent settings.
