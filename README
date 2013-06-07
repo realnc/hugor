@@ -24,16 +24,16 @@ Compiling from source
 
 If you wish to build from source, you will need the development packages
 for the Qt library (version 4.4 or later; 4.5 or newer is *highly*
-recommended) and SDL_mixer or FMOD.  SDL_mixer is recommended and you'll
-need at least version 1.2.12.  To get correct support for MOD and MP3
-music, SDL_mixer needs to have been built with modplug and libmad
-support.
+recommended), SDL_mixer (at least 1.2.12) and QtGStreamer.   To get
+correct support for MOD and MP3 music, SDL_mixer needs to have been
+built with modplug and libmad support.  In order to be able to play
+videos, you will need the correct GStreamer plugins/codecs installed.
+The gstreamer-ffmpeg plugin should be a safe bet.
 
 Once all dependencies are installed, you can build Hugor with the
-following commands (substitute "sdl" for "fmod" if you want to use the
-FMOD sound backend):
+following commands:
 
-  qmake SOUND=sdl
+  qmake
   make -jN
 
 Substitute the 'N' in '-jN' with the amount of CPUs or cores in your
