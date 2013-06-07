@@ -412,6 +412,10 @@ HFrame::singleKeyPressEvent( QKeyEvent* event )
 void
 HFrame::mousePressEvent( QMouseEvent* e )
 {
+    if (e->button() != Qt::LeftButton) {
+        e->ignore();
+        return;
+    }
     if (this->fInputMode == NoInput) {
         this->fKeyQueue.append(0);
         this->fClickQueue.append(e->pos());
