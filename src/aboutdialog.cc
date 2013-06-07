@@ -26,10 +26,6 @@ AboutDialog::AboutDialog( QWidget* parent )
     str += QString::number(HEVERSION) + "." + QString::number(HEREVISION)
            + HEINTERIM + "</p>";
 
-    // FMOD license requirement.
-#ifdef SOUND_FMOD
-    str += "<p>Audio engine: FMOD Sound System by Firelight Technologies</p>";
-#endif
     str += "<p>For bug reports or any other form of feedback, you can send email"
             " to <a href=\"mailto:realnc@gmail.com\">realnc@gmail.com</a></p>";
 

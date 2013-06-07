@@ -7,18 +7,11 @@ TARGET = hugor
 ICON = mac_icon.icns
 RC_FILE += hugor.rc
 
-PKGCONFIG += QtGStreamer-0.10 QtGStreamerUi-0.10 QtGStreamerUtils-0.10
-
-!count(SOUND, 1) {
-    error("Use SOUND=sdl or SOUND=fmod to select a sound engine")
-} else:!contains(SOUND, sdl):!contains(SOUND, fmod) {
-    error("SOUND argument not recognized")
-}
-
-CONFIG += $$SOUND
-
-sdl:DEFINES += SOUND_SDL
-fmod:DEFINES += SOUND_FMOD
+PKGCONFIG += \
+    QtGStreamer-0.10 \
+    QtGStreamerUi-0.10 \
+    QtGStreamerUtils-0.10 \
+    SDL_mixer
 
 # Static OS X builds need to explicitly include the text codec plugins.
 macx {
@@ -37,24 +30,6 @@ macx {
     QMAKE_CFLAGS += -fvisibility=hidden -fomit-frame-pointer
     QMAKE_CXXFLAGS += -fvisibility=hidden -fomit-frame-pointer
     QMAKE_LFLAGS += -dead_strip
-
-    sdl {
-        PKGCONFIG += SDL_mixer
-    }
-
-    fmod {
-        LIBS += -L./fmod/api/lib -lfmodex
-        INCLUDEPATH += ./fmod/api/inc
-    }
-} else {
-    sdl {
-        PKGCONFIG += SDL_mixer
-    }
-
-    fmod {
-        LIBS += -L/opt/fmodex/api/lib -lfmodex
-        INCLUDEPATH += /opt/fmodex/api/inc
-    }
 }
 
 win32 {
@@ -115,6 +90,7 @@ HEADERS += \
     src/version.h \
     src/gstvideoplayer.h \
     src/rwopsappsrc.h \
+    src/rwopsbundle.h \
     \
     hugo/heheader.h \
     hugo/htokens.h
@@ -134,6 +110,8 @@ SOURCES += \
     src/settingsoverrides.cc \
     src/gstvideoplayer.cc \
     src/rwopsappsrc.cc \
+    src/soundsdl.cc \
+    src/rwopsbundle.c \
     \
     hugo/he.c \
     hugo/hebuffer.c \
@@ -145,16 +123,6 @@ SOURCES += \
     hugo/herun.c \
     hugo/heset.c \
     hugo/stringfn.c
-
-sdl {
-    HEADERS += src/rwopsbundle.h
-
-    SOURCES += \
-        src/soundsdl.cc \
-        src/rwopsbundle.c
-}
-
-fmod:SOURCES += src/soundfmod.cc
 
 OTHER_FILES += \
     README \

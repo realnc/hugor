@@ -3,11 +3,6 @@
 
 #include <QColor>
 
-#ifdef SOUND_FMOD
-#include <fmod.hpp>
-extern FMOD::System* fmSystem;
-#endif
-
 extern "C" void hugo_stopmusic( void );
 extern "C" void hugo_stopsample( void );
 QColor hugoColorToQt( int color );

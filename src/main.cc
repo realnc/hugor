@@ -16,7 +16,6 @@ extern "C" {
 #include "settings.h"
 
 
-#ifdef SOUND_SDL
 // On some platforms, SDL redefines main in order to provide a
 // platform-specific main() implementation.  However, Qt handles this too,
 // so things can get weird.  We need to make sure main is not redefined so
@@ -26,7 +25,6 @@ extern "C" {
 // to text files on Windows), which would break things.
 #ifdef main
 #  undef main
-#endif
 #endif
 
 // Static OS X builds need the Qt codec plugins.
