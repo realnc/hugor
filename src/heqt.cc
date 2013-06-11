@@ -9,7 +9,7 @@
 
 #include "happlication.h"
 #include "hmainwindow.h"
-#include "gstvideoplayer.h"
+#include "videoplayer.h"
 #include "hframe.h"
 #include "settings.h"
 #include "hugodefs.h"
@@ -862,7 +862,6 @@ hugo_playvideo( HUGO_FILE infile, long len, char loop, char bg, int vol )
     if (not hApp->settings()->enableVideo or hApp->settings()->videoSysError) {
         return false;
     }
-
     hugo_stopvideo();
     if (not vidPlayer) {
         vidPlayer = new VideoPlayer(hFrame);
@@ -874,16 +873,13 @@ hugo_playvideo( HUGO_FILE infile, long len, char loop, char bg, int vol )
         return false;
     }
     vidPlayer->setVolume(vol);
-    vidPlayer->resize(physical_windowwidth, physical_windowheight);
-    int x = (physical_windowwidth - vidPlayer->width()) / 2 + physical_windowleft;
-    int y = (physical_windowheight - vidPlayer->height()) / 2 + physical_windowtop;
-    vidPlayer->move(x, y);
-    vidPlayer->show();
-
+    vidPlayer->setGeometry((physical_windowwidth - vidPlayer->width()) / 2 + physical_windowleft,
+                           (physical_windowheight - vidPlayer->height()) / 2 + physical_windowtop,
+                           physical_windowwidth, physical_windowheight);
     if (not bg) {
         QEventLoop idleLoop;
         QObject::connect(vidPlayer, SIGNAL(videoFinished()), &idleLoop, SLOT(quit()));
-        QObject::connect(vidPlayer, SIGNAL(errorOccured()), &idleLoop, SLOT(quit()));
+        QObject::connect(vidPlayer, SIGNAL(errorOccurred()), &idleLoop, SLOT(quit()));
         QObject::connect(hApp, SIGNAL(gameQuitting()), &idleLoop, SLOT(quit()));
         vidPlayer->play();
         idleLoop.exec();

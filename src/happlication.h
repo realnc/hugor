@@ -72,7 +72,7 @@ class HApplication: public QApplication {
     // Replacement for main().  We need this so that we can start the
     // Hugo engine after the QApplication main event loop has started.
     void
-    main( QString gameFileName );
+    entryPoint( QString gameFileName );
 
   public:
     HApplication( int& argc, char* argv[], const char* appName, const char* appVersion,

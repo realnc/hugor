@@ -1,4 +1,4 @@
-QT += core gui
+QT += core
 contains(QT_MAJOR_VERSION, 5):QT += widgets
 TEMPLATE = app
 CONFIG += warn_on link_pkgconfig exceptions
@@ -7,11 +7,35 @@ TARGET = hugor
 ICON = mac_icon.icns
 RC_FILE += hugor.rc
 
-PKGCONFIG += \
-    QtGStreamer-0.10 \
-    QtGStreamerUi-0.10 \
-    QtGStreamerUtils-0.10 \
-    SDL_mixer
+PKGCONFIG += SDL_mixer
+
+contains(QT_MAJOR_VERSION, 4) {
+    PKGCONFIG += \
+        QtGStreamer-0.10 \
+        QtGStreamerUi-0.10 \
+        QtGStreamerUtils-0.10 \
+        gstreamer-video-0.10
+
+    HEADERS += \
+        src/videoplayergst_p.h \
+        src/rwopsappsrc.h
+
+    SOURCES += \
+        src/videoplayergst.cc \
+        src/videoplayergst_p.cc \
+        src/rwopsappsrc.cc
+} else {
+    QT += multimediawidgets
+
+    HEADERS += \
+        src/videoplayerqt5_p.h \
+        src/rwopsqiodev.h
+
+    SOURCES += \
+        src/videoplayerqt5.cc \
+        src/videoplayerqt5_p.cc \
+        src/rwopsqiodev.cc
+}
 
 # Static OS X builds need to explicitly include the text codec plugins.
 macx {
@@ -34,6 +58,7 @@ macx {
 
 win32 {
     TARGET = Hugor
+    QTPLUGIN += dsengine
 
     *-g++* {
         QMAKE_CFLAGS += -march=i686 -mtune=generic
@@ -60,7 +85,6 @@ QMAKE_CFLAGS_WARN_OFF =
     QMAKE_CFLAGS_WARN_ON += -Wno-unused-parameter
 }
 
-INCLUDEPATH += /usr/local/include
 INCLUDEPATH += src hugo
 OBJECTS_DIR = obj
 MOC_DIR = tmp
@@ -88,9 +112,8 @@ HEADERS += \
     src/settings.h \
     src/settingsoverrides.h \
     src/version.h \
-    src/gstvideoplayer.h \
-    src/rwopsappsrc.h \
     src/rwopsbundle.h \
+    src/videoplayer.h \
     \
     hugo/heheader.h \
     hugo/htokens.h
@@ -108,8 +131,6 @@ SOURCES += \
     src/main.cc \
     src/settings.cc \
     src/settingsoverrides.cc \
-    src/gstvideoplayer.cc \
-    src/rwopsappsrc.cc \
     src/soundsdl.cc \
     src/rwopsbundle.c \
     \

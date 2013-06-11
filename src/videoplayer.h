@@ -1,11 +1,10 @@
 #ifndef VIDEOPLAYER_H
 #define VIDEOPLAYER_H
 
-#include <QGst/Ui/VideoWidget>
-#include <QGst/Pipeline>
+#include <QWidget>
 
 
-class VideoPlayer: public QGst::Ui::VideoWidget {
+class VideoPlayer: public QWidget {
     Q_OBJECT
 
 public:
@@ -21,18 +20,17 @@ public slots:
 
 signals:
     void videoFinished();
-    void errorOccured();
+    void errorOccurred();
+
+protected:
+    void resizeEvent(QResizeEvent* e);
 
 private:
-    void fSetupSource(QGst::ElementPtr source);
-    void fOnBusMessage(const QGst::MessagePtr& message);
-    void fOnVideoSinkChange(const QGst::MessagePtr& msg);
-
-    QGst::PipelinePtr fPipeline;
     struct SDL_RWops* fRwops;
     long fDataLen;
-    class RwopsApplicationSource* fAppSrc;
     bool fLooping;
+    friend class VideoPlayer_priv;
+    class VideoPlayer_priv* d;
 };
 
 

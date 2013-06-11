@@ -289,7 +289,7 @@ HApplication::event( QEvent* e )
 
 
 void
-HApplication::main( QString gameFileName )
+HApplication::entryPoint( QString gameFileName )
 {
     // Process pending events in case we have a FileOpen event. Freeze user
     // input while doing so; we don't want to leave a way to mess with the
