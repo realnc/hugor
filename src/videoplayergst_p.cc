@@ -40,7 +40,7 @@ VideoPlayer_priv::fOnBusMessage(const QGst::MessagePtr& message)
             }
             QGst::StateChangedMessagePtr sc = message.staticCast<QGst::StateChangedMessage>();
             if (sc->newState() == QGst::StatePaused) {
-                QGst::PadPtr vidpad(vidpad = QGlib::emit<QGst::PadPtr>(fPipeline, "get-video-pad", 0));
+                QGst::PadPtr vidpad(QGlib::emit<QGst::PadPtr>(fPipeline, "get-video-pad", 0));
                 if (vidpad.isNull()) {
                     break;
                 }
