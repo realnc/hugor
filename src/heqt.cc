@@ -581,7 +581,7 @@ hugo_settextpos( int x, int y )
 
 /* PRINTFATALERROR may be #defined in heheader.h.
  */
-extern "C" void
+void
 printFatalError( char* a )
 {
     hugo_print(a);
@@ -780,7 +780,7 @@ hugo_strlen( char* a )
 
 
 // FIXME: Check for errors when loading images.
-extern "C" int
+int
 hugo_displaypicture( FILE* infile, long len )
 {
     // Open it as a QFile.
@@ -846,7 +846,7 @@ hugo_hasvideo( void )
 static VideoPlayer* vidPlayer = 0;
 
 
-extern "C" void
+void
 hugo_stopvideo( void )
 {
     if (vidPlayer) {
@@ -856,7 +856,7 @@ hugo_stopvideo( void )
 }
 
 
-extern "C" int
+int
 hugo_playvideo( HUGO_FILE infile, long len, char loop, char bg, int vol )
 {
     if (not hApp->settings()->enableVideo or hApp->settings()->videoSysError) {

@@ -3,8 +3,6 @@
 
 #include <QColor>
 
-extern "C" void hugo_stopmusic( void );
-extern "C" void hugo_stopsample( void );
 QColor hugoColorToQt( int color );
 void initSoundEngine();
 void closeSoundEngine();

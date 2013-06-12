@@ -22,6 +22,8 @@
 #define MAXBUFFER 255
 #define MAXUNDO 1024
 
+#define HUGO_FILE FILE*
+
 #if __STDC_VERSION__ >= 199901L
 /* We're using a C99 compiler, meaning 'inline' is supported. */
 #define HUGO_INLINE static inline
@@ -31,7 +33,6 @@
 #endif
 
 #define PRINTFATALERROR printFatalError
-void printFatalError( char* a );
 #define NO_TERMINAL_LINEFEED
 #define FRONT_END
 #define GRAPHICS_SUPPORTED
@@ -39,6 +40,23 @@ void printFatalError( char* a );
 #define USE_TEXTBUFFER
 #define USE_SMARTFORMATTING
 #define SCROLLBACK_DEFINED
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+void printFatalError(char* a);
+int hugo_displaypicture(FILE* infile, long len);
+int hugo_playmusic(HUGO_FILE infile, long reslength, char loop_flag);
+void hugo_musicvolume(int vol);
+void hugo_stopmusic(void);
+int hugo_playsample(HUGO_FILE infile, long reslength, char loop_flag);
+void hugo_samplevolume(int vol);
+void hugo_stopsample(void);
+int hugo_playvideo(HUGO_FILE infile, long len, char loop, char bg, int vol);
+void hugo_stopvideo(void);
+#ifdef __cplusplus
+}
+#endif
 
 
 #endif /* HEQTHEADER_H */

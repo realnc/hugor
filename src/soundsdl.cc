@@ -59,7 +59,7 @@ closeSoundEngine()
 }
 
 
-extern "C" int
+int
 hugo_playmusic( HUGO_FILE infile, long reslength, char loop_flag )
 {
     if (not hApp->settings()->enableMusic) {
@@ -129,7 +129,7 @@ hugo_playmusic( HUGO_FILE infile, long reslength, char loop_flag )
 }
 
 
-extern "C" void
+void
 hugo_musicvolume( int vol )
 {
     if (vol < 0)
@@ -147,7 +147,7 @@ hugo_musicvolume( int vol )
 }
 
 
-extern "C" void
+void
 hugo_stopmusic( void )
 {
     Mix_HaltMusic();
@@ -169,7 +169,7 @@ muteSound( bool mute )
 }
 
 
-extern "C" int
+int
 hugo_playsample( HUGO_FILE infile, long reslength, char loop_flag )
 {
     if (not hApp->settings()->enableSoundEffects) {
@@ -236,7 +236,7 @@ hugo_playsample( HUGO_FILE infile, long reslength, char loop_flag )
 }
 
 
-extern "C" void
+void
 hugo_samplevolume( int vol )
 {
     if (vol < 0)
@@ -254,7 +254,7 @@ hugo_samplevolume( int vol )
 }
 
 
-extern "C" void
+void
 hugo_stopsample( void )
 {
     Mix_HaltChannel(-1);
