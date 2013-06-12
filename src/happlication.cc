@@ -220,6 +220,8 @@ HApplication::fRunGame()
         strcpy(argv1, this->fGameFile.toLocal8Bit().constData());
         char* argv[2] = {argv0, argv1};
         this->fMainWin->setUpdatesEnabled(true);
+        this->fMainWin->raise();
+        this->fMainWin->activateWindow();
         emit gameStarting();
         he_main(2, argv);
         this->fGameRunning = false;
