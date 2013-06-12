@@ -58,6 +58,7 @@ HMainWindow::HMainWindow( QWidget* parent )
     menu->addAction(act);
     this->addAction(act);
     connect(act, SIGNAL(triggered()), SLOT(fShowConfDialog()));
+    fPreferencesAction = act;
 
     // "View" menu.
     menu = menuBar->addMenu(tr("&View"));
@@ -65,6 +66,7 @@ HMainWindow::HMainWindow( QWidget* parent )
     menu->addAction(act);
     this->addAction(act);
     connect(act, SIGNAL(triggered()), SLOT(showScrollback()));
+    fScrollbackAction = act;
 
 #ifdef Q_WS_MAC
     act = new QAction(tr("Enter &Full Screen"), this);
@@ -112,9 +114,6 @@ HMainWindow::HMainWindow( QWidget* parent )
     // Use a sane minimum size; by default Qt would allow us to be resized
     // to almost zero.
     this->setMinimumSize(240, 180);
-
-    // Use the actions we added above as our context menu.
-    this->setContextMenuPolicy(Qt::ActionsContextMenu);
 
     fErrorMsg = new QErrorMessage(this);
     fErrorMsg->setWindowTitle(hApp->applicationName());
@@ -359,6 +358,33 @@ HMainWindow::changeEvent( QEvent* e )
         this->fFullscreenAdjust();
     }
     e->accept();
+}
+
+
+void
+HMainWindow::contextMenuEvent( QContextMenuEvent* e )
+{
+    QMenu menu(this);
+    QList<const QAction*> actions = hFrame->getGameContextMenuEntries(menu);
+    if (not actions.isEmpty()) {
+        menu.addSeparator();
+    }
+    menu.addAction(fPreferencesAction);
+    menu.addAction(fScrollbackAction);
+    menu.addAction(fFullscreenAction);
+    const QAction* selectedAction = menu.exec(e->globalPos());
+    e->accept();
+    if (not selectedAction or not actions.contains(selectedAction)) {
+        return;
+    }
+    QString text(selectedAction->text());
+    bool execute = false;
+    if (text.endsWith("...")) {
+        text.truncate(text.length() - 3);
+    } else {
+        execute = true;
+    }
+    hFrame->insertInputText(text, execute, true);
 }
 
 

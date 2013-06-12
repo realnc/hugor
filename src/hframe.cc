@@ -5,6 +5,7 @@
 #include <QPainter>
 #include <QTimer>
 #include <QTextCodec>
+#include <QMenu>
 
 extern "C" {
 #include "heheader.h"
@@ -123,6 +124,30 @@ HFrame::fHandleFocusChange( QWidget* old, QWidget* now )
 }
 
 
+void HFrame::fEndInputMode( bool addToHistory )
+{
+    this->fInputReady = true;
+    this->fInputMode = NoInput;
+    // The current command only needs to be appended to the history if
+    // it's not empty and differs from the previous command in the history.
+    if (((this->fHistory.isEmpty() and not fInputBuf.isEmpty())
+         or (not this->fHistory.isEmpty()
+             and not fInputBuf.isEmpty()
+             and fInputBuf != this->fHistory.last()))
+        and addToHistory)
+    {
+        this->fHistory.append(fInputBuf);
+        // If we're about to overflow the max history cap, delete the
+        // oldest command from the history.
+        if (this->fHistory.size() > this->fMaxHistCap) {
+            this->fHistory.removeFirst();
+        }
+    }
+    this->fCurHistIndex = 0;
+    emit inputReady();
+}
+
+
 void
 HFrame::paintEvent( QPaintEvent* )
 {
@@ -222,24 +247,7 @@ HFrame::keyPressEvent( QKeyEvent* e )
 #else
     } else if (e->key() == Qt::Key_Enter or e->key() == Qt::Key_Return) {
 #endif
-        this->fInputReady = true;
-        this->fInputMode = NoInput;
-        // The current command only needs to be appended to the history if
-        // it's not empty and differs from the previous command in the history.
-        if ((this->fHistory.isEmpty() and not buf.isEmpty())
-            or (not this->fHistory.isEmpty()
-                and not buf.isEmpty()
-                and buf != this->fHistory.last()))
-        {
-            this->fHistory.append(buf);
-            // If we're about to overflow the max history cap, delete the
-            // oldest command from the history.
-            if (this->fHistory.size() > this->fMaxHistCap) {
-                this->fHistory.removeFirst();
-            }
-        }
-        this->fCurHistIndex = 0;
-        emit inputReady();
+        fEndInputMode(true);
         return;
     } else if (e->matches(QKeySequence::Delete)) {
         if (i < buf.length()) {
@@ -430,21 +438,13 @@ HFrame::mouseDoubleClickEvent( QMouseEvent* e )
     if (this->fInputMode != NormalInput) {
         return;
     }
-
     // Get the word at the double click position.
     QString word(TB_FindWord(e->x(), e->y()));
     if (word.isEmpty()) {
         // No word found.
         return;
     }
-
-    // Insert the word at the current command editing position. Append
-    // a space so it won't run together with what the user types next.
-    word.append(' ');
-    this->fInputBuf.insert(this->fInputCurrentChar, word);
-    this->fInputCurrentChar += word.length();
-    this->update();
-    this->updateCursorPos();
+    this->insertInputText(word, false, false);
 }
 
 
@@ -689,4 +689,48 @@ HFrame::resetCursorBlinking()
     if (QApplication::cursorFlashTime() > 1) {
         this->fBlinkTimer->start(QApplication::cursorFlashTime() / 2);
     }
+}
+
+
+void
+HFrame::insertInputText( QString txt, bool execute, bool clearCurrent )
+{
+    if (this->fInputMode != NormalInput) {
+        return;
+    }
+    // Clear the current input, if requested.
+    if (clearCurrent) {
+        this->fInputBuf.clear();
+        this->fInputCurrentChar = 0;
+    }
+    // If the command is not to be executed, append a space so it won't run
+    // together with what the user types next.
+    if (not execute) {
+        txt.append(' ');
+    }
+    this->fInputBuf.insert(this->fInputCurrentChar, txt);
+    this->fInputCurrentChar += txt.length();
+    this->update();
+    this->updateCursorPos();
+    if (execute) {
+        fEndInputMode(false);
+    }
+}
+
+
+QList<const QAction*>
+HFrame::getGameContextMenuEntries( QMenu& dst )
+{
+    QList<const QAction*> actions;
+    if (fInputMode != NormalInput) {
+        return actions;
+    }
+    for (int i = 0; i < context_commands; ++i) {
+        if (qstrcmp(context_command[i], "-") == 0) {
+            dst.addSeparator();
+        } else {
+            actions.append(dst.addAction(context_command[i]));
+        }
+    }
+    return actions;
 }

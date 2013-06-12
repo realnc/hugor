@@ -15,7 +15,9 @@ class HMainWindow: public QMainWindow {
     class ConfDialog* fConfDialog;
     class AboutDialog* fAboutDialog;
     class HScrollbackWindow* fScrollbackWindow;
+    class QAction* fPreferencesAction;
     class QAction* fFullscreenAction;
+    class QAction* fScrollbackAction;
     bool fMenuBarVisible;
 #if QT_VERSION >= 0x040600
     QIcon fFullscreenEnterIcon;
@@ -44,6 +46,9 @@ class HMainWindow: public QMainWindow {
 
     virtual void
     changeEvent( QEvent* e );
+
+    virtual void
+    contextMenuEvent( QContextMenuEvent* e );
 
   public:
     HMainWindow( QWidget* parent );

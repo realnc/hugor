@@ -125,6 +125,10 @@ class HFrame: public QWidget {
     void
     fHandleFocusChange( QWidget* old, QWidget* now );
 
+    // End line input mode and send the command to the game.
+    void
+    fEndInputMode( bool addToHistory );
+
   protected:
     virtual void
     paintEvent( QPaintEvent* );
@@ -254,6 +258,17 @@ class HFrame: public QWidget {
     // desktop environment and ajust the blink timer as needed.
     void
     resetCursorBlinking();
+
+    // Insert text at the current command input position. If 'execute' is set,
+    // the command is also executed. If 'clear' is set, the current command
+    // will be cleared before adding the text.
+    void
+    insertInputText( QString txt, bool execute, bool clearCurrent );
+
+    // Returns a list of current context menu entries set by the game
+    // and inserts them into the `dst` menu.
+    QList<const QAction*>
+    getGameContextMenuEntries( class QMenu& dst );
 };
 
 
