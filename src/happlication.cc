@@ -350,4 +350,7 @@ HApplication::notifyPreferencesChange( const Settings* sett )
     if (not sett->enableSoundEffects) {
         hugo_stopsample();
     }
+    if (not sett->enableVideo) {
+        hugo_stopvideo();
+    }
 }

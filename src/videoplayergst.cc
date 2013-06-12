@@ -94,6 +94,7 @@ VideoPlayer::stop()
 {
     if (d->fPipeline) {
         d->fPipeline->setState(QGst::StateNull);
+        emit videoFinished();
     }
 }
 
