@@ -83,6 +83,7 @@ VideoPlayer::loadVideo(FILE* src, long len, bool loop)
 void
 VideoPlayer::play()
 {
+    this->d->setMaximumSize(this->maximumSize());
     if (d->fPipeline) {
         d->fPipeline->setState(QGst::StatePlaying);
     }

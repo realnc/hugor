@@ -873,8 +873,8 @@ hugo_playvideo( HUGO_FILE infile, long len, char loop, char bg, int vol )
         return false;
     }
     vidPlayer->setVolume(vol);
-    vidPlayer->setGeometry((physical_windowwidth - vidPlayer->width()) / 2 + physical_windowleft,
-                           (physical_windowheight - vidPlayer->height()) / 2 + physical_windowtop,
+    vidPlayer->setMaximumSize(QSize(physical_windowwidth, physical_windowheight));
+    vidPlayer->setGeometry(physical_windowleft, physical_windowtop,
                            physical_windowwidth, physical_windowheight);
     if (not bg) {
         QEventLoop idleLoop;

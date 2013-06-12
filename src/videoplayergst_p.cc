@@ -36,8 +36,14 @@ VideoPlayer_priv::fOnBusMessage(const QGst::MessagePtr& message)
     switch (message->type()) {
         case QGst::MessageStateChanged: {
             if (message->source() != fPipeline) {
+                // The state change doesn't belong to our pipeline.
                 break;
             }
+            // If the video is now ready to play, the pipeline will be in the
+            // paused state and will have negotiated the caps. Extract the video
+            // resolution from the caps object so that we can resize our window
+            // in case it's smaller than us (we don't allow the video to scale
+            // to a larger size than its own resolution.)
             QGst::StateChangedMessagePtr sc = message.staticCast<QGst::StateChangedMessage>();
             if (sc->newState() == QGst::StatePaused) {
                 QGst::PadPtr vidpad(QGlib::emit<QGst::PadPtr>(fPipeline, "get-video-pad", 0));
@@ -53,9 +59,17 @@ VideoPlayer_priv::fOnBusMessage(const QGst::MessagePtr& message)
                 if (not val.toBool()) {
                     break;
                 }
-                this->q->setGeometry(this->q->x() + (this->width() - vidWidth) / 2,
-                                     this->q->y() + (this->height() - vidHeight) / 2,
-                                     vidWidth, vidHeight);
+                // Make sure that we won't end up being enlarged; we only allow our
+                // window to shrink. The video must be scaled down in that case.
+                QSize vidSize(vidWidth, vidHeight);
+                if (vidSize.width() > this->maximumWidth() or vidSize.height() > this->maximumHeight()) {
+                    vidSize.scale(this->maximumSize(), Qt::KeepAspectRatio);
+                }
+                this->q->setGeometry(q->x() + (this->maximumWidth() - vidSize.width()) / 2,
+                                     q->y() + (this->maximumHeight() - vidSize.height()) / 2,
+                                     vidSize.width(), vidSize.height());
+                this->q->setMaximumSize(vidSize);
+                this->setMaximumSize(vidSize);
                 this->q->show();
             }
             break;
