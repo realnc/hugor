@@ -7,9 +7,14 @@ play adventure games created with Kent Tessman’s Hugo authoring system:
   http://www.generalcoffee.com
 
 Hugor supports all graphics, sound and music formats of the Hugo engine.
-Video, however, is not (yet?) supported.
+Video is fully supported in the Linux version.  In order to be able to
+play videos, you will need the correct GStreamer plugins/codecs installed.
+The gstreamer-ffmpeg plugin should be a safe bet.
 
-It runs on all current major operating systems (Linux, Mac OS X and
+(For runtime library dependencies of the distributed Linux binary, please
+consult the README.linux-bin file.)
+
+Hugor runs on all current major operating systems (Linux, Mac OS X and
 Microsoft Windows).  You can find up to date, ready to run binaries at:
 
   http://ifwiki.org/index.php/Hugor
@@ -26,9 +31,7 @@ If you wish to build from source, you will need the development packages
 for the Qt library (version 4.4 or later; 4.5 or newer is *highly*
 recommended), SDL_mixer (at least 1.2.12) and QtGStreamer.   To get
 correct support for MOD and MP3 music, SDL_mixer needs to have been
-built with modplug and libmad support.  In order to be able to play
-videos, you will need the correct GStreamer plugins/codecs installed.
-The gstreamer-ffmpeg plugin should be a safe bet.
+built with modplug and libmad support.
 
 Once all dependencies are installed, you can build Hugor with the
 following commands:
@@ -38,8 +41,8 @@ following commands:
 
 Substitute the 'N' in '-jN' with the amount of CPUs or cores in your
 system in order to utilize all of them for a faster compilation process.
-If you are not GNU Make, then the -j option might not be supported.  If
-that's the case, simply omit that option altogether.
+(If you are not using GNU Make, then the -j option might not be supported.
+If that's the case, simply omit that option altogether.)
 
 If all goes well, you will find an executable in the current directory
 which you can copy somewhere else and run it however you want.

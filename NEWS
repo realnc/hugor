@@ -1,3 +1,37 @@
+Git - 2013-06-12
+================
+
+  - Support for game-specific start-up configuration files.  The set of
+    configuration options is not fully decided yet and thus isn't documented.
+    For now, see:
+
+      http://www.joltcountry.com/phpBB2/viewtopic.php?t=8896
+
+    for more information.
+
+  - Fullscreen mode is now restored correctly between sessions.
+
+  - Video is now fully supported in the Linux version of Hugor.  Consult the
+    README for details about the GStreamer packages/plugins Hugor now depends
+    on.  When building from source, video support can be disabled with:
+
+      CONFIG+=disable-video
+
+  - The FMOD sound back-end has been removed.  SDL is now the only supported
+    sound back-end.
+
+  - Games that expect mouse input will no longer receive right-clicks (or
+    left-clicks on left-handed mouse devices), since this is reserved for the
+    context menu.
+
+  - If this version of Hugor is started for the first time, fullscreen mode will
+    default to a 4:3 display ratio, as otherwise text lines can be extremely
+    long on wide screen displays.
+
+  - Context menu entries set by the game are now supported and displayed in the
+    context menu.
+
+
 1.0 - 2012-08-15
 ================
 
