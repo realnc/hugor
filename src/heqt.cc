@@ -833,6 +833,27 @@ hugo_displaypicture( FILE* infile, long len )
 }
 
 
+#ifdef DISABLE_VIDEO
+int
+hugo_hasvideo( void )
+{ return false; }
+
+void
+hugo_stopvideo( void )
+{ }
+
+int
+hugo_playvideo( HUGO_FILE infile, long, char, char, int )
+{
+    fclose(infile);
+    return true;
+}
+
+#else
+
+static VideoPlayer* vidPlayer = 0;
+
+
 int
 hugo_hasvideo( void )
 {
@@ -841,9 +862,6 @@ hugo_hasvideo( void )
     }
     return false;
 }
-
-
-static VideoPlayer* vidPlayer = 0;
 
 
 void
@@ -889,3 +907,5 @@ hugo_playvideo( HUGO_FILE infile, long len, char loop, char bg, int vol )
     }
     return true;
 }
+
+#endif

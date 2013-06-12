@@ -1,5 +1,6 @@
 #ifndef VIDEOPLAYER_H
 #define VIDEOPLAYER_H
+#ifndef DISABLE_VIDEO
 
 #include <QWidget>
 
@@ -34,4 +35,5 @@ private:
 };
 
 
+#endif
 #endif

@@ -1,6 +1,7 @@
 #include <QColorDialog>
 #include <QSignalMapper>
 #include <QPushButton>
+#include <QCheckBox>
 
 #include "confdialog.h"
 #include "ui_confdialog.h"
@@ -28,7 +29,11 @@ ConfDialog::ConfDialog( HMainWindow* parent )
 #endif
 
     ui->allowGraphicsCheckBox->setChecked(sett->enableGraphics);
+#ifdef DISABLE_VIDEO
+    ui->allowVideoCheckBox->setDisabled(true);
+#else
     ui->allowVideoCheckBox->setChecked(sett->enableVideo);
+#endif
     ui->allowSoundEffectsCheckBox->setChecked(sett->enableSoundEffects);
     ui->allowMusicCheckBox->setChecked(sett->enableMusic);
     ui->smoothScalingCheckBox->setChecked(sett->useSmoothScaling);

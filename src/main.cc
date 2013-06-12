@@ -5,7 +5,7 @@
 #include <QMessageBox>
 #include <cstdlib>
 
-#if QT_VERSION < 0x050000
+#ifdef VIDEO_GSTREAMER
     #include <QGst/Init>
     #include <QGlib/Error>
 #endif
@@ -46,7 +46,7 @@ int main( int argc, char* argv[] )
 {
     initSoundEngine();
 
-#if QT_VERSION < 0x050000
+#ifdef VIDEO_GSTREAMER
     QString gstErr;
     bool gstException = false;
     try {
@@ -60,7 +60,7 @@ int main( int argc, char* argv[] )
     HApplication* app = new HApplication(argc, argv, "Hugor", HUGOR_VERSION,
                                          "Nikos Chantziaras", "");
 
-#if QT_VERSION < 0x050000
+#ifdef VIDEO_GSTREAMER
     if (gstException) {
         QString errMsg(QObject::tr("Unable to use GStreamer. Video support will be "
                                    "disabled."));

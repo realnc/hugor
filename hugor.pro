@@ -9,32 +9,40 @@ RC_FILE += hugor.rc
 
 PKGCONFIG += SDL_mixer
 
-contains(QT_MAJOR_VERSION, 4) {
-    PKGCONFIG += \
-        QtGStreamer-0.10 \
-        QtGStreamerUi-0.10 \
-        QtGStreamerUtils-0.10 \
-        gstreamer-video-0.10
+!disable-video {
+    contains(QT_MAJOR_VERSION, 4) {
+        DEFINES += VIDEO_GSTREAMER
 
-    HEADERS += \
-        src/videoplayergst_p.h \
-        src/rwopsappsrc.h
+        PKGCONFIG += \
+            QtGStreamer-0.10 \
+            QtGStreamerUi-0.10 \
+            QtGStreamerUtils-0.10 \
+            gstreamer-video-0.10
 
-    SOURCES += \
-        src/videoplayergst.cc \
-        src/videoplayergst_p.cc \
-        src/rwopsappsrc.cc
+        HEADERS += \
+            src/videoplayergst_p.h \
+            src/rwopsappsrc.h
+
+        SOURCES += \
+            src/videoplayergst.cc \
+            src/videoplayergst_p.cc \
+            src/rwopsappsrc.cc
+    } else {
+        DEFINES += VIDEO_QT5
+
+        QT += multimediawidgets
+
+        HEADERS += \
+            src/videoplayerqt5_p.h \
+            src/rwopsqiodev.h
+
+        SOURCES += \
+            src/videoplayerqt5.cc \
+            src/videoplayerqt5_p.cc \
+            src/rwopsqiodev.cc
+    }
 } else {
-    QT += multimediawidgets
-
-    HEADERS += \
-        src/videoplayerqt5_p.h \
-        src/rwopsqiodev.h
-
-    SOURCES += \
-        src/videoplayerqt5.cc \
-        src/videoplayerqt5_p.cc \
-        src/rwopsqiodev.cc
+    DEFINES += DISABLE_VIDEO
 }
 
 # Static OS X builds need to explicitly include the text codec plugins.
@@ -58,7 +66,9 @@ macx {
 
 win32 {
     TARGET = Hugor
-    QTPLUGIN += dsengine
+    !disable-video {
+        QTPLUGIN += dsengine
+    }
 
     *-g++* {
         QMAKE_CFLAGS += -march=i686 -mtune=generic
