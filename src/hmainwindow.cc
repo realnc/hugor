@@ -299,11 +299,15 @@ HMainWindow::toggleFullscreen()
 {
     if (this->isFullScreen()) {
         this->showNormal();
+        if (hApp->settings()->isMaximized) {
+            this->showMaximized();
+        }
         hApp->settings()->isFullscreen = false;
     } else {
         // Remember our windowed size in case we quit while in fullscreen.
         hApp->settings()->appSize = this->size();
         hApp->settings()->isFullscreen = true;
+        hApp->settings()->isMaximized = this->isMaximized();
         this->showFullScreen();
     }
     hApp->settings()->saveToDisk();
