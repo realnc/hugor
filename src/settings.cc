@@ -246,9 +246,11 @@ Settings::saveToDisk()
     sett.endGroup();
 
     sett.beginGroup(SETT_GEOMETRY_GRP);
-    // Do not save application size if we're in fullscreen mode, since we
-    // need to restore the windowed, non-fullscreen size next time we run.
-    if (not hMainWin->isFullScreen()) {
+    // Do not save current application size if we're in fullscreen mode, since
+    // we need to restore the windowed, non-fullscreen size next time we run.
+    if (hMainWin->isFullScreen()) {
+        sett.setValue(SETT_APP_SIZE, this->appSize);
+    } else {
         sett.setValue(SETT_APP_SIZE, hMainWin->size());
     }
     sett.setValue(SETT_OVERLAY_SCROLL, this->overlayScrollback);
