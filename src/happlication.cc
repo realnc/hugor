@@ -125,10 +125,9 @@ HApplication::HApplication( int& argc, char* argv[], const char* appName,
 
     // Restore the application's size.
     this->fMainWin->resize(this->fSettings->appSize);
-    if ((settOvr and settOvr->fullscreen) or fSettings->isFullscreen) {
-        this->fMainWin->toggleFullscreen();
+    if (settOvr and settOvr->fullscreen) {
+        fSettings->isFullscreen = true;
     }
-    this->fFrameWin->show();
 
     // Set application window icon, unless we're on OS X where the bundle
     // icon is used.
@@ -311,6 +310,17 @@ HApplication::entryPoint( QString gameFileName )
                                                        this->fSettings->lastFileOpenDir,
                                                        QObject::tr("Hugo Games")
                                                        + QString::fromLatin1("(*.hex *.Hex *.HEX)"));
+    }
+
+    // Switch to fullscreen, if needed.
+    if (fSettings->isFullscreen) {
+        this->fMainWin->toggleFullscreen();
+        // If we don't let the event loop run for a while, for some reason
+        // the screen will be flashing when the window first becomes visible.
+        // The reason is unknown, but this seems to work around the issue.
+        for (int i = 0; i < 5000; ++i) {
+            this->advanceEventLoop(QEventLoop::ExcludeUserInputEvents);
+        }
     }
 
     // Automatically quit the application when the last window has closed.
