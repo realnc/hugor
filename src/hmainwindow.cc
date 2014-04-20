@@ -222,11 +222,9 @@ HMainWindow::showScrollback()
     // If no overlay was requested and the scrollback is currently in its
     // overlay mode, make it a regular window again.
     if (not hApp->settings()->overlayScrollback) {
-        if (this->fScrollbackWindow->windowType() == Qt::Widget) {
-            this->hideScrollback();
-            this->fScrollbackWindow->setParent(0);
-            this->fScrollbackWindow->setWindowFlags(Qt::Window);
-        }
+        this->hideScrollback();
+        // If a widget has no parent, it will be displayed in a new window,
+        this->fScrollbackWindow->setParent(0);
         this->fScrollbackWindow->show();
         this->fScrollbackWindow->activateWindow();
         this->fScrollbackWindow->raise();
@@ -239,7 +237,6 @@ HMainWindow::showScrollback()
 
     // We need to overlay the scrollback. Remove the game window from view and
     // replace it with the scrollback window if we haven't already done so.
-    this->fScrollbackWindow->setWindowFlags(Qt::Widget);
     hApp->marginWidget()->removeWidget(hFrame);
     hApp->marginWidget()->setContentsMargins(0, 0, 0, 0);
     hApp->marginWidget()->addWidget(this->fScrollbackWindow);
