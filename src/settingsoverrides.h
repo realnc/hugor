@@ -14,6 +14,8 @@ class SettingsOverrides {
     int fullscreenWidth;
     bool hideMenuBar;
     int marginSize;
+    int widthRatio;
+    int heightRatio;
     int propFontSize;
     int fixedFontSize;
     bool imageSmoothing;

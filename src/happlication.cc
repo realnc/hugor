@@ -10,6 +10,7 @@
 #include <QDialogButtonBox>
 #include <QStyle>
 #include <QMenuBar>
+#include <QDesktopWidget>
 
 extern "C" {
 #include "heheader.h"
@@ -245,26 +246,37 @@ HApplication::fUpdateMarginColor( int color )
 void
 HApplication::updateMargins( int color )
 {
-    if (hMainWin->isFullScreen() and this->fSettings->fullscreenWidth > 0) {
+    int scrWidth = QApplication::desktop()->screenGeometry().width();
+    int scrHeight = QApplication::desktop()->screenGeometry().height();
+    int margin;
+
+    // In fullscreen mode, respect the aspect ratio and max width settings.
+    if (hMainWin->isFullScreen()) {
+        int maxWidth = fSettings->fullscreenWidth * scrWidth / 100;
+
+        // Adjust max fullscreen width if a ratio is specified.
+        if (fSettings->widthRatio != 0 and fSettings->heightRatio != 0) {
+            int ratioWidth = (double)fSettings->widthRatio / (double)fSettings->heightRatio
+                             * (double)scrHeight;
+            if (maxWidth > ratioWidth) {
+                maxWidth = ratioWidth;
+            }
+        }
+
         // Calculate how big the margin should be to get the specified
         // width.
-        int targetWidth = qMin(this->fSettings->fullscreenWidth, this->fMarginWidget->width());
-        int margin = (this->fMarginWidget->width() - targetWidth) / 2;
-        this->fMarginWidget->setContentsMargins(margin, 0, margin,
-                                                this->fBottomMarginSize);
-        this->fUpdateMarginColor(color);
-        return;
+        int targetWidth = qMin(maxWidth, this->fMarginWidget->width());
+        margin = (fMarginWidget->width() - targetWidth) / 2;
+    } else {
+        // In windowed mode, do not update the margins if we're currently
+        // displaying scrollback as an overlay.
+        if (fMarginWidget->layout()->indexOf(fFrameWin) < 0) {
+            return;
+        }
+        margin = fSettings->marginSize;
     }
-
-    // Do not update the margins if we're currently displaying scrollback
-    // as an overlay.
-    if (this->fMarginWidget->layout()->indexOf(this->fFrameWin) < 0)
-        return;
-
-    int marginSize = this->fSettings->marginSize;
-    this->fMarginWidget->setContentsMargins(marginSize, 0, marginSize,
-                                            this->fBottomMarginSize);
-    this->fUpdateMarginColor(color);
+    fMarginWidget->setContentsMargins(margin, 0, margin, fBottomMarginSize);
+    fUpdateMarginColor(color);
 }
 
 

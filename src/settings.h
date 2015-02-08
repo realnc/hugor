@@ -9,7 +9,9 @@
 class Settings {
   public:
     Settings()
-        : videoSysError(false)
+        : videoSysError(false),
+          widthRatio(4),
+          heightRatio(3)
     { }
 
     void
@@ -52,6 +54,8 @@ class Settings {
     // These are not saved. Used for temporary overrides that only apply
     // to the current session.
     bool videoSysError;
+    int widthRatio;
+    int heightRatio;
 };
 
 

@@ -163,6 +163,12 @@ Settings::loadFromDisk( SettingsOverrides* ovr )
     }
     sett.endGroup();
 
+    // If an aspect ratio is specified in the overrides, use it.
+    if (ovr) {
+        widthRatio = ovr->widthRatio;
+        heightRatio = ovr->heightRatio;
+    }
+
     sett.beginGroup(SETT_GEOMETRY_GRP);
     this->appSize = sett.value(SETT_APP_SIZE, QSize(800, 600)).toSize();
     this->overlayScrollback = sett.value(SETT_OVERLAY_SCROLL, true).toBool();
@@ -171,8 +177,15 @@ Settings::loadFromDisk( SettingsOverrides* ovr )
     this->marginSize = sett.value(SETT_MARGIN_SIZE, 0).toInt();
     // If fullscreen width is not set, use one that results in a 4:3 ratio.
     int scrHeight = QApplication::desktop()->screenGeometry().height();
+    int scrWidth = QApplication::desktop()->screenGeometry().width();
     this->fullscreenWidth = sett.value(SETT_FULLSCREEN_WIDTH,
-                                       (double)scrHeight * (4.0 / 3.0)).toInt();
+                                       (double)scrHeight * ((double)widthRatio / (double)heightRatio)
+                                       * 100.0 / (double)scrWidth).toInt();
+    if (this->fullscreenWidth > 100) {
+        this->fullscreenWidth = 100;
+    } else if (this->fullscreenWidth < 10) {
+        this->fullscreenWidth = 10;
+    }
     sett.endGroup();
 
     // Apply overrides for non-existent settings.
