@@ -1,13 +1,14 @@
-Git - 2013-06-12
+Git - 2015-02-08
 ================
 
-  - Support for game-specific start-up configuration files.  The set of
-    configuration options is not fully decided yet and thus isn't documented.
-    For now, see:
+  - Support for game-specific start-up configuration files. See the file:
 
-      http://www.joltcountry.com/phpBB2/viewtopic.php?t=8896
+      example.cfg
 
-    for more information.
+    for details.
+
+  - The "Fullscreen Width" configuration option is now a percentage, rather
+    than an absolute pixel value.
 
   - Fullscreen mode is now restored correctly between sessions.
 
