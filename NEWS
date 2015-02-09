@@ -10,6 +10,9 @@ Git - 2015-02-08
   - The "Fullscreen Width" configuration option is now a percentage, rather
     than an absolute pixel value.
 
+  - The scrollback now ignores main window word wrapping and does its own word
+    wrapping.
+
   - Fullscreen mode is now restored correctly between sessions.
 
   - Video is now fully supported in the Linux version of Hugor.  Consult the
