@@ -982,7 +982,7 @@ void Poke(unsigned int a, unsigned char v);
 void PokeWord(unsigned int a, unsigned int v);
 #endif
 char *PrintHex(long a);
-void Printout(char *a);
+void Printout(char *a, int no_scrollback_linebreak);
 /* void PrintSetting(int t, int a, int b, int c, int d); */
 void PromptMore(void);
 int RecordCommands(void);

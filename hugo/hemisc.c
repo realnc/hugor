@@ -397,7 +397,7 @@ AddFontCode:
 				current_text_x+thisline-1,
 				current_text_y+lineheight-1);
 #endif
-			Printout(pbuffer);
+			Printout(pbuffer, 0);
 			lastfont = currentfont;
 #ifdef USE_TEXTBUFFER
 			bufferfont = currentfont;
@@ -487,7 +487,7 @@ AddFontCode:
 
 			tempfont = currentfont;
 			hugo_font(currentfont = lastfont);
-			Printout(pbuffer);
+			Printout(pbuffer, linebreak);
 			lastfont = currentfont;
 			hugo_font(currentfont = tempfont);
 
@@ -547,7 +547,7 @@ AddFontCode:
 	if (!sticky)
 	{
 		hugo_font(currentfont = lastfont);
-		Printout(pbuffer);
+		Printout(pbuffer, 0);
 		lastfont = currentfont;
 		strcpy(pbuffer, "");
 		linebreak = 0;
@@ -1011,7 +1011,7 @@ void Flushpbuffer()
 
 	pbuffer[strlen(pbuffer)+1] = '\0';
 	pbuffer[strlen(pbuffer)] = (char)NO_NEWLINE;
-	Printout(Ltrim(pbuffer));
+	Printout(Ltrim(pbuffer), 0);
 	currentpos = hugo_textwidth(pbuffer);	/* -charwidth; */
 	strcpy(pbuffer, "");
 }
@@ -1638,7 +1638,7 @@ char *PrintHex(long a)
 	font changes, color setting, and window scrolling.
 */
 
-void Printout(char *a)
+void Printout(char *a, int no_scrollback_linebreak)
 {
 	char b[2], sticky = 0, trimmed = 0;
 	char tempfcolor;
@@ -1838,7 +1838,7 @@ void Printout(char *a)
 		}
 
 #if defined (SCROLLBACK_DEFINED)
-		if (!inwindow) hugo_sendtoscrollback("\n");
+		if (!inwindow && !no_scrollback_linebreak) hugo_sendtoscrollback("\n");
 #endif
 	}
 
