@@ -13,6 +13,12 @@ Git - 2015-02-08
   - The scrollback now ignores main window word wrapping and does its own word
     wrapping.
 
+  - Scriptfile output can now be word-wrapped. The text width to use when
+    wrapping is configurable through a new configuration option.
+
+  - Scriptfiles are now written using the correct character encoding of the
+    operating system's locale.
+
   - Fullscreen mode is now restored correctly between sessions.
 
   - Video is now fully supported in the Linux version of Hugor.  Consult the
