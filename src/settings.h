@@ -37,6 +37,7 @@ class Settings {
     bool softTextScrolling;
     bool extraButter;
     bool smartFormatting;
+    int scriptWrap;
 
     bool askForGameFile;
     QString lastFileOpenDir;

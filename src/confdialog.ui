@@ -251,13 +251,39 @@
       <string>Misc</string>
      </property>
      <layout class="QGridLayout" name="gridLayout">
-      <item row="0" column="0">
-       <widget class="QCheckBox" name="softScrollCheckBox">
+      <item row="2" column="1">
+       <widget class="QCheckBox" name="overlayScrollbackCheckBox">
         <property name="toolTip">
-         <string>&lt;p&gt;Scrolls-in new text line by line instead of all at once.&lt;/p&gt;</string>
+         <string>&lt;p&gt;Make the scrollback window the same size as the game window and position it exactly over it.&lt;/p&gt;</string>
         </property>
         <property name="text">
-         <string>Soft Text Scrolling</string>
+         <string>Overlay Scrollback</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2">
+       <widget class="QSpinBox" name="fullscreenWidthSpinBox">
+        <property name="suffix">
+         <string>%</string>
+        </property>
+        <property name="minimum">
+         <number>10</number>
+        </property>
+        <property name="maximum">
+         <number>100</number>
+        </property>
+        <property name="value">
+         <number>100</number>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="3">
+       <widget class="QLabel" name="marginSizeLabel">
+        <property name="text">
+         <string>Margin Size</string>
+        </property>
+        <property name="buddy">
+         <cstring>marginSizeSpinBox</cstring>
         </property>
        </widget>
       </item>
@@ -271,31 +297,43 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="2">
-       <layout class="QFormLayout" name="formLayout_2">
-        <item row="0" column="0">
-         <widget class="QSpinBox" name="marginSizeSpinBox">
-          <property name="suffix">
-           <string>px</string>
-          </property>
-          <property name="maximum">
-           <number>9999</number>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <widget class="QLabel" name="marginSizeLabel">
-          <property name="text">
-           <string>Margin Size</string>
-          </property>
-          <property name="buddy">
-           <cstring>marginSizeSpinBox</cstring>
-          </property>
-         </widget>
-        </item>
-       </layout>
+      <item row="4" column="2">
+       <widget class="QSpinBox" name="scriptWrapSpinBox">
+        <property name="specialValueText">
+         <string>None</string>
+        </property>
+        <property name="suffix">
+         <string>ch</string>
+        </property>
+        <property name="minimum">
+         <number>20</number>
+        </property>
+        <property name="maximum">
+         <number>9999</number>
+        </property>
+       </widget>
       </item>
-      <item row="1" column="0">
+      <item row="0" column="0">
+       <widget class="QCheckBox" name="softScrollCheckBox">
+        <property name="toolTip">
+         <string>&lt;p&gt;Scrolls-in new text line by line instead of all at once.&lt;/p&gt;</string>
+        </property>
+        <property name="text">
+         <string>Soft Text Scrolling</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="3">
+       <widget class="QLabel" name="scriptWrapLabel">
+        <property name="text">
+         <string>Scriptfile Wrap</string>
+        </property>
+        <property name="buddy">
+         <cstring>marginSizeSpinBox</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
        <widget class="QCheckBox" name="smartFormattingCheckBox">
         <property name="toolTip">
          <string>&lt;p&gt;Converts ASCII quotes and dashes to typographical ones.&lt;/p&gt;</string>
@@ -305,45 +343,25 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="1">
-       <widget class="QCheckBox" name="overlayScrollbackCheckBox">
-        <property name="toolTip">
-         <string>&lt;p&gt;Make the scrollback window the same size as the game window and position it exactly over it.&lt;/p&gt;</string>
+      <item row="0" column="2">
+       <widget class="QSpinBox" name="marginSizeSpinBox">
+        <property name="suffix">
+         <string>px</string>
         </property>
-        <property name="text">
-         <string>Overlay Scrollback</string>
+        <property name="maximum">
+         <number>9999</number>
         </property>
        </widget>
       </item>
-      <item row="1" column="2">
-       <layout class="QFormLayout" name="formLayout_6">
-        <item row="0" column="0">
-         <widget class="QSpinBox" name="fullscreenWidthSpinBox">
-          <property name="suffix">
-           <string>%</string>
-          </property>
-          <property name="minimum">
-           <number>10</number>
-          </property>
-          <property name="maximum">
-           <number>100</number>
-          </property>
-          <property name="value">
-           <number>100</number>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <widget class="QLabel" name="label_3">
-          <property name="text">
-           <string>Fullscreen Width</string>
-          </property>
-          <property name="buddy">
-           <cstring>marginSizeSpinBox</cstring>
-          </property>
-         </widget>
-        </item>
-       </layout>
+      <item row="2" column="3">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>Fullscreen Width</string>
+        </property>
+        <property name="buddy">
+         <cstring>marginSizeSpinBox</cstring>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -360,6 +378,30 @@
    <header>kcolorbutton.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>mainFontBox</tabstop>
+  <tabstop>mainFontSizeSpinBox</tabstop>
+  <tabstop>fixedFontBox</tabstop>
+  <tabstop>fixedFontSizeSpinBox</tabstop>
+  <tabstop>mainTextColorButton</tabstop>
+  <tabstop>mainBgColorButton</tabstop>
+  <tabstop>bannerTextColorButton</tabstop>
+  <tabstop>bannerBgColorButton</tabstop>
+  <tabstop>allowGraphicsCheckBox</tabstop>
+  <tabstop>allowVideoCheckBox</tabstop>
+  <tabstop>allowMusicCheckBox</tabstop>
+  <tabstop>allowSoundEffectsCheckBox</tabstop>
+  <tabstop>smoothScalingCheckBox</tabstop>
+  <tabstop>muteSoundCheckBox</tabstop>
+  <tabstop>softScrollCheckBox</tabstop>
+  <tabstop>butterCheckBox</tabstop>
+  <tabstop>smartFormattingCheckBox</tabstop>
+  <tabstop>overlayScrollbackCheckBox</tabstop>
+  <tabstop>marginSizeSpinBox</tabstop>
+  <tabstop>fullscreenWidthSpinBox</tabstop>
+  <tabstop>scriptWrapSpinBox</tabstop>
+  <tabstop>scriptWrapSpinBox_2</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

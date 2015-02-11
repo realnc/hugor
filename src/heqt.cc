@@ -6,6 +6,7 @@
 #include <QFileDialog>
 #include <QTextCodec>
 #include <QMessageBox>
+#include <QTextLayout>
 
 #include "happlication.h"
 #include "hmainwindow.h"
@@ -193,6 +194,60 @@ hugo_overwrite( char* )
     return true;
 }
 
+static QString scriptBuffer;
+
+static void
+flushScript()
+{
+    // If wrapping is disabled, write out all text as-is.
+    if (hApp->settings()->scriptWrap <= 0) {
+        fprintf(::script, "%s", scriptBuffer.toLocal8Bit().constData());
+        fflush(::script);
+        scriptBuffer.clear();
+        return;
+    }
+
+    QTextStream strm(&scriptBuffer);
+    QString textLine;
+    while (not (textLine = strm.readLine()).isNull()) {
+        // If the line fits and doesn't need wrapping, write it out as-is.
+        if (textLine.length() < hApp->settings()->scriptWrap) {
+            fprintf(::script, "%s", textLine.trimmed().toLocal8Bit().constData());
+            if (not strm.atEnd()) {
+                fprintf(::script, "\n");
+            }
+            continue;
+        }
+
+        QTextLayout layout(textLine);
+        QTextOption txtOpts(Qt::AlignLeft);
+        txtOpts.setWrapMode(QTextOption::WordWrap);
+        layout.setTextOption(txtOpts);
+
+        layout.beginLayout();
+        QTextLine layoutLine;
+        QString output;
+        while ((layoutLine = layout.createLine()).isValid()) {
+            layoutLine.setNumColumns(hApp->settings()->scriptWrap);
+            output.append(textLine.mid(layoutLine.textStart(), layoutLine.textLength()));
+            output.append('\n');
+        }
+        layout.endLayout();
+        fprintf(::script, "%s", output.toLocal8Bit().constData());
+    }
+
+    fflush(::script);
+    scriptBuffer.clear();
+}
+
+int
+hugo_fclose( HUGO_FILE file )
+{
+    if (file == script)
+        flushScript();
+    return fclose(file);
+}
+
 
 /* hugo_closefiles
 
@@ -204,8 +259,9 @@ void
 hugo_closefiles()
 {
     fclose(game);
-    if (script)
-        fclose(script);
+    if (script) {
+        hugo_fclose(script);
+    }
     if (io)
         fclose(io);
     if (record)
@@ -233,6 +289,14 @@ hugo_sendtoscrollback( char* a )
 }
 
 
+int
+hugo_writetoscript(const char* s)
+{
+    scriptBuffer.append(hApp->hugoCodec()->toUnicode(s));
+    return 0;
+}
+
+
 /* hugo_getkey
 
     Returns the next keystroke waiting in the keyboard buffer.  It is
@@ -249,7 +313,7 @@ hugo_getkey( void )
 {
     flushScrollback();
     if (::script != NULL) {
-        fflush(::script);
+        flushScript();
     }
     int c = hFrame->getNextKey();
     if (c == 0) {
@@ -278,8 +342,8 @@ hugo_getline( char* p )
     hugo_setbackcolor(bgcolor);
     hugo_print(p);
     if (::script != NULL) {
-        fprintf(::script, "%s", p);
-        fflush(::script);
+        hugo_writetoscript(p);
+        flushScript();
     }
 
     // Switch to input color.
@@ -293,8 +357,9 @@ hugo_getline( char* p )
 
     // Also copy the input to the script file, if there is one.
     if (script != NULL) {
-        fprintf(::script, "%s\n", buffer);
-        fflush(::script);
+        hugo_writetoscript(buffer);
+        hugo_writetoscript("\n");
+        flushScript();
     }
 
     hugo_sendtoscrollback(buffer);

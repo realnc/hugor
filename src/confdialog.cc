@@ -56,6 +56,11 @@ ConfDialog::ConfDialog( HMainWindow* parent )
     ui->marginSizeSpinBox->setValue(sett->marginSize);
     ui->overlayScrollbackCheckBox->setChecked(sett->overlayScrollback);
     ui->fullscreenWidthSpinBox->setValue(sett->fullscreenWidth);
+    if (sett->scriptWrap < ui->scriptWrapSpinBox->minimum()) {
+        ui->scriptWrapSpinBox->setValue(ui->scriptWrapSpinBox->minimum());
+    } else {
+        ui->scriptWrapSpinBox->setValue(sett->scriptWrap);
+    }
 
 #ifdef Q_WS_MAC
     // On Mac OS X, the dialog should not have any buttons, and settings
@@ -111,6 +116,7 @@ ConfDialog::fMakeInstantApply()
     connect(ui->smartFormattingCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
     connect(ui->marginSizeSpinBox, SIGNAL(valueChanged(int)), this, SLOT(fApplySettings()));
     connect(ui->fullscreenWidthSpinBox, SIGNAL(valueChanged(int)), this, SLOT(fApplySettings()));
+    connect(ui->scriptWrapSpinBox, SIGNAL(valueChanged(int)), this, SLOT(fApplySettings()));
     connect(ui->allowGraphicsCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
     connect(ui->allowVideoCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
     connect(ui->allowSoundEffectsCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
@@ -150,6 +156,11 @@ ConfDialog::fApplySettings()
     sett->overlayScrollback = ui->overlayScrollbackCheckBox->isChecked();
     sett->marginSize = ui->marginSizeSpinBox->value();
     sett->fullscreenWidth = ui->fullscreenWidthSpinBox->value();
+    if (ui->scriptWrapSpinBox->value() <= ui->scriptWrapSpinBox->minimum()) {
+        sett->scriptWrap = 0;
+    } else {
+        sett->scriptWrap = ui->scriptWrapSpinBox->value();
+    }
 
     // Notify the application that preferences have changed.
     hApp->notifyPreferencesChange(sett);

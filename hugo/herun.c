@@ -328,9 +328,7 @@ FreshInput:
 									buffer[strlen(buffer)-1] = '\0';
 								sprintf(line, "\n%s%s", GetWord(var[prompt]), buffer);
 								if (script)
-									/* fprintf() this way for Glk */
-									if (fprintf(script, "%s", "\n")<0)
-										FatalError(WRITE_E);
+									if (hugo_writetoscript("\n")<0) FatalError(WRITE_E);
 #if defined (SCROLLBACK_DEFINED)
 								hugo_sendtoscrollback("\n");
 #endif
@@ -2508,7 +2506,7 @@ int RunScriptSet()
 		{
 			if (script)
 			{
-				if (fclose(script)) return (0);
+				if (hugo_fclose(script)) return (0);
 				script = NULL;
 				return 1;
 			}

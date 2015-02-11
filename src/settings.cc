@@ -62,6 +62,7 @@ qtRuntimeVersion()
 #define SETT_SOFT_SCROLL QString::fromLatin1("softTextScrolling")
 #define SETT_EXTRA_BUTTER QString::fromLatin1("extraButter")
 #define SETT_SMART_FORMATTING QString::fromLatin1("smartFormatting")
+#define SETT_SCRIPT_WRAP QString::fromLatin1("scriptWrap")
 #define SETT_ASK_FILE QString::fromLatin1("askforfileatstart")
 #define SETT_LAST_OPEN_DIR QString::fromLatin1("lastFileOpenDir")
 #define SETT_GAMES_LIST QString::fromLatin1("games")
@@ -148,6 +149,7 @@ Settings::loadFromDisk( SettingsOverrides* ovr )
     sett.beginGroup(SETT_MISC_GRP);
     this->askForGameFile = sett.value(SETT_ASK_FILE, true).toBool();
     this->lastFileOpenDir = sett.value(SETT_LAST_OPEN_DIR, QString::fromLatin1("")).toString();
+    this->scriptWrap = sett.value(SETT_SCRIPT_WRAP, 0).toInt();
     sett.endGroup();
 
     sett.beginGroup(SETT_RECENT_GRP);
@@ -252,6 +254,7 @@ Settings::saveToDisk()
     sett.beginGroup(SETT_MISC_GRP);
     sett.setValue(SETT_ASK_FILE, this->askForGameFile);
     sett.setValue(SETT_LAST_OPEN_DIR, this->lastFileOpenDir);
+    sett.setValue(SETT_SCRIPT_WRAP, this->scriptWrap);
     sett.endGroup();
 
     sett.beginGroup(SETT_RECENT_GRP);

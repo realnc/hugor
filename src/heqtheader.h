@@ -40,6 +40,8 @@
 #define USE_TEXTBUFFER
 #define USE_SMARTFORMATTING
 #define SCROLLBACK_DEFINED
+#define CUSTOM_SCRIPT_WRITE
+#define HUGO_FCLOSE
 
 #ifdef __cplusplus
 extern "C" {
@@ -54,6 +56,8 @@ void hugo_samplevolume(int vol);
 void hugo_stopsample(void);
 int hugo_playvideo(HUGO_FILE infile, long len, char loop, char bg, int vol);
 void hugo_stopvideo(void);
+int hugo_writetoscript(const char* s);
+int hugo_fclose(HUGO_FILE file);
 #ifdef __cplusplus
 }
 #endif

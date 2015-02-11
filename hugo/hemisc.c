@@ -1720,8 +1720,7 @@ void Printout(char *a, int no_scrollback_linebreak)
 		}
 
 		if (script && (unsigned char)b[0]>=' ')
-			/* fprintf() this way for Glk */
-			if (fprintf(script, "%s", b) < 0) FatalError(WRITE_E);
+			if (hugo_writetoscript(b) < 0) FatalError(WRITE_E);
 
 #if defined (SCROLLBACK_DEFINED)
 		if (!inwindow && (unsigned char)b[0]>=' ')
@@ -1830,11 +1829,9 @@ void Printout(char *a, int no_scrollback_linebreak)
 			PromptMore();
 		}
 
-		if (script)
+		if (script && !no_scrollback_linebreak)
 		{
-			/* fprintf() this way for Glk */
-			if (fprintf(script, "%s", "\n")<0)
-				FatalError(WRITE_E);
+			if (hugo_writetoscript("\n")<0) FatalError(WRITE_E);
 		}
 
 #if defined (SCROLLBACK_DEFINED)

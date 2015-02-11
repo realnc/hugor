@@ -909,6 +909,9 @@ int hugo_timewait(int n);
 #if defined (SCROLLBACK_DEFINED)
 void hugo_sendtoscrollback(char *a);
 #endif
+#if !defined (HUGO_FCLOSE)
+#define hugo_fclose fclose
+#endif
 #if !defined (COMPILE_V25)
 int hugo_hasvideo(void);
 #endif
