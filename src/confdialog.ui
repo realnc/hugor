@@ -122,7 +122,7 @@
          <string>Scrollback</string>
         </property>
         <property name="buddy">
-         <cstring>mainFontBox</cstring>
+         <cstring>scrollbackFontBox</cstring>
         </property>
        </widget>
       </item>
@@ -366,7 +366,7 @@
          <string>Scriptfile Wrap</string>
         </property>
         <property name="buddy">
-         <cstring>marginSizeSpinBox</cstring>
+         <cstring>scriptWrapSpinBox</cstring>
         </property>
        </widget>
       </item>
@@ -396,7 +396,7 @@
          <string>Fullscreen Width</string>
         </property>
         <property name="buddy">
-         <cstring>marginSizeSpinBox</cstring>
+         <cstring>fullscreenWidthSpinBox</cstring>
         </property>
        </widget>
       </item>
@@ -420,6 +420,8 @@
   <tabstop>mainFontSizeSpinBox</tabstop>
   <tabstop>fixedFontBox</tabstop>
   <tabstop>fixedFontSizeSpinBox</tabstop>
+  <tabstop>scrollbackFontBox</tabstop>
+  <tabstop>scrollbackFontSizeSpinBox</tabstop>
   <tabstop>mainTextColorButton</tabstop>
   <tabstop>mainBgColorButton</tabstop>
   <tabstop>bannerTextColorButton</tabstop>
