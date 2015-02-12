@@ -199,8 +199,11 @@ static QString scriptBuffer;
 static void
 flushScript()
 {
-    // If wrapping is disabled, write out all text as-is.
-    if (hApp->settings()->scriptWrap <= 0) {
+    const int wrapWidth = hApp->settings()->scriptWrap;
+
+    // If wrapping is disabled, or the entire buffer is below our wrap limit,
+    // write out all text as-is.
+    if (wrapWidth <= 0 or scriptBuffer.length() <= wrapWidth) {
         fprintf(::script, "%s", scriptBuffer.toLocal8Bit().constData());
         fflush(::script);
         scriptBuffer.clear();
@@ -211,7 +214,7 @@ flushScript()
     QString textLine;
     while (not (textLine = strm.readLine()).isNull()) {
         // If the line fits and doesn't need wrapping, write it out as-is.
-        if (textLine.length() < hApp->settings()->scriptWrap) {
+        if (textLine.length() < wrapWidth) {
             fprintf(::script, "%s", textLine.trimmed().toLocal8Bit().constData());
             if (not strm.atEnd()) {
                 fprintf(::script, "\n");
@@ -228,7 +231,7 @@ flushScript()
         QTextLine layoutLine;
         QString output;
         while ((layoutLine = layout.createLine()).isValid()) {
-            layoutLine.setNumColumns(hApp->settings()->scriptWrap);
+            layoutLine.setNumColumns(wrapWidth);
             output.append(textLine.mid(layoutLine.textStart(), layoutLine.textLength()));
             output.append('\n');
         }
