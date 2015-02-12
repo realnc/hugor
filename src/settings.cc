@@ -59,6 +59,7 @@ qtRuntimeVersion()
 #define SETT_STATUS_TXT_COLOR QString::fromLatin1("bannertext")
 #define SETT_MAIN_FONT QString::fromLatin1("main")
 #define SETT_FIXED_FONT QString::fromLatin1("fixed")
+#define SETT_SCROLLBACK_FONT QString::fromLatin1("scrollback")
 #define SETT_SOFT_SCROLL QString::fromLatin1("softTextScrolling")
 #define SETT_EXTRA_BUTTER QString::fromLatin1("extraButter")
 #define SETT_SMART_FORMATTING QString::fromLatin1("smartFormatting")
@@ -141,6 +142,10 @@ Settings::loadFromDisk( SettingsOverrides* ovr )
     tmp.fromString(sett.value(SETT_FIXED_FONT, DEFAULT_MONO).toString());
     this->fixedFont.setFamily(tmp.family());
     this->fixedFont.setPointSize(tmp.pointSize());
+    this->scrollbackFont.setStyleStrategy(strat);
+    tmp.fromString(sett.value(SETT_SCROLLBACK_FONT, DEFAULT_PROP).toString());
+    this->scrollbackFont.setFamily(tmp.family());
+    this->scrollbackFont.setPointSize(tmp.pointSize());
     this->softTextScrolling = sett.value(SETT_SOFT_SCROLL, true).toBool();
     this->extraButter = sett.value(SETT_EXTRA_BUTTER, false).toBool();
     this->smartFormatting = sett.value(SETT_SMART_FORMATTING, true).toBool();
@@ -208,6 +213,9 @@ Settings::loadFromDisk( SettingsOverrides* ovr )
         if (not sett.contains(SETT_FIXED_FONT)) {
             this->fixedFont.setPointSize(ovr->fixedFontSize);
         }
+        if (not sett.contains(SETT_SCROLLBACK_FONT)) {
+            this->scrollbackFont.setPointSize(ovr->scrollbackFontSize);
+        }
         sett.endGroup();
 
         sett.beginGroup(SETT_MEDIA_GRP);
@@ -246,6 +254,7 @@ Settings::saveToDisk()
     sett.beginGroup(SETT_FONTS_GRP);
     sett.setValue(SETT_MAIN_FONT, this->propFont.toString());
     sett.setValue(SETT_FIXED_FONT, this->fixedFont.toString());
+    sett.setValue(SETT_SCROLLBACK_FONT, this->scrollbackFont.toString());
     sett.setValue(SETT_SOFT_SCROLL, this->softTextScrolling);
     sett.setValue(SETT_EXTRA_BUTTER, this->extraButter);
     sett.setValue(SETT_SMART_FORMATTING, this->smartFormatting);

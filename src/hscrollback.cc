@@ -3,6 +3,7 @@
 #include "hscrollback.h"
 #include "happlication.h"
 #include "hmainwindow.h"
+#include "settings.h"
 
 
 HScrollbackWindow::HScrollbackWindow( QWidget* parent )
@@ -16,6 +17,7 @@ HScrollbackWindow::HScrollbackWindow( QWidget* parent )
     this->setUndoRedoEnabled(false);
     this->setTextInteractionFlags(Qt::TextSelectableByMouse);
     this->setFrameStyle(QFrame::NoFrame | QFrame::Plain);
+    this->setFont(hApp->settings()->scrollbackFont);
     // Don't allow the scrollbuffer to grow forever; limit it to fMaximumBlockCount lines.
     this->document()->setMaximumBlockCount(this->fMaximumBlockCount);
     this->resize(this->fInitialWidth, this->fInitialHeight);

@@ -364,6 +364,7 @@ HApplication::notifyPreferencesChange( const Settings* sett )
 
     // The fonts might have changed.
     hFrame->setFontType(currentfont);
+    hMainWin->setScrollbackFont(sett->scrollbackFont);
 
     // Change the text cursor's height according to the new input font's height.
     //qFrame->gameWindow()->setCursorHeight(QFontMetrics(sett->inputFont).height());

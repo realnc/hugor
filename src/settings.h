@@ -34,6 +34,7 @@ class Settings {
 
     QFont propFont;
     QFont fixedFont;
+    QFont scrollbackFont;
     bool softTextScrolling;
     bool extraButter;
     bool smartFormatting;

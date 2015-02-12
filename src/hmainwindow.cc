@@ -416,3 +416,10 @@ HMainWindow::showMenuBar()
     this->fMenuBarVisible = true;
     this->menuBar()->show();
 }
+
+
+void
+HMainWindow::setScrollbackFont( const QFont& font )
+{
+    this->fScrollbackWindow->setFont(font);
+}

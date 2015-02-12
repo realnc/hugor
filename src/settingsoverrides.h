@@ -18,6 +18,7 @@ class SettingsOverrides {
     int heightRatio;
     int propFontSize;
     int fixedFontSize;
+    int scrollbackFontSize;
     bool imageSmoothing;
     bool pauseAudio;
 };

@@ -66,6 +66,9 @@ class HMainWindow: public QMainWindow {
     errorMsgObj()
     { return this->fErrorMsg; }
 
+    void
+    setScrollbackFont( const QFont& font );
+
   public slots:
     void
     showScrollback();

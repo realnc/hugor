@@ -26,6 +26,7 @@ SettingsOverrides::SettingsOverrides( const QString& filename )
     this->heightRatio = sett.value(QString::fromLatin1("heightRatio"), 3).toInt();
     this->propFontSize = sett.value(QString::fromLatin1("propFontSize"), 0).toInt();
     this->fixedFontSize = sett.value(QString::fromLatin1("fixedFontSize"), 0).toInt();
+    this->scrollbackFontSize = sett.value(QString::fromLatin1("scrollbackFontSize"), 0).toInt();
     this->imageSmoothing = sett.value(QString::fromLatin1("imageSmoothing"), true).toBool();
     sett.endGroup();
 

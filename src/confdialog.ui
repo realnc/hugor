@@ -89,6 +89,43 @@
         </item>
        </layout>
       </item>
+      <item row="2" column="1">
+       <layout class="QHBoxLayout" name="horizontalLayout_8">
+        <item>
+         <widget class="QFontComboBox" name="scrollbackFontBox">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QSpinBox" name="scrollbackFontSizeSpinBox">
+          <property name="suffix">
+           <string notr="true">pt</string>
+          </property>
+          <property name="minimum">
+           <number>6</number>
+          </property>
+          <property name="maximum">
+           <number>72</number>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>Scrollback</string>
+        </property>
+        <property name="buddy">
+         <cstring>mainFontBox</cstring>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
@@ -400,7 +437,6 @@
   <tabstop>marginSizeSpinBox</tabstop>
   <tabstop>fullscreenWidthSpinBox</tabstop>
   <tabstop>scriptWrapSpinBox</tabstop>
-  <tabstop>scriptWrapSpinBox_2</tabstop>
  </tabstops>
  <resources/>
  <connections>

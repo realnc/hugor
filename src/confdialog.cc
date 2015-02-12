@@ -46,8 +46,10 @@ ConfDialog::ConfDialog( HMainWindow* parent )
 
     ui->mainFontSizeSpinBox->setValue(sett->propFont.pointSize());
     ui->fixedFontSizeSpinBox->setValue(sett->fixedFont.pointSize());
+    ui->scrollbackFontSizeSpinBox->setValue(sett->scrollbackFont.pointSize());
     ui->mainFontBox->setCurrentFont(sett->propFont);
     ui->fixedFontBox->setCurrentFont(sett->fixedFont);
+    ui->scrollbackFontBox->setCurrentFont(sett->scrollbackFont);
     ui->softScrollCheckBox->setChecked(sett->softTextScrolling);
     ui->butterCheckBox->setChecked(sett->extraButter);
     ui->butterCheckBox->setEnabled(sett->softTextScrolling);
@@ -109,8 +111,10 @@ ConfDialog::fMakeInstantApply()
 {
     connect(ui->mainFontBox, SIGNAL(currentFontChanged(QFont)), this, SLOT(fApplySettings()));
     connect(ui->fixedFontBox, SIGNAL(currentFontChanged(QFont)), this, SLOT(fApplySettings()));
+    connect(ui->scrollbackFontBox, SIGNAL(currentFontChanged(QFont)), this, SLOT(fApplySettings()));
     connect(ui->mainFontSizeSpinBox, SIGNAL(valueChanged(int)), this, SLOT(fApplySettings()));
     connect(ui->fixedFontSizeSpinBox, SIGNAL(valueChanged(int)), this, SLOT(fApplySettings()));
+    connect(ui->scrollbackFontSizeSpinBox, SIGNAL(valueChanged(int)), this, SLOT(fApplySettings()));
     connect(ui->softScrollCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
     connect(ui->butterCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
     connect(ui->smartFormattingCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
@@ -148,8 +152,10 @@ ConfDialog::fApplySettings()
     sett->statusTextColor = ui->bannerTextColorButton->color();
     sett->propFont = ui->mainFontBox->currentFont();
     sett->fixedFont = ui->fixedFontBox->currentFont();
+    sett->scrollbackFont = ui->scrollbackFontBox->currentFont();
     sett->propFont.setPointSize(ui->mainFontSizeSpinBox->value());
     sett->fixedFont.setPointSize(ui->fixedFontSizeSpinBox->value());
+    sett->scrollbackFont.setPointSize(ui->scrollbackFontSizeSpinBox->value());
     sett->softTextScrolling = ui->softScrollCheckBox->isChecked();
     sett->extraButter = ui->butterCheckBox->isChecked();
     sett->smartFormatting = ui->smartFormattingCheckBox->isChecked();
