@@ -27,6 +27,9 @@ Git - 2015-02-08
 
       CONFIG+=disable-video
 
+    GStreamer 0.10 as well as the newer 1.x is supported. (See the README on
+    how to select the version you want when building from source.)
+
   - The FMOD sound back-end has been removed.  SDL is now the only supported
     sound back-end.
 
