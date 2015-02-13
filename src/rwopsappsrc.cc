@@ -1,6 +1,8 @@
 #include "rwopsappsrc.h"
 
 #include <SDL_rwops.h>
+#include <glib.h>
+#include <gst/gstversion.h>
 
 
 void
@@ -17,7 +19,21 @@ void
 RwopsApplicationSource::needData(uint len)
 {
     QGst::BufferPtr buffer = QGst::Buffer::create(len);
-    long cnt = SDL_RWread(fRwops, buffer->data(), 1, len);
+    void* data;
+
+#if GST_CHECK_VERSION(1, 0, 0)
+    QGst::MapInfo mapInf;
+    if (not buffer->map(mapInf, QGst::MapWrite)) {
+        qWarning() << "Can't map QGst buffer memory.";
+        this->endOfStream();
+        return;
+    }
+    data = mapInf.data();
+#else
+    data = buffer->data();
+#endif
+
+    long cnt = SDL_RWread(fRwops, data, 1, len);
     this->pushBuffer(buffer);
     // Indicate EOS if there's no more data to be had from the RWops.
     if (cnt < len) {

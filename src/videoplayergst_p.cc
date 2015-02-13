@@ -5,6 +5,8 @@
 #include <QGst/Message>
 #include <QGlib/Error>
 #include <QGst/Pad>
+#include <glib.h>
+#include <gst/gstversion.h>
 #include <gst/video/video.h>
 
 #include "rwopsappsrc.h"
@@ -50,15 +52,31 @@ VideoPlayer_priv::fOnBusMessage(const QGst::MessagePtr& message)
                 if (vidpad.isNull()) {
                     break;
                 }
+#if GST_CHECK_VERSION(1, 0, 0)
+                QGst::CapsPtr caps = vidpad->currentCaps();
+#else
                 QGst::CapsPtr caps = vidpad->negotiatedCaps();
+#endif
                 if (caps.isNull()) {
                     break;
                 }
                 gint vidWidth, vidHeight;
+#if GST_CHECK_VERSION(1, 0, 0)
+                GstVideoInfo vidInfo;
+                gst_video_info_init(&vidInfo);
+                QGlib::Value val(gst_video_info_from_caps(&vidInfo, caps));
+                if (val.toBool()) {
+                    vidWidth = vidInfo.width;
+                    vidHeight = vidInfo.height;
+                } else {
+                    break;
+                }
+#else
                 QGlib::Value val(gst_video_get_size(vidpad, &vidWidth, &vidHeight));
                 if (not val.toBool()) {
                     break;
                 }
+#endif
                 // Make sure that we won't end up being enlarged; we only allow our
                 // window to shrink. The video must be scaled down in that case.
                 QSize vidSize(vidWidth, vidHeight);
@@ -77,7 +95,9 @@ VideoPlayer_priv::fOnBusMessage(const QGst::MessagePtr& message)
 
         case QGst::MessageEos:
             if (q->fLooping) {
-                fPipeline->seek(QGst::FormatTime, QGst::SeekFlagFlush, 0);
+                fPipeline->setState(QGst::StateNull);
+                fPipeline->seek(QGst::FormatTime, QGst::SeekFlagNone, 0);
+                fPipeline->setState(QGst::StatePlaying);
             } else {
                 q->stop();
                 Q_EMIT videoFinished();

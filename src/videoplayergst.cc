@@ -8,6 +8,8 @@
 #include <QGst/Bus>
 #include <QGst/Message>
 #include <QGst/StreamVolume>
+#include <glib.h>
+#include <gst/gstversion.h>
 #include <SDL_rwops.h>
 
 #include "hmainwindow.h"
@@ -45,7 +47,13 @@ bool
 VideoPlayer::loadVideo(FILE* src, long len, bool loop)
 {
     if (not d->fPipeline) {
-        d->fPipeline = QGst::ElementFactory::make("playbin2").dynamicCast<QGst::Pipeline>();
+        const char* playbinName =
+#if GST_CHECK_VERSION(1, 0, 0)
+                "playbin";
+#else
+                "playbin2";
+#endif
+        d->fPipeline = QGst::ElementFactory::make(playbinName).dynamicCast<QGst::Pipeline>();
         if (not d->fPipeline) {
             hMainWin->errorMsgObj()->showMessage(tr("Unable to play video. You are "
                                                     "probably missing the GStreamer plugins "

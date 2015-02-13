@@ -13,11 +13,19 @@ PKGCONFIG += SDL_mixer
     contains(QT_MAJOR_VERSION, 4) {
         DEFINES += VIDEO_GSTREAMER
 
-        PKGCONFIG += \
-            QtGStreamer-0.10 \
-            QtGStreamerUi-0.10 \
-            QtGStreamerUtils-0.10 \
-            gstreamer-video-0.10
+        gstreamer-0.10 {
+            PKGCONFIG += \
+                QtGStreamer-0.10 \
+                QtGStreamerUi-0.10 \
+                QtGStreamerUtils-0.10 \
+                gstreamer-video-0.10
+        } else {
+            PKGCONFIG += \
+                QtGStreamer-1.0 \
+                QtGStreamerUi-1.0 \
+                QtGStreamerUtils-1.0 \
+                gstreamer-video-1.0
+        }
 
         HEADERS += \
             src/videoplayergst_p.h \
