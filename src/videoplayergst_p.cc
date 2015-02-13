@@ -9,6 +9,10 @@
 #include <gst/gstversion.h>
 #include <gst/video/video.h>
 
+#if GST_CHECK_VERSION(1, 0, 0)
+#include <QGst/VideoOverlay>
+#endif
+
 #include "rwopsappsrc.h"
 #include "hmainwindow.h"
 
@@ -122,8 +126,12 @@ VideoPlayer_priv::fOnBusMessage(const QGst::MessagePtr& message)
 void
 VideoPlayer_priv::fOnVideoSinkChange(const QGst::MessagePtr& msg)
 {
-    if (msg->type() == QGst::MessageElement
-        and msg->internalStructure()->name() == QLatin1String("prepare-xwindow-id"))
+    if (msg->type() == QGst::MessageElement and
+#if GST_CHECK_VERSION(1, 0, 0)
+        QGst::VideoOverlay::isPrepareWindowHandleMessage(msg))
+#else
+        msg->internalStructure()->name() == QLatin1String("prepare-xwindow-id"))
+#endif
     {
         this->videoSink()->setProperty("force-aspect-ratio", true);
         QGst::ElementPtr sink = fPipeline->property("video-sink").get<QGst::ElementPtr>();
