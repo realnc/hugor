@@ -8,6 +8,7 @@
 #include <QGst/Bus>
 #include <QGst/Message>
 #include <QGst/StreamVolume>
+#include <QGst/Event>
 #include <glib.h>
 #include <gst/gstversion.h>
 #include <SDL_rwops.h>
@@ -93,6 +94,15 @@ VideoPlayer::play()
 {
     this->d->setMaximumSize(this->maximumSize());
     if (d->fPipeline) {
+        if (this->fLooping) {
+            QGst::SeekEventPtr seekEv = QGst::SeekEvent::create(1.0, QGst::FormatTime,
+                                                                QGst::SeekFlagSegment | QGst::SeekFlagFlush,
+                                                                QGst::SeekTypeSet, 0,
+                                                                QGst::SeekTypeNone, -1);
+            d->fPipeline->setState(QGst::StatePaused);
+            d->fPipeline->getState(0, 0, -1);
+            d->fPipeline->sendEvent(seekEv);
+        }
         d->fPipeline->setState(QGst::StatePlaying);
     }
 }

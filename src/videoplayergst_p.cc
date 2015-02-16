@@ -5,6 +5,7 @@
 #include <QGst/Message>
 #include <QGlib/Error>
 #include <QGst/Pad>
+#include <QGst/Event>
 #include <glib.h>
 #include <gst/gstversion.h>
 #include <gst/video/video.h>
@@ -97,15 +98,18 @@ VideoPlayer_priv::fOnBusMessage(const QGst::MessagePtr& message)
             break;
         }
 
+        case QGst::MessageSegmentDone: {
+            QGst::SeekEventPtr seekEv = QGst::SeekEvent::create(1.0, QGst::FormatTime,
+                                                                QGst::SeekFlagSegment,
+                                                                QGst::SeekTypeSet, 0,
+                                                                QGst::SeekTypeNone, -1);
+            fPipeline->sendEvent(seekEv);
+            break;
+        }
+
         case QGst::MessageEos:
-            if (q->fLooping) {
-                fPipeline->setState(QGst::StateNull);
-                fPipeline->seek(QGst::FormatTime, QGst::SeekFlagNone, 0);
-                fPipeline->setState(QGst::StatePlaying);
-            } else {
-                q->stop();
-                Q_EMIT videoFinished();
-            }
+            q->stop();
+            Q_EMIT videoFinished();
             break;
 
         case QGst::MessageError: {
