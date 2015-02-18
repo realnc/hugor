@@ -4,27 +4,25 @@ distribution's package manager:
 
   * Qt 4 GUI
   * SDL
-  * QtGStreamer
-
-To get QtGStreamer, you will have to install the following packages:
-(those are for Ubuntu, but other distros should have similar names)
-
-  libqtgstreamerui-0.10-0
-  libqtgstreamerutils-0.10-0
+  * GStreamer
 
 If you're using Ubuntu 11.10 or newer, or have KDE 4 installed, you have Qt 4
 already installed.  If not, the package is usually called something like
-"libqt4" or "libqt4-gui".  Most of the time you will not need to install this
-explicitly, as installing QtGStreamer should have pulled Qt 4 along with it
-as a dependency.
+"libqt4" or "libqt4-gui".
 
 The SDL package is most likely called "libsdl", "libsdl1.2" or
 "libsdl1.2debian".  If you have a system where you compiled SDL yourself,
 make sure that it was built with audio and timers support.
 
 Also make sure you have a gstreamer video plugin that can play MPEG and AVI
-videos.  Your best bet would be to make sure the ffmpeg GStreamer plugin is
-installed, along with gstreamer-plugins-base.  On Ubuntu, that would be:
+videos.  Your best bet would be to make sure the ffmpeg or libav GStreamer
+plugin is installed, along with gstreamer-plugins-base.  On Ubuntu, that would
+be:
+
+  gstreamer1.0-libav
+  gstreamer1.0-plugins-base
+
+If you're on older version that still uses GStreamer 0.10 instead of 1.x, then:
 
   gstreamer0.10-ffmpeg
   gstreamer0.10-plugins-base

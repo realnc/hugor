@@ -35,7 +35,7 @@ MOD and MP3 music, SDL_mixer needs to have been built with modplug and
 libmad support.
 
 
-For video support, you will also need QtGStreamer.  Either 0.10.x or 1.x
+For video support, you will also need GStreamer.  Either 0.10.x or 1.x
 will work.  By default, 1.x is assumed.  You can choose 0.10 instead if
 your system doesn't yet provide the newer gstreamer libraries; see below
 on how to do that.
@@ -51,7 +51,7 @@ system in order to utilize all of them for a faster compilation process.
 (If you are not using GNU Make, then the -j option might not be supported.
 If that's the case, simply omit that option altogether.)
 
-If you want to build against QtGStreamer 0.10 instead of 1.x, call qmake
+If you want to build against GStreamer 0.10 instead of 1.x, call qmake
 with:
 
   qmake CONFIG+=gstreamer-0.10
