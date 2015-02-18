@@ -1,31 +1,38 @@
 #ifndef VIDEOPLAYERGST_P
 #define VIDEOPLAYERGST_P
 
-#include <QGst/Ui/VideoWidget>
-#include <QGst/Pipeline>
+#include <QWidget>
+#include <gst/gstelement.h>
+#include <gst/gstpipeline.h>
+#include <gst/app/gstappsrc.h>
+#include <cstring>
 
 
-class VideoPlayer_priv: public QGst::Ui::VideoWidget {
+class VideoPlayer_priv: public QWidget {
     Q_OBJECT
 
 public:
     VideoPlayer_priv(QWidget *parent, class VideoPlayer* qPtr)
-        : QGst::Ui::VideoWidget(parent),
+        : QWidget(parent),
           q(qPtr),
+          fPipeline(0),
           fAppSrc(0)
-    { }
+    {
+        memset(&fAppSrcCbs, 0, sizeof(fAppSrcCbs));
+    }
 
     class VideoPlayer* q;
-    QGst::PipelinePtr fPipeline;
-    class RwopsApplicationSource* fAppSrc;
-
-    void fSetupSource(QGst::ElementPtr source);
-    void fOnBusMessage(const QGst::MessagePtr& message);
-    void fOnVideoSinkChange(const QGst::MessagePtr& msg);
+    GstElement* fPipeline;
+    GstAppSrc* fAppSrc;
+    GstAppSrcCallbacks fAppSrcCbs;
 
 signals:
     void videoFinished();
     void errorOccurred();
+
+public:
+    static void cbOnSourceSetup(GstPipeline*, GstAppSrc* source, VideoPlayer_priv* d);
+    static void cbOnBusMessage(GstBus*, GstMessage* message, VideoPlayer_priv* d);
 };
 
 

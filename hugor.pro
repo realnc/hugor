@@ -15,26 +15,21 @@ PKGCONFIG += SDL_mixer
 
         gstreamer-0.10 {
             PKGCONFIG += \
-                QtGStreamer-0.10 \
-                QtGStreamerUi-0.10 \
-                QtGStreamerUtils-0.10 \
-                gstreamer-video-0.10
+                gstreamer-interfaces-0.10 \
+                gstreamer-video-0.10 \
+                gstreamer-app-0.10
         } else {
             PKGCONFIG += \
-                QtGStreamer-1.0 \
-                QtGStreamerUi-1.0 \
-                QtGStreamerUtils-1.0 \
-                gstreamer-video-1.0
+                gstreamer-video-1.0 \
+                gstreamer-app-1.0
         }
 
         HEADERS += \
-            src/videoplayergst_p.h \
-            src/rwopsappsrc.h
+            src/videoplayergst_p.h
 
         SOURCES += \
             src/videoplayergst.cc \
-            src/videoplayergst_p.cc \
-            src/rwopsappsrc.cc
+            src/videoplayergst_p.cc
     } else {
         DEFINES += VIDEO_QT5
 

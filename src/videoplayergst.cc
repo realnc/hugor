@@ -3,19 +3,22 @@
 
 #include <QResizeEvent>
 #include <QErrorMessage>
-#include <QGlib/Connect>
-#include <QGst/ElementFactory>
-#include <QGst/Bus>
-#include <QGst/Message>
-#include <QGst/StreamVolume>
-#include <QGst/Event>
+#include <QDebug>
 #include <glib.h>
 #include <gst/gstversion.h>
+#include <gst/gstelement.h>
+#include <gst/gstpipeline.h>
+#if GST_CHECK_VERSION(1, 0, 0)
+#include <gst/video/videooverlay.h>
+#else
+#include <gst/interfaces/xoverlay.h>
+#endif
+#include <gst/video/video.h>
 #include <SDL_rwops.h>
 
+#include "happlication.h"
 #include "hmainwindow.h"
 #include "rwopsbundle.h"
-#include "rwopsappsrc.h"
 
 
 VideoPlayer::VideoPlayer(QWidget *parent)
@@ -23,6 +26,8 @@ VideoPlayer::VideoPlayer(QWidget *parent)
       fRwops(0)
 {
     this->d = new VideoPlayer_priv(this, this);
+    d->winId(); // Enforce a native window handle for gstreamer.
+    d->setUpdatesEnabled(false); // Don't fight with gstreamer over updates.
     connect(d, SIGNAL(videoFinished()), SIGNAL(videoFinished()));
     connect(d, SIGNAL(errorOccurred()), SIGNAL(errorOccurred()));
     // So that the mouse cursor can be made visible again when moving the mouse.
@@ -34,14 +39,53 @@ VideoPlayer::VideoPlayer(QWidget *parent)
 VideoPlayer::~VideoPlayer()
 {
     if (d->fPipeline) {
-        d->fPipeline->setState(QGst::StateNull);
-        d->fPipeline->bus()->disableSyncMessageEmission();
-        d->stopPipelineWatch();
+        GstBus* bus = gst_pipeline_get_bus((GstPipeline*)d->fPipeline);
+        gst_bus_remove_signal_watch(bus);
+#if !GST_CHECK_VERSION(1, 0, 0)
+        gst_bus_disable_sync_message_emission(bus);
+#endif
+        gst_element_set_state(d->fPipeline, GST_STATE_NULL);
+        gst_object_unref(bus);
+        gst_object_unref(d->fPipeline);
     }
     if (fRwops) {
         SDL_RWclose(fRwops);
     }
 }
+
+
+extern "C" {
+
+#if not GST_CHECK_VERSION(1, 0, 0)
+static void
+cbSyncMessage(GstBus*, GstMessage* message, gpointer userData)
+{
+    if (GST_MESSAGE_TYPE(message) == GST_MESSAGE_ELEMENT
+        and gst_structure_has_name(message->structure, "prepare-xwindow-id"))
+    {
+         GstElement* sink = GST_ELEMENT(GST_MESSAGE_SRC(message));
+         gst_x_overlay_set_window_handle(GST_X_OVERLAY(GST_MESSAGE_SRC(message)),
+                                         static_cast<QWidget*>(userData)->winId());
+         g_object_set(sink, "force-aspect-ratio", true, NULL);
+     }
+}
+#endif
+
+
+static void
+cbOnBusMessage(GstBus* bus, GstMessage* message, gpointer d)
+{
+    VideoPlayer_priv::cbOnBusMessage(bus, message, static_cast<VideoPlayer_priv*>(d));
+}
+
+
+static void
+cbOnSourceSetup(GstPipeline* playbin, GstAppSrc* source, gpointer d)
+{
+    static_cast<VideoPlayer_priv*>(d)->cbOnSourceSetup(playbin, source, static_cast<VideoPlayer_priv*>(d));
+}
+
+} // extern "C"
 
 
 bool
@@ -54,24 +98,31 @@ VideoPlayer::loadVideo(FILE* src, long len, bool loop)
 #else
                 "playbin2";
 #endif
-        d->fPipeline = QGst::ElementFactory::make(playbinName).dynamicCast<QGst::Pipeline>();
+        d->fPipeline = gst_element_factory_make(playbinName, 0);
         if (not d->fPipeline) {
             hMainWin->errorMsgObj()->showMessage(tr("Unable to play video. You are "
                                                     "probably missing the GStreamer plugins "
                                                     "from the \"gst-plugins-base\" set."));
             return false;
         }
-        // Let the video widget watch the pipeline for new video sinks. This
-        // makes sure that our superclass will set up the video sink correctly.
-        d->watchPipeline(d->fPipeline);
-        QGst::BusPtr bus = d->fPipeline->bus();
+
+        GstBus* bus = gst_pipeline_get_bus(GST_PIPELINE(d->fPipeline));
         // We need to be informed when the playback state changes.
-        bus->addSignalWatch();
-        QGlib::connect(bus, "message", d, &VideoPlayer_priv::fOnBusMessage);
-        // We need to be informed when a video sink is added.
-        bus->enableSyncMessageEmission();
-        QGlib::connect(bus, "sync-message", d, &VideoPlayer_priv::fOnVideoSinkChange);
-        QGlib::connect(d->fPipeline, "source-setup", d, &VideoPlayer_priv::fSetupSource);
+        gst_bus_add_signal_watch(bus);
+        g_signal_connect(bus, "message", G_CALLBACK(cbOnBusMessage), d);
+#if GST_CHECK_VERSION(1, 0, 0)
+        // With gst 1.x, we can configure aspect ratio and set the window ID
+        // directly on playbin.
+        g_object_set(d->fPipeline, "force-aspect-ratio", true, NULL);
+        gst_video_overlay_set_window_handle(GST_VIDEO_OVERLAY(d->fPipeline), (guintptr)d->winId());
+#else
+        // With gst 0.10, we need to be informed when a video sink is added
+        // so we can configure it later.
+        gst_bus_enable_sync_message_emission(bus);
+        g_signal_connect(bus, "sync-message", G_CALLBACK(cbSyncMessage), d);
+#endif
+        g_signal_connect(d->fPipeline, "source-setup", G_CALLBACK(cbOnSourceSetup), d);
+        gst_object_unref(bus);
     }
     if (fRwops) {
         SDL_RWclose(fRwops);
@@ -84,7 +135,7 @@ VideoPlayer::loadVideo(FILE* src, long len, bool loop)
     }
     fDataLen = len;
     fLooping = loop;
-    d->fPipeline->setProperty("uri", "appsrc://");
+    g_object_set(G_OBJECT(d->fPipeline), "uri", "appsrc://", NULL);
     return true;
 }
 
@@ -92,18 +143,25 @@ VideoPlayer::loadVideo(FILE* src, long len, bool loop)
 void
 VideoPlayer::play()
 {
+    if (d->fPipeline == 0) {
+        return;
+    }
+
     this->d->setMaximumSize(this->maximumSize());
-    if (d->fPipeline) {
-        if (this->fLooping) {
-            QGst::SeekEventPtr seekEv = QGst::SeekEvent::create(1.0, QGst::FormatTime,
-                                                                QGst::SeekFlagSegment | QGst::SeekFlagFlush,
-                                                                QGst::SeekTypeSet, 0,
-                                                                QGst::SeekTypeNone, -1);
-            d->fPipeline->setState(QGst::StatePaused);
-            d->fPipeline->getState(0, 0, -1);
-            d->fPipeline->sendEvent(seekEv);
+    gst_element_set_state(d->fPipeline, GST_STATE_PLAYING);
+    hApp->advanceEventLoop();
+    if (this->fLooping) {
+        // Wait for the pipeline to transition into the playing state.
+        gst_element_get_state(d->fPipeline, 0, 0, GST_CLOCK_TIME_NONE);
+        // Seek to the end the first time so that there's no pause before
+        // the first segment message arrives.
+        if (not gst_element_seek(d->fPipeline, 1.0, GST_FORMAT_TIME,
+                                 (GstSeekFlags)((int)GST_SEEK_FLAG_FLUSH | (int)GST_SEEK_FLAG_SEGMENT),
+                                 GST_SEEK_TYPE_END, 0, GST_SEEK_TYPE_NONE, GST_CLOCK_TIME_NONE))
+        {
+            qWarning() << "Sending initial video seek event failed.";
+            stop();
         }
-        d->fPipeline->setState(QGst::StatePlaying);
     }
 }
 
@@ -112,7 +170,7 @@ void
 VideoPlayer::stop()
 {
     if (d->fPipeline) {
-        d->fPipeline->setState(QGst::StateNull);
+        gst_element_set_state(d->fPipeline, GST_STATE_NULL);
         emit videoFinished();
     }
 }
@@ -124,15 +182,12 @@ VideoPlayer::setVolume(int vol)
     if (not d->fPipeline) {
         return;
     }
-    QGst::StreamVolumePtr svp = d->fPipeline.dynamicCast<QGst::StreamVolume>();
-    if (svp) {
-        if (vol < 0) {
-            vol = 0;
-        } else if (vol > 100) {
-            vol = 100;
-        }
-        svp->setVolume((double)vol / 100.0, QGst::StreamVolumeFormatLinear);
+    if (vol < 0) {
+        vol = 0;
+    } else if (vol > 100) {
+        vol = 100;
     }
+    g_object_set(d->fPipeline, "volume", (gdouble)vol / 100.0, NULL);
 }
 
 

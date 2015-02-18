@@ -6,8 +6,7 @@
 #include <cstdlib>
 
 #ifdef VIDEO_GSTREAMER
-    #include <QGst/Init>
-    #include <QGlib/Error>
+    #include <gst/gst.h>
 #endif
 
 extern "C" {
@@ -49,12 +48,10 @@ int main( int argc, char* argv[] )
 #ifdef VIDEO_GSTREAMER
     QString gstErr;
     bool gstException = false;
-    try {
-        QGst::init(&argc, &argv);
-    } catch (const QGlib::Error& e) {
-        gstErr = e.message();
-        gstException = true;
-    }
+    gst_init(&argc, &argv);
+    // TODO: use gst_init_check()
+//    gstErr = e.message();
+//    gstException = true;
 #endif
 
     HApplication* app = new HApplication(argc, argv, "Hugor", HUGOR_VERSION,
