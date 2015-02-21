@@ -937,7 +937,6 @@ hugo_stopvideo( void )
 {
     if (vidPlayer) {
         vidPlayer->stop();
-        vidPlayer->hide();
     }
 }
 
@@ -969,7 +968,6 @@ hugo_playvideo( HUGO_FILE infile, long len, char loop, char bg, int vol )
         QObject::connect(hApp, SIGNAL(gameQuitting()), &idleLoop, SLOT(quit()));
         vidPlayer->play();
         idleLoop.exec();
-        vidPlayer->hide();
     } else {
         vidPlayer->play();
     }

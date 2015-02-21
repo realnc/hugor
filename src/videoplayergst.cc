@@ -39,13 +39,12 @@ VideoPlayer::VideoPlayer(QWidget *parent)
 VideoPlayer::~VideoPlayer()
 {
     if (d->fPipeline) {
-        GstBus* bus = gst_pipeline_get_bus((GstPipeline*)d->fPipeline);
-        gst_bus_remove_signal_watch(bus);
-#if !GST_CHECK_VERSION(1, 0, 0)
-        gst_bus_disable_sync_message_emission(bus);
+        gst_bus_remove_signal_watch(d->fBus);
+#if not GST_CHECK_VERSION(1, 0, 0)
+        gst_bus_disable_sync_message_emission(d->fBus);
 #endif
         gst_element_set_state(d->fPipeline, GST_STATE_NULL);
-        gst_object_unref(bus);
+        gst_object_unref(d->fBus);
         gst_object_unref(d->fPipeline);
     }
     if (fRwops) {
@@ -65,7 +64,7 @@ cbSyncMessage(GstBus*, GstMessage* message, gpointer userData)
     {
          GstElement* sink = GST_ELEMENT(GST_MESSAGE_SRC(message));
          gst_x_overlay_set_window_handle(GST_X_OVERLAY(GST_MESSAGE_SRC(message)),
-                                         static_cast<QWidget*>(userData)->winId());
+                                         (guintptr)static_cast<QWidget*>(userData)->winId());
          g_object_set(sink, "force-aspect-ratio", true, NULL);
      }
 }
@@ -73,16 +72,16 @@ cbSyncMessage(GstBus*, GstMessage* message, gpointer userData)
 
 
 static void
-cbOnBusMessage(GstBus* bus, GstMessage* message, gpointer d)
+cbOnBusMessage(GstBus*, GstMessage* message, gpointer d)
 {
-    VideoPlayer_priv::cbOnBusMessage(bus, message, static_cast<VideoPlayer_priv*>(d));
+    VideoPlayer_priv::cbOnBusMessage(message, static_cast<VideoPlayer_priv*>(d));
 }
 
 
 static void
-cbOnSourceSetup(GstPipeline* playbin, GstAppSrc* source, gpointer d)
+cbOnSourceSetup(GstPipeline*, GstAppSrc* source, gpointer d)
 {
-    static_cast<VideoPlayer_priv*>(d)->cbOnSourceSetup(playbin, source, static_cast<VideoPlayer_priv*>(d));
+    static_cast<VideoPlayer_priv*>(d)->cbOnSourceSetup(source, static_cast<VideoPlayer_priv*>(d));
 }
 
 } // extern "C"
@@ -106,10 +105,10 @@ VideoPlayer::loadVideo(FILE* src, long len, bool loop)
             return false;
         }
 
-        GstBus* bus = gst_pipeline_get_bus(GST_PIPELINE(d->fPipeline));
+        d->fBus = gst_pipeline_get_bus(GST_PIPELINE(d->fPipeline));
         // We need to be informed when the playback state changes.
-        gst_bus_add_signal_watch(bus);
-        g_signal_connect(bus, "message", G_CALLBACK(cbOnBusMessage), d);
+        gst_bus_add_signal_watch(d->fBus);
+        g_signal_connect(d->fBus, "message", G_CALLBACK(cbOnBusMessage), d);
 #if GST_CHECK_VERSION(1, 0, 0)
         // With gst 1.x, we can configure aspect ratio and set the window ID
         // directly on playbin.
@@ -118,11 +117,10 @@ VideoPlayer::loadVideo(FILE* src, long len, bool loop)
 #else
         // With gst 0.10, we need to be informed when a video sink is added
         // so we can configure it later.
-        gst_bus_enable_sync_message_emission(bus);
-        g_signal_connect(bus, "sync-message", G_CALLBACK(cbSyncMessage), d);
+        gst_bus_enable_sync_message_emission(d->fBus);
+        g_signal_connect(d->fBus, "sync-message", G_CALLBACK(cbSyncMessage), d);
 #endif
         g_signal_connect(d->fPipeline, "source-setup", G_CALLBACK(cbOnSourceSetup), d);
-        gst_object_unref(bus);
     }
     if (fRwops) {
         SDL_RWclose(fRwops);
@@ -172,6 +170,7 @@ VideoPlayer::stop()
     if (d->fPipeline) {
         gst_element_set_state(d->fPipeline, GST_STATE_NULL);
         emit videoFinished();
+        hide();
     }
 }
 
