@@ -198,6 +198,9 @@ Settings::loadFromDisk( SettingsOverrides* ovr )
     // Apply overrides for non-existent settings.
     if (ovr) {
         sett.beginGroup(SETT_GEOMETRY_GRP);
+        if (not sett.contains(SETT_FULLSCREEN)) {
+            this->isFullscreen = ovr->fullscreen;
+        }
         if (not sett.contains(SETT_FULLSCREEN_WIDTH)) {
             this->fullscreenWidth = ovr->fullscreenWidth;
         }
@@ -207,13 +210,13 @@ Settings::loadFromDisk( SettingsOverrides* ovr )
         sett.endGroup();
 
         sett.beginGroup(SETT_FONTS_GRP);
-        if (not sett.contains(SETT_MAIN_FONT)) {
+        if (not sett.contains(SETT_MAIN_FONT) and ovr->propFontSize > 0) {
             this->propFont.setPointSize(ovr->propFontSize);
         }
-        if (not sett.contains(SETT_FIXED_FONT)) {
+        if (not sett.contains(SETT_FIXED_FONT) and ovr->fixedFontSize > 0) {
             this->fixedFont.setPointSize(ovr->fixedFontSize);
         }
-        if (not sett.contains(SETT_SCROLLBACK_FONT)) {
+        if (not sett.contains(SETT_SCROLLBACK_FONT) and ovr->scrollbackFontSize > 0) {
             this->scrollbackFont.setPointSize(ovr->scrollbackFontSize);
         }
         sett.endGroup();

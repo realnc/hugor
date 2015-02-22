@@ -126,9 +126,6 @@ HApplication::HApplication( int& argc, char* argv[], const char* appName,
 
     // Restore the application's size.
     this->fMainWin->resize(this->fSettings->appSize);
-    if (settOvr and settOvr->fullscreen) {
-        fSettings->isFullscreen = true;
-    }
 
     // Set application window icon, unless we're on OS X where the bundle
     // icon is used.
