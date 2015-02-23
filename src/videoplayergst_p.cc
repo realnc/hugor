@@ -84,6 +84,9 @@ cbAppsrcNeedData(GstAppSrc* src, guint length, gpointer userData)
 #endif
 
     long cnt = SDL_RWread(rwops, data, 1, length);
+#if GST_CHECK_VERSION(1, 0, 0)
+    gst_buffer_unmap(buffer, &mapInf);
+#endif
     gst_app_src_push_buffer(src, buffer);
     // Indicate EOS if there's no more data to be had from the RWops.
     if (cnt < length) {
@@ -213,7 +216,4 @@ VideoPlayer_priv::cbOnBusMessage(GstMessage* message, VideoPlayer_priv* d)
         default:
             break;
     }
-    // TODO: is this needed?
-    //gst_object_unref(bus);
-    //gst_message_unref(message);
 }
