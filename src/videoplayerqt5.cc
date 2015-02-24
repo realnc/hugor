@@ -35,10 +35,8 @@ VideoPlayer::VideoPlayer(QWidget *parent)
 
     connect(d->fMediaPlayer, SIGNAL(mediaStatusChanged(QMediaPlayer::MediaStatus)),
             d, SLOT(onStatusChange(QMediaPlayer::MediaStatus)));
-    connect(d, SIGNAL(videoFinished()), SIGNAL(videoFinished()));
     connect(d->fMediaPlayer, SIGNAL(error(QMediaPlayer::Error)),
             d, SLOT(onError(QMediaPlayer::Error)));
-    connect(d, SIGNAL(errorOccurred()), SIGNAL(errorOccurred()));
 }
 
 

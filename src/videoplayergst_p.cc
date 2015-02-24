@@ -198,7 +198,6 @@ VideoPlayer_priv::cbOnBusMessage(GstMessage* message, VideoPlayer_priv* d)
 
         case GST_MESSAGE_EOS:
             QMetaObject::invokeMethod(d->q, "stop", conType);
-            emit d->videoFinished();
             break;
 
         case GST_MESSAGE_ERROR: {
@@ -209,7 +208,7 @@ VideoPlayer_priv::cbOnBusMessage(GstMessage* message, VideoPlayer_priv* d)
             QMetaObject::invokeMethod(hMainWin->errorMsgObj(), "showMessage", Q_ARG(QString, errorStr));
             QMetaObject::invokeMethod(d->q, "stop", conType);
             g_error_free(gErr);
-            emit d->errorOccurred();
+            emit d->q->errorOccurred();
             break;
         }
 

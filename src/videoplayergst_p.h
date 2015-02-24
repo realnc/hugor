@@ -23,10 +23,6 @@ public:
     static void cbOnSourceSetup(GstAppSrc* source, VideoPlayer_priv* d);
     static void cbOnBusMessage(GstMessage* message, VideoPlayer_priv* d);
 
-signals:
-    void videoFinished();
-    void errorOccurred();
-
 public slots:
     void adjustForVideoSize(QSize vidSize);
 };

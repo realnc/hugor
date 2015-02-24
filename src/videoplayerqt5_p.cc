@@ -15,7 +15,7 @@ VideoPlayer_priv::onStatusChange(QMediaPlayer::MediaStatus status)
     if (q->fLooping) {
         q->play();
     } else {
-        emit videoFinished();
+        emit q->videoFinished();
     }
 }
 
@@ -34,5 +34,5 @@ VideoPlayer_priv::onError(QMediaPlayer::Error error)
         msg += ", but I don't know what went wrong.";
     }
     hMainWin->errorMsgObj()->showMessage(msg);
-    emit errorOccurred();
+    emit q->errorOccurred();
 }

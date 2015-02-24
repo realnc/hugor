@@ -21,10 +21,6 @@ public:
     class QVideoWidget* fVideoWidget;
     class RwopsQIODevice* fIODev;
 
-signals:
-    void videoFinished();
-    void errorOccurred();
-
 public slots:
     void onStatusChange(QMediaPlayer::MediaStatus status);
     void onError(QMediaPlayer::Error error);

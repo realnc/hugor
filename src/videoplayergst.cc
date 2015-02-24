@@ -28,8 +28,6 @@ VideoPlayer::VideoPlayer(QWidget *parent)
     this->d = new VideoPlayer_priv(this, this);
     d->winId(); // Enforce a native window handle for gstreamer.
     d->setUpdatesEnabled(false); // Don't fight with gstreamer over updates.
-    connect(d, SIGNAL(videoFinished()), SIGNAL(videoFinished()));
-    connect(d, SIGNAL(errorOccurred()), SIGNAL(errorOccurred()));
     // So that the mouse cursor can be made visible again when moving the mouse.
     this->setMouseTracking(true);
     d->setMouseTracking(true);
