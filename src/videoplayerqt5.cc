@@ -13,6 +13,13 @@
 #include "hmainwindow.h"
 
 
+void initVideoEngine(int, char*[])
+{ }
+
+void closeVideoEngine()
+{ }
+
+
 VideoPlayer::VideoPlayer(QWidget *parent)
     : QWidget(parent),
       fRwops(0)

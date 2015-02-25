@@ -5,10 +5,6 @@
 #include <QMessageBox>
 #include <cstdlib>
 
-#ifdef VIDEO_GSTREAMER
-    #include <gst/gst.h>
-#endif
-
 extern "C" {
 #include "heheader.h"
 }
@@ -44,30 +40,12 @@ extern "C" {
 int main( int argc, char* argv[] )
 {
     initSoundEngine();
-
-#ifdef VIDEO_GSTREAMER
-    QString gstErr;
-    bool gstException = false;
-    gst_init(&argc, &argv);
-    // TODO: use gst_init_check()
-//    gstErr = e.message();
-//    gstException = true;
+#ifndef DISABLE_VIDEO
+    initVideoEngine(argc, argv);
 #endif
 
     HApplication* app = new HApplication(argc, argv, "Hugor", HUGOR_VERSION,
                                          "Nikos Chantziaras", "");
-
-#ifdef VIDEO_GSTREAMER
-    if (gstException) {
-        QString errMsg(QObject::tr("Unable to use GStreamer. Video support will be "
-                                   "disabled."));
-        if (not gstErr.isEmpty()) {
-            errMsg += QObject::tr("The GStreamer error was: ") + gstErr;
-        }
-        QMessageBox::critical(0, app->applicationName(), errMsg);
-        app->settings()->videoSysError = true;
-    }
-#endif
 
     // Filename of the game to run.
     QString gameFileName;
@@ -99,6 +77,9 @@ int main( int argc, char* argv[] )
     QMetaObject::invokeMethod(app, "entryPoint", Qt::QueuedConnection, Q_ARG(QString, gameFileName));
     ret = app->exec();
     delete app;
+#ifndef DISABLE_VIDEO
+    closeVideoEngine();
+#endif
     closeSoundEngine();
     return ret;
 }

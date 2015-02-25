@@ -10,7 +10,20 @@ RC_FILE += hugor.rc
 PKGCONFIG += SDL_mixer
 
 !disable-video {
-    contains(QT_MAJOR_VERSION, 4) {
+    qt5-video {
+        DEFINES += VIDEO_QT5
+
+        QT += multimediawidgets
+
+        HEADERS += \
+            src/videoplayerqt5_p.h \
+            src/rwopsqiodev.h
+
+        SOURCES += \
+            src/videoplayerqt5.cc \
+            src/videoplayerqt5_p.cc \
+            src/rwopsqiodev.cc
+    } else {
         DEFINES += VIDEO_GSTREAMER
 
         gstreamer-0.10 {
@@ -28,21 +41,9 @@ PKGCONFIG += SDL_mixer
             src/videoplayergst_p.h
 
         SOURCES += \
+            src/gstinit.cc \
             src/videoplayergst.cc \
             src/videoplayergst_p.cc
-    } else {
-        DEFINES += VIDEO_QT5
-
-        QT += multimediawidgets
-
-        HEADERS += \
-            src/videoplayerqt5_p.h \
-            src/rwopsqiodev.h
-
-        SOURCES += \
-            src/videoplayerqt5.cc \
-            src/videoplayerqt5_p.cc \
-            src/rwopsqiodev.cc
     }
 } else {
     DEFINES += DISABLE_VIDEO
@@ -70,7 +71,14 @@ macx {
 win32 {
     TARGET = Hugor
     !disable-video {
-        QTPLUGIN += dsengine
+        gstreamer-0.10 {
+            error("GStreamer 0.10 is not supported on Windows. You need GStreamer 1.x.")
+        }
+        qt5-video {
+            QTPLUGIN += dsengine
+        } else {
+            include(gstreamer-static.pri)
+        }
     }
 
     *-g++* {
