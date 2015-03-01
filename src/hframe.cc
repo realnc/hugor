@@ -223,6 +223,10 @@ HFrame::keyPressEvent( QKeyEvent* e )
         return;
     }
 
+    if (e->key() == Qt::Key_Escape) {
+        emit escKeyPressed();
+    }
+
     if (this->fInputMode == NoInput) {
         this->singleKeyPressEvent(e);
         return;

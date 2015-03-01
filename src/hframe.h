@@ -161,6 +161,9 @@ class HFrame: public QWidget {
     // Emitted when scrolling or paging up.
     void requestScrollback();
 
+    // Emitted when the escape key is pressed on the keyboard.
+    void escKeyPressed();
+
   public:
     HFrame( QWidget* parent );
 
