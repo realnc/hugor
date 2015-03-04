@@ -13,6 +13,8 @@ Git - 2015-02-08
   - The scrollback now ignores main window word wrapping and does its own word
     wrapping.
 
+  - The scrollback font is now configurable.
+
   - Scriptfile output can now be word-wrapped. The text width to use when
     wrapping is configurable through a new configuration option.
 
@@ -21,9 +23,10 @@ Git - 2015-02-08
 
   - Fullscreen mode is now restored correctly between sessions.
 
-  - Video is now fully supported in the Linux version of Hugor.  Consult the
-    README for details about the GStreamer packages/plugins Hugor now depends
-    on.  When building from source, video support can be disabled with:
+  - Video is now fully supported in the Linux and Windows versions of Hugor.
+    Consult the README for details about the GStreamer packages/plugins Hugor
+    now depends on.  When building from source, video support can be disabled
+    with:
 
       CONFIG+=disable-video
 

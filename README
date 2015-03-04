@@ -7,10 +7,10 @@ play adventure games created with Kent Tessman’s Hugo authoring system:
   http://www.generalcoffee.com
 
 Hugor supports all graphics, sound and music formats of the Hugo engine.
-Video is fully supported in the Linux version.  In order to be able to
-play videos, you will need the correct GStreamer plugins/codecs installed.
-The gstreamer-libav (GStreamer 1.x) or gstreamer-ffmpeg (GStreamer 0.10)
-plugin should be a safe bet.
+Video is fully supported in the Linux and Windows versions.  In order to
+be able to play videos, you will need the correct GStreamer
+plugins/codecs installed.  The gstreamer-libav (GStreamer 1.x) or
+gstreamer-ffmpeg (GStreamer 0.10) plugin should be a safe bet.
 
 (For runtime library dependencies of the distributed Linux binary, please
 consult the README.linux-bin file.)
@@ -33,7 +33,6 @@ for the Qt library (version 4.4 or later; 4.5 or newer is *highly*
 recommended), SDL_mixer (at least 1.2.12).  To get correct support for
 MOD and MP3 music, SDL_mixer needs to have been built with modplug and
 libmad support.
-
 
 For video support, you will also need GStreamer.  Either 0.10.x or 1.x
 will work.  By default, 1.x is assumed.  You can choose 0.10 instead if
