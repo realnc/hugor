@@ -1,7 +1,7 @@
 PKGCONFIG += \
-    sndfile \
-    cairo-gobject \
-    libmpg123 \
+    #cairo-gobject \
+    pthreads \
+    #libmpg123 \
     gstreamer-riff-1.0 \
     gstreamer-pbutils-1.0 \
     gstreamer-audio-1.0 \
@@ -99,12 +99,12 @@ LIBS += \
     -lgstjpegformat \
     -lgstliveadder \
     -lgstmidi \
-    -lgstmodplug \
+    #-lgstmodplug \
     -lgstmpegpsdemux \
     -lgstmpegpsmux \
     -lgstmpegtsdemux \
     -lgstmpegtsmux \
-    -lgstmpg123 \
+    #-lgstmpg123 \
     -lgstmulaw \
     -lgstmultifile \
     -lgstmultipart \
@@ -124,22 +124,36 @@ LIBS += \
     -lgstshapewipe \
     -lgstsmooth \
     -lgstsmpte \
-    -lgstsndfile \
+    #-lgstsndfile \
     -lgstspeed \
     -lgstsubenc \
     -lgstsubparse \
     -lgsttcp \
     -lgstcutter \
-    -lgstbz2 \
-    -lgstcairo \
+    #-lgstbz2 \
+    #-lgstcairo \
     -lgstcamerabin2 \
     -lgstcoloreffects \
     -lgstcompositor \
-    -lgstogg \
-    -lgstvorbis \
+    #-lgstogg \
+    #-lgstvorbis \
     \
     -lgstrtp-1.0 -lgstbadvideo-1.0 -lgstbadbase-1.0 -lgstcodecparsers-1.0 -lgio-2.0 -lgstnet-1.0 \
     -lgstmpegts-1.0 -lgstsdp-1.0 -lgstrtsp-1.0 -lgstbasecamerabinsrc-1.0 -lgstphotography-1.0 \
     \
-    -lavformat -lavcodec -lavutil -lavresample -lavfilter -lswscale -lavdevice -lksuser -lstrmiids \
-    -ld3d9 -lsetupapi -lbz2 -ldsound -ldxerr9 -ldnsapi -liphlpapi
+    -lavformat \
+    -lavcodec \
+    -lavutil \
+    -lavresample \
+    -lavfilter \
+    -lswscale \
+    -lavdevice \
+    -lksuser \
+    -lstrmiids \
+    -ld3d9 \
+    -lsetupapi \
+    -lbz2 \
+    -ldsound \
+    -ldxerr9 \
+    -ldnsapi \
+    -liphlpapi
