@@ -7,7 +7,11 @@ TARGET = hugor
 ICON = mac_icon.icns
 RC_FILE += hugor.rc
 
-PKGCONFIG += SDL_mixer
+sdl-1.2 {
+    PKGCONFIG += SDL_mixer
+} else {
+    PKGCONFIG += SDL2_mixer
+}
 
 !disable-video {
     qt5-video {
