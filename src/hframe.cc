@@ -439,7 +439,7 @@ HFrame::mousePressEvent( QMouseEvent* e )
 void
 HFrame::mouseDoubleClickEvent( QMouseEvent* e )
 {
-    if (this->fInputMode != NormalInput) {
+    if (this->fInputMode != NormalInput or e->button() != Qt::LeftButton) {
         return;
     }
     // Get the word at the double click position.
