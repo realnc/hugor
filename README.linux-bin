@@ -16,8 +16,8 @@ make sure that it was built with audio and timers support.
 
 Also make sure you have a gstreamer video plugin that can play MPEG and AVI
 videos.  Your best bet would be to make sure the ffmpeg or libav GStreamer
-plugin is installed, along with gstreamer-plugins-base.  On Ubuntu, that would
-be:
+plugin is installed, along with gstreamer-plugins-base and
+gstreamer-plugins-good.  On Ubuntu, that would be:
 
   gstreamer1.0-libav
   gstreamer1.0-plugins-base

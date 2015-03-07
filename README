@@ -12,6 +12,9 @@ be able to play videos, you will need the correct GStreamer
 plugins/codecs installed.  The gstreamer-libav (GStreamer 1.x) or
 gstreamer-ffmpeg (GStreamer 0.10) plugin should be a safe bet.
 
+For audio support, SDL and SDL_mixer are needed.  Both SDL1 as well as
+SDL2 are supported.
+
 (For runtime library dependencies of the distributed Linux binary, please
 consult the README.linux-bin file.)
 
@@ -30,7 +33,8 @@ Compiling from source
 
 If you wish to build from source, you will need the development packages
 for the Qt library (version 4.4 or later; 4.5 or newer is *highly*
-recommended), SDL_mixer (at least 1.2.12).  To get correct support for
+recommended) and SDL_mixer (2.0 or higher is recommended and assumed by
+default, but version 1.2 is also supported).  To get correct support for
 MOD and MP3 music, SDL_mixer needs to have been built with modplug and
 libmad support.
 
@@ -50,14 +54,31 @@ system in order to utilize all of them for a faster compilation process.
 (If you are not using GNU Make, then the -j option might not be supported.
 If that's the case, simply omit that option altogether.)
 
+By default, SDL_mixer 2.0 is used.  To build against SDL 1.2 instead, use:
+
+  qmake CONFIG+=sdl-1.2
+
+To disable audio support completely, use:
+
+  qmake CONFIG+=disable-audio
+
 If you want to build against GStreamer 0.10 instead of 1.x, call qmake
 with:
 
   qmake CONFIG+=gstreamer-0.10
 
+Note that SDL is still needed for video support, even if audio is
+disabled.  SDL2 is assumed, unless you specify CONFIG+=sdl-1.2.
+
 If you want to disable video support:
 
   qmake CONFIG+=disable-video
+
+If you want to specify multiple CONFIG options, don't forget to quote
+them.  For example, to build without audio support but with video support
+and use gstreamer 0.10 and SDL 1.2:
+
+  qmake CONFIG+="disable-audio sdl-1.2 gstreamer-0.10"
 
 If all goes well, you will find an executable in the current directory
 which you can copy somewhere else and run it however you want.
