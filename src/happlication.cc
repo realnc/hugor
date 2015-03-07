@@ -31,7 +31,7 @@ HApplication::HApplication( int& argc, char* argv[], const char* appName,
                             const char* appVersion, const char* orgName,
                             const char* orgDomain )
     : QApplication(argc, argv),
-      fBottomMarginSize(5),
+      fBottomMarginSize(0),
       fGameRunning(false),
       fHugoCodec(QTextCodec::codecForName("Windows-1252")),
       fDesktopIsGnome(false)
