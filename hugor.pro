@@ -7,13 +7,28 @@ TARGET = hugor
 ICON = mac_icon.icns
 RC_FILE += hugor.rc
 
-sdl-1.2 {
-    PKGCONFIG += SDL_mixer
+!disable-audio {
+    sdl-1.2 {
+        PKGCONFIG += SDL_mixer
+    } else {
+        PKGCONFIG += SDL2_mixer
+    }
+    SOURCES += src/soundsdl.cc
+    SOURCES *= src/rwopsbundle.c
 } else {
-    PKGCONFIG += SDL2_mixer
+    DEFINES += DISABLE_AUDIO
+    SOURCES += src/soundnone.cc
 }
 
 !disable-video {
+    # We still need SDL for SDL_RWops, even without audio.
+    disable-audio {
+        sdl-1.2 {
+            PKGCONFIG += sdl
+        } else {
+            PKGCONFIG += sdl2
+        }
+    }
     qt5-video {
         DEFINES += VIDEO_QT5
 
@@ -49,6 +64,7 @@ sdl-1.2 {
             src/videoplayergst.cc \
             src/videoplayergst_p.cc
     }
+    SOURCES *= src/rwopsbundle.c
 } else {
     DEFINES += DISABLE_VIDEO
 }
@@ -156,8 +172,6 @@ SOURCES += \
     src/main.cc \
     src/settings.cc \
     src/settingsoverrides.cc \
-    src/soundsdl.cc \
-    src/rwopsbundle.c \
     \
     hugo/he.c \
     hugo/hebuffer.c \

@@ -34,10 +34,16 @@ ConfDialog::ConfDialog( HMainWindow* parent )
 #else
     ui->allowVideoCheckBox->setChecked(sett->enableVideo);
 #endif
+#ifdef DISABLE_AUDIO
+    ui->allowSoundEffectsCheckBox->setDisabled(true);
+    ui->allowMusicCheckBox->setDisabled(true);
+    ui->muteSoundCheckBox->setDisabled(true);
+#else
     ui->allowSoundEffectsCheckBox->setChecked(sett->enableSoundEffects);
     ui->allowMusicCheckBox->setChecked(sett->enableMusic);
-    ui->smoothScalingCheckBox->setChecked(sett->useSmoothScaling);
     ui->muteSoundCheckBox->setChecked(sett->muteSoundInBackground);
+#endif
+    ui->smoothScalingCheckBox->setChecked(sett->useSmoothScaling);
 
     ui->mainBgColorButton->setColor(sett->mainBgColor);
     ui->mainTextColorButton->setColor(sett->mainTextColor);
