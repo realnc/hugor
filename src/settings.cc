@@ -57,6 +57,8 @@ qtRuntimeVersion()
 #define SETT_MAIN_TXT_COLOR QString::fromLatin1("maintext")
 #define SETT_STATUS_BG_COLOR QString::fromLatin1("bannerbg")
 #define SETT_STATUS_TXT_COLOR QString::fromLatin1("bannertext")
+#define SETT_CUSTOM_FS_MARGIN_COLOR QString::fromLatin1("customFsMarginColor")
+#define SETT_MARGIN_COLOR QString::fromLatin1("fullscreenMargin")
 #define SETT_MAIN_FONT QString::fromLatin1("main")
 #define SETT_FIXED_FONT QString::fromLatin1("fixed")
 #define SETT_SCROLLBACK_FONT QString::fromLatin1("scrollback")
@@ -99,6 +101,8 @@ Settings::loadFromDisk( SettingsOverrides* ovr )
     this->mainTextColor = sett.value(SETT_MAIN_TXT_COLOR, hugoColorToQt(DEF_FCOLOR)).value<QColor>();
     this->statusBgColor = sett.value(SETT_STATUS_BG_COLOR, hugoColorToQt(DEF_SLBGCOLOR)).value<QColor>();
     this->statusTextColor = sett.value(SETT_STATUS_TXT_COLOR, hugoColorToQt(DEF_SLFCOLOR)).value<QColor>();
+    this->customFsMarginColor = sett.value(SETT_CUSTOM_FS_MARGIN_COLOR, false).toBool();
+    this->fsMarginColor = sett.value(SETT_MARGIN_COLOR, hugoColorToQt(DEF_BGCOLOR)).value<QColor>();
     sett.endGroup();
 
 #ifdef Q_WS_MAC
@@ -229,6 +233,13 @@ Settings::loadFromDisk( SettingsOverrides* ovr )
             this->muteSoundInBackground = ovr->pauseAudio;
         }
         sett.endGroup();
+
+        sett.beginGroup(SETT_COLORS_GRP);
+        if (not sett.contains(SETT_CUSTOM_FS_MARGIN_COLOR) and ovr->fsMarginColor.isValid()) {
+            this->fsMarginColor = ovr->fsMarginColor;
+            this->customFsMarginColor = true;
+        }
+        sett.endGroup();
     }
 }
 
@@ -252,6 +263,8 @@ Settings::saveToDisk()
     sett.setValue(SETT_MAIN_TXT_COLOR, this->mainTextColor);
     sett.setValue(SETT_STATUS_BG_COLOR, this->statusBgColor);
     sett.setValue(SETT_STATUS_TXT_COLOR, this->statusTextColor);
+    sett.setValue(SETT_CUSTOM_FS_MARGIN_COLOR, this->customFsMarginColor);
+    sett.setValue(SETT_MARGIN_COLOR, this->fsMarginColor);
     sett.endGroup();
 
     sett.beginGroup(SETT_FONTS_GRP);

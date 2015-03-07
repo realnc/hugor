@@ -31,6 +31,8 @@ class Settings {
     QColor mainBgColor;
     QColor statusTextColor;
     QColor statusBgColor;
+    bool customFsMarginColor;
+    QColor fsMarginColor;
 
     QFont propFont;
     QFont fixedFont;

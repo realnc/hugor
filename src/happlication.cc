@@ -235,7 +235,11 @@ HApplication::fUpdateMarginColor( int color )
         return;
 
     QPalette palette = this->fMarginWidget->palette();
-    palette.setColor(QPalette::Window, hugoColorToQt(color));
+    const Settings* sett = hApp->settings();
+    const QColor& qColor = (hMainWin->isFullScreen() and sett->customFsMarginColor)
+                           ? sett->fsMarginColor
+                           : hugoColorToQt(color);
+    palette.setColor(QPalette::Window, qColor);
     this->fMarginWidget->setPalette(palette);
 }
 

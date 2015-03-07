@@ -2,6 +2,7 @@
 #define SETTINGSOVERRIDES_H
 
 #include <QString>
+#include <QColor>
 
 
 class SettingsOverrides {
@@ -14,6 +15,7 @@ class SettingsOverrides {
     int fullscreenWidth;
     bool hideMenuBar;
     int marginSize;
+    QColor fsMarginColor;
     int widthRatio;
     int heightRatio;
     int propFontSize;

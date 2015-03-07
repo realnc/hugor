@@ -28,6 +28,8 @@ SettingsOverrides::SettingsOverrides( const QString& filename )
     this->fixedFontSize = sett.value(QString::fromLatin1("fixedFontSize"), 0).toInt();
     this->scrollbackFontSize = sett.value(QString::fromLatin1("scrollbackFontSize"), 0).toInt();
     this->imageSmoothing = sett.value(QString::fromLatin1("imageSmoothing"), true).toBool();
+    QString namedColor = sett.value(QString::fromLatin1("fsMarginColor"), QString()).toString();
+    this->fsMarginColor.setNamedColor(namedColor);
     sett.endGroup();
 
     sett.beginGroup(QString::fromLatin1("media"));

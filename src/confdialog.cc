@@ -43,6 +43,10 @@ ConfDialog::ConfDialog( HMainWindow* parent )
     ui->mainTextColorButton->setColor(sett->mainTextColor);
     ui->bannerBgColorButton->setColor(sett->statusBgColor);
     ui->bannerTextColorButton->setColor(sett->statusTextColor);
+    ui->fsMarginColorButton->setColor(sett->fsMarginColor);
+    connect(ui->customFsMarginColorCheckBox, SIGNAL(toggled(bool)), ui->fsMarginColorButton, SLOT(setEnabled(bool)));
+    connect(ui->customFsMarginColorCheckBox, SIGNAL(toggled(bool)), ui->fsMarginColorLabel, SLOT(setEnabled(bool)));
+    ui->customFsMarginColorCheckBox->setChecked(sett->customFsMarginColor);
 
     ui->mainFontSizeSpinBox->setValue(sett->propFont.pointSize());
     ui->fixedFontSizeSpinBox->setValue(sett->fixedFont.pointSize());
@@ -132,6 +136,8 @@ ConfDialog::fMakeInstantApply()
     connect(ui->mainBgColorButton, SIGNAL(changed(QColor)), this, SLOT(fApplySettings()));
     connect(ui->bannerTextColorButton, SIGNAL(changed(QColor)), this, SLOT(fApplySettings()));
     connect(ui->bannerBgColorButton, SIGNAL(changed(QColor)), this, SLOT(fApplySettings()));
+    connect(ui->customFsMarginColorCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
+    connect(ui->fsMarginColorButton, SIGNAL(changed(QColor)), this, SLOT(fApplySettings()));
 }
 
 
@@ -150,6 +156,8 @@ ConfDialog::fApplySettings()
     sett->mainTextColor = ui->mainTextColorButton->color();
     sett->statusBgColor = ui->bannerBgColorButton->color();
     sett->statusTextColor = ui->bannerTextColorButton->color();
+    sett->customFsMarginColor = ui->customFsMarginColorCheckBox->isChecked();
+    sett->fsMarginColor = ui->fsMarginColorButton->color();
     sett->propFont = ui->mainFontBox->currentFont();
     sett->fixedFont = ui->fixedFontBox->currentFont();
     sett->scrollbackFont = ui->scrollbackFontBox->currentFont();
