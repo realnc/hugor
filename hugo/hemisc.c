@@ -492,8 +492,8 @@ AddFontCode:
 			hugo_font(currentfont = tempfont);
 
 			pbuffer[linebreak] = t;
-			strcpy(pbuffer, pbuffer+linebreak);
-			plen = strlen(pbuffer);
+			plen = strlen(pbuffer+linebreak);
+			memmove(pbuffer, pbuffer+linebreak, plen + 1);
 			thisline = thisline - linebreaklen;
 			linebreak = 0;
 			linebreaklen = 0;
