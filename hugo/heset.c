@@ -169,6 +169,7 @@ GetNextWord:
 		case ARRAYDATA_T:
 		case ARRAY_T:
 		{
+			char af_flag = false;
 			/* array[n]... */
 			if (t==ARRAYDATA_T)
 			{
@@ -231,8 +232,6 @@ GetNextWord:
 
 			if (MEM(codeptr)==EQUALS_T)
 			{
-				char af_flag = false;
-
 				codeptr++;
 
 				do
