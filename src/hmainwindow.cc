@@ -149,6 +149,7 @@ HMainWindow::fFullscreenAdjust()
 #endif
     }
     hApp->updateMargins(-1);
+    hFrame->updateGameScreen(true);
 }
 
 

@@ -378,7 +378,7 @@ int
 hugo_iskeywaiting( void )
 {
     //qDebug(Q_FUNC_INFO);
-    QMetaObject::invokeMethod(hFrame, "updateGameScreen", INVOKE_BLOCK);
+    QMetaObject::invokeMethod(hFrame, "updateGameScreen", INVOKE_BLOCK, Q_ARG(bool, false));
     return hFrame->hasKeyInQueue();
 }
 
@@ -393,7 +393,7 @@ hugo_timewait( int n )
     //qDebug() << Q_FUNC_INFO;
     if (hApp->gameRunning() and n > 0) {
         SleepFuncs::msleep(1000 / n);
-        QMetaObject::invokeMethod(hFrame, "updateGameScreen", INVOKE_BLOCK);
+        QMetaObject::invokeMethod(hFrame, "updateGameScreen", INVOKE_BLOCK, Q_ARG(bool, false));
     }
     return true;
 }

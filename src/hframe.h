@@ -284,7 +284,7 @@ class HFrame: public QWidget {
 
     // Update the game screen, if needed.
     void
-    updateGameScreen();
+    updateGameScreen(bool force);
 };
 
 

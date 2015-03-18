@@ -486,7 +486,7 @@ void
 HFrame::startInput( int xPos, int yPos )
 {
     //qDebug() << Q_FUNC_INFO;
-    updateGameScreen();
+    updateGameScreen(false);
     this->fInputReady = false;
     this->fInputMode = NormalInput;
     this->fInputStartX = xPos;
@@ -636,7 +636,7 @@ HFrame::scrollUp( int left, int top, int right, int bottom, int h )
         timer.start(12);
         idleLoop.exec();
     }
-    updateGameScreen();
+    updateGameScreen(false);
 }
 
 
@@ -663,10 +663,10 @@ HFrame::flushText()
 
 
 void
-HFrame::updateGameScreen()
+HFrame::updateGameScreen(bool force)
 {
     flushText();
-    if (fNeedScreenUpdate) {
+    if (fNeedScreenUpdate or force) {
         //qDebug(Q_FUNC_INFO);
         hApp->updateMargins(this->fBgColor);
         fNeedScreenUpdate = false;

@@ -94,7 +94,7 @@ HugoHandlers::endGetline()
 {
     hFrame->setCursorVisible(false);
     print(const_cast<char*>("\r\n"));
-    hFrame->updateGameScreen();
+    hFrame->updateGameScreen(false);
 }
 
 

@@ -144,7 +144,7 @@ VideoPlayer::play()
         return;
     }
 
-    hFrame->updateGameScreen();
+    hFrame->updateGameScreen(true);
 
     this->d->setMaximumSize(this->maximumSize());
     gst_element_set_state(d->fPipeline, GST_STATE_PLAYING);
