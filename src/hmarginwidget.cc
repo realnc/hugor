@@ -1,5 +1,6 @@
 #include <QVBoxLayout>
 #include <QWheelEvent>
+#include <QPainter>
 
 #include "hmarginwidget.h"
 #include "hmainwindow.h"
@@ -13,8 +14,7 @@ HMarginWidget::HMarginWidget( QWidget* parent )
     this->fLayout->setContentsMargins(0, 0, 0, 0);
     this->fLayout->setSpacing(0);
     this->setLayout(this->fLayout);
-    this->setBackgroundRole(QPalette::Window);
-    this->setAutoFillBackground(true);
+    this->setAttribute(Qt::WA_OpaquePaintEvent);
 }
 
 
@@ -36,6 +36,20 @@ HMarginWidget::mouseMoveEvent( QMouseEvent* e )
         this->setMouseTracking(false);
     }
     QWidget::mouseMoveEvent(e);
+}
+
+
+void
+HMarginWidget::paintEvent(QPaintEvent*)
+{
+    const QMargins& m = contentsMargins();
+    if (m.isNull()) {
+        return;
+    }
+    const QBrush& color = palette().background();
+    QPainter p(this);
+    p.fillRect(0, 0, m.left(), height(), color);
+    p.fillRect(width() - m.right(), 0, m.right(), height(), color);
 }
 
 

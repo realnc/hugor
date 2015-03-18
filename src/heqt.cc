@@ -1,23 +1,43 @@
 #include <QDebug>
-#include <QFontMetrics>
-#include <QFile>
 #include <QFileInfo>
-#include <QTimer>
-#include <QFileDialog>
 #include <QTextCodec>
-#include <QMessageBox>
 #include <QTextLayout>
+#include <QMetaObject>
+#include <QThread>
+#include <QTimer>
+#include <QTextCodec>
+#include <QMutexLocker>
 
 #include "happlication.h"
 #include "hmainwindow.h"
-#include "videoplayer.h"
+#include "hmarginwidget.h"
 #include "hframe.h"
 #include "settings.h"
 #include "hugodefs.h"
+#include "hugohandlers.h"
 
 extern "C" {
 #include "heheader.h"
 }
+
+
+#define INVOKE_BLOCK Qt::BlockingQueuedConnection
+
+// Exposes QThread::msleep(), which is protected.
+class SleepFuncs: public QThread {
+public:
+    using QThread::msleep;
+};
+
+// Used to wait on the GUI thread for a condition.
+static QMutex* waiterMutex = 0;
+
+// Buffer for the script file. We don't immediately write text to the script
+// file. We write to the buffer instead and flush it to the file when needed.
+static QString* scriptBuffer = 0;
+
+// Buffer for the scrollback. We flush it when needed.
+static QByteArray* scrollbackBuffer = 0;
 
 
 /* Helper routine. Converts a Hugo color to a Qt color.
@@ -51,6 +71,63 @@ hugoColorToQt( int color )
       default:                 qtColor.setRgb(0x000000);
     }
     return qtColor;
+}
+
+
+static void
+flushScriptBuffer()
+{
+    const int wrapWidth = hApp->settings()->scriptWrap;
+
+    // If wrapping is disabled, or the entire buffer is below our wrap limit,
+    // write out all text as-is.
+    if (wrapWidth <= 0 or scriptBuffer->length() <= wrapWidth) {
+        fprintf(::script, "%s", scriptBuffer->toLocal8Bit().constData());
+        fflush(::script);
+        scriptBuffer->clear();
+        return;
+    }
+
+    QTextStream strm(scriptBuffer);
+    QString textLine;
+    while (not (textLine = strm.readLine()).isNull()) {
+        // If the line fits and doesn't need wrapping, write it out as-is.
+        if (textLine.length() < wrapWidth) {
+            fprintf(::script, "%s", textLine.trimmed().toLocal8Bit().constData());
+            if (not strm.atEnd()) {
+                fprintf(::script, "\n");
+            }
+            continue;
+        }
+
+        QTextLayout layout(textLine);
+        QTextOption txtOpts(Qt::AlignLeft);
+        txtOpts.setWrapMode(QTextOption::WordWrap);
+        layout.setTextOption(txtOpts);
+
+        layout.beginLayout();
+        QTextLine layoutLine;
+        QString output;
+        while ((layoutLine = layout.createLine()).isValid()) {
+            layoutLine.setNumColumns(wrapWidth);
+            output.append(textLine.mid(layoutLine.textStart(), layoutLine.textLength()));
+            output.append('\n');
+        }
+        layout.endLayout();
+        fprintf(::script, "%s", output.toLocal8Bit().constData());
+    }
+
+    fflush(::script);
+    scriptBuffer->clear();
+}
+
+
+static void
+flushScrollbackBuffer()
+{
+    QMetaObject::invokeMethod(hMainWin, "appendToScrollback", INVOKE_BLOCK,
+                              Q_ARG(QByteArray, *scrollbackBuffer));
+    scrollbackBuffer->clear();
 }
 
 
@@ -108,7 +185,6 @@ hugo_splitpath( char* path, char* drive, char* dir, char* fname, char* ext )
     qstrcpy(fname, inf.completeBaseName().toLocal8Bit().constData());
     qstrcpy(dir, inf.absolutePath().toLocal8Bit().constData());
     //qDebug() << "splitpath:" << drive << dir << fname << ext;
-    return;
 }
 
 
@@ -141,42 +217,7 @@ hugo_makepath( char* path, char* drive, char* dir, char* fname, char* ext )
 void
 hugo_getfilename( char* a, char* b )
 {
-    Q_ASSERT(a != 0 and b != 0);
-
-    QString fname;
-    QString filter;
-    // Fallback message in case we won't recognize the 'a' string.
-    QString caption("Select a file");
-    // Assume save mode. We do this in order to get a confirmation dialog
-    // on existing files, in case we won't recognize the 'a' string.
-    bool saveMode = true;
-
-    if (QString::fromLatin1(a).endsWith("to save")) {
-        filter = QObject::tr("Hugo Saved Games") + QString::fromLatin1(" (*.sav)");
-        caption = "Save current game position";
-    } else if (QString::fromLatin1(a).endsWith("to restore")) {
-        filter = QObject::tr("Hugo Saved Games") + QString::fromLatin1(" (*.sav *.Sav *.SAV)");
-        caption = "Restore a saved game position";
-        saveMode = false;
-    } else if (QString::fromLatin1(a).endsWith("for command recording")) {
-        filter = QObject::tr("Hugo recording files") + QString::fromLatin1(" (*.rec)");
-        caption = "Record commands to a file";
-    } else if (QString::fromLatin1(a).endsWith("for command playback")) {
-        filter = QObject::tr("Hugo recording files") + QString::fromLatin1(" (*.rec *.Rec *.REC)");
-        caption = "Play recorded commands from a file";
-        saveMode = false;
-    } else if (QString::fromLatin1(a).endsWith("transcription (or printer name)")) {
-        filter = QObject::tr("Transcription files") + QString::fromLatin1(" (*.txt)");
-        caption = "Save transcript to a file";
-    }
-
-    if (saveMode) {
-        fname = QFileDialog::getSaveFileName(hMainWin, caption, b, filter);
-    } else {
-        fname = QFileDialog::getOpenFileName(hMainWin, caption, b, filter);
-    }
-    qstrcpy(line, fname.toLocal8Bit().constData());
-    return;
+    QMetaObject::invokeMethod(hHandlers, "getfilename", INVOKE_BLOCK, Q_ARG(char*, a), Q_ARG(char*, b));
 }
 
 
@@ -194,67 +235,20 @@ hugo_overwrite( char* )
     return true;
 }
 
-static QString scriptBuffer;
-
-static void
-flushScript()
-{
-    const int wrapWidth = hApp->settings()->scriptWrap;
-
-    // If wrapping is disabled, or the entire buffer is below our wrap limit,
-    // write out all text as-is.
-    if (wrapWidth <= 0 or scriptBuffer.length() <= wrapWidth) {
-        fprintf(::script, "%s", scriptBuffer.toLocal8Bit().constData());
-        fflush(::script);
-        scriptBuffer.clear();
-        return;
-    }
-
-    QTextStream strm(&scriptBuffer);
-    QString textLine;
-    while (not (textLine = strm.readLine()).isNull()) {
-        // If the line fits and doesn't need wrapping, write it out as-is.
-        if (textLine.length() < wrapWidth) {
-            fprintf(::script, "%s", textLine.trimmed().toLocal8Bit().constData());
-            if (not strm.atEnd()) {
-                fprintf(::script, "\n");
-            }
-            continue;
-        }
-
-        QTextLayout layout(textLine);
-        QTextOption txtOpts(Qt::AlignLeft);
-        txtOpts.setWrapMode(QTextOption::WordWrap);
-        layout.setTextOption(txtOpts);
-
-        layout.beginLayout();
-        QTextLine layoutLine;
-        QString output;
-        while ((layoutLine = layout.createLine()).isValid()) {
-            layoutLine.setNumColumns(wrapWidth);
-            output.append(textLine.mid(layoutLine.textStart(), layoutLine.textLength()));
-            output.append('\n');
-        }
-        layout.endLayout();
-        fprintf(::script, "%s", output.toLocal8Bit().constData());
-    }
-
-    fflush(::script);
-    scriptBuffer.clear();
-}
 
 int
 hugo_fclose( HUGO_FILE file )
 {
-    if (file == script)
-        flushScript();
+    if (file == script) {
+        flushScriptBuffer();
+    }
     return fclose(file);
 }
 
 
 /* hugo_closefiles
 
-    Closes all open files.  NOTE:  If the operating system automatically
+    Closes all open files.  Note:  If the operating system automatically
     closes any open streams upon exit from the program, this function may
     be left empty.
 */
@@ -272,15 +266,6 @@ hugo_closefiles()
 }
 
 
-static QByteArray scrollbackBuf;
-
-static void
-flushScrollback()
-{
-    hMainWin->appendToScrollback(scrollbackBuf);
-    scrollbackBuf.clear();
-}
-
 /* hugo_sendtoscrollback
 
    Stores a given line in the scrollback buffer (optional).
@@ -288,14 +273,14 @@ flushScrollback()
 void
 hugo_sendtoscrollback( char* a )
 {
-    scrollbackBuf.append(a);
+    scrollbackBuffer->append(a);
 }
 
 
 int
 hugo_writetoscript(const char* s)
 {
-    scriptBuffer.append(hApp->hugoCodec()->toUnicode(s));
+    scriptBuffer->append(hApp->hugoCodec()->toUnicode(s));
     return 0;
 }
 
@@ -314,19 +299,26 @@ hugo_writetoscript(const char* s)
 int
 hugo_getkey( void )
 {
-    flushScrollback();
-    if (::script != NULL) {
-        flushScript();
+    if (::script != 0) {
+        flushScriptBuffer();
     }
-    int c = hFrame->getNextKey();
-    if (c == 0) {
+    flushScrollbackBuffer();
+
+    QMutexLocker mLocker(waiterMutex);
+    if (not hugo_iskeywaiting()) {
+        hFrame->keypressAvailableWaitCond.wait(waiterMutex);
+    }
+    mLocker.unlock();
+
+    int key = hFrame->getNextKey();
+    if (key == 0) {
         // It's a mouse click.
         const QPoint& pos = hFrame->getNextClick();
         display_pointer_x = (pos.x() - physical_windowleft) / FIXEDCHARWIDTH + 1;
         display_pointer_y = (pos.y() - physical_windowtop) / FIXEDLINEHEIGHT + 1;
         return 1;
     }
-    return c;
+    return key;
 }
 
 
@@ -337,34 +329,27 @@ hugo_getkey( void )
 void
 hugo_getline( char* p )
 {
-    hugo_sendtoscrollback(p);
-    flushScrollback();
-
-    // Print the prompt in normal text colors.
-    hugo_settextcolor(fcolor);
-    hugo_setbackcolor(bgcolor);
-    hugo_print(p);
     if (::script != NULL) {
         hugo_writetoscript(p);
-        flushScript();
+        flushScriptBuffer();
     }
+    hugo_sendtoscrollback(p);
+    flushScrollbackBuffer();
 
-    // Switch to input color.
-    hugo_settextcolor(icolor);
+    // FIXME: Clear or import the keypress queue.
+    QMutexLocker mLocker(waiterMutex);
+    QMetaObject::invokeMethod(hHandlers, "startGetline", INVOKE_BLOCK, Q_ARG(char*, p));
+    hFrame->inputLineWaitCond.wait(waiterMutex);
+    hFrame->getInput(::buffer, MAXBUFFER);
+    QMetaObject::invokeMethod(hHandlers, "endGetline", INVOKE_BLOCK);
 
-    hFrame->setCursorVisible(true);
-    hFrame->moveCursorPos(QPoint(current_text_x, current_text_y));
-    hFrame->getInput(buffer, MAXBUFFER, current_text_x, current_text_y);
-    hFrame->setCursorVisible(false);
-    hugo_print(const_cast<char*>("\r\n"));
-
-    // Also copy the input to the script file, if there is one.
+    // Also copy the input to the script file (if there is one) and the
+    // scrollback.
     if (script != NULL) {
         hugo_writetoscript(buffer);
         hugo_writetoscript("\n");
-        flushScript();
+        flushScriptBuffer();
     }
-
     hugo_sendtoscrollback(buffer);
     hugo_sendtoscrollback(const_cast<char*>("\n"));
 }
@@ -393,6 +378,9 @@ hugo_waitforkey( void )
 int
 hugo_iskeywaiting( void )
 {
+    //qDebug(Q_FUNC_INFO);
+    QMetaObject::invokeMethod(hFrame, "flushText", INVOKE_BLOCK);
+    QMetaObject::invokeMethod(hFrame, "updateGameScreen", INVOKE_BLOCK);
     return hFrame->hasKeyInQueue();
 }
 
@@ -404,17 +392,12 @@ hugo_iskeywaiting( void )
 int
 hugo_timewait( int n )
 {
-    if (not hApp->gameRunning() or n < 1) {
-        return true;
+    //qDebug() << Q_FUNC_INFO;
+    if (hApp->gameRunning() and n > 0) {
+        SleepFuncs::msleep(1000 / n);
+        QMetaObject::invokeMethod(hFrame, "flushText", INVOKE_BLOCK);
+        QMetaObject::invokeMethod(hFrame, "updateGameScreen", INVOKE_BLOCK);
     }
-
-    QEventLoop idleLoop;
-    QTimer timer;
-    timer.setSingleShot(true);
-    QObject::connect(&timer, SIGNAL(timeout()), &idleLoop, SLOT(quit()));
-    QObject::connect(hApp, SIGNAL(gameQuitting()), &idleLoop, SLOT(quit()));
-    timer.start(1000 / n);
-    idleLoop.exec();
     return true;
 }
 
@@ -457,6 +440,9 @@ hugo_timewait( int n )
 void
 hugo_init_screen( void )
 {
+    waiterMutex = new QMutex;
+    scriptBuffer = new QString;
+    scrollbackBuffer = new QByteArray;
 }
 
 
@@ -466,8 +452,9 @@ hugo_init_screen( void )
 int
 hugo_hasgraphics( void )
 {
-    if (hApp->settings()->enableGraphics)
-        return true;
+    if (hApp->settings()->enableGraphics) {
+        return 1;
+    }
     return false;
 }
 
@@ -475,7 +462,8 @@ hugo_hasgraphics( void )
 void
 hugo_setgametitle( char* t )
 {
-    hMainWin->setWindowTitle(QString::fromLatin1(t));
+    QMetaObject::invokeMethod(hMainWin, "setWindowTitle", INVOKE_BLOCK,
+                              Q_ARG(QString, QString::fromLatin1(t)));
 }
 
 
@@ -484,6 +472,9 @@ hugo_setgametitle( char* t )
 void
 hugo_cleanup_screen( void )
 {
+    delete waiterMutex;
+    delete scriptBuffer;
+    delete scrollbackBuffer;
 }
 
 
@@ -493,7 +484,7 @@ hugo_cleanup_screen( void )
 void
 hugo_clearfullscreen( void )
 {
-    hFrame->clearRegion(0, 0, 0, 0);
+    QMetaObject::invokeMethod(hHandlers, "clearfullscreen", INVOKE_BLOCK);
     currentpos = 0;
     currentline = 1;
     TB_Clear(0, 0, screenwidth, screenheight);
@@ -506,28 +497,13 @@ hugo_clearfullscreen( void )
 void
 hugo_clearwindow( void )
 {
-    hFrame->setBgColor(bgcolor);
-    hFrame->clearRegion(physical_windowleft, physical_windowtop,
-                        physical_windowright, physical_windowbottom);
+    QMetaObject::invokeMethod(hHandlers, "clearwindow", INVOKE_BLOCK);
     currentpos = 0;
     currentline = 1;
     TB_Clear(physical_windowleft, physical_windowtop,
              physical_windowright, physical_windowbottom);
 }
 
-
-void
-calcFontDimensions()
-{
-    const QFontMetrics& curMetr = hFrame->currentFontMetrics();
-    const QFontMetrics fixedMetr(hApp->settings()->fixedFont);
-
-    FIXEDCHARWIDTH = fixedMetr.averageCharWidth();
-    FIXEDLINEHEIGHT = fixedMetr.height();
-
-    charwidth = curMetr.averageCharWidth();
-    lineheight = curMetr.height();
-}
 
 /* This function does whatever is necessary to set the system up for
    a standard text display */
@@ -563,13 +539,7 @@ calcFontDimensions()
 void
 hugo_settextmode( void )
 {
-    calcFontDimensions();
-    SCREENWIDTH = hFrame->width();
-    SCREENHEIGHT = hFrame->height();
-
-    /* Must be set: */
-    hugo_settextwindow(1, 1,
-        SCREENWIDTH/FIXEDCHARWIDTH, SCREENHEIGHT/FIXEDLINEHEIGHT);
+    QMetaObject::invokeMethod(hHandlers, "settextmode", INVOKE_BLOCK);
 }
 
 
@@ -591,27 +561,8 @@ hugo_settextmode( void )
 void
 hugo_settextwindow( int left, int top, int right, int bottom )
 {
-    //qDebug() << "settextwindow" << left << top << right << bottom;
-    /* Must be set: */
-    physical_windowleft = (left - 1) * FIXEDCHARWIDTH;
-    physical_windowtop = (top - 1) * FIXEDLINEHEIGHT;
-    physical_windowright = right * FIXEDCHARWIDTH - 1;
-    physical_windowbottom = bottom * FIXEDLINEHEIGHT - 1;
-
-    // Correct for full-width windows where the right border would
-    // otherwise be clipped to a multiple of charwidth, leaving a
-    // sliver of the former window at the righthand side.
-    if (right >= SCREENWIDTH / FIXEDCHARWIDTH)
-        physical_windowright = hFrame->width() - 1;
-    if (bottom >= SCREENHEIGHT / FIXEDLINEHEIGHT)
-        physical_windowbottom = hFrame->height() - 1;
-
-    physical_windowwidth = physical_windowright - physical_windowleft + 1;
-    physical_windowheight = physical_windowbottom - physical_windowtop + 1;
-
-    hFrame->setFgColor(fcolor);
-    hFrame->setBgColor(bgcolor);
-    hFrame->setFontType(currentfont);
+    QMetaObject::invokeMethod(hHandlers, "settextwindow", INVOKE_BLOCK, Q_ARG(int, left),
+                              Q_ARG(int, top), Q_ARG(int, right), Q_ARG(int, bottom));
 }
 
 
@@ -638,7 +589,7 @@ hugo_settextpos( int x, int y )
 {
     // Must be set:
     currentline = y;
-    currentpos = (x - 1) * charwidth;   // Note:  zero-based
+    currentpos = (x - 1) * ::charwidth;   // Note:  zero-based
 
     // current_text_x/row are calculated assuming that the
     // character position (1, 1) is the pixel position (0, 0)
@@ -652,7 +603,8 @@ hugo_settextpos( int x, int y )
 void
 printFatalError( char* a )
 {
-    hugo_print(a);
+    QMetaObject::invokeMethod(hHandlers, "printFatalError", INVOKE_BLOCK,
+                              Q_ARG(char*, a));
 }
 
 
@@ -671,67 +623,7 @@ printFatalError( char* a )
 void
 hugo_print( char* a )
 {
-    //const QFontMetrics& m = hFrame->currentFontMetrics();
-    uint len = qstrlen(a);
-    QString ac;
-
-    for (uint i = 0; i < len; ++i) {
-        // If we've passed the bottom of the window, align to the bottom edge.
-        if (current_text_y > physical_windowbottom - lineheight) {
-            int temp_lh = lineheight;
-            lineheight = current_text_y - physical_windowbottom + lineheight;
-            current_text_y -= lineheight;
-            if (inwindow)
-                --lineheight;
-            hugo_scrollwindowup();
-            lineheight = temp_lh;
-        }
-
-        switch (a[i]) {
-          case '\n':
-            hFrame->flushText();
-            current_text_y += lineheight;
-            hFrame->update();
-            //hApp->advanceEventLoop();
-            //last_was_italic = false;
-            break;
-
-          case '\r':
-            hFrame->flushText();
-            if (!inwindow) {
-                current_text_x = physical_windowleft - FIXEDCHARWIDTH;
-            } else {
-                current_text_x = 0;
-            }
-            current_text_x = physical_windowleft;
-            //last_was_italic = false;
-            break;
-
-          default: {
-            ac += hApp->hugoCodec()->toUnicode(a + i, 1);
-            //hFrame->printText(QString(QChar(a[i])).toLatin1().constData(), current_text_x, current_text_y);
-            //hFrame->flushText();
-            //current_text_x += hugo_charwidth(a[i]);
-          }
-        }
-    }
-
-    hFrame->printText(ac, current_text_x, current_text_y);
-    current_text_x += hFrame->currentFontMetrics().width(ac);
-    //qDebug() << printBuf;
-
-    // Check again after printing.
-    if (current_text_y > physical_windowbottom - lineheight) {
-        int temp_lh = lineheight;
-        hFrame->flushText();
-        lineheight = current_text_y - physical_windowbottom + lineheight;
-        current_text_y -= lineheight;
-        if (inwindow)
-            --lineheight;
-        hugo_scrollwindowup();
-        lineheight = temp_lh;
-    }
-    hFrame->update();
+    QMetaObject::invokeMethod(hHandlers, "print", INVOKE_BLOCK, Q_ARG(char*, a));
 }
 
 
@@ -740,8 +632,9 @@ hugo_print( char* a )
 void
 hugo_scrollwindowup()
 {
-    hFrame->scrollUp(physical_windowleft, physical_windowtop,
-                     physical_windowright, physical_windowbottom, lineheight);
+    QMetaObject::invokeMethod(hFrame, "scrollUp", INVOKE_BLOCK, Q_ARG(int, physical_windowleft),
+                              Q_ARG(int, physical_windowtop), Q_ARG(int, physical_windowright),
+                              Q_ARG(int, physical_windowbottom), Q_ARG(int, lineheight));
     TB_Scroll();
 }
 
@@ -755,23 +648,21 @@ hugo_scrollwindowup()
 void
 hugo_font( int f )
 {
-    hFrame->setFontType(f);
-    charwidth = hFrame->currentFontMetrics().averageCharWidth();
-    lineheight = hFrame->currentFontMetrics().height();
+    QMetaObject::invokeMethod(hHandlers, "font", INVOKE_BLOCK, Q_ARG(int, f));
 }
 
 
 void
 hugo_settextcolor( int c )
 {
-    hFrame->setFgColor(c);
+    QMetaObject::invokeMethod(hHandlers, "settextcolor", INVOKE_BLOCK, Q_ARG(int, c));
 }
 
 
 void
 hugo_setbackcolor( int c )
 {
-    hFrame->setBgColor(c);
+    QMetaObject::invokeMethod(hHandlers, "setbackcolor", INVOKE_BLOCK, Q_ARG(int, c));
 }
 
 
@@ -818,12 +709,13 @@ hugo_textwidth( char* a )
 
     // Construct a string that contains only printable characters.
     for (size_t i = 0; i < slen; ++i) {
-        if (a[i] == COLOR_CHANGE)
+        if (a[i] == COLOR_CHANGE) {
             i += 2;
-        else if (a[i] == FONT_CHANGE)
-                ++i;
-        else
+        } else if (a[i] == FONT_CHANGE) {
+            ++i;
+        } else {
             str += hApp->hugoCodec()->toUnicode(a + i, 1);
+        }
     }
     return hFrame->currentFontMetrics().width(str);
 }
@@ -836,72 +728,80 @@ hugo_strlen( char* a )
     size_t slen = qstrlen(a);
 
     for (size_t i = 0; i < slen; ++i) {
-        if (a[i] == COLOR_CHANGE)
+        if (a[i] == COLOR_CHANGE) {
             i += 2;
-        else if (a[i] == FONT_CHANGE)
+        } else if (a[i] == FONT_CHANGE) {
             ++i;
-        else
+        } else {
             ++len;
+        }
     }
     return len;
 }
 
 
-// FIXME: Check for errors when loading images.
 int
-hugo_displaypicture( FILE* infile, long len )
+hugo_displaypicture( HUGO_FILE infile, long len )
 {
-    // Open it as a QFile.
-    long pos = ftell(infile);
-    QFile file;
-    file.open(infile, QIODevice::ReadOnly);
-    file.seek(pos);
+    int result;
+    QMetaObject::invokeMethod(hHandlers, "displaypicture", INVOKE_BLOCK,
+                              Q_RETURN_ARG(int, result), Q_ARG(HUGO_FILE, infile), Q_ARG(long, len));
+    return result;
+}
 
-    // Load the data into a byte array.
-    const QByteArray& data = file.read(len);
 
-    // Create the image from the data.
-    // FIXME: Allow only JPEG images. By default, QImage supports
-    // all image formats recognized by Qt.
-    QImage img;
-    img.loadFromData(data);
+int
+hugo_playmusic( HUGO_FILE infile, long reslength, char loop_flag )
+{
+    int result;
+    QMetaObject::invokeMethod(hHandlers, "playmusic", INVOKE_BLOCK,
+                              Q_RETURN_ARG(int, result), Q_ARG(HUGO_FILE, infile), Q_ARG(long, reslength),
+                              Q_ARG(char, loop_flag));
+    return result;
+}
 
-    // Done with the file.
-    file.close();
-    fclose(infile);
 
-    // Scale the image, if needed.
-    QSize imgSize(img.size());
-    if (img.width() > physical_windowwidth) {
-        imgSize.setWidth(physical_windowwidth);
-    }
-    if (img.height() > physical_windowheight) {
-        imgSize.setHeight(physical_windowheight);
-    }
-    // Make sure to keep the aspect ratio (don't stretch.)
-    if (imgSize != img.size()) {
-        // Only apply a smoothing filter if that setting is enabled
-        // in the settings.
-        Qt::TransformationMode mode;
-        if (hApp->settings()->useSmoothScaling) {
-            mode = Qt::SmoothTransformation;
-        } else {
-            mode = Qt::FastTransformation;
-        }
-        img = img.scaled(imgSize, Qt::KeepAspectRatio, mode);
-        imgSize = img.size();
-    }
+void
+hugo_musicvolume( int vol )
+{
+    QMetaObject::invokeMethod(hHandlers, "musicvolume", INVOKE_BLOCK, Q_ARG(int, vol));
+}
 
-    // The image should be displayed centered.
-    int x = (physical_windowwidth - imgSize.width()) / 2 + physical_windowleft;
-    int y = (physical_windowheight - imgSize.height()) / 2 + physical_windowtop;
-    hFrame->printImage(img, x, y);
-    hFrame->update();
-    return true;
+
+void
+hugo_stopmusic( void )
+{
+    QMetaObject::invokeMethod(hHandlers, "stopmusic", INVOKE_BLOCK);
+}
+
+
+int
+hugo_playsample( HUGO_FILE infile, long reslength, char loop_flag )
+{
+    int result;
+    QMetaObject::invokeMethod(hHandlers, "playsample", INVOKE_BLOCK,
+                              Q_RETURN_ARG(int, result), Q_ARG(HUGO_FILE, infile), Q_ARG(long, reslength),
+                              Q_ARG(char, loop_flag));
+    return result;
+}
+
+
+void
+hugo_samplevolume( int vol )
+{
+    QMetaObject::invokeMethod(hHandlers, "samplevolume", INVOKE_BLOCK, Q_ARG(int, vol));
+}
+
+
+void
+hugo_stopsample( void )
+{
+    QMetaObject::invokeMethod(hHandlers, "stopsample", INVOKE_BLOCK);
 }
 
 
 #ifdef DISABLE_VIDEO
+
 int
 hugo_hasvideo( void )
 { return false; }
@@ -919,9 +819,6 @@ hugo_playvideo( HUGO_FILE infile, long, char, char, int )
 
 #else
 
-static VideoPlayer* vidPlayer = 0;
-
-
 int
 hugo_hasvideo( void )
 {
@@ -935,44 +832,18 @@ hugo_hasvideo( void )
 void
 hugo_stopvideo( void )
 {
-    if (vidPlayer) {
-        vidPlayer->stop();
-    }
+    QMetaObject::invokeMethod(hHandlers, "stopvideo", INVOKE_BLOCK);
 }
 
 
 int
 hugo_playvideo( HUGO_FILE infile, long len, char loop, char bg, int vol )
 {
-    if (not hApp->settings()->enableVideo or hApp->settings()->videoSysError) {
-        return false;
-    }
-    hugo_stopvideo();
-    if (not vidPlayer) {
-        vidPlayer = new VideoPlayer(hFrame);
-        if (not vidPlayer) {
-            return false;
-        }
-    }
-    if (not vidPlayer->loadVideo(infile, len, loop)) {
-        return false;
-    }
-    vidPlayer->setVolume(vol);
-    vidPlayer->setMaximumSize(QSize(physical_windowwidth, physical_windowheight));
-    vidPlayer->setGeometry(physical_windowleft, physical_windowtop,
-                           physical_windowwidth, physical_windowheight);
-    if (not bg) {
-        QEventLoop idleLoop;
-        QObject::connect(vidPlayer, SIGNAL(videoFinished()), &idleLoop, SLOT(quit()));
-        QObject::connect(vidPlayer, SIGNAL(errorOccurred()), &idleLoop, SLOT(quit()));
-        QObject::connect(hApp, SIGNAL(gameQuitting()), &idleLoop, SLOT(quit()));
-        QObject::connect(hFrame, SIGNAL(escKeyPressed()), &idleLoop, SLOT(quit()));
-        vidPlayer->play();
-        idleLoop.exec();
-    } else {
-        vidPlayer->play();
-    }
-    return true;
+    int result;
+    QMetaObject::invokeMethod(hHandlers, "playvideo", INVOKE_BLOCK, Q_RETURN_ARG(int, result),
+                              Q_ARG(HUGO_FILE, infile), Q_ARG(long, len), Q_ARG(char, loop),
+                              Q_ARG(char, bg), Q_ARG(int, vol));
+    return result;
 }
 
 #endif

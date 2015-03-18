@@ -155,6 +155,8 @@ HEADERS += \
     src/version.h \
     src/rwopsbundle.h \
     src/videoplayer.h \
+    src/enginerunner.h \
+    src/hugohandlers.h \
     \
     hugo/heheader.h \
     hugo/htokens.h
@@ -172,6 +174,8 @@ SOURCES += \
     src/main.cc \
     src/settings.cc \
     src/settingsoverrides.cc \
+    src/enginerunner.cc \
+    src/hugohandlers.cc \
     \
     hugo/he.c \
     hugo/hebuffer.c \

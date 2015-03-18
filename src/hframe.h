@@ -5,6 +5,8 @@
 #include <QQueue>
 #include <QList>
 #include <QFontMetrics>
+#include <QMutex>
+#include <QWaitCondition>
 
 #include "happlication.h"
 
@@ -39,6 +41,10 @@ class HFrame: public QWidget {
     // Mouse click input queue.
     QQueue<QPoint> fClickQueue;
 
+    // The keypress and click queues are also accessed from the engine thread.
+    QMutex fKeyQueueMutex;
+    QMutex fClickQueueMutex;
+
     // Input buffer.
     QString fInputBuf;
 
@@ -67,6 +73,7 @@ class HFrame: public QWidget {
     // Current colors.
     int fFgColor;
     int fBgColor;
+    int fMarginColor;
 
     // Current font attributes.
     bool fUseFixedFont;
@@ -77,8 +84,8 @@ class HFrame: public QWidget {
     // Current font metrics.
     QFontMetrics fFontMetrics;
 
-    // We use a pixmap to render to, and then display that in our
-    // paintEvent().
+    // We render game output into a pixmap first instead or painting directly
+    // on the widget. We then draw the pixmap in our paintEvent().
     QPixmap fPixmap;
 
     // We buffer text printed with printText() so that we can draw
@@ -111,6 +118,13 @@ class HFrame: public QWidget {
     // Mute timer.
     class QTimer* fMuteTimer;
 
+    // Keeps track of whether the game screen needs updating.
+    bool fNeedScreenUpdate;
+
+    // Add a keypress to our input queue.
+    void
+    fEnqueueKey(char key);
+
   private slots:
     // Called by the timer to blink the text cursor.
     void
@@ -131,7 +145,7 @@ class HFrame: public QWidget {
 
   protected:
     virtual void
-    paintEvent( QPaintEvent* );
+    paintEvent(QPaintEvent* e);
 
     virtual void
     resizeEvent( QResizeEvent* e );
@@ -155,9 +169,6 @@ class HFrame: public QWidget {
     mouseMoveEvent( QMouseEvent* e );
 
   signals:
-    // Emitted when an input operation has finished successfully.
-    void inputReady();
-
     // Emitted when scrolling or paging up.
     void requestScrollback();
 
@@ -167,9 +178,19 @@ class HFrame: public QWidget {
   public:
     HFrame( QWidget* parent );
 
-    // Read an input line.
+    // The engine thread waits on this until an input line has been entered.
+    QWaitCondition inputLineWaitCond;
+
+    // The engine thread waits on this until a keypress is available.
+    QWaitCondition keypressAvailableWaitCond;
+
+    // Start reading an input line.
     void
-    getInput( char* buf, size_t buflen, int xPos, int yPos );
+    startInput( int xPos, int yPos );
+
+    // Get the most recently entered input line and clear it.
+    void
+    getInput(char* buf, size_t buflen);
 
     // Returns the next character waiting in the queue. If the queue is
     // empty, it will wait for a character to become available.
@@ -182,11 +203,7 @@ class HFrame: public QWidget {
     getNextClick();
 
     bool
-    hasKeyInQueue()
-    {
-        this->flushText();
-        return not this->fKeyQueue.isEmpty();
-    }
+    hasKeyInQueue();
 
     // Clear a region of the window using the current background color.
     void
@@ -194,20 +211,11 @@ class HFrame: public QWidget {
 
     // Set the current foreground color.
     void
-    setFgColor( int color )
-    {
-        this->flushText();
-        this->fFgColor = color;
-    }
+    setFgColor( int color );
 
     // Set the current background color.
     void
-    setBgColor( int color )
-    {
-        this->flushText();
-        this->fBgColor = color;
-        hApp->updateMargins(this->fBgColor);
-    }
+    setBgColor( int color );
 
     void
     setFontType( int hugoFont );
@@ -226,14 +234,6 @@ class HFrame: public QWidget {
     // (no buffering is performed.)
     void
     printImage( const QImage& img, int x, int y );
-
-    // Scroll a region of the screen up by 'h' pixels.
-    void
-    scrollUp( int left, int top, int right, int bottom, int h );
-
-    // Flush any pending text drawing.
-    void
-    flushText();
 
     // Change the text cursor position.
     void
@@ -272,6 +272,19 @@ class HFrame: public QWidget {
     // and inserts them into the `dst` menu.
     QList<const QAction*>
     getGameContextMenuEntries( class QMenu& dst );
+
+  public slots:
+    // Flush any pending text drawing.
+    void
+    flushText();
+
+    // Scroll a region of the screen up by 'h' pixels.
+    void
+    scrollUp( int left, int top, int right, int bottom, int h );
+
+    // Update the game screen, if needed.
+    void
+    updateGameScreen();
 };
 
 

@@ -11,6 +11,7 @@
 #include <QStyle>
 #include <QMenuBar>
 #include <QDesktopWidget>
+#include <QThread>
 
 extern "C" {
 #include "heheader.h"
@@ -22,6 +23,9 @@ extern "C" {
 #include "settings.h"
 #include "settingsoverrides.h"
 #include "hugodefs.h"
+#include "enginerunner.h"
+#include "hugohandlers.h"
+#include "videoplayer.h"
 
 
 HApplication* hApp = 0;
@@ -82,6 +86,7 @@ HApplication::HApplication( int& argc, char* argv[], const char* appName,
         }
     }
 
+// FIXME: Also use Gnome for OS X.
 #ifdef Q_WS_X11
     // Detect whether we're running in Gnome.
     QDialogButtonBox::ButtonLayout layoutPolicy
@@ -119,7 +124,6 @@ HApplication::HApplication( int& argc, char* argv[], const char* appName,
     this->updateMargins(::bgcolor);
     this->fMainWin->setCentralWidget(this->fMarginWidget);
 
-
     if (settOvr and settOvr->hideMenuBar) {
         this->fMainWin->hideMenuBar();
     }
@@ -133,12 +137,17 @@ HApplication::HApplication( int& argc, char* argv[], const char* appName,
     this->setWindowIcon(QIcon(":/he_32-bit_48x48.png"));
 #endif
     delete settOvr;
+
+    hHandlers = new HugoHandlers(this);
 }
 
 
 HApplication::~HApplication()
 {
     //qDebug() << Q_FUNC_INFO;
+    Q_ASSERT(hHandlers != 0);
+    delete hHandlers;
+    hHandlers = 0;
     Q_ASSERT(hApp != 0);
     this->fSettings->saveToDisk();
     delete this->fSettings;
@@ -212,18 +221,19 @@ HApplication::fRunGame()
         // Run the Hugo engine.
         this->fGameRunning = true;
         this->fGameFile = finfo.absoluteFilePath();
-        char argv0[] = "hugor";
-        char* argv1 = new char[this->fGameFile.toLocal8Bit().size() + 1];
-        strcpy(argv1, this->fGameFile.toLocal8Bit().constData());
-        char* argv[2] = {argv0, argv1};
         this->fMainWin->setUpdatesEnabled(true);
         this->fMainWin->raise();
         this->fMainWin->activateWindow();
-        emit gameStarting();
-        he_main(2, argv);
-        this->fGameRunning = false;
-        this->fGameFile.clear();
-        emit gameHasQuit();
+        fEngineRunner = new EngineRunner(fGameFile);
+        fHugoThread = new QThread(this);
+        fHugoThread->setObjectName("engine");
+        fEngineRunner->moveToThread(fHugoThread);
+        connect(fEngineRunner, SIGNAL(finished()), fHugoThread, SLOT(quit()));
+        connect(fHugoThread, SIGNAL(started()), fEngineRunner, SLOT(runEngine()));
+        connect(fHugoThread, SIGNAL(finished()), fEngineRunner, SLOT(deleteLater()));
+        connect(fHugoThread, SIGNAL(finished()), fHugoThread, SLOT(deleteLater()));
+        connect(fHugoThread, SIGNAL(finished()), SLOT(handleEngineFinished()));
+        fHugoThread->start();
     }
 }
 
@@ -310,7 +320,7 @@ HApplication::entryPoint( QString gameFileName )
     // GUI when we don't have a game running yet.  We do this a bunch of
     // times to make sure the FileOpen event can propagate properly.
     for (int i = 0; i < 100; ++i) {
-        this->advanceEventLoop(QEventLoop::ExcludeUserInputEvents);
+        this->advanceEventLoop();
     }
 
     if (this->fNextGame.isEmpty()) {
@@ -332,7 +342,7 @@ HApplication::entryPoint( QString gameFileName )
         // the screen will be flashing when the window first becomes visible.
         // The reason is unknown, but this seems to work around the issue.
         for (int i = 0; i < 5000; ++i) {
-            this->advanceEventLoop(QEventLoop::ExcludeUserInputEvents);
+            this->advanceEventLoop();
         }
     }
 
@@ -347,8 +357,19 @@ HApplication::entryPoint( QString gameFileName )
             this->fMainWin->show();
         }
         this->fRunGame();
+    } else {
+        // File dialog was canceled.
+        quit();
     }
-    this->fMainWin->close();
+}
+
+
+void HApplication::handleEngineFinished()
+{
+    this->fGameRunning = false;
+    this->fGameFile.clear();
+    emit gameHasQuit();
+    fMainWin->close();
 }
 
 
@@ -361,22 +382,38 @@ HApplication::notifyPreferencesChange( const Settings* sett )
     this->updateMargins(::bgcolor);
 
     // Recalculate font dimensions, in case font settings have changed.
-    calcFontDimensions();
+    hHandlers->calcFontDimensions();
 
     // The fonts might have changed.
     hFrame->setFontType(currentfont);
     hMainWin->setScrollbackFont(sett->scrollbackFont);
 
-    // Change the text cursor's height according to the new input font's height.
-    //qFrame->gameWindow()->setCursorHeight(QFontMetrics(sett->inputFont).height());
     display_needs_repaint = true;
+#ifndef DISABLE_AUDIO
     if (not sett->enableMusic) {
-        hugo_stopmusic();
+        hHandlers->stopmusic();
     }
     if (not sett->enableSoundEffects) {
-        hugo_stopsample();
+        hHandlers->stopsample();
     }
+#endif
+#ifndef DISABLE_VIDEO
     if (not sett->enableVideo) {
-        hugo_stopvideo();
+        hHandlers->stopvideo();
     }
+#endif
+}
+
+
+void
+HApplication::advanceEventLoop()
+{
+    // Guard against re-entrancy.
+    static volatile bool working = false;
+    if (working) {
+        return;
+    }
+    working = true;
+    this->processEvents(QEventLoop::ExcludeUserInputEvents);
+    working = false;
 }

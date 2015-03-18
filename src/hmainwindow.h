@@ -54,9 +54,6 @@ class HMainWindow: public QMainWindow {
     HMainWindow( QWidget* parent );
 
     void
-    appendToScrollback( const QByteArray& str );
-
-    void
     hideMenuBar();
 
     void
@@ -70,6 +67,9 @@ class HMainWindow: public QMainWindow {
     setScrollbackFont( const QFont& font );
 
   public slots:
+    void
+    appendToScrollback( const QByteArray& str );
+
     void
     showScrollback();
 

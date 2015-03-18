@@ -33,6 +33,9 @@ class HMarginWidget: public QWidget {
 
     virtual void
     mouseMoveEvent( QMouseEvent* e );
+
+    virtual void
+    paintEvent(QPaintEvent*);
 };
 
 

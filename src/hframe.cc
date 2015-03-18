@@ -16,6 +16,7 @@ extern "C" {
 #include "hmarginwidget.h"
 #include "hugodefs.h"
 #include "settings.h"
+#include "hugohandlers.h"
 
 
 HFrame* hFrame = 0;
@@ -32,6 +33,7 @@ HFrame::HFrame( QWidget* parent )
       fCurHistIndex(0),
       fFgColor(HUGO_BLACK),
       fBgColor(HUGO_WHITE),
+      fMarginColor(HUGO_WHITE),
       fUseFixedFont(false),
       fUseUnderlineFont(false),
       fUseItalicFont(false),
@@ -45,7 +47,8 @@ HFrame::HFrame( QWidget* parent )
       fCursorVisible(false),
       fBlinkVisible(false),
       fBlinkTimer(new QTimer(this)),
-      fMuteTimer(new QTimer(this))
+      fMuteTimer(new QTimer(this)),
+      fNeedScreenUpdate(false)
 {
     // We handle player input, so we need to accept focus.
     this->setFocusPolicy(Qt::WheelFocus);
@@ -68,7 +71,18 @@ HFrame::HFrame( QWidget* parent )
     connect(this, SIGNAL(requestScrollback()), hMainWin, SLOT(showScrollback()));
 
     this->setAttribute(Qt::WA_InputMethodEnabled);
+    this->setAttribute(Qt::WA_OpaquePaintEvent);
     hFrame = this;
+}
+
+
+void
+HFrame::fEnqueueKey(char key)
+{
+    QMutexLocker mLocker(&fKeyQueueMutex);
+    // TODO: Impose an upper limit on the maximum amount of queued keys.
+    fKeyQueue.enqueue(key);
+    keypressAvailableWaitCond.wakeAll();
 }
 
 
@@ -124,7 +138,8 @@ HFrame::fHandleFocusChange( QWidget* old, QWidget* now )
 }
 
 
-void HFrame::fEndInputMode( bool addToHistory )
+void
+HFrame::fEndInputMode( bool addToHistory )
 {
     this->fInputReady = true;
     this->fInputMode = NoInput;
@@ -144,15 +159,19 @@ void HFrame::fEndInputMode( bool addToHistory )
         }
     }
     this->fCurHistIndex = 0;
-    emit inputReady();
+    // Make the input text part of the display pixmap.
+    printText(fInputBuf.toLatin1().constData(), fInputStartX, fInputStartY);
+    inputLineWaitCond.wakeAll();
 }
 
 
 void
-HFrame::paintEvent( QPaintEvent* )
+HFrame::paintEvent( QPaintEvent* e )
 {
+    //qDebug(Q_FUNC_INFO);
     QPainter p(this);
-    p.drawPixmap(0, 0, this->fPixmap);
+    p.setClipRegion(e->region());
+    p.drawPixmap(e->rect(), fPixmap, e->rect());
 
     // Draw our current input. We need to do this here, after the pixmap
     // has already been painted, so that the input gets painted on top.
@@ -189,24 +208,24 @@ HFrame::resizeEvent( QResizeEvent* e )
         return;
     }
 
-    // Save a copy of the current pixmap.
-    const QPixmap& tmp = this->fPixmap.copy();
+    // Save a copy of the current pixmaps.
+    const QPixmap& tmp = fPixmap.copy();
 
     // Adjust the margins so that we get our final size.
     hApp->updateMargins(-1);
 
-    // Create a new pixmap, using the new size and fill it with
-    // the default background color.
-    QPixmap newPixmap(this->size());
-    newPixmap.fill(hugoColorToQt(this->fBgColor));
+    // Create new pixmaps, using the new size and fill it with the default
+    // background color.
+    QPixmap newPixmap(size());
+    newPixmap.fill(hugoColorToQt(fBgColor));
 
-    // Draw the saved pixmap into the new one and use it as our new
+    // Draw the saved pixmaps into the new ones and use them as our new
     // display.
     QPainter p(&newPixmap);
     p.drawPixmap(0, 0, tmp);
-    this->fPixmap = newPixmap;
+    fPixmap = newPixmap;
 
-    hugo_settextmode();
+    hHandlers->settextmode();
     display_needs_repaint = true;
 }
 
@@ -352,7 +371,6 @@ HFrame::keyPressEvent( QKeyEvent* e )
         i += strToAdd.length();
     }
     this->updateCursorPos();
-    this->update();
 }
 
 
@@ -377,7 +395,7 @@ HFrame::inputMethodEvent( QInputMethodEvent* e )
         QWidget::inputMethodEvent(e);
         return;
     }
-    this->fKeyQueue.enqueue(bytes[0]);
+    fEnqueueKey(bytes[0]);
 }
 
 
@@ -394,19 +412,19 @@ HFrame::singleKeyPressEvent( QKeyEvent* event )
         return;
 
       case Qt::Key_Left:
-        this->fKeyQueue.enqueue(8);
+        fEnqueueKey(8);
         break;
 
       case Qt::Key_Up:
-        this->fKeyQueue.enqueue(11);
+        fEnqueueKey(11);
         break;
 
       case Qt::Key_Right:
-        this->fKeyQueue.enqueue(21);
+        fEnqueueKey(21);
         break;
 
       case Qt::Key_Down:
-        this->fKeyQueue.enqueue(10);
+        fEnqueueKey(10);
         break;
 
       default:
@@ -416,7 +434,7 @@ HFrame::singleKeyPressEvent( QKeyEvent* event )
             QWidget::keyPressEvent(event);
             return;
         }
-        this->fKeyQueue.enqueue(event->text().at(0).toLatin1());
+        fEnqueueKey(event->text().at(0).toLatin1());
     }
 }
 
@@ -429,7 +447,8 @@ HFrame::mousePressEvent( QMouseEvent* e )
         return;
     }
     if (this->fInputMode == NoInput) {
-        this->fKeyQueue.append(0);
+        fEnqueueKey(0);
+        QMutexLocker mLocker(&fClickQueueMutex);
         this->fClickQueue.append(e->pos());
     }
     e->accept();
@@ -464,77 +483,84 @@ HFrame::mouseMoveEvent( QMouseEvent* e )
 
 
 void
-HFrame::getInput( char* buf, size_t buflen, int xPos, int yPos )
+HFrame::startInput( int xPos, int yPos )
 {
-    this->flushText();
     //qDebug() << Q_FUNC_INFO;
-    Q_ASSERT(buf != 0);
-
+    flushText();
+    updateGameScreen();
     this->fInputReady = false;
     this->fInputMode = NormalInput;
     this->fInputStartX = xPos;
     this->fInputStartY = yPos;
     this->fInputCurrentChar = 0;
+}
 
-    // Wait for a complete input line.
-    while (hApp->gameRunning() and not this->fInputReady) {
-        hApp->advanceEventLoop(QEventLoop::WaitForMoreEvents | QEventLoop::AllEvents);
-    }
 
-    // Make the input text part of the display pixmap.
-    this->printText(this->fInputBuf.toLatin1().constData(), this->fInputStartX, this->fInputStartY);
-
+void
+HFrame::getInput(char* buf, size_t buflen)
+{
+    Q_ASSERT(buf != 0);
     qstrncpy(buf, this->fInputBuf.toLatin1(), buflen);
-    //qDebug() << this->fInputBuf;
-    this->fInputBuf.clear();
+    fInputBuf.clear();
 }
 
 
 int
 HFrame::getNextKey()
 {
-    this->flushText();
     //qDebug() << Q_FUNC_INFO;
-
-    //this->scrollDown();
-
-    // If we have a key waiting, return it.
-    if (not this->fKeyQueue.isEmpty()) {
-        return this->fKeyQueue.dequeue();
-    }
-
-    // Wait for at least a key to become available.
-    this->update();
-    while (this->fKeyQueue.isEmpty() and hApp->gameRunning()) {
-        hApp->advanceEventLoop(QEventLoop::WaitForMoreEvents | QEventLoop::AllEvents);
-    }
-
-    if (not hApp->gameRunning()) {
-        // Game is quitting.
-        return -3;
-    }
-    return this->fKeyQueue.dequeue();
+    QMutexLocker mLocker(&fKeyQueueMutex);
+    Q_ASSERT(not fKeyQueue.isEmpty());
+    return fKeyQueue.dequeue();
 }
 
 
 QPoint
 HFrame::getNextClick()
 {
+    QMutexLocker mLocker(&fClickQueueMutex);
     Q_ASSERT(not this->fClickQueue.isEmpty());
     return this->fClickQueue.dequeue();
+}
+
+
+bool
+HFrame::hasKeyInQueue()
+{
+    QMutexLocker mLocker(&fKeyQueueMutex);
+    return not fKeyQueue.isEmpty();
 }
 
 
 void
 HFrame::clearRegion( int left, int top, int right, int bottom )
 {
-    this->flushText();
+    //qDebug(Q_FUNC_INFO);
+    flushText();
+    fNeedScreenUpdate = true;
     if (left == 0 and top == 0 and right == 0 and bottom == 0) {
-        this->fPixmap.fill(hugoColorToQt(this->fBgColor));
+        fPixmap.fill(hugoColorToQt(this->fBgColor));
         return;
     }
-    QPainter p(&this->fPixmap);
+    QPainter p(&fPixmap);
     p.fillRect(left, top, right - left + 1, bottom - top + 1, hugoColorToQt(this->fBgColor));
+}
+
+
+void
+HFrame::setFgColor(int color)
+{
+    this->flushText();
+    this->fFgColor = color;
+}
+
+
+void
+HFrame::setBgColor(int color)
+{
+    this->flushText();
+    this->fBgColor = color;
+    fMarginColor = fBgColor;
 }
 
 
@@ -551,7 +577,7 @@ HFrame::setFontType( int hugoFont )
     f.setUnderline(this->fUseUnderlineFont);
     f.setItalic(this->fUseItalicFont);
     f.setBold(this->fUseBoldFont);
-    this->fFontMetrics = QFontMetrics(f, &this->fPixmap);
+    this->fFontMetrics = QFontMetrics(f, &fPixmap);
 
     // Adjust text caret for new font.
     this->setCursorHeight(this->fFontMetrics.height());
@@ -573,8 +599,9 @@ void
 HFrame::printImage( const QImage& img, int x, int y )
 {
     this->flushText();
-    QPainter p(&this->fPixmap);
+    QPainter p(&fPixmap);
     p.drawImage(x, y, img);
+    fNeedScreenUpdate = true;
 }
 
 
@@ -589,43 +616,23 @@ HFrame::scrollUp( int left, int top, int right, int bottom, int h )
     QRegion exposed;
     ++right;
     ++bottom;
-
-#if QT_VERSION < 0x040600
-    // Qt versions prior to 4.6 lack the QPixmap::scroll() routine. For
-    // those versions we implement a (slower) fallback, where we simply
-    // paint the contents from source to destination.
-    QRect scrRect(left, top, right - left, bottom - top);
-    QRect dest = scrRect & fPixmap.rect();
-    QRect src = dest.translated(0, h) & dest;
-    if (src.isEmpty()) {
-        return;
-    }
-
-    //this->fPixmap.detach();
-    QPixmap pix = this->fPixmap;
-    QPainter p(&pix);
-    p.setCompositionMode(QPainter::CompositionMode_Source);
-    p.drawPixmap(src.translated(0, -h), this->fPixmap, src);
-    p.end();
-    this->fPixmap = pix;
-
-    exposed += dest;
-    exposed -= src.translated(0, -h);
-#else
-    // Qt 4.6 and newer have scroll(), which is fast and nice.
-    this->fPixmap.scroll(0, -h, left, top, right - left, bottom - top, &exposed);
-#endif
+    fPixmap.scroll(0, -h, left, top, right - left, bottom - top, &exposed);
+    fNeedScreenUpdate = true;
 
     // Fill exposed region.
     const QRect& r = exposed.boundingRect();
     this->clearRegion(r.left(), r.top(), r.left() + r.width(), r.top() + r.bottom());
+
     if (hApp->settings()->softTextScrolling) {
-        if (hApp->settings()->extraButter) {
-            hugo_timewait(59);
-        } else {
-            hApp->advanceEventLoop();
-        }
+        QEventLoop idleLoop;
+        QTimer timer;
+        timer.setSingleShot(true);
+        QObject::connect(&timer, SIGNAL(timeout()), &idleLoop, SLOT(quit()));
+        QObject::connect(hApp, SIGNAL(gameQuitting()), &idleLoop, SLOT(quit()));
+        timer.start(12);
+        idleLoop.exec();
     }
+    updateGameScreen();
 }
 
 
@@ -639,21 +646,27 @@ HFrame::flushText()
     f.setUnderline(this->fUseUnderlineFont);
     f.setItalic(this->fUseItalicFont);
     f.setBold(this->fUseBoldFont);
-    QFontMetrics m(f);
-    QPainter p(&this->fPixmap);
+    QPainter p(&fPixmap);
     p.setFont(f);
     p.setPen(hugoColorToQt(this->fFgColor));
     p.setBackgroundMode(Qt::OpaqueMode);
     p.setBackground(QBrush(hugoColorToQt(this->fBgColor)));
-    /*
-    for (int i = 0; i < this->fPrintBuffer.length(); ++i) {
-        p.drawText(this->fFlushXPos, this->fFlushYPos + m.ascent(), QString(this->fPrintBuffer.at(i)));
-        this->fFlushXPos += m.width(this->fPrintBuffer.at(i));
-    }
-    */
-    p.drawText(this->fFlushXPos, this->fFlushYPos + m.ascent() + 1, this->fPrintBuffer);
-    //qDebug() << this->fPrintBuffer;
+    p.drawText(this->fFlushXPos, this->fFlushYPos + currentFontMetrics().ascent() + 1,
+               this->fPrintBuffer);
     this->fPrintBuffer.clear();
+    fNeedScreenUpdate = true;
+}
+
+
+void
+HFrame::updateGameScreen()
+{
+    if (fNeedScreenUpdate) {
+        //qDebug(Q_FUNC_INFO);
+        hApp->updateMargins(this->fBgColor);
+        fNeedScreenUpdate = false;
+        update();
+    }
 }
 
 
@@ -683,6 +696,7 @@ HFrame::updateCursorPos()
     if (not this->fBlinkVisible) {
         this->fBlinkCursor();
     }
+    update();
 }
 
 
@@ -714,7 +728,6 @@ HFrame::insertInputText( QString txt, bool execute, bool clearCurrent )
     }
     this->fInputBuf.insert(this->fInputCurrentChar, txt);
     this->fInputCurrentChar += txt.length();
-    this->update();
     this->updateCursorPos();
     if (execute) {
         fEndInputMode(false);

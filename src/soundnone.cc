@@ -1,6 +1,5 @@
-extern "C" {
-#include "heheader.h"
-}
+#include <cstdio>
+#include "hugohandlers.h"
 #include "hugodefs.h"
 
 
@@ -14,42 +13,42 @@ closeSoundEngine()
 { }
 
 
+void
+muteSound(bool)
+{ }
+
+
 int
-hugo_playmusic( HUGO_FILE infile, long, char )
+HugoHandlers::playmusic(HUGO_FILE infile, long, char)
 {
-    fclose(infile);
+    std::fclose(infile);
     return false;
 }
 
 
 void
-hugo_musicvolume( int )
+HugoHandlers::musicvolume(int)
 { }
 
 
 void
-hugo_stopmusic( void )
-{ }
-
-
-void
-muteSound( bool )
+HugoHandlers::stopmusic()
 { }
 
 
 int
-hugo_playsample( HUGO_FILE infile, long, char )
+HugoHandlers::playsample(HUGO_FILE infile, long, char)
 {
-    fclose(infile);
+    std::fclose(infile);
     return false;
 }
 
 
 void
-hugo_samplevolume( int )
+HugoHandlers::samplevolume(int)
 { }
 
 
 void
-hugo_stopsample( void )
+HugoHandlers::stopsample()
 { }

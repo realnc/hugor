@@ -1,3 +1,5 @@
+#ifndef HEHEADER_H
+#define HEHEADER_H
 /*
 	HEHEADER.H
 
@@ -1236,3 +1238,5 @@ HUGO_INLINE void PokeWord(unsigned int a, unsigned int v)
 #include "hdinter.h"
 #endif
 
+
+#endif /* HEHEADER_H */

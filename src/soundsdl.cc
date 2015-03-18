@@ -2,6 +2,7 @@
 #include <SDL_mixer.h>
 #include <QDebug>
 #include <QFile>
+#include <cstdio>
 
 extern "C" {
 #include "heheader.h"
@@ -9,6 +10,8 @@ extern "C" {
 #include "happlication.h"
 #include "settings.h"
 #include "rwopsbundle.h"
+#include "hugohandlers.h"
+
 
 // Current music and sample volumes. Needed to restore the volumes
 // after muting them.
@@ -59,11 +62,26 @@ closeSoundEngine()
 }
 
 
+void
+muteSound( bool mute )
+{
+    if (mute and not isMuted) {
+        Mix_VolumeMusic(0);
+        Mix_Volume(-1, 0);
+        isMuted = true;
+    } else if (not mute and isMuted) {
+        Mix_VolumeMusic(currentMusicVol);
+        Mix_Volume(-1, currentSampleVol);
+        isMuted = false;
+    }
+}
+
+
 int
-hugo_playmusic( HUGO_FILE infile, long reslength, char loop_flag )
+HugoHandlers::playmusic(HUGO_FILE infile, long reslength, char loop_flag)
 {
     if (not hApp->settings()->enableMusic) {
-        fclose(infile);
+        std::fclose(infile);
         return false;
     }
 
@@ -85,7 +103,7 @@ hugo_playmusic( HUGO_FILE infile, long reslength, char loop_flag )
     SDL_RWops* rwops = RWFromMediaBundle(infile, reslength);
     if (rwops == 0) {
         qWarning() << "ERROR:" << SDL_GetError();
-        fclose(infile);
+        std::fclose(infile);
         return false;
     }
 
@@ -130,7 +148,7 @@ hugo_playmusic( HUGO_FILE infile, long reslength, char loop_flag )
 
 
 void
-hugo_musicvolume( int vol )
+HugoHandlers::musicvolume(int vol)
 {
     if (vol < 0)
         vol = 0;
@@ -148,32 +166,17 @@ hugo_musicvolume( int vol )
 
 
 void
-hugo_stopmusic( void )
+HugoHandlers::stopmusic()
 {
     Mix_HaltMusic();
 }
 
 
-void
-muteSound( bool mute )
-{
-    if (mute and not isMuted) {
-        Mix_VolumeMusic(0);
-        Mix_Volume(-1, 0);
-        isMuted = true;
-    } else if (not mute and isMuted) {
-        Mix_VolumeMusic(currentMusicVol);
-        Mix_Volume(-1, currentSampleVol);
-        isMuted = false;
-    }
-}
-
-
 int
-hugo_playsample( HUGO_FILE infile, long reslength, char loop_flag )
+HugoHandlers::playsample(HUGO_FILE infile, long reslength, char loop_flag)
 {
     if (not hApp->settings()->enableSoundEffects) {
-        fclose(infile);
+        std::fclose(infile);
         return false;
     }
 
@@ -197,7 +200,7 @@ hugo_playsample( HUGO_FILE infile, long reslength, char loop_flag )
     if (not file->open(infile, QIODevice::ReadOnly)) {
         qWarning() << "ERROR: Can't open sample sound file";
         file->close();
-        fclose(infile);
+        std::fclose(infile);
         return false;
     }
 
@@ -205,7 +208,7 @@ hugo_playsample( HUGO_FILE infile, long reslength, char loop_flag )
     SDL_RWops* rwops = SDL_RWFromConstMem(file->map(ftell(infile), reslength), reslength);
     // Done with the file.
     file->close();
-    fclose(infile);
+    std::fclose(infile);
     if (rwops == 0) {
         qWarning() << "ERROR:" << SDL_GetError();
         return false;
@@ -237,7 +240,7 @@ hugo_playsample( HUGO_FILE infile, long reslength, char loop_flag )
 
 
 void
-hugo_samplevolume( int vol )
+HugoHandlers::samplevolume(int vol)
 {
     if (vol < 0)
         vol = 0;
@@ -255,7 +258,7 @@ hugo_samplevolume( int vol )
 
 
 void
-hugo_stopsample( void )
+HugoHandlers::stopsample()
 {
     Mix_HaltChannel(-1);
 }

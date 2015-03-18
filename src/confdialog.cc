@@ -61,9 +61,6 @@ ConfDialog::ConfDialog( HMainWindow* parent )
     ui->fixedFontBox->setCurrentFont(sett->fixedFont);
     ui->scrollbackFontBox->setCurrentFont(sett->scrollbackFont);
     ui->softScrollCheckBox->setChecked(sett->softTextScrolling);
-    ui->butterCheckBox->setChecked(sett->extraButter);
-    ui->butterCheckBox->setEnabled(sett->softTextScrolling);
-    connect(ui->softScrollCheckBox, SIGNAL(toggled(bool)), ui->butterCheckBox, SLOT(setEnabled(bool)));
     ui->smartFormattingCheckBox->setChecked(sett->smartFormatting);
     ui->marginSizeSpinBox->setValue(sett->marginSize);
     ui->overlayScrollbackCheckBox->setChecked(sett->overlayScrollback);
@@ -126,7 +123,6 @@ ConfDialog::fMakeInstantApply()
     connect(ui->fixedFontSizeSpinBox, SIGNAL(valueChanged(int)), this, SLOT(fApplySettings()));
     connect(ui->scrollbackFontSizeSpinBox, SIGNAL(valueChanged(int)), this, SLOT(fApplySettings()));
     connect(ui->softScrollCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
-    connect(ui->butterCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
     connect(ui->smartFormattingCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
     connect(ui->marginSizeSpinBox, SIGNAL(valueChanged(int)), this, SLOT(fApplySettings()));
     connect(ui->fullscreenWidthSpinBox, SIGNAL(valueChanged(int)), this, SLOT(fApplySettings()));
@@ -171,7 +167,6 @@ ConfDialog::fApplySettings()
     sett->fixedFont.setPointSize(ui->fixedFontSizeSpinBox->value());
     sett->scrollbackFont.setPointSize(ui->scrollbackFontSizeSpinBox->value());
     sett->softTextScrolling = ui->softScrollCheckBox->isChecked();
-    sett->extraButter = ui->butterCheckBox->isChecked();
     sett->smartFormatting = ui->smartFormattingCheckBox->isChecked();
     sett->overlayScrollback = ui->overlayScrollbackCheckBox->isChecked();
     sett->marginSize = ui->marginSizeSpinBox->value();

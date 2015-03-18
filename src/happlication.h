@@ -40,6 +40,10 @@ class HApplication: public QApplication {
     // Are we running in Gnome?
     bool fDesktopIsGnome;
 
+    // Hugo engine runner and thread.
+    class EngineRunner* fEngineRunner;
+    QThread* fHugoThread;
+
     // Run the game file contained in fNextGame.
     void
     fRunGame();
@@ -56,10 +60,6 @@ class HApplication: public QApplication {
 #endif
 
   signals:
-    // Emitted just prior to starting a game.  The game has not started yet
-    // when this is emitted.
-    void gameStarting();
-
     // Emitted prior to quitting a game.  The game has not quit yet when this
     // is emitted.
     void gameQuitting();
@@ -73,6 +73,9 @@ class HApplication: public QApplication {
     // Hugo engine after the QApplication main event loop has started.
     void
     entryPoint( QString gameFileName );
+
+    void
+    handleEngineFinished();
 
   public:
     HApplication( int& argc, char* argv[], const char* appName, const char* appVersion,
@@ -121,48 +124,7 @@ class HApplication: public QApplication {
 
     // Advance the event loop.
     void
-    advanceEventLoop( QEventLoop::ProcessEventsFlags flags = QEventLoop::AllEvents )
-    {
-        // Guard against re-entrancy.
-        static bool working = false;
-        if (working) {
-            return;
-        }
-        working = true;
-
-        // DeferredDelete events need to be dispatched manually, since we don't
-        // return to the main event loop while a game is running.
-#ifndef Q_WS_MAC
-        // On OS X, this causes CPU utilization to go through the roof.  Not
-        // sure why.  Disable this for now on OS X until further information
-        // is available on this.
-        this->sendPostedEvents(0, QEvent::DeferredDelete);
-#endif
-        this->sendPostedEvents();
-        this->processEvents(flags);
-        this->sendPostedEvents();
-        working = false;
-    }
-
-    // Advance the event loop with a timeout.
-    void
-    advanceEventLoop( QEventLoop::ProcessEventsFlags flags, int maxtime )
-    {
-        // Guard against re-entrancy.
-        static bool working = false;
-        if (working) {
-            return;
-        }
-        working = true;
-
-#ifndef Q_WS_MAC
-        this->sendPostedEvents(0, QEvent::DeferredDelete);
-#endif
-        this->sendPostedEvents();
-        this->processEvents(flags, maxtime);
-        this->sendPostedEvents();
-        working = false;
-    }
+    advanceEventLoop();
 
     // Text codec used by Hugo.
     QTextCodec*

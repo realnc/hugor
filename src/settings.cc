@@ -63,7 +63,6 @@ qtRuntimeVersion()
 #define SETT_FIXED_FONT QString::fromLatin1("fixed")
 #define SETT_SCROLLBACK_FONT QString::fromLatin1("scrollback")
 #define SETT_SOFT_SCROLL QString::fromLatin1("softTextScrolling")
-#define SETT_EXTRA_BUTTER QString::fromLatin1("extraButter")
 #define SETT_SMART_FORMATTING QString::fromLatin1("smartFormatting")
 #define SETT_SCRIPT_WRAP QString::fromLatin1("scriptWrap")
 #define SETT_ASK_FILE QString::fromLatin1("askforfileatstart")
@@ -151,7 +150,6 @@ Settings::loadFromDisk( SettingsOverrides* ovr )
     this->scrollbackFont.setFamily(tmp.family());
     this->scrollbackFont.setPointSize(tmp.pointSize());
     this->softTextScrolling = sett.value(SETT_SOFT_SCROLL, true).toBool();
-    this->extraButter = sett.value(SETT_EXTRA_BUTTER, false).toBool();
     this->smartFormatting = sett.value(SETT_SMART_FORMATTING, true).toBool();
     sett.endGroup();
 
@@ -272,7 +270,6 @@ Settings::saveToDisk()
     sett.setValue(SETT_FIXED_FONT, this->fixedFont.toString());
     sett.setValue(SETT_SCROLLBACK_FONT, this->scrollbackFont.toString());
     sett.setValue(SETT_SOFT_SCROLL, this->softTextScrolling);
-    sett.setValue(SETT_EXTRA_BUTTER, this->extraButter);
     sett.setValue(SETT_SMART_FORMATTING, this->smartFormatting);
     sett.endGroup();
 
