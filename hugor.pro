@@ -124,6 +124,10 @@ QMAKE_CFLAGS_WARN_OFF =
 *-g++* {
     # Avoid "unused parameter" warnings with C code.
     QMAKE_CFLAGS_WARN_ON += -Wno-unused-parameter
+
+    # Use optimizations that don't interfere with debugging in debug builds.
+    QMAKE_CXXFLAGS_DEBUG += -Og
+    QMAKE_CFLAGS_DEBUG += -Og
 }
 
 INCLUDEPATH += src hugo
