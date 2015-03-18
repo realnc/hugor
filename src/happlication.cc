@@ -402,6 +402,7 @@ HApplication::notifyPreferencesChange( const Settings* sett )
         hHandlers->stopvideo();
     }
 #endif
+    fFrameWin->updateGameScreen(true);
 }
 
 
