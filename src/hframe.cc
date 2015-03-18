@@ -486,7 +486,6 @@ void
 HFrame::startInput( int xPos, int yPos )
 {
     //qDebug() << Q_FUNC_INFO;
-    flushText();
     updateGameScreen();
     this->fInputReady = false;
     this->fInputMode = NormalInput;
@@ -617,7 +616,7 @@ HFrame::scrollUp( int left, int top, int right, int bottom, int h )
         return;
     }
 
-    this->flushText();
+    flushText();
     QRegion exposed;
     ++right;
     ++bottom;
@@ -666,6 +665,7 @@ HFrame::flushText()
 void
 HFrame::updateGameScreen()
 {
+    flushText();
     if (fNeedScreenUpdate) {
         //qDebug(Q_FUNC_INFO);
         hApp->updateMargins(this->fBgColor);
