@@ -336,7 +336,6 @@ hugo_getline( char* p )
     hugo_sendtoscrollback(p);
     flushScrollbackBuffer();
 
-    // FIXME: Clear or import the keypress queue.
     QMutexLocker mLocker(waiterMutex);
     QMetaObject::invokeMethod(hHandlers, "startGetline", INVOKE_BLOCK, Q_ARG(char*, p));
     hFrame->inputLineWaitCond.wait(waiterMutex);

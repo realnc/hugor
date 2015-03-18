@@ -493,6 +493,11 @@ HFrame::startInput( int xPos, int yPos )
     this->fInputStartX = xPos;
     this->fInputStartY = yPos;
     this->fInputCurrentChar = 0;
+
+    QMutexLocker mKeyLocker(&fKeyQueueMutex);
+    QMutexLocker mClickLocker(&fClickQueueMutex);
+    fKeyQueue.clear();
+    fClickQueue.clear();
 }
 
 
