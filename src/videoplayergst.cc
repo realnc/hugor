@@ -18,6 +18,7 @@
 
 #include "happlication.h"
 #include "hmainwindow.h"
+#include "hframe.h"
 #include "rwopsbundle.h"
 
 
@@ -142,6 +143,8 @@ VideoPlayer::play()
     if (d->fPipeline == 0) {
         return;
     }
+
+    hFrame->updateGameScreen();
 
     this->d->setMaximumSize(this->maximumSize());
     gst_element_set_state(d->fPipeline, GST_STATE_PLAYING);
