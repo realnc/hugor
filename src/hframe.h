@@ -123,7 +123,7 @@ class HFrame: public QWidget {
 
     // Add a keypress to our input queue.
     void
-    fEnqueueKey(char key);
+    fEnqueueKey(char key, QMouseEvent* e);
 
   private slots:
     // Called by the timer to blink the text cursor.

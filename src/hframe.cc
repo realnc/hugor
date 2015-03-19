@@ -77,11 +77,21 @@ HFrame::HFrame( QWidget* parent )
 
 
 void
-HFrame::fEnqueueKey(char key)
+HFrame::fEnqueueKey(char key, QMouseEvent* e)
 {
-    QMutexLocker mLocker(&fKeyQueueMutex);
-    // TODO: Impose an upper limit on the maximum amount of queued keys.
-    fKeyQueue.enqueue(key);
+    QMutexLocker mKeyLocker(&fKeyQueueMutex);
+    QMutexLocker mClickLocker(&fClickQueueMutex);
+    // Only allow one keypress or click in the queue. No reason to use a queue
+    // for that, but we might still want the possibilty to change this to allow
+    // multiple keys/clicks to queue up, if the need for that arises.
+    if (fKeyQueue.empty()) {
+        fKeyQueue.enqueue(key);
+        if (e) {
+            fClickQueue.append(e->pos());
+        }
+    }
+    mKeyLocker.unlock();
+    mClickLocker.unlock();
     keypressAvailableWaitCond.wakeAll();
 }
 
@@ -395,7 +405,7 @@ HFrame::inputMethodEvent( QInputMethodEvent* e )
         QWidget::inputMethodEvent(e);
         return;
     }
-    fEnqueueKey(bytes[0]);
+    fEnqueueKey(bytes[0], 0);
 }
 
 
@@ -412,19 +422,19 @@ HFrame::singleKeyPressEvent( QKeyEvent* event )
         return;
 
       case Qt::Key_Left:
-        fEnqueueKey(8);
+        fEnqueueKey(8, 0);
         break;
 
       case Qt::Key_Up:
-        fEnqueueKey(11);
+        fEnqueueKey(11, 0);
         break;
 
       case Qt::Key_Right:
-        fEnqueueKey(21);
+        fEnqueueKey(21, 0);
         break;
 
       case Qt::Key_Down:
-        fEnqueueKey(10);
+        fEnqueueKey(10, 0);
         break;
 
       default:
@@ -434,7 +444,7 @@ HFrame::singleKeyPressEvent( QKeyEvent* event )
             QWidget::keyPressEvent(event);
             return;
         }
-        fEnqueueKey(event->text().at(0).toLatin1());
+        fEnqueueKey(event->text().at(0).toLatin1(), 0);
     }
 }
 
@@ -447,9 +457,7 @@ HFrame::mousePressEvent( QMouseEvent* e )
         return;
     }
     if (this->fInputMode == NoInput) {
-        fEnqueueKey(0);
-        QMutexLocker mLocker(&fClickQueueMutex);
-        this->fClickQueue.append(e->pos());
+        fEnqueueKey(0, e);
     }
     e->accept();
 }
