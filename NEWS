@@ -1,4 +1,4 @@
-Git - 2015-03-07
+Git - 2015-03-19
 ================
 
   - Support for game-specific start-up configuration files. See the file:
@@ -51,6 +51,12 @@ Git - 2015-03-07
 
   - The margin color auto-detection when in fullscreen mode can now be disabled
     and a custom color can be manually configured.
+
+  - The interpreter is now executing games in their own thread. A game that (for
+    whatever reason) is stuck or froze up, will not result in the rest of the
+    application hanging with no possibility to quit. Previously, the only way to
+    exit the application in such cases was to kill the interpreter process
+    through an operating system facility (like the task manager on Windows.)
 
 
 1.0 - 2012-08-15
