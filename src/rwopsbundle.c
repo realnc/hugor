@@ -1,5 +1,6 @@
 #include <errno.h>
 #include <string.h>
+#include <SDL_version.h>
 #include <SDL_rwops.h>
 #include <SDL_error.h>
 
@@ -38,8 +39,13 @@ RWOpsCheck( SDL_RWops* rwops )
  *
  * Must return the new current SEET_SET position.
  */
+#if SDL_VERSION_ATLEAST(1,3,0)
+static Sint64
+RWOpsSeekFunc( SDL_RWops* rwops, Sint64 offset, int whence )
+#else
 static int
 RWOpsSeekFunc( SDL_RWops* rwops, int offset, int whence )
+#endif
 {
     BundleFileInfo* info;
     int seekRet;
@@ -68,8 +74,13 @@ RWOpsSeekFunc( SDL_RWops* rwops, int offset, int whence )
  *
  * Must return the number of elements (not bytes) that have been read.
  */
+#if SDL_VERSION_ATLEAST(1,3,0)
+static size_t
+RWOpsReadFunc( SDL_RWops* rwops, void* ptr, size_t size, size_t maxnum )
+#else
 static int
 RWOpsReadFunc( SDL_RWops* rwops, void* ptr, int size, int maxnum )
+#endif
 {
     BundleFileInfo* info;
     long bytesToRead = size * maxnum;
@@ -96,8 +107,13 @@ RWOpsReadFunc( SDL_RWops* rwops, void* ptr, int size, int maxnum )
 /* RWops write callback. This always fails, since we never write to media
  * bundle files.
  */
+#if SDL_VERSION_ATLEAST(1,3,0)
+static size_t
+RWOpsWriteFunc( SDL_RWops* rwops, const void* ptr, size_t size, size_t num )
+#else
 static int
 RWOpsWriteFunc( SDL_RWops* rwops, const void* ptr, int size, int num )
+#endif
 {
     if (!RWOpsCheck(rwops))
         return -1;
