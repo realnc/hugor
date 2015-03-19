@@ -37,7 +37,6 @@ void RunSet(int gotvalue)
 {
 	char inc = 0;                   /* increment/decrement */
 	char temparrexpr, propval = 0;
-	char outofrange = 0;
 	int a = 0, t = 0, obj = 0;
 	int newl = 0;                   /* new length */
 	int newp = 0;			/* new property val */
@@ -344,8 +343,6 @@ LoopBack:
 	{
 		case 1:
 		{
-			outofrange = 0;
-
 			incdec = 0;
 
 			if (MEM(codeptr) != EQUALS_T)
