@@ -176,6 +176,7 @@ HugoHandlers::print(char* a)
             }
             hFrame->scrollUp(physical_windowleft, physical_windowtop, physical_windowright,
                              physical_windowbottom, lineheight);
+            TB_Scroll();
             lineheight = temp_lh;
         }
 
@@ -216,6 +217,7 @@ HugoHandlers::print(char* a)
         }
         hFrame->scrollUp(physical_windowleft, physical_windowtop, physical_windowright,
                          physical_windowbottom, lineheight);
+        TB_Scroll();
         lineheight = temp_lh;
     }
 }
