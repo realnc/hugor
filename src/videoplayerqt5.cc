@@ -13,7 +13,7 @@
 #include "hmainwindow.h"
 
 
-void initVideoEngine(int, char*[])
+void initVideoEngine(int&, char*[])
 { }
 
 void closeVideoEngine()

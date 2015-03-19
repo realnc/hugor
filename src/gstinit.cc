@@ -280,21 +280,17 @@ registerGstStaticPlugins()
 #endif // Q_OS_WIN32
 
 
-void initVideoEngine(int argc, char* argv[])
+void initVideoEngine(int& argc, char* argv[])
 {
-    QString gstErr;
-    bool gstException = false;
-    gst_init(&argc, &argv);
-    // TODO: use gst_init_check()
-    //gstErr = e.message();
-    //gstException = true;
+    GError* gstError = 0;
 
-    if (gstException) {
+    if (not gst_init_check(&argc, &argv, &gstError)) {
         QString errMsg(QObject::tr("Unable to use GStreamer. Video support will be "
                                    "disabled."));
-        if (not gstErr.isEmpty()) {
-            errMsg += QObject::tr("The GStreamer error was: ") + gstErr;
+        if (gstError->message != 0 && qstrlen(gstError->message) > 0) {
+            errMsg += QObject::tr("The GStreamer error was: ") + QString::fromLocal8Bit(gstError->message);
         }
+        g_error_free(gstError);
         QMessageBox::critical(0, hApp->applicationName(), errMsg);
         hApp->settings()->videoSysError = true;
     }

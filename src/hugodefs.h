@@ -5,7 +5,7 @@
 
 QColor hugoColorToQt( int color );
 void initSoundEngine();
-void initVideoEngine( int argc, char* argv[] );
+void initVideoEngine( int& argc, char* argv[] );
 void closeSoundEngine();
 void closeVideoEngine();
 void muteSound( bool mute );
