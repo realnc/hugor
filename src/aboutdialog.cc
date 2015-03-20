@@ -8,10 +8,7 @@ extern "C" {
 
 AboutDialog::AboutDialog( QWidget* parent )
     : QDialog(parent, Qt::MSWindowsFixedSizeDialogHint | Qt::CustomizeWindowHint | Qt::WindowTitleHint
-#if QT_VERSION >= 0x040500
-              | Qt::WindowCloseButtonHint
-#endif
-             ),
+              | Qt::WindowCloseButtonHint),
       ui(new Ui::AboutDialog)
 {
     ui->setupUi(this);

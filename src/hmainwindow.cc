@@ -31,10 +31,8 @@ HMainWindow::HMainWindow( QWidget* parent )
       fConfDialog(0),
       fAboutDialog(0),
       fMenuBarVisible(true)
-#if (QT_VERSION >= 0x040600)
       , fFullscreenEnterIcon(QIcon::fromTheme(QString::fromLatin1("view-fullscreen"))),
       fFullscreenExitIcon(QIcon::fromTheme(QString::fromLatin1("view-restore")))
-#endif
 {
     Q_ASSERT(hMainWin == 0);
 
@@ -51,10 +49,8 @@ HMainWindow::HMainWindow( QWidget* parent )
     // "Edit" menu.
     menu = menuBar->addMenu(tr("&Edit"));
     act = new QAction(tr("&Preferences..."), this);
-#if QT_VERSION >= 0x040600
     act->setIcon(QIcon::fromTheme(QString::fromLatin1("configure")));
     act->setShortcuts(QKeySequence::Preferences);
-#endif
     menu->addAction(act);
     this->addAction(act);
     connect(act, SIGNAL(triggered()), SLOT(fShowConfDialog()));
@@ -74,9 +70,7 @@ HMainWindow::HMainWindow( QWidget* parent )
     act = new QAction(tr("&Fullscreen Mode"), this);
     act->setCheckable(true);
 #endif
-#if QT_VERSION >= 0x040600
     act->setIcon(this->fFullscreenEnterIcon);
-#endif
     QList<QKeySequence> keySeqList;
 #ifdef Q_WS_MAC
     keySeqList.append(QKeySequence("Meta+Ctrl+F"));
@@ -103,9 +97,7 @@ HMainWindow::HMainWindow( QWidget* parent )
     // "Help" menu.
     menu = menuBar->addMenu(tr("&Help"));
     act = new QAction(tr("A&bout Hugor"), this);
-#if QT_VERSION >= 0x040600
     act->setIcon(QIcon::fromTheme(QString::fromLatin1("help-about")));
-#endif
     menu->addAction(act);
     connect(act, SIGNAL(triggered()), SLOT(fShowAbout()));
 
@@ -126,9 +118,7 @@ void
 HMainWindow::fFullscreenAdjust()
 {
     if (this->isFullScreen()) {
-#if QT_VERSION >= 0x040600
         this->fFullscreenAction->setIcon(this->fFullscreenExitIcon);
-#endif
 #ifdef Q_WS_MAC
         this->fFullscreenAction->setText("Exit Full Screen");
 #else
@@ -136,9 +126,7 @@ HMainWindow::fFullscreenAdjust()
         this->menuBar()->hide();
 #endif
     } else {
-#if QT_VERSION >= 0x040600
         this->fFullscreenAction->setIcon(this->fFullscreenEnterIcon);
-#endif
 #ifdef Q_WS_MAC
         this->fFullscreenAction->setText("Enter Full Screen");
 #else

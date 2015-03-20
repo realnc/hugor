@@ -77,12 +77,13 @@ muteSound( bool mute )
 }
 
 
-int
-HugoHandlers::playmusic(HUGO_FILE infile, long reslength, char loop_flag)
+void
+HugoHandlers::playmusic(HUGO_FILE infile, long reslength, char loop_flag, int* result)
 {
     if (not hApp->settings()->enableMusic) {
         std::fclose(infile);
-        return false;
+        *result = false;
+        return;
     }
 
     // We only play one music track at a time, so it's enough
@@ -104,7 +105,8 @@ HugoHandlers::playmusic(HUGO_FILE infile, long reslength, char loop_flag)
     if (rwops == 0) {
         qWarning() << "ERROR:" << SDL_GetError();
         std::fclose(infile);
-        return false;
+        *result = false;
+        return;
     }
 
     // SDL_mixer's auto-detection doesn't always work reliably. It's very
@@ -125,7 +127,8 @@ HugoHandlers::playmusic(HUGO_FILE infile, long reslength, char loop_flag)
         break;
     default:
         qWarning() << "ERROR: Unknown music resource type";
-        return false;
+        *result = false;
+        return;
     }
 
     // Create a Mix_Music* from the RWops. Let SDL_mixer take ownership of
@@ -133,7 +136,8 @@ HugoHandlers::playmusic(HUGO_FILE infile, long reslength, char loop_flag)
     music = Mix_LoadMUSType_RW(rwops, musType, true);
     if (music == 0) {
         qWarning() << "ERROR:" << Mix_GetError();
-        return false;
+        *result = false;
+        return;
     }
 
     // Start playing the music. Loop forever if 'loop_flag' is true.
@@ -141,9 +145,10 @@ HugoHandlers::playmusic(HUGO_FILE infile, long reslength, char loop_flag)
     if (Mix_PlayMusic(music, loop_flag ? -1 : 1) != 0) {
         qWarning() << "ERROR:" << Mix_GetError();
         Mix_FreeMusic(music);
-        return false;
+        *result = false;
+        return;
     }
-    return true;
+    *result = true;
 }
 
 
@@ -172,12 +177,13 @@ HugoHandlers::stopmusic()
 }
 
 
-int
-HugoHandlers::playsample(HUGO_FILE infile, long reslength, char loop_flag)
+void
+HugoHandlers::playsample(HUGO_FILE infile, long reslength, char loop_flag, int* result)
 {
     if (not hApp->settings()->enableSoundEffects) {
         std::fclose(infile);
-        return false;
+        *result = false;
+        return;
     }
 
     // We only play one sample at a time, so it's enough to make these
@@ -201,7 +207,8 @@ HugoHandlers::playsample(HUGO_FILE infile, long reslength, char loop_flag)
         qWarning() << "ERROR: Can't open sample sound file";
         file->close();
         std::fclose(infile);
-        return false;
+        *result = false;
+        return;
     }
 
     // Map the data into memory and create an RWops from that data.
@@ -211,7 +218,8 @@ HugoHandlers::playsample(HUGO_FILE infile, long reslength, char loop_flag)
     std::fclose(infile);
     if (rwops == 0) {
         qWarning() << "ERROR:" << SDL_GetError();
-        return false;
+        *result = false;
+        return;
     }
 
     // If a Mix_Chunk* already exists from a previous call, delete it first.
@@ -225,7 +233,8 @@ HugoHandlers::playsample(HUGO_FILE infile, long reslength, char loop_flag)
     chunk = Mix_LoadWAV_RW(rwops, true);
     if (chunk == 0) {
         qWarning() << "ERROR:" << Mix_GetError();
-        return false;
+        *result = false;
+        return;
     }
 
     // Start playing the sample. Loop forever if 'loop_flag' is true.
@@ -233,9 +242,10 @@ HugoHandlers::playsample(HUGO_FILE infile, long reslength, char loop_flag)
     if (Mix_PlayChannel(-1, chunk, loop_flag ? -1 : 0) < 0) {
         qWarning() << "ERROR:" << Mix_GetError();
         Mix_FreeChunk(chunk);
-        return false;
+        *result = false;
+        return;
     }
-    return true;
+    *result = true;
 }
 
 

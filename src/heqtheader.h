@@ -47,7 +47,7 @@
 extern "C" {
 #endif
 void printFatalError(char* a);
-int hugo_displaypicture(FILE* infile, long len);
+int hugo_displaypicture(HUGO_FILE infile, long len);
 int hugo_playmusic(HUGO_FILE infile, long reslength, char loop_flag);
 void hugo_musicvolume(int vol);
 void hugo_stopmusic(void);

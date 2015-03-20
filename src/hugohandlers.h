@@ -40,16 +40,16 @@ class HugoHandlers: public QObject {
     void font(int f);
     void settextcolor(int c);
     void setbackcolor(int c);
-    int displaypicture(HUGO_FILE infile, long len);
-    int playmusic(HUGO_FILE infile, long reslength, char loop_flag);
+    void displaypicture(HUGO_FILE infile, long len, int* result);
+    void playmusic(HUGO_FILE infile, long reslength, char loop_flag, int* result);
     void musicvolume(int vol);
     void stopmusic();
-    int playsample(HUGO_FILE infile, long reslength, char loop_flag);
+    void playsample(HUGO_FILE infile, long reslength, char loop_flag, int* result);
     void samplevolume(int vol);
     void stopsample();
 #ifndef DISABLE_VIDEO
     void stopvideo();
-    int playvideo(HUGO_FILE infile, long len, char loop, char bg, int vol);
+    void playvideo(HUGO_FILE infile, long len, char loop, char bg, int vol, int* result);
 #endif
 
   private:

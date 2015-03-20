@@ -246,8 +246,8 @@ HugoHandlers::setbackcolor(int c)
 
 
 // FIXME: Check for errors when loading images.
-int
-HugoHandlers::displaypicture(HUGO_FILE infile, long len)
+void
+HugoHandlers::displaypicture(HUGO_FILE infile, long len, int* result)
 {
     // Open it as a QFile.
     long pos = ftell(infile);
@@ -294,7 +294,7 @@ HugoHandlers::displaypicture(HUGO_FILE infile, long len)
     int x = (physical_windowwidth - imgSize.width()) / 2 + physical_windowleft;
     int y = (physical_windowheight - imgSize.height()) / 2 + physical_windowtop;
     hFrame->printImage(img, x, y);
-    return true;
+    *result = true;
 }
 
 
@@ -309,21 +309,24 @@ HugoHandlers::stopvideo()
 }
 
 
-int
-HugoHandlers::playvideo(FILE* infile, long len, char loop, char bg, int vol)
+void
+HugoHandlers::playvideo(HUGO_FILE infile, long len, char loop, char bg, int vol, int* result)
 {
     if (not hApp->settings()->enableVideo or hApp->settings()->videoSysError) {
-        return false;
+        *result = false;
+        return;
     }
     stopvideo();
     if (not fVidPlayer) {
         fVidPlayer = new VideoPlayer(hFrame);
         if (not fVidPlayer) {
-            return false;
+            *result = false;
+            return;
         }
     }
     if (not fVidPlayer->loadVideo(infile, len, loop)) {
-        return false;
+        *result = false;
+        return;
     }
     fVidPlayer->setVolume(vol);
     fVidPlayer->setMaximumSize(QSize(physical_windowwidth, physical_windowheight));
@@ -340,7 +343,7 @@ HugoHandlers::playvideo(FILE* infile, long len, char loop, char bg, int vol)
     } else {
         fVidPlayer->play();
     }
-    return true;
+    *result = true;
 }
 
 #endif // !DISABLE_VIDEO

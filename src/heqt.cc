@@ -23,6 +23,10 @@ extern "C" {
 
 #define INVOKE_BLOCK Qt::BlockingQueuedConnection
 
+Q_DECLARE_METATYPE(HUGO_FILE)
+Q_DECLARE_METATYPE(int*)
+Q_DECLARE_METATYPE(char*)
+
 // Exposes QThread::msleep(), which is protected.
 class SleepFuncs: public QThread {
 public:
@@ -437,6 +441,9 @@ hugo_timewait( int n )
 void
 hugo_init_screen( void )
 {
+    qRegisterMetaType<char*>("char*");
+    qRegisterMetaType<HUGO_FILE>("HUGO_FILE");
+    qRegisterMetaType<int*>("int*");
     waiterMutex = new QMutex;
     scriptBuffer = new QString;
     scrollbackBuffer = new QByteArray;
@@ -742,7 +749,7 @@ hugo_displaypicture( HUGO_FILE infile, long len )
 {
     int result;
     QMetaObject::invokeMethod(hHandlers, "displaypicture", INVOKE_BLOCK,
-                              Q_RETURN_ARG(int, result), Q_ARG(HUGO_FILE, infile), Q_ARG(long, len));
+                              Q_ARG(HUGO_FILE, infile), Q_ARG(long, len), Q_ARG(int*, &result));
     return result;
 }
 
@@ -752,8 +759,8 @@ hugo_playmusic( HUGO_FILE infile, long reslength, char loop_flag )
 {
     int result;
     QMetaObject::invokeMethod(hHandlers, "playmusic", INVOKE_BLOCK,
-                              Q_RETURN_ARG(int, result), Q_ARG(HUGO_FILE, infile), Q_ARG(long, reslength),
-                              Q_ARG(char, loop_flag));
+                              Q_ARG(HUGO_FILE, infile), Q_ARG(long, reslength),
+                              Q_ARG(char, loop_flag), Q_ARG(int*, &result));
     return result;
 }
 
@@ -777,8 +784,8 @@ hugo_playsample( HUGO_FILE infile, long reslength, char loop_flag )
 {
     int result;
     QMetaObject::invokeMethod(hHandlers, "playsample", INVOKE_BLOCK,
-                              Q_RETURN_ARG(int, result), Q_ARG(HUGO_FILE, infile), Q_ARG(long, reslength),
-                              Q_ARG(char, loop_flag));
+                              Q_ARG(HUGO_FILE, infile), Q_ARG(long, reslength),
+                              Q_ARG(char, loop_flag), Q_ARG(int*, &result));
     return result;
 }
 
@@ -837,9 +844,9 @@ int
 hugo_playvideo( HUGO_FILE infile, long len, char loop, char bg, int vol )
 {
     int result;
-    QMetaObject::invokeMethod(hHandlers, "playvideo", INVOKE_BLOCK, Q_RETURN_ARG(int, result),
+    QMetaObject::invokeMethod(hHandlers, "playvideo", INVOKE_BLOCK,
                               Q_ARG(HUGO_FILE, infile), Q_ARG(long, len), Q_ARG(char, loop),
-                              Q_ARG(char, bg), Q_ARG(int, vol));
+                              Q_ARG(char, bg), Q_ARG(int, vol), Q_ARG(int*, &result));
     return result;
 }
 

@@ -3,6 +3,7 @@
 #ifndef DISABLE_VIDEO
 
 #include <QWidget>
+#include <cstdio>
 
 
 class VideoPlayer: public QWidget {

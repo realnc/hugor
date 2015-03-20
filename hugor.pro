@@ -7,6 +7,10 @@ TARGET = hugor
 ICON = mac_icon.icns
 RC_FILE += hugor.rc
 
+contains(QT_MAJOR_VERSION, 4):lessThan(QT_MINOR_VERSION, 6) {
+    error(Qt $$QT_VERSION is not supported. You need at least version 4.6.)
+}
+
 !disable-audio {
     sdl-1.2 {
         PKGCONFIG += SDL_mixer

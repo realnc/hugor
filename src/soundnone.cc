@@ -18,11 +18,11 @@ muteSound(bool)
 { }
 
 
-int
-HugoHandlers::playmusic(HUGO_FILE infile, long, char)
+void
+HugoHandlers::playmusic(HUGO_FILE infile, long, char, int* result)
 {
     std::fclose(infile);
-    return false;
+    *result = false;
 }
 
 
@@ -36,11 +36,11 @@ HugoHandlers::stopmusic()
 { }
 
 
-int
-HugoHandlers::playsample(HUGO_FILE infile, long, char)
+void
+HugoHandlers::playsample(HUGO_FILE infile, long, char, int* result)
 {
     std::fclose(infile);
-    return false;
+    *result = false;
 }
 
 

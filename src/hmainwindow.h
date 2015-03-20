@@ -19,10 +19,8 @@ class HMainWindow: public QMainWindow {
     class QAction* fFullscreenAction;
     class QAction* fScrollbackAction;
     bool fMenuBarVisible;
-#if QT_VERSION >= 0x040600
     QIcon fFullscreenEnterIcon;
     QIcon fFullscreenExitIcon;
-#endif
 
     void
     fFullscreenAdjust();

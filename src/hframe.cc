@@ -275,11 +275,7 @@ HFrame::keyPressEvent( QKeyEvent* e )
         i = 0;
     } else if (e->matches(QKeySequence::MoveToEndOfLine) or e->matches(QKeySequence::MoveToEndOfBlock)) {
         i = buf.length();
-#if QT_VERSION >= 0x040500
     } else if (e->matches(QKeySequence::InsertParagraphSeparator)) {
-#else
-    } else if (e->key() == Qt::Key_Enter or e->key() == Qt::Key_Return) {
-#endif
         fEndInputMode(true);
         return;
     } else if (e->matches(QKeySequence::Delete)) {
