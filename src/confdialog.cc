@@ -26,6 +26,7 @@ ConfDialog::ConfDialog( HMainWindow* parent )
     ui->mainTextColorButton->setFixedSize(macSize);
     ui->bannerBgColorButton->setFixedSize(macSize);
     ui->bannerTextColorButton->setFixedSize(macSize);
+    ui->fsMarginColorButton->setFixedSize(macSize);
 #endif
 
     ui->allowGraphicsCheckBox->setChecked(sett->enableGraphics);
