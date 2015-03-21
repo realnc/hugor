@@ -6,7 +6,7 @@
 #include "settings.h"
 
 
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_WIN
 extern "C" {
 //GST_PLUGIN_STATIC_DECLARE(accurip);
 GST_PLUGIN_STATIC_DECLARE(adder);
@@ -277,7 +277,7 @@ registerGstStaticPlugins()
     GST_PLUGIN_STATIC_REGISTER(y4menc);
     GST_PLUGIN_STATIC_REGISTER(yadif);
 }
-#endif // Q_OS_WIN32
+#endif // Q_OS_WIN
 
 
 void initVideoEngine(int& argc, char* argv[])
@@ -295,7 +295,7 @@ void initVideoEngine(int& argc, char* argv[])
         hApp->settings()->videoSysError = true;
     }
 
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_WIN
     registerGstStaticPlugins();
 #endif
 }

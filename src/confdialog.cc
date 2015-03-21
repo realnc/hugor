@@ -18,7 +18,7 @@ ConfDialog::ConfDialog( HMainWindow* parent )
     Settings* sett = hApp->settings();
     sett->loadFromDisk();
 
-#ifdef Q_WS_MAC
+#ifdef Q_OS_MAC
     // On the Mac, make the color selection buttons smaller so that they
     // become square instead of round.
     QSize macSize(48, 24);
@@ -71,7 +71,7 @@ ConfDialog::ConfDialog( HMainWindow* parent )
         ui->scriptWrapSpinBox->setValue(sett->scriptWrap);
     }
 
-#ifdef Q_WS_MAC
+#ifdef Q_OS_MAC
     // On Mac OS X, the dialog should not have any buttons, and settings
     // changes should apply instantly.
     this->fMakeInstantApply();

@@ -84,7 +84,7 @@ Settings::loadFromDisk( SettingsOverrides* ovr )
     sett.beginGroup(SETT_MEDIA_GRP);
     this->enableGraphics = sett.value(SETT_GRAPHICS, true).toBool();
     this->enableVideo = sett.value(SETT_VIDEO, true).toBool();
-#ifndef Q_WS_ANDROID
+#ifndef Q_OS_ANDROID
     this->enableSoundEffects = sett.value(SETT_SOUNDS, true).toBool();
     this->enableMusic = sett.value(SETT_MUSIC, true).toBool();
 #else
@@ -104,15 +104,15 @@ Settings::loadFromDisk( SettingsOverrides* ovr )
     this->fsMarginColor = sett.value(SETT_MARGIN_COLOR, hugoColorToQt(DEF_BGCOLOR)).value<QColor>();
     sett.endGroup();
 
-#ifdef Q_WS_MAC
+#ifdef Q_OS_MAC
     const QString& DEFAULT_PROP = QString::fromLatin1("Georgia,15");
     const QString& DEFAULT_MONO = QString::fromLatin1("Andale Mono,15");
 #else
-#ifdef Q_WS_WIN
+#ifdef Q_OS_WIN
     const QString& DEFAULT_PROP = QString::fromLatin1("Times New Roman,12");
     const QString& DEFAULT_MONO = QString::fromLatin1("Courier New,12");
 #else
-#ifdef Q_WS_ANDROID
+#ifdef Q_OS_ANDROID
     const QString& DEFAULT_PROP = QString::fromLatin1("Droid Serif");
     const QString& DEFAULT_MONO = QString::fromLatin1("Droid Sans Mono");
 #else

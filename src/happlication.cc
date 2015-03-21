@@ -86,8 +86,7 @@ HApplication::HApplication( int& argc, char* argv[], const char* appName,
         }
     }
 
-// FIXME: Also use Gnome for OS X.
-#ifdef Q_WS_X11
+#ifdef Q_OS_UNIX
     // Detect whether we're running in Gnome.
     QDialogButtonBox::ButtonLayout layoutPolicy
         = QDialogButtonBox::ButtonLayout(QApplication::style()->styleHint(QStyle::SH_DialogButtonLayout));
@@ -133,7 +132,7 @@ HApplication::HApplication( int& argc, char* argv[], const char* appName,
 
     // Set application window icon, unless we're on OS X where the bundle
     // icon is used.
-#ifndef Q_WS_MAC
+#ifndef Q_OS_MAC
     this->setWindowIcon(QIcon(":/he_32-bit_48x48.png"));
 #endif
     delete settOvr;
@@ -177,7 +176,7 @@ HApplication::fRunGame()
 
         // Set the application's window title to contain the filename of
         // the game we're running. The game is free to change that later on.
-#ifdef Q_WS_MAC
+#ifdef Q_OS_MAC
         // Just use the filename on OS X.  Seems to be the norm there.
         //qWinGroup->setWindowTitle(finfo.fileName());
 #else
@@ -289,7 +288,7 @@ HApplication::updateMargins( int color )
 }
 
 
-#ifdef Q_WS_MAC
+#ifdef Q_OS_MAC
 #include <QFileOpenEvent>
 bool
 HApplication::event( QEvent* e )

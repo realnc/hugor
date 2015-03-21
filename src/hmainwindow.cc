@@ -39,7 +39,7 @@ HMainWindow::HMainWindow( QWidget* parent )
     // We make our menu bar parentless so it will be shared by all our windows
     // in Mac OS X.
     QMenuBar* menuBar = new QMenuBar(0);
-#ifndef Q_WS_MAC
+#ifndef Q_OS_MAC
     this->setMenuBar(menuBar);
 #endif
 
@@ -64,7 +64,7 @@ HMainWindow::HMainWindow( QWidget* parent )
     connect(act, SIGNAL(triggered()), SLOT(showScrollback()));
     fScrollbackAction = act;
 
-#ifdef Q_WS_MAC
+#ifdef Q_OS_MAC
     act = new QAction(tr("Enter &Full Screen"), this);
 #else
     act = new QAction(tr("&Fullscreen Mode"), this);
@@ -72,9 +72,9 @@ HMainWindow::HMainWindow( QWidget* parent )
 #endif
     act->setIcon(this->fFullscreenEnterIcon);
     QList<QKeySequence> keySeqList;
-#ifdef Q_WS_MAC
+#ifdef Q_OS_MAC
     keySeqList.append(QKeySequence("Meta+Ctrl+F"));
-#elif defined(Q_WS_WIN)
+#elif defined(Q_OS_WIN)
     keySeqList.append(QKeySequence("F11"));
     keySeqList.append(QKeySequence("Alt+Return"));
     keySeqList.append(QKeySequence("Alt+Enter"));
@@ -119,7 +119,7 @@ HMainWindow::fFullscreenAdjust()
 {
     if (this->isFullScreen()) {
         this->fFullscreenAction->setIcon(this->fFullscreenExitIcon);
-#ifdef Q_WS_MAC
+#ifdef Q_OS_MAC
         this->fFullscreenAction->setText("Exit Full Screen");
 #else
         this->fFullscreenAction->setChecked(true);
@@ -127,7 +127,7 @@ HMainWindow::fFullscreenAdjust()
 #endif
     } else {
         this->fFullscreenAction->setIcon(this->fFullscreenEnterIcon);
-#ifdef Q_WS_MAC
+#ifdef Q_OS_MAC
         this->fFullscreenAction->setText("Enter Full Screen");
 #else
         this->fFullscreenAction->setChecked(false);
@@ -153,7 +153,7 @@ HMainWindow::fShowConfDialog()
     this->fConfDialog = new ConfDialog(this);
     this->fConfDialog->setWindowTitle(hApp->applicationName() + ' ' + tr("Preferences"));
     connect(this->fConfDialog, SIGNAL(finished(int)), this, SLOT(fHideConfDialog()));
-#ifdef Q_WS_MAC
+#ifdef Q_OS_MAC
     // There's a bug in Qt for OS X that results in a visual glitch with
     // QFontComboBox widgets inside QFormLayouts.  Making the dialog 4 pixels
     // higher fixes it.
@@ -315,7 +315,7 @@ HMainWindow::closeEvent( QCloseEvent* e )
                                           QMessageBox::Yes | QMessageBox::Cancel, this);
     msgBox->setDefaultButton(QMessageBox::Cancel);
     msgBox->setInformativeText(tr("Any unsaved progress in the story will be lost."));
-#ifdef Q_WS_MAC
+#ifdef Q_OS_MAC
     msgBox->setIconPixmap(QPixmap(":/he_32-bit_72x72.png"));
     // This presents the dialog as a sheet in OS X.
     msgBox->setWindowModality(Qt::WindowModal);

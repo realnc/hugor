@@ -51,7 +51,7 @@ class HApplication: public QApplication {
     void
     fUpdateMarginColor( int color );
 
-#ifdef Q_WS_MAC
+#ifdef Q_OS_MAC
   protected:
     // On the Mac, dropping a file on our application icon will generate a
     // FileOpen event, so we override this to be able to handle it.
