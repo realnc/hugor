@@ -12,10 +12,10 @@ contains(QT_MAJOR_VERSION, 4):lessThan(QT_MINOR_VERSION, 6) {
 }
 
 !disable-audio {
-    sdl-1.2 {
-        PKGCONFIG += SDL_mixer
-    } else {
+    sdl2 {
         PKGCONFIG += SDL2_mixer
+    } else {
+        PKGCONFIG += SDL_mixer
     }
     SOURCES += src/soundsdl.cc
     SOURCES *= src/rwopsbundle.c
@@ -27,10 +27,10 @@ contains(QT_MAJOR_VERSION, 4):lessThan(QT_MINOR_VERSION, 6) {
 !disable-video {
     # We still need SDL for SDL_RWops, even without audio.
     disable-audio {
-        sdl-1.2 {
-            PKGCONFIG += sdl
-        } else {
+        sdl2 {
             PKGCONFIG += sdl2
+        } else {
+            PKGCONFIG += sdl
         }
     }
     qt5-video {
