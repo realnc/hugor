@@ -86,13 +86,16 @@ HApplication::HApplication( int& argc, char* argv[], const char* appName,
         }
     }
 
+// FIXME: Also use Gnome for OS X.
 #ifdef Q_WS_X11
     // Detect whether we're running in Gnome.
     QDialogButtonBox::ButtonLayout layoutPolicy
         = QDialogButtonBox::ButtonLayout(QApplication::style()->styleHint(QStyle::SH_DialogButtonLayout));
-    fDesktopIsGnome = layoutPolicy == QDialogButtonBox::GnomeLayout;
-#elif defined(Q_OS_MAC)
-    fDesktopIsGnome = true;
+    if (layoutPolicy == QDialogButtonBox::GnomeLayout) {
+        this->fDesktopIsGnome = true;
+    } else {
+        this->fDesktopIsGnome = false;
+    }
 #endif
 
     // Load our persistent settings.
