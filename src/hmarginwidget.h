@@ -10,6 +10,7 @@ class HMarginWidget: public QWidget {
   private:
     QWidget* fBannerWidget;
     class QVBoxLayout* fLayout;
+    QColor fColor;
 
   public:
     HMarginWidget( QWidget* parent = 0 );
@@ -26,6 +27,9 @@ class HMarginWidget: public QWidget {
 
     void
     removeWidget( QWidget* w );
+
+    void
+    setColor(QColor color);
 
   protected:
     virtual void

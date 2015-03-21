@@ -4,11 +4,13 @@
 
 #include "hmarginwidget.h"
 #include "hmainwindow.h"
+#include "hugodefs.h"
 
 
-HMarginWidget::HMarginWidget( QWidget* parent )
+HMarginWidget::HMarginWidget(QWidget* parent )
     : QWidget(parent),
-      fBannerWidget(0)
+      fBannerWidget(0),
+      fColor(hugoColorToQt(17))
 {
     this->fLayout = new QVBoxLayout;
     this->fLayout->setContentsMargins(0, 0, 0, 0);
@@ -46,10 +48,9 @@ HMarginWidget::paintEvent(QPaintEvent*)
     if (m.isNull()) {
         return;
     }
-    const QBrush& color = palette().background();
     QPainter p(this);
-    p.fillRect(0, 0, m.left(), height(), color);
-    p.fillRect(width() - m.right(), 0, m.right(), height(), color);
+    p.fillRect(0, 0, m.left(), height(), fColor);
+    p.fillRect(width() - m.right(), 0, m.right(), height(), fColor);
 }
 
 
@@ -81,4 +82,11 @@ void
 HMarginWidget::removeWidget( QWidget* w )
 {
     this->fLayout->removeWidget(w);
+}
+
+
+void
+HMarginWidget::setColor(QColor color)
+{
+    fColor = color;
 }

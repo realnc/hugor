@@ -121,7 +121,7 @@ HApplication::HApplication( int& argc, char* argv[], const char* appName,
 
     this->fFrameWin = new HFrame(this->fMarginWidget);
     this->fMarginWidget->addWidget(this->fFrameWin);
-    this->updateMargins(::bgcolor);
+    this->updateMargins(-1);
     this->fMainWin->setCentralWidget(this->fMarginWidget);
 
     if (settOvr and settOvr->hideMenuBar) {
@@ -244,13 +244,11 @@ HApplication::fUpdateMarginColor( int color )
     if (color < 0)
         return;
 
-    QPalette palette = this->fMarginWidget->palette();
     const Settings* sett = hApp->settings();
     const QColor& qColor = (hMainWin->isFullScreen() and sett->customFsMarginColor)
                            ? sett->fsMarginColor
                            : hugoColorToQt(color);
-    palette.setColor(QPalette::Window, qColor);
-    this->fMarginWidget->setPalette(palette);
+    fMarginWidget->setColor(qColor);
 }
 
 

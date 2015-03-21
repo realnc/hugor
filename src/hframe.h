@@ -73,7 +73,6 @@ class HFrame: public QWidget {
     // Current colors.
     int fFgColor;
     int fBgColor;
-    int fMarginColor;
 
     // Current font attributes.
     bool fUseFixedFont;

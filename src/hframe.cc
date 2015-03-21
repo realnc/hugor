@@ -31,9 +31,8 @@ HFrame::HFrame( QWidget* parent )
       fInputCurrentChar(0),
       fMaxHistCap(200),
       fCurHistIndex(0),
-      fFgColor(HUGO_BLACK),
-      fBgColor(HUGO_WHITE),
-      fMarginColor(HUGO_WHITE),
+      fFgColor(16), // Default text color
+      fBgColor(17), // Default background color
       fUseFixedFont(false),
       fUseUnderlineFont(false),
       fUseItalicFont(false),
@@ -551,7 +550,13 @@ HFrame::clearRegion( int left, int top, int right, int bottom )
         return;
     }
     QPainter p(&fPixmap);
-    p.fillRect(left, top, right - left + 1, bottom - top + 1, hugoColorToQt(this->fBgColor));
+    QRect rect(left, top, right - left + 1, bottom - top + 1);
+    p.fillRect(rect, hugoColorToQt(this->fBgColor));
+
+    // If this was a fullscreen clear, then also clear the margin color.
+    if (rect == fPixmap.rect()) {
+        hApp->updateMargins(fBgColor);
+    }
 }
 
 
@@ -568,7 +573,6 @@ HFrame::setBgColor(int color)
 {
     this->flushText();
     this->fBgColor = color;
-    fMarginColor = fBgColor;
 }
 
 
@@ -674,6 +678,7 @@ HFrame::updateGameScreen(bool force)
         //qDebug(Q_FUNC_INFO);
         hApp->updateMargins(this->fBgColor);
         fNeedScreenUpdate = false;
+        hApp->marginWidget()->update();
         update();
     }
 }
