@@ -12,9 +12,7 @@ contains(QT_MAJOR_VERSION, 4):lessThan(QT_MINOR_VERSION, 6) {
     error(Qt $$QT_VERSION is not supported. You need at least version 4.6.)
 }
 
-static-qt {
-    DEFINES += STATIC_QT
-}
+static:DEFINES += STATIC_QT
 
 !disable-audio {
     sdl2 {
@@ -79,7 +77,7 @@ static-qt {
 }
 
 # Static OS X builds against Qt4 need to explicitly include the text codec plugins.
-macx:static-qt:contains(QT_MAJOR_VERSION, 4) {
+macx:static:contains(QT_MAJOR_VERSION, 4) {
     QTPLUGIN += qcncodecs qjpcodecs qtwcodecs qkrcodecs
 }
 
