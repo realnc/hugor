@@ -1,4 +1,5 @@
 QT += core
+QT_CONFIG -= no-pkg-config
 contains(QT_MAJOR_VERSION, 5):QT += widgets
 TEMPLATE = app
 CONFIG += warn_on link_pkgconfig exceptions
