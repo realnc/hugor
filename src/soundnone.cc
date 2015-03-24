@@ -19,6 +19,16 @@ muteSound(bool)
 
 
 void
+updateMusicVolume()
+{ }
+
+
+void
+updateSoundVolume()
+{ }
+
+
+void
 HugoHandlers::playmusic(HUGO_FILE infile, long, char, int* result)
 {
     std::fclose(infile);

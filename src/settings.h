@@ -26,6 +26,8 @@ class Settings {
     bool enableMusic;
     bool useSmoothScaling;
     bool muteSoundInBackground;
+    int musicVolume;
+    int soundVolume;
 
     QColor mainTextColor;
     QColor mainBgColor;

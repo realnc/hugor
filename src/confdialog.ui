@@ -313,6 +313,55 @@
           </property>
          </widget>
         </item>
+        <item>
+         <widget class="QLabel" name="label_5">
+          <property name="text">
+           <string>Music Volume</string>
+          </property>
+          <property name="buddy">
+           <cstring>musicVolSlider</cstring>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QSlider" name="musicVolSlider">
+          <property name="maximum">
+           <number>100</number>
+          </property>
+          <property name="value">
+           <number>100</number>
+          </property>
+          <property name="sliderPosition">
+           <number>100</number>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_7">
+          <property name="text">
+           <string>Sound Effects Volume</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QSlider" name="fxVolSlider">
+          <property name="maximum">
+           <number>100</number>
+          </property>
+          <property name="value">
+           <number>100</number>
+          </property>
+          <property name="sliderPosition">
+           <number>100</number>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
        </layout>
       </widget>
      </item>
@@ -486,8 +535,8 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>269</x>
-     <y>503</y>
+     <x>278</x>
+     <y>568</y>
     </hint>
     <hint type="destinationlabel">
      <x>157</x>
@@ -502,8 +551,8 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>341</x>
-     <y>503</y>
+     <x>350</x>
+     <y>568</y>
     </hint>
     <hint type="destinationlabel">
      <x>286</x>

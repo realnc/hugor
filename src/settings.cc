@@ -53,6 +53,8 @@ qtRuntimeVersion()
 #define SETT_MUSIC QString::fromLatin1("music")
 #define SETT_SMOOTH_IMAGES QString::fromLatin1("smoothImageScaling")
 #define SETT_PAUSE_SOUND QString::fromLatin1("pauseSoundInBackground")
+#define SETT_MUSIC_VOL QString::fromLatin1("musicVolume")
+#define SETT_SOUND_VOL QString::fromLatin1("soundVolume")
 #define SETT_MAIN_BG_COLOR QString::fromLatin1("mainbg")
 #define SETT_MAIN_TXT_COLOR QString::fromLatin1("maintext")
 #define SETT_STATUS_BG_COLOR QString::fromLatin1("bannerbg")
@@ -93,6 +95,8 @@ Settings::loadFromDisk( SettingsOverrides* ovr )
 #endif
     this->useSmoothScaling = sett.value(SETT_SMOOTH_IMAGES, true).toBool();
     this->muteSoundInBackground = sett.value(SETT_PAUSE_SOUND, true).toBool();
+    this->musicVolume = sett.value(SETT_MUSIC_VOL, 100).toInt();
+    this->soundVolume = sett.value(SETT_SOUND_VOL, 100).toInt();
     sett.endGroup();
 
     sett.beginGroup(SETT_COLORS_GRP);
@@ -254,6 +258,8 @@ Settings::saveToDisk()
     sett.setValue(SETT_MUSIC, this->enableMusic);
     sett.setValue(SETT_SMOOTH_IMAGES, this->useSmoothScaling);
     sett.setValue(SETT_PAUSE_SOUND, this->muteSoundInBackground);
+    sett.setValue(SETT_MUSIC_VOL, this->musicVolume);
+    sett.setValue(SETT_SOUND_VOL, this->soundVolume);
     sett.endGroup();
 
     sett.beginGroup(SETT_COLORS_GRP);

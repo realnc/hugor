@@ -393,6 +393,8 @@ HApplication::notifyPreferencesChange( const Settings* sett )
     if (not sett->enableSoundEffects) {
         hHandlers->stopsample();
     }
+    updateMusicVolume();
+    updateSoundVolume();
 #endif
 #ifndef DISABLE_VIDEO
     if (not sett->enableVideo) {

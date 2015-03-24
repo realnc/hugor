@@ -3,6 +3,7 @@
 #include <QDebug>
 #include <QFile>
 #include <cstdio>
+#include <cmath>
 
 extern "C" {
 #include "heheader.h"
@@ -11,6 +12,7 @@ extern "C" {
 #include "settings.h"
 #include "rwopsbundle.h"
 #include "hugohandlers.h"
+#include "hugodefs.h"
 
 
 // Current music and sample volumes. Needed to restore the volumes
@@ -74,6 +76,20 @@ muteSound( bool mute )
         Mix_Volume(-1, currentSampleVol);
         isMuted = false;
     }
+}
+
+
+void
+updateMusicVolume()
+{
+    hHandlers->musicvolume(currentMusicVol);
+}
+
+
+void
+updateSoundVolume()
+{
+    hHandlers->samplevolume(currentSampleVol);
 }
 
 
@@ -142,6 +158,7 @@ HugoHandlers::playmusic(HUGO_FILE infile, long reslength, char loop_flag, int* r
 
     // Start playing the music. Loop forever if 'loop_flag' is true.
     // Otherwise, just play it once.
+    updateMusicVolume();
     if (Mix_PlayMusic(music, loop_flag ? -1 : 1) != 0) {
         qWarning() << "ERROR:" << Mix_GetError();
         Mix_FreeMusic(music);
@@ -163,10 +180,16 @@ HugoHandlers::musicvolume(int vol)
     // Convert the Hugo volume range [0..100] to the SDL volume
     // range [0..MIX_MAX_VOLUME].
     vol = (vol * MIX_MAX_VOLUME) / 100;
+    currentMusicVol = vol;
+
+    // Attenuate the result by the global volume setting. Use an exponential
+    // volume scale (we actually want the third power or higher, but
+    // SDL_mixer's shitty range of 0..128 doesn't really allow for that.)
+    vol = vol * std::pow((float)hApp->settings()->musicVolume / 100.f, 2);
+
     if (not isMuted) {
         Mix_VolumeMusic(vol);
     }
-    currentMusicVol = vol;
 }
 
 
@@ -239,6 +262,7 @@ HugoHandlers::playsample(HUGO_FILE infile, long reslength, char loop_flag, int* 
 
     // Start playing the sample. Loop forever if 'loop_flag' is true.
     // Otherwise, just play it once.
+    updateSoundVolume();
     if (Mix_PlayChannel(-1, chunk, loop_flag ? -1 : 0) < 0) {
         qWarning() << "ERROR:" << Mix_GetError();
         Mix_FreeChunk(chunk);
@@ -260,10 +284,16 @@ HugoHandlers::samplevolume(int vol)
     // Convert the Hugo volume range [0..100] to the SDL volume
     // range [0..MIX_MAX_VOLUME].
     vol = (vol * MIX_MAX_VOLUME) / 100;
+    currentSampleVol = vol;
+
+    // Attenuate the result by the global volume setting. Use an exponential
+    // volume scale (we actually want the third power or higher, but
+    // SDL_mixer's shitty range of 0..128 doesn't really allow for that.)
+    vol = vol * std::pow((float)hApp->settings()->soundVolume / 100.f, 2);
+
     if (not isMuted) {
         Mix_Volume(-1, vol);
     }
-    currentSampleVol = vol;
 }
 
 

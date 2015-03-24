@@ -9,6 +9,8 @@ void initVideoEngine( int& argc, char* argv[] );
 void closeSoundEngine();
 void closeVideoEngine();
 void muteSound( bool mute );
+void updateMusicVolume();
+void updateSoundVolume();
 
 // Defined Hugo colors.
 #define HUGO_BLACK         0

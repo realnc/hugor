@@ -8,6 +8,7 @@
 #include "settings.h"
 #include "happlication.h"
 #include "hmainwindow.h"
+#include "hugodefs.h"
 
 
 ConfDialog::ConfDialog( HMainWindow* parent )
@@ -17,6 +18,9 @@ ConfDialog::ConfDialog( HMainWindow* parent )
     ui->setupUi(this);
     Settings* sett = hApp->settings();
     sett->loadFromDisk();
+
+    fInitialMusicVol = sett->musicVolume;
+    fInitialSoundVol = sett->soundVolume;
 
 #ifdef Q_OS_MAC
     // On the Mac, make the color selection buttons smaller so that they
@@ -39,10 +43,18 @@ ConfDialog::ConfDialog( HMainWindow* parent )
     ui->allowSoundEffectsCheckBox->setDisabled(true);
     ui->allowMusicCheckBox->setDisabled(true);
     ui->muteSoundCheckBox->setDisabled(true);
+    ui->musicVolSlider->setValue(0);
+    ui->musicVolSlider->setDisabled(true);
+    ui->fxVolSlider->setValue(0);
+    ui->fxVolSlider->setDisabled(true);
 #else
     ui->allowSoundEffectsCheckBox->setChecked(sett->enableSoundEffects);
     ui->allowMusicCheckBox->setChecked(sett->enableMusic);
     ui->muteSoundCheckBox->setChecked(sett->muteSoundInBackground);
+    ui->musicVolSlider->setValue(sett->musicVolume);
+    ui->fxVolSlider->setValue(sett->soundVolume);
+    connect(ui->musicVolSlider, SIGNAL(valueChanged(int)), SLOT(fSetMusicVolume(int)));
+    connect(ui->fxVolSlider, SIGNAL(valueChanged(int)), SLOT(fSetSoundVolume(int)));
 #endif
     ui->smoothScalingCheckBox->setChecked(sett->useSmoothScaling);
 
@@ -90,6 +102,7 @@ ConfDialog::ConfDialog( HMainWindow* parent )
         ui->buttonBox->setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Apply | QDialogButtonBox::Cancel);
         connect(ui->buttonBox->button(QDialogButtonBox::Apply), SIGNAL(clicked()), this, SLOT(fApplySettings()));
         connect(this, SIGNAL(accepted()), this, SLOT(fApplySettings()));
+        connect(this, SIGNAL(rejected()), SLOT(fCancel()));
     }
 #endif
 }
@@ -134,6 +147,8 @@ ConfDialog::fMakeInstantApply()
     connect(ui->allowMusicCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
     connect(ui->smoothScalingCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
     connect(ui->muteSoundCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
+    connect(ui->musicVolSlider, SIGNAL(valueChanged(int)), SLOT(fApplySettings()));
+    connect(ui->fxVolSlider, SIGNAL(valueChanged(int)), SLOT(fApplySettings()));
     connect(ui->overlayScrollbackCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
     connect(ui->mainTextColorButton, SIGNAL(changed(QColor)), this, SLOT(fApplySettings()));
     connect(ui->mainBgColorButton, SIGNAL(changed(QColor)), this, SLOT(fApplySettings()));
@@ -155,6 +170,8 @@ ConfDialog::fApplySettings()
     sett->enableMusic = ui->allowMusicCheckBox->isChecked();
     sett->useSmoothScaling = ui->smoothScalingCheckBox->isChecked();
     sett->muteSoundInBackground = ui->muteSoundCheckBox->isChecked();
+    sett->musicVolume = ui->musicVolSlider->value();
+    sett->soundVolume = ui->fxVolSlider->value();
     sett->mainBgColor = ui->mainBgColorButton->color();
     sett->mainTextColor = ui->mainTextColorButton->color();
     sett->statusBgColor = ui->bannerBgColorButton->color();
@@ -182,4 +199,33 @@ ConfDialog::fApplySettings()
     hApp->notifyPreferencesChange(sett);
 
     sett->saveToDisk();
+
+    fInitialMusicVol = sett->musicVolume;
+    fInitialSoundVol = sett->soundVolume;
+}
+
+
+void
+ConfDialog::fCancel()
+{
+    hApp->settings()->musicVolume = fInitialMusicVol;
+    hApp->settings()->soundVolume = fInitialSoundVol;
+    updateMusicVolume();
+    updateSoundVolume();
+}
+
+
+void
+ConfDialog::fSetMusicVolume(int vol)
+{
+    hApp->settings()->musicVolume = vol;
+    updateMusicVolume();
+}
+
+
+void
+ConfDialog::fSetSoundVolume(int vol)
+{
+    hApp->settings()->soundVolume = vol;
+    updateSoundVolume();
 }
