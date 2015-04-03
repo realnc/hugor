@@ -68,13 +68,13 @@ void
 muteSound( bool mute )
 {
     if (mute and not isMuted) {
+        isMuted = true;
         Mix_VolumeMusic(0);
         Mix_Volume(-1, 0);
-        isMuted = true;
     } else if (not mute and isMuted) {
-        Mix_VolumeMusic(currentMusicVol);
-        Mix_Volume(-1, currentSampleVol);
         isMuted = false;
+        updateMusicVolume();
+        updateSoundVolume();
     }
 }
 
