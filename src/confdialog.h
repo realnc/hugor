@@ -21,7 +21,6 @@ class ConfDialog: public QDialog {
 
   private:
     Ui::ConfDialog* ui;
-    int fInitialMusicVol;
     int fInitialSoundVol;
 
     // Makes the dialog's controls apply instantly when they change.
@@ -34,9 +33,6 @@ class ConfDialog: public QDialog {
 
     void
     fCancel();
-
-    void
-    fSetMusicVolume(int vol);
 
     void
     fSetSoundVolume(int vol);

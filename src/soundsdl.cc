@@ -185,7 +185,7 @@ HugoHandlers::musicvolume(int vol)
     // Attenuate the result by the global volume setting. Use an exponential
     // volume scale (we actually want the third power or higher, but
     // SDL_mixer's shitty range of 0..128 doesn't really allow for that.)
-    vol = vol * std::pow((float)hApp->settings()->musicVolume / 100.f, 2);
+    vol = vol * std::pow((float)hApp->settings()->soundVolume / 100.f, 2);
 
     if (not isMuted) {
         Mix_VolumeMusic(vol);
