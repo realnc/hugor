@@ -108,6 +108,7 @@ void
 HFrame::fMuteSound()
 {
     muteSound(true);
+    muteVideo(true);
 }
 
 
@@ -141,6 +142,7 @@ HFrame::fHandleFocusChange( QWidget* old, QWidget* now )
     } else if (old == 0 and now != 0) {
         this->fMuteTimer->stop();
         muteSound(false);
+        muteVideo(false);
         // The application window gained focus.  Reset cursor blinking.
         this->resetCursorBlinking();
     }

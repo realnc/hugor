@@ -806,6 +806,14 @@ hugo_stopsample( void )
 
 #ifdef DISABLE_VIDEO
 
+void
+muteVideo(bool)
+{ }
+
+void
+updateVideoVolume()
+{ }
+
 int
 hugo_hasvideo( void )
 { return false; }

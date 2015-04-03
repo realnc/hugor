@@ -18,7 +18,9 @@ public:
 public slots:
     void play();
     void stop();
+    void updateVolume();
     void setVolume(int vol);
+    void setMute(bool mute);
 
 signals:
     void videoFinished();

@@ -40,7 +40,8 @@ VideoPlayer_priv::VideoPlayer_priv(QWidget* parent, class VideoPlayer* qPtr)
       q(qPtr),
       fPipeline(0),
       fAppSrc(0),
-      fBus(0)
+      fBus(0),
+      fVolume(100)
 {
     memset(&fAppSrcCbs, 0, sizeof(fAppSrcCbs));
 

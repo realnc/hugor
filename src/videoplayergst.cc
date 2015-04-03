@@ -4,6 +4,7 @@
 #include <QResizeEvent>
 #include <QErrorMessage>
 #include <QDebug>
+#include <cmath>
 #include <glib.h>
 #include <gst/gstversion.h>
 #include <gst/gstelement.h>
@@ -19,7 +20,37 @@
 #include "happlication.h"
 #include "hmainwindow.h"
 #include "hframe.h"
+#include "settings.h"
 #include "rwopsbundle.h"
+#include "hugodefs.h"
+
+
+static bool isMuted = false;
+static VideoPlayer* currentVideo = 0;
+
+
+void muteVideo(bool mute)
+{
+    if (mute and not isMuted) {
+        isMuted = true;
+        if (currentVideo) {
+            currentVideo->setMute(true);
+        }
+    } else if (not mute and isMuted) {
+        isMuted = false;
+        if (currentVideo) {
+            currentVideo->setMute(false);
+        }
+    }
+}
+
+
+void updateVideoVolume()
+{
+    if (currentVideo) {
+        currentVideo->updateVolume();
+    }
+}
 
 
 VideoPlayer::VideoPlayer(QWidget *parent)
@@ -38,6 +69,7 @@ VideoPlayer::VideoPlayer(QWidget *parent)
 VideoPlayer::~VideoPlayer()
 {
     if (d->fPipeline) {
+        ::currentVideo = 0;
         gst_bus_remove_signal_watch(d->fBus);
 #if not GST_CHECK_VERSION(1, 0, 0)
         gst_bus_disable_sync_message_emission(d->fBus);
@@ -147,6 +179,8 @@ VideoPlayer::play()
     hFrame->updateGameScreen(true);
 
     this->d->setMaximumSize(this->maximumSize());
+    ::currentVideo = this;
+    updateVolume();
     gst_element_set_state(d->fPipeline, GST_STATE_PLAYING);
     hApp->advanceEventLoop();
     if (this->fLooping) {
@@ -177,6 +211,15 @@ VideoPlayer::stop()
 
 
 void
+VideoPlayer::updateVolume()
+{
+    if (d->fPipeline) {
+        setVolume(d->fVolume);
+    }
+}
+
+
+void
 VideoPlayer::setVolume(int vol)
 {
     if (not d->fPipeline) {
@@ -187,9 +230,24 @@ VideoPlayer::setVolume(int vol)
     } else if (vol > 100) {
         vol = 100;
     }
-    g_object_set(d->fPipeline, "volume", (gdouble)vol / 100.0, NULL);
+    d->fVolume = vol;
+
+    // Attenuate the result by the global volume setting. Use an exponential
+    // volume scale. Use the second power instead of the third to be consistent
+    // with the SDL audio volume.
+    g_object_set(d->fPipeline, "volume",
+                 std::pow(((gdouble)vol * hApp->settings()->soundVolume) / 10000.0, 2),
+                 NULL);
 }
 
+
+void
+VideoPlayer::setMute(bool mute)
+{
+    if (d->fPipeline) {
+        g_object_set(d->fPipeline, "mute", mute, NULL);
+    }
+}
 
 void
 VideoPlayer::resizeEvent(QResizeEvent* e)

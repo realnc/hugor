@@ -395,6 +395,7 @@ HApplication::notifyPreferencesChange( const Settings* sett )
     }
     updateMusicVolume();
     updateSoundVolume();
+    updateVideoVolume();
 #endif
 #ifndef DISABLE_VIDEO
     if (not sett->enableVideo) {

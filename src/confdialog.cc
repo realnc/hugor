@@ -42,12 +42,15 @@ ConfDialog::ConfDialog( HMainWindow* parent )
     ui->allowSoundEffectsCheckBox->setDisabled(true);
     ui->allowMusicCheckBox->setDisabled(true);
     ui->muteSoundCheckBox->setDisabled(true);
-    ui->volumeSlider->setValue(0);
-    ui->volumeSlider->setDisabled(true);
 #else
     ui->allowSoundEffectsCheckBox->setChecked(sett->enableSoundEffects);
     ui->allowMusicCheckBox->setChecked(sett->enableMusic);
     ui->muteSoundCheckBox->setChecked(sett->muteSoundInBackground);
+#endif
+#if defined(DISABLE_VIDEO) and defined(DISABLE_AUDIO)
+    ui->volumeSlider->setValue(0);
+    ui->volumeSlider->setDisabled(true);
+#else
     ui->volumeSlider->setValue(sett->soundVolume);
     connect(ui->volumeSlider, SIGNAL(valueChanged(int)), SLOT(fSetSoundVolume(int)));
 #endif
@@ -203,6 +206,7 @@ ConfDialog::fCancel()
     hApp->settings()->soundVolume = fInitialSoundVol;
     updateMusicVolume();
     updateSoundVolume();
+    updateVideoVolume();
 }
 
 
@@ -212,4 +216,5 @@ ConfDialog::fSetSoundVolume(int vol)
     hApp->settings()->soundVolume = vol;
     updateMusicVolume();
     updateSoundVolume();
+    updateVideoVolume();
 }

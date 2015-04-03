@@ -17,6 +17,8 @@ public:
     GstAppSrc* fAppSrc;
     GstBus* fBus;
     GstAppSrcCallbacks fAppSrcCbs;
+    int fVolume;
+
     static GMainLoop* fGMainLoop;
     static GThread* fGMainLoopThread;
 
