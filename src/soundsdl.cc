@@ -17,8 +17,8 @@ extern "C" {
 
 // Current music and sample volumes. Needed to restore the volumes
 // after muting them.
-static int currentMusicVol = MIX_MAX_VOLUME;
-static int currentSampleVol = MIX_MAX_VOLUME;
+static int currentMusicVol = 100;
+static int currentSampleVol = 100;
 static bool isMuted = false;
 
 
