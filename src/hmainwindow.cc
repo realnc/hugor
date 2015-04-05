@@ -30,8 +30,8 @@ HMainWindow::HMainWindow( QWidget* parent )
     : QMainWindow(parent),
       fConfDialog(0),
       fAboutDialog(0),
-      fMenuBarVisible(true)
-      , fFullscreenEnterIcon(QIcon::fromTheme(QString::fromLatin1("view-fullscreen"))),
+      fMenuBarVisible(true),
+      fFullscreenEnterIcon(QIcon::fromTheme(QString::fromLatin1("view-fullscreen"))),
       fFullscreenExitIcon(QIcon::fromTheme(QString::fromLatin1("view-restore")))
 {
     Q_ASSERT(hMainWin == 0);
