@@ -260,7 +260,7 @@
           </widget>
          </item>
          <item row="2" column="0" colspan="2">
-          <widget class="QCheckBox" name="muteSoundCheckBox">
+          <widget class="QCheckBox" name="muteWhenMinimizedCheckBox">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -268,10 +268,10 @@
             </sizepolicy>
            </property>
            <property name="toolTip">
-            <string>&lt;p&gt;Mutes all sound when the application window loses focus.&lt;/p&gt;</string>
+            <string>&lt;p&gt;Mutes all sound when the application window is minimized.&lt;/p&gt;</string>
            </property>
            <property name="text">
-            <string>Mute Sound in &amp;Background</string>
+            <string>Mute When Mi&amp;nimized</string>
            </property>
           </widget>
          </item>
@@ -562,7 +562,7 @@
   <tabstop>bannerBgColorButton</tabstop>
   <tabstop>allowMusicCheckBox</tabstop>
   <tabstop>allowSoundEffectsCheckBox</tabstop>
-  <tabstop>muteSoundCheckBox</tabstop>
+  <tabstop>muteWhenMinimizedCheckBox</tabstop>
   <tabstop>volumeSlider</tabstop>
   <tabstop>allowGraphicsCheckBox</tabstop>
   <tabstop>allowVideoCheckBox</tabstop>

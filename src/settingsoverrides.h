@@ -22,7 +22,7 @@ class SettingsOverrides {
     int fixedFontSize;
     int scrollbackFontSize;
     bool imageSmoothing;
-    bool pauseAudio;
+    bool muteWhenMinimized;
 };
 
 

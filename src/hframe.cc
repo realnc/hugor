@@ -46,7 +46,6 @@ HFrame::HFrame( QWidget* parent )
       fCursorVisible(false),
       fBlinkVisible(false),
       fBlinkTimer(new QTimer(this)),
-      fMuteTimer(new QTimer(this)),
       fNeedScreenUpdate(false)
 {
     // We handle player input, so we need to accept focus.
@@ -61,9 +60,6 @@ HFrame::HFrame( QWidget* parent )
 
     // We need to check whether the application lost focus.
     connect(qApp, SIGNAL(focusChanged(QWidget*,QWidget*)), SLOT(fHandleFocusChange(QWidget*,QWidget*)));
-
-    this->fMuteTimer->setSingleShot(true);
-    connect(this->fMuteTimer, SIGNAL(timeout()), SLOT(fMuteSound()));
 
     // Requesting scrollback simply triggers the scrollback window.
     // Since focus is lost, subsequent scrolling/paging events will work as expected.
@@ -105,27 +101,9 @@ HFrame::fBlinkCursor()
 
 
 void
-HFrame::fMuteSound()
-{
-    muteSound(true);
-    muteVideo(true);
-}
-
-
-void
 HFrame::fHandleFocusChange( QWidget* old, QWidget* now )
 {
     if (now == 0) {
-        // Mute the sound after a while (if a mute isn't already scheduled.)
-        // We do this delayed mute because Qt sometimes makes it appear as
-        // though the whole application has lost focus when switching from
-        // the main window to a dialog.  This happens only for a very brief
-        // amount of time.  This allows us to avoid muting the sound if focus
-        // is lost only for a very brief moment (which can sometimes confuse
-        // the audio backend.)
-        if (hApp->settings()->muteSoundInBackground and not this->fMuteTimer->isActive()) {
-            this->fMuteTimer->start(60);
-        }
         // The application window lost focus.  Disable cursor blinking.
         this->fBlinkTimer->stop();
 #ifdef Q_OS_MAC
@@ -140,9 +118,6 @@ HFrame::fHandleFocusChange( QWidget* old, QWidget* now )
         }
 #endif
     } else if (old == 0 and now != 0) {
-        this->fMuteTimer->stop();
-        muteSound(false);
-        muteVideo(false);
         // The application window gained focus.  Reset cursor blinking.
         this->resetCursorBlinking();
     }

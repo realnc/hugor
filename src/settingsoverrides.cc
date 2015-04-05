@@ -33,6 +33,6 @@ SettingsOverrides::SettingsOverrides( const QString& filename )
     sett.endGroup();
 
     sett.beginGroup(QString::fromLatin1("media"));
-    this->pauseAudio = sett.value(QString::fromLatin1("backgroundPauseAudio"), true).toBool();
+    this->muteWhenMinimized = sett.value(QString::fromLatin1("muteWhenMinimized"), true).toBool();
     sett.endGroup();
 }

@@ -52,7 +52,7 @@ qtRuntimeVersion()
 #define SETT_SOUNDS QString::fromLatin1("sounds")
 #define SETT_MUSIC QString::fromLatin1("music")
 #define SETT_SMOOTH_IMAGES QString::fromLatin1("smoothImageScaling")
-#define SETT_PAUSE_SOUND QString::fromLatin1("pauseSoundInBackground")
+#define SETT_MUTE_MINIMIZED QString::fromLatin1("muteWhenMinimized")
 #define SETT_SOUND_VOL QString::fromLatin1("soundVolume")
 #define SETT_MAIN_BG_COLOR QString::fromLatin1("mainbg")
 #define SETT_MAIN_TXT_COLOR QString::fromLatin1("maintext")
@@ -93,7 +93,7 @@ Settings::loadFromDisk( SettingsOverrides* ovr )
     this->enableMusic = sett.value(SETT_MUSIC, false).toBool();
 #endif
     this->useSmoothScaling = sett.value(SETT_SMOOTH_IMAGES, true).toBool();
-    this->muteSoundInBackground = sett.value(SETT_PAUSE_SOUND, true).toBool();
+    this->muteWhenMinimized = sett.value(SETT_MUTE_MINIMIZED, true).toBool();
     this->soundVolume = sett.value(SETT_SOUND_VOL, 100).toInt();
     sett.endGroup();
 
@@ -229,8 +229,8 @@ Settings::loadFromDisk( SettingsOverrides* ovr )
         if (not sett.contains(SETT_SMOOTH_IMAGES)) {
             this->useSmoothScaling = ovr->imageSmoothing;
         }
-        if (not sett.contains(SETT_PAUSE_SOUND)) {
-            this->muteSoundInBackground = ovr->pauseAudio;
+        if (not sett.contains(SETT_MUTE_MINIMIZED)) {
+            this->muteWhenMinimized = ovr->muteWhenMinimized;
         }
         sett.endGroup();
 
@@ -255,7 +255,7 @@ Settings::saveToDisk()
     sett.setValue(SETT_SOUNDS, this->enableSoundEffects);
     sett.setValue(SETT_MUSIC, this->enableMusic);
     sett.setValue(SETT_SMOOTH_IMAGES, this->useSmoothScaling);
-    sett.setValue(SETT_PAUSE_SOUND, this->muteSoundInBackground);
+    sett.setValue(SETT_MUTE_MINIMIZED, this->muteWhenMinimized);
     sett.setValue(SETT_SOUND_VOL, this->soundVolume);
     sett.endGroup();
 

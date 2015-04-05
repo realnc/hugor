@@ -325,20 +325,29 @@ HMainWindow::closeEvent( QCloseEvent* e )
 void
 HMainWindow::changeEvent( QEvent* e )
 {
+    // Don't do anything special if the window state was not changed by the
+    // environment.
     if (e->type() != QEvent::WindowStateChange or not e->spontaneous()) {
         QMainWindow::changeEvent(e);
         return;
     }
 
-    // Window state was changed by the environment. Check whether we're
-    // changing to/from fullscreen and update our fullscreen action if so.
     QWindowStateChangeEvent* chEv = static_cast<QWindowStateChangeEvent*>(e);
+
     if ((chEv->oldState().testFlag(Qt::WindowFullScreen) and not this->isFullScreen())
         or (not chEv->oldState().testFlag(Qt::WindowFullScreen) and this->isFullScreen()))
     {
         this->fFullscreenAdjust();
+    } else if (chEv->oldState().testFlag(Qt::WindowMinimized) and not this->isMinimized()) {
+        muteSound(false);
+        muteVideo(false);
+    } else if (hApp->settings()->muteWhenMinimized
+               and not chEv->oldState().testFlag(Qt::WindowMinimized) and this->isMinimized())
+    {
+        muteSound(true);
+        muteVideo(true);
     }
-    e->accept();
+    QMainWindow::changeEvent(e);
 }
 
 

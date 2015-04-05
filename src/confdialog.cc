@@ -45,7 +45,7 @@ ConfDialog::ConfDialog( HMainWindow* parent )
 #else
     ui->allowSoundEffectsCheckBox->setChecked(sett->enableSoundEffects);
     ui->allowMusicCheckBox->setChecked(sett->enableMusic);
-    ui->muteSoundCheckBox->setChecked(sett->muteSoundInBackground);
+    ui->muteWhenMinimizedCheckBox->setChecked(sett->muteWhenMinimized);
 #endif
 #if defined(DISABLE_VIDEO) and defined(DISABLE_AUDIO)
     ui->volumeSlider->setValue(0);
@@ -143,7 +143,7 @@ ConfDialog::fMakeInstantApply()
     connect(ui->allowSoundEffectsCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
     connect(ui->allowMusicCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
     connect(ui->smoothScalingCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
-    connect(ui->muteSoundCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
+    connect(ui->muteWhenMinimizedCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
     connect(ui->volumeSlider, SIGNAL(valueChanged(int)), SLOT(fApplySettings()));
     connect(ui->overlayScrollbackCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
     connect(ui->mainTextColorButton, SIGNAL(changed(QColor)), this, SLOT(fApplySettings()));
@@ -165,7 +165,7 @@ ConfDialog::fApplySettings()
     sett->enableSoundEffects = ui->allowSoundEffectsCheckBox->isChecked();
     sett->enableMusic = ui->allowMusicCheckBox->isChecked();
     sett->useSmoothScaling = ui->smoothScalingCheckBox->isChecked();
-    sett->muteSoundInBackground = ui->muteSoundCheckBox->isChecked();
+    sett->muteWhenMinimized = ui->muteWhenMinimizedCheckBox->isChecked();
     sett->soundVolume = ui->volumeSlider->value();
     sett->mainBgColor = ui->mainBgColorButton->color();
     sett->mainTextColor = ui->mainTextColorButton->color();
