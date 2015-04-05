@@ -62,7 +62,6 @@ ConfDialog::ConfDialog( HMainWindow* parent )
     ui->bannerTextColorButton->setColor(sett->statusTextColor);
     ui->fsMarginColorButton->setColor(sett->fsMarginColor);
     connect(ui->customFsMarginColorCheckBox, SIGNAL(toggled(bool)), ui->fsMarginColorButton, SLOT(setEnabled(bool)));
-    connect(ui->customFsMarginColorCheckBox, SIGNAL(toggled(bool)), ui->fsMarginColorLabel, SLOT(setEnabled(bool)));
     ui->customFsMarginColorCheckBox->setChecked(sett->customFsMarginColor);
 
     ui->mainFontSizeSpinBox->setValue(sett->propFont.pointSize());
