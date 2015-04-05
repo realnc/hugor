@@ -1,4 +1,4 @@
-Git - 2015-03-19
+Git - 2015-04-05
 ================
 
   - Support for game-specific start-up configuration files. See the file:
@@ -24,14 +24,6 @@ Git - 2015-03-19
   - Fullscreen mode is now restored correctly between sessions.
 
   - Video is now fully supported in the Linux and Windows versions of Hugor.
-    Consult the README for details about the GStreamer packages/plugins Hugor
-    now depends on.  When building from source, video support can be disabled
-    with:
-
-      CONFIG+=disable-video
-
-    GStreamer 0.10 as well as the newer 1.x is supported. (See the README on
-    how to select the version you want when building from source.)
 
   - The FMOD sound back-end has been removed.  SDL is now the only supported
     sound back-end.
@@ -57,6 +49,13 @@ Git - 2015-03-19
     application hanging with no possibility to quit. Previously, the only way to
     exit the application in such cases was to kill the interpreter process
     through an operating system facility (like the task manager on Windows.)
+
+  - The sound volume is now configurable through a slider in the preferences
+    dialog.
+
+  - The behavior of the "mute sound in background" setting has been changed. It
+    now only mutes the sound when the application is minimized, not when it
+    loses focus.
 
 
 1.0 - 2012-08-15
