@@ -54,6 +54,8 @@ class Settings {
     bool overlayScrollback;
     int marginSize;
     int fullscreenWidth;
+    bool startFullscreen;
+    bool startWindowed;
 
     // These are not saved. Used for temporary overrides that only apply
     // to the current session.

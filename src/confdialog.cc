@@ -80,6 +80,13 @@ ConfDialog::ConfDialog( HMainWindow* parent )
     } else {
         ui->scriptWrapSpinBox->setValue(sett->scriptWrap);
     }
+    if (sett->startFullscreen) {
+        ui->fullscreenRadioButton->setChecked(true);
+    } else if (sett->startWindowed) {
+        ui->windowRadioButton->setChecked(true);
+    } else {
+        ui->lastStateRadioButton->setChecked(true);
+    }
 
 #ifdef Q_OS_MAC
     // On Mac OS X, the dialog should not have any buttons, and settings
@@ -152,6 +159,7 @@ ConfDialog::fMakeInstantApply()
     connect(ui->bannerBgColorButton, SIGNAL(changed(QColor)), this, SLOT(fApplySettings()));
     connect(ui->customFsMarginColorCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
     connect(ui->fsMarginColorButton, SIGNAL(changed(QColor)), this, SLOT(fApplySettings()));
+    connect(ui->startInButtonGroup, SIGNAL(buttonClicked(int)), SLOT(fApplySettings()));
 }
 
 
@@ -189,6 +197,8 @@ ConfDialog::fApplySettings()
     } else {
         sett->scriptWrap = ui->scriptWrapSpinBox->value();
     }
+    sett->startFullscreen = ui->fullscreenRadioButton->isChecked();
+    sett->startWindowed = ui->windowRadioButton->isChecked();
 
     // Notify the application that preferences have changed.
     hApp->notifyPreferencesChange(sett);

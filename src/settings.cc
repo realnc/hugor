@@ -75,6 +75,8 @@ qtRuntimeVersion()
 #define SETT_FULLSCREEN QString::fromLatin1("fullscreen")
 #define SETT_MARGIN_SIZE QString::fromLatin1("marginSize")
 #define SETT_FULLSCREEN_WIDTH QString::fromLatin1("fullscreenWidth")
+#define SETT_START_FULLSCREEN QString::fromLatin1("startFullscreen")
+#define SETT_START_WINDOWED QString::fromLatin1("startWindowed")
 
 
 void
@@ -197,6 +199,14 @@ Settings::loadFromDisk( SettingsOverrides* ovr )
     } else if (this->fullscreenWidth < 10) {
         this->fullscreenWidth = 10;
     }
+    this->startFullscreen = sett.value(SETT_START_FULLSCREEN, true).toBool();
+    if (this->startFullscreen) {
+        this->isFullscreen = true;
+    }
+    this->startWindowed = sett.value(SETT_START_WINDOWED, false).toBool();
+    if (this->startWindowed) {
+        this->isFullscreen = false;
+    }
     sett.endGroup();
 
     // Apply overrides for non-existent settings.
@@ -299,6 +309,8 @@ Settings::saveToDisk()
     sett.setValue(SETT_FULLSCREEN, hMainWin->isFullScreen());
     sett.setValue(SETT_MARGIN_SIZE, this->marginSize);
     sett.setValue(SETT_FULLSCREEN_WIDTH, this->fullscreenWidth);
+    sett.setValue(SETT_START_FULLSCREEN, this->startFullscreen);
+    sett.setValue(SETT_START_WINDOWED, this->startWindowed);
     sett.endGroup();
     sett.sync();
 }
