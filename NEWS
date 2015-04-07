@@ -1,4 +1,4 @@
-Git - 2015-04-05
+Git - 2015-04-07
 ================
 
   - Support for game-specific start-up configuration files. See the file:
@@ -56,6 +56,12 @@ Git - 2015-04-05
   - The behavior of the "mute sound in background" setting has been changed. It
     now only mutes the sound when the application is minimized, not when it
     loses focus.
+
+  - The mode in which the interpreter starts (fullscreen, window, last state) is
+    now configurable.
+
+  - Alt+tabbing out of the interpreter when in fullscreen mode will now minimize
+    it.
 
 
 1.0 - 2012-08-15
