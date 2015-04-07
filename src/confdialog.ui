@@ -376,11 +376,8 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
-        <widget class="QSplitter" name="splitter">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <widget class="QWidget" name="layoutWidget">
+        <layout class="QHBoxLayout" name="horizontalLayout_5">
+         <item>
           <layout class="QFormLayout" name="formLayout_5">
            <property name="formAlignment">
             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -476,72 +473,100 @@
             </widget>
            </item>
           </layout>
-         </widget>
-         <widget class="QGroupBox" name="startInGroupBox">
-          <property name="toolTip">
-           <string>&lt;p&gt;This lets you choose in which state the interpreter should start games. You can choose to always start in fullscreen or windowed mode, or use the same mode the interpreter was in the last time it was running.&lt;/p&gt;</string>
-          </property>
-          <property name="title">
-           <string>Start in</string>
-          </property>
-          <property name="flat">
-           <bool>true</bool>
-          </property>
-          <layout class="QFormLayout" name="formLayout_8">
-           <property name="formAlignment">
-            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
            </property>
-           <item row="0" column="0" colspan="2">
-            <widget class="QRadioButton" name="fullscreenRadioButton">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="text">
-              <string>Fullscreen</string>
-             </property>
-             <attribute name="buttonGroup">
-              <string notr="true">startInButtonGroup</string>
-             </attribute>
-            </widget>
-           </item>
-           <item row="1" column="0" colspan="2">
-            <widget class="QRadioButton" name="windowRadioButton">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="text">
-              <string>Window</string>
-             </property>
-             <attribute name="buttonGroup">
-              <string notr="true">startInButtonGroup</string>
-             </attribute>
-            </widget>
-           </item>
-           <item row="2" column="0" colspan="2">
-            <widget class="QRadioButton" name="lastStateRadioButton">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="text">
-              <string>Last State</string>
-             </property>
-             <attribute name="buttonGroup">
-              <string notr="true">startInButtonGroup</string>
-             </attribute>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </widget>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="startInGroupBox">
+           <property name="toolTip">
+            <string>&lt;p&gt;This lets you choose in which state the interpreter should start games. You can choose to always start in fullscreen or windowed mode, or use the same mode the interpreter was in the last time it was running.&lt;/p&gt;</string>
+           </property>
+           <property name="title">
+            <string>Start in</string>
+           </property>
+           <property name="flat">
+            <bool>true</bool>
+           </property>
+           <layout class="QFormLayout" name="formLayout_8">
+            <property name="formAlignment">
+             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+            </property>
+            <item row="0" column="0" colspan="2">
+             <widget class="QRadioButton" name="fullscreenRadioButton">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="text">
+               <string>Fullscreen</string>
+              </property>
+              <attribute name="buttonGroup">
+               <string notr="true">startInButtonGroup</string>
+              </attribute>
+             </widget>
+            </item>
+            <item row="1" column="0" colspan="2">
+             <widget class="QRadioButton" name="windowRadioButton">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="text">
+               <string>Window</string>
+              </property>
+              <attribute name="buttonGroup">
+               <string notr="true">startInButtonGroup</string>
+              </attribute>
+             </widget>
+            </item>
+            <item row="2" column="0" colspan="2">
+             <widget class="QRadioButton" name="lastStateRadioButton">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="text">
+               <string>Last State</string>
+              </property>
+              <attribute name="buttonGroup">
+               <string notr="true">startInButtonGroup</string>
+              </attribute>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_2">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
        </item>
        <item>
         <layout class="QFormLayout" name="formLayout_3">
