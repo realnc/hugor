@@ -117,6 +117,14 @@ HFrame::fHandleFocusChange( QWidget* old, QWidget* now )
             this->fBlinkCursor();
         }
 #endif
+        // Minimize the application if we're fullscreen.
+        if (hMainWin->isFullScreen()) {
+            hMainWin->showMinimized();
+            if (hApp->settings()->muteWhenMinimized) {
+                muteSound(true);
+                muteVideo(true);
+            }
+        }
     } else if (old == 0 and now != 0) {
         // The application window gained focus.  Reset cursor blinking.
         this->resetCursorBlinking();
