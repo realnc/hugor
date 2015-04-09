@@ -34,14 +34,10 @@ extern "C" {
 
 
 AboutDialog::AboutDialog( QWidget* parent )
-    : QDialog(parent, Qt::MSWindowsFixedSizeDialogHint | Qt::CustomizeWindowHint | Qt::WindowTitleHint
-              | Qt::WindowCloseButtonHint),
+    : QDialog(parent, Qt::WindowTitleHint | Qt::WindowSystemMenuHint),
       ui(new Ui::AboutDialog)
 {
     ui->setupUi(this);
-
-    // Make the dialog fixed-size.
-    this->layout()->setSizeConstraint(QLayout::SetFixedSize);
 
     // Construct a string holding all version info.
     QString str("<p>Hugor v");
