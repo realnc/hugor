@@ -1,4 +1,4 @@
-Git - 2015-04-07
+Git - 2015-04-09
 ================
 
   - Support for game-specific start-up configuration files. See the file:
@@ -62,6 +62,11 @@ Git - 2015-04-07
 
   - Alt+tabbing out of the interpreter when in fullscreen mode will now minimize
     it.
+
+  - Hugor is now licensed under the GNU General Public License version 3, along
+    with an additional permission to combine and distribute it together with the
+    Hugo Engine. (The special permission is needed, since the Hugo Engine uses a
+    license that is not compatible with the GPL.)
 
 
 1.0 - 2012-08-15
