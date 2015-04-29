@@ -68,7 +68,7 @@ ConfDialog::ConfDialog( HMainWindow* parent )
 #ifdef DISABLE_AUDIO
     ui->allowSoundEffectsCheckBox->setDisabled(true);
     ui->allowMusicCheckBox->setDisabled(true);
-    ui->muteSoundCheckBox->setDisabled(true);
+    ui->muteWhenMinimizedCheckBox->setDisabled(true);
 #else
     ui->allowSoundEffectsCheckBox->setChecked(sett->enableSoundEffects);
     ui->allowMusicCheckBox->setChecked(sett->enableMusic);
