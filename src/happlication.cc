@@ -282,21 +282,11 @@ void
 HApplication::updateMargins( int color )
 {
     int scrWidth = QApplication::desktop()->screenGeometry().width();
-    int scrHeight = QApplication::desktop()->screenGeometry().height();
     int margin;
 
     // In fullscreen mode, respect the aspect ratio and max width settings.
     if (hMainWin->isFullScreen()) {
         int maxWidth = fSettings->fullscreenWidth * scrWidth / 100;
-
-        // Adjust max fullscreen width if a ratio is specified.
-        if (fSettings->widthRatio != 0 and fSettings->heightRatio != 0) {
-            int ratioWidth = (double)fSettings->widthRatio / (double)fSettings->heightRatio
-                             * (double)scrHeight;
-            if (maxWidth > ratioWidth) {
-                maxWidth = ratioWidth;
-            }
-        }
 
         // Calculate how big the margin should be to get the specified
         // width.

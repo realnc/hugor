@@ -204,9 +204,13 @@ Settings::loadFromDisk( SettingsOverrides* ovr )
     sett.endGroup();
 
     // If an aspect ratio is specified in the overrides, use it.
+    int widthRatio;
+    int heightRatio;
     if (ovr) {
         widthRatio = ovr->widthRatio;
         heightRatio = ovr->heightRatio;
+    } else {
+        widthRatio = heightRatio = 1;
     }
 
     sett.beginGroup(SETT_GEOMETRY_GRP);
@@ -242,7 +246,7 @@ Settings::loadFromDisk( SettingsOverrides* ovr )
         if (not sett.contains(SETT_FULLSCREEN)) {
             this->isFullscreen = ovr->fullscreen;
         }
-        if (not sett.contains(SETT_FULLSCREEN_WIDTH)) {
+        if (not sett.contains(SETT_FULLSCREEN_WIDTH) and ovr->fullscreenWidth > 0) {
             this->fullscreenWidth = ovr->fullscreenWidth;
         }
         if (not sett.contains(SETT_MARGIN_SIZE)) {
