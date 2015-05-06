@@ -73,7 +73,8 @@ HFrame::HFrame( QWidget* parent )
       fCursorVisible(false),
       fBlinkVisible(false),
       fBlinkTimer(new QTimer(this)),
-      fNeedScreenUpdate(false)
+      fNeedScreenUpdate(false),
+      fMinimizeTimer(new QTimer(this))
 {
     // We handle player input, so we need to accept focus.
     this->setFocusPolicy(Qt::WheelFocus);
@@ -87,6 +88,9 @@ HFrame::HFrame( QWidget* parent )
 
     // We need to check whether the application lost focus.
     connect(qApp, SIGNAL(focusChanged(QWidget*,QWidget*)), SLOT(fHandleFocusChange(QWidget*,QWidget*)));
+
+    fMinimizeTimer->setSingleShot(true);
+    connect(fMinimizeTimer, SIGNAL(timeout()), SLOT(fHandleFocusLost()));
 
     // Requesting scrollback simply triggers the scrollback window.
     // Since focus is lost, subsequent scrolling/paging events will work as expected.
@@ -131,35 +135,47 @@ void
 HFrame::fHandleFocusChange( QWidget* old, QWidget* now )
 {
     if (now == 0) {
-        // The application window lost focus.  Disable cursor blinking.
-        this->fBlinkTimer->stop();
-#ifdef Q_OS_MAC
-        // On the Mac, when applications lose focus the cursor must be disabled.
-        if (this->fBlinkVisible) {
-            this->fBlinkCursor();
-        }
-#else
-        // On all other systems we assume the cursor must stay visible.
-        if (not this->fBlinkVisible) {
-            this->fBlinkCursor();
-        }
-#endif
-        // Minimize the application if we're fullscreen (except on OSX.)
-        if (hMainWin->isFullScreen()) {
-#ifndef Q_OS_MAC
-            hMainWin->showMinimized();
-#endif
-            if (hApp->settings()->muteWhenMinimized) {
-                muteSound(true);
-                muteVideo(true);
-            }
-        }
+        // Minimize a bit later, in case we only lose focus for a very short
+        // time.
+        fMinimizeTimer->start(40);
     } else if (old == 0 and now != 0) {
+        // In case we only lost focus only for a short time, abort any pending
+        // minimize operation.
+        fMinimizeTimer->stop();
+
         // The application window gained focus.  Reset cursor blinking and
         // unmute (just in case we were muted previously.)
         this->resetCursorBlinking();
         muteSound(false);
         muteVideo(false);
+    }
+}
+
+void
+HFrame::fHandleFocusLost()
+{
+    // The application window lost focus.  Disable cursor blinking.
+    this->fBlinkTimer->stop();
+#ifdef Q_OS_MAC
+    // On the Mac, when applications lose focus the cursor must be disabled.
+    if (this->fBlinkVisible) {
+        this->fBlinkCursor();
+    }
+#else
+    // On all other systems we assume the cursor must stay visible.
+    if (not this->fBlinkVisible) {
+        this->fBlinkCursor();
+    }
+#endif
+    // Minimize the application if we're fullscreen (except on OSX.)
+    if (hMainWin->isFullScreen()) {
+#ifndef Q_OS_MAC
+        hMainWin->showMinimized();
+#endif
+        if (hApp->settings()->muteWhenMinimized) {
+            muteSound(true);
+            muteVideo(true);
+        }
     }
 }
 

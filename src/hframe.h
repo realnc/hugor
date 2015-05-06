@@ -144,6 +144,10 @@ class HFrame: public QWidget {
     // Keeps track of whether the game screen needs updating.
     bool fNeedScreenUpdate;
 
+    // We need a small time delay before minimizing when losing focus while
+    // in fullscreen mode.
+    class QTimer* fMinimizeTimer;
+
     // Add a keypress to our input queue.
     void
     fEnqueueKey(char key, QMouseEvent* e);
@@ -157,6 +161,9 @@ class HFrame: public QWidget {
     // can disable keyboard cursor blinking when we lose focus.
     void
     fHandleFocusChange( QWidget* old, QWidget* now );
+
+    void
+    fHandleFocusLost();
 
     // End line input mode and send the command to the game.
     void
