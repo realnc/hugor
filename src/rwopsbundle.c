@@ -44,6 +44,9 @@ typedef struct {
     FILE* file;
     long startPos;
     long endPos;
+#if SDL_VERSION_ATLEAST(1,3,0)
+    Sint64 size;
+#endif
 } BundleFileInfo;
 
 
@@ -58,6 +61,20 @@ RWOpsCheck( SDL_RWops* rwops )
     }
     return SDL_TRUE;
 }
+
+
+/* RWops size callback. Only exists in SDL2 and reports the size of our data
+ * in bytes.
+ */
+#if SDL_VERSION_ATLEAST(1,3,0)
+static Sint64
+RWOpsSizeFunc( SDL_RWops* rwops )
+{
+    if (!RWOpsCheck(rwops))
+        return -1;
+    return ((BundleFileInfo*)rwops->hidden.unknown.data1)->size;
+}
+#endif
 
 
 /* RWops seek callback. We apply offsets to make all seek operations relative
@@ -196,6 +213,10 @@ RWFromMediaBundle( FILE* mediaBundle, long resLength )
     info->endPos = info->startPos + resLength;
 
     rwops->hidden.unknown.data1 = info;
+#if SDL_VERSION_ATLEAST(1,3,0)
+    rwops->size = RWOpsSizeFunc;
+    info->size = resLength;
+#endif
     rwops->seek = RWOpsSeekFunc;
     rwops->read = RWOpsReadFunc;
     rwops->write = RWOpsWriteFunc;
