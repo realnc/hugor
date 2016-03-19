@@ -320,6 +320,16 @@ HMainWindow::toggleFullscreen()
 
 
 void
+HMainWindow::setFullscreen( bool f )
+{
+    if ((f and this->isFullScreen()) or (not f and not this->isFullScreen())) {
+        return;
+    }
+    toggleFullscreen();
+}
+
+
+void
 HMainWindow::closeEvent( QCloseEvent* e )
 {
     if (not hApp->gameRunning()) {

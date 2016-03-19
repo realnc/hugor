@@ -90,8 +90,8 @@ void DisplayPicture(void)
 		return;
 
 	/* Find out what type of image resource this is */
-	resource_type = (char)((fgetc(resource_file)==0xff)?JPEG_R:UNKNOWN_R);
-	fseek(resource_file, -1, SEEK_CUR);
+	resource_type = (char)((hugo_fgetc(resource_file)==0xff)?JPEG_R:UNKNOWN_R);
+	hugo_fseek(resource_file, -1, SEEK_CUR);
 
 	/* If FindResource() is successful, the resource file is already
 	   open and positioned; hugo_displaypicture() is responsible for
@@ -131,11 +131,11 @@ void PlayMusic(void)
 		return;
 
 	/* Find out what type of music resource this is */
-	resstart = ftell(resource_file);
+	resstart = hugo_ftell(resource_file);
 
 	/* Check for MIDI */
-	fseek(resource_file, resstart, SEEK_SET);
-	fread(resname, 4, 1, resource_file);
+	hugo_fseek(resource_file, resstart, SEEK_SET);
+	hugo_fread(resname, 4, 1, resource_file);
 	if (!memcmp(resname, "MThd", 4))
 	{
 		resource_type = MIDI_R;
@@ -143,8 +143,8 @@ void PlayMusic(void)
 	}
 
 	/* Check for XM */
-	fseek(resource_file, resstart, SEEK_SET);
-	fread(resname, 17, 1, resource_file);
+	hugo_fseek(resource_file, resstart, SEEK_SET);
+	hugo_fread(resname, 17, 1, resource_file);
 	if (!memcmp(resname, "Extended Module: ", 17))
 	{
 		resource_type = XM_R;
@@ -152,8 +152,8 @@ void PlayMusic(void)
 	}
 
 	/* Check for S3M */
-	fseek(resource_file, resstart+0x2c, SEEK_SET);
-	fread(resname, 4, 1, resource_file);
+	hugo_fseek(resource_file, resstart+0x2c, SEEK_SET);
+	hugo_fread(resname, 4, 1, resource_file);
 	if (!memcmp(resname, "SCRM", 4))
 	{
 		resource_type = S3M_R;
@@ -161,8 +161,8 @@ void PlayMusic(void)
 	}
 
 	/* Check for MOD */
-	fseek(resource_file, resstart+1080, SEEK_SET);
-	fread(resname, 4, 1, resource_file);
+	hugo_fseek(resource_file, resstart+1080, SEEK_SET);
+	hugo_fread(resname, 4, 1, resource_file);
 	resname[4] = '\0';
 	/* There are a whole bunch of different MOD identifiers: */
 	if (!strcmp(resname+1, "CHN") ||	/* 4CHN, 6CHN, 8CHN */
@@ -187,7 +187,7 @@ void PlayMusic(void)
 	resource_type = UNKNOWN_R;
 
 Identified:
-	fseek(resource_file, resstart, SEEK_SET);
+	hugo_fseek(resource_file, resstart, SEEK_SET);
 
 	if (!hugo_playmusic(resource_file, reslength, loop_flag))
 		var[system_status] = STAT_LOADERROR;
@@ -222,13 +222,13 @@ void PlaySample(void)
 		return;
 
 	/* Find out what kind of audio sample this is */
-	fread(resname, 4, 1, resource_file);
+	hugo_fread(resname, 4, 1, resource_file);
 	if (!memcmp(resname, "WAVE", 4))
 		resource_type = WAVE_R;
 	else
 		resource_type = UNKNOWN_R;
 
-	fseek(resource_file, -4, SEEK_CUR);
+	hugo_fseek(resource_file, -4, SEEK_CUR);
 
 	if (!hugo_playsample(resource_file, reslength, loop_flag))
 		var[system_status] = STAT_LOADERROR;
@@ -275,11 +275,11 @@ void PlayVideo(void)
 		return;
 
 	/* Find out what type of video resource this is */
-	resstart = ftell(resource_file);
+	resstart = hugo_ftell(resource_file);
 
 	/* Check for MPEG */
-	fseek(resource_file, resstart, SEEK_SET);
-	fread(resname, 4, 1, resource_file);
+	hugo_fseek(resource_file, resstart, SEEK_SET);
+	hugo_fread(resname, 4, 1, resource_file);
 	if (resname[2]==0x01 && (unsigned char)resname[3]==0xba)
 	{
 		resource_type = MPEG_R;
@@ -287,8 +287,8 @@ void PlayVideo(void)
 	}
 
 	/* Check for AVI */
-	fseek(resource_file, resstart+8, SEEK_SET);
-	fread(resname, 4, 1, resource_file);
+	hugo_fseek(resource_file, resstart+8, SEEK_SET);
+	hugo_fread(resname, 4, 1, resource_file);
 	if (!memcmp(resname, "AVI ", 4))
 	{
 		resource_type = AVI_R;
@@ -299,13 +299,13 @@ void PlayVideo(void)
 	resource_type = UNKNOWN_R;
 
 Identified:
-	fseek(resource_file, resstart, SEEK_SET);
+	hugo_fseek(resource_file, resstart, SEEK_SET);
 
 #if !defined (COMPILE_V25)
 	if (!hugo_playvideo(resource_file, reslength, loop_flag, background, volume))
 		var[system_status] = STAT_LOADERROR;
 #else
-	fclose(resource_file);
+	hugo_fclose(resource_file);
 	resource_file = NULL;
 #endif
 }
@@ -380,8 +380,8 @@ long FindResource(char *filename, char *resname)
 #endif
 
 	/* Read the resourcefile header */
-	/* if (fgetc(resource_file)!='R') goto ResfileError; */
-	i = fgetc(resource_file);
+	/* if (hugo_fgetc(resource_file)!='R') goto ResfileError; */
+	i = hugo_fgetc(resource_file);
 	if (i=='r')
 		res_32bits = true;
 	else if (i=='R')
@@ -389,12 +389,12 @@ long FindResource(char *filename, char *resname)
 	else
 		goto ResfileError;
 	/* Read and ignore the resource file version. */
-	fgetc(resource_file);
-	rescount = fgetc(resource_file);
-	rescount += fgetc(resource_file)*256;
-	startofdata = fgetc(resource_file);
-	startofdata += (unsigned int)fgetc(resource_file)*256;
-	if (ferror(resource_file))
+	hugo_fgetc(resource_file);
+	rescount = hugo_fgetc(resource_file);
+	rescount += hugo_fgetc(resource_file)*256;
+	startofdata = hugo_fgetc(resource_file);
+	startofdata += (unsigned int)hugo_fgetc(resource_file)*256;
+	if (hugo_ferror(resource_file))
 		goto ResfileError;
 
 
@@ -403,33 +403,33 @@ long FindResource(char *filename, char *resname)
 	*/
 	for (i=1; i<=rescount; i++)
 	{
-		len = fgetc(resource_file);
-		if (ferror(resource_file))
+		len = hugo_fgetc(resource_file);
+		if (hugo_ferror(resource_file))
 			goto ResfileError;
 
-		if (!(fgets(resource_in_file, len+1, resource_file)))
+		if (!(hugo_fgets(resource_in_file, len+1, resource_file)))
 			goto ResfileError;
 
-		resposition = (long)fgetc(resource_file);
-		resposition += (long)fgetc(resource_file)*256L;
-		resposition += (long)fgetc(resource_file)*65536L;
+		resposition = (long)hugo_fgetc(resource_file);
+		resposition += (long)hugo_fgetc(resource_file)*256L;
+		resposition += (long)hugo_fgetc(resource_file)*65536L;
 		if (res_32bits)
 		{
-			resposition += (long)fgetc(resource_file)*16777216L;
+			resposition += (long)hugo_fgetc(resource_file)*16777216L;
 		}
 
-		reslength = (long)fgetc(resource_file);
-		reslength += (long)fgetc(resource_file)*256L;
-		reslength += (long)fgetc(resource_file)*65536L;
+		reslength = (long)hugo_fgetc(resource_file);
+		reslength += (long)hugo_fgetc(resource_file)*256L;
+		reslength += (long)hugo_fgetc(resource_file)*65536L;
 		if (res_32bits)
 		{
-			reslength += (long)fgetc(resource_file)*16777216L;
+			reslength += (long)hugo_fgetc(resource_file)*16777216L;
 		}
-		if (ferror(resource_file)) goto ResfileError;
+		if (hugo_ferror(resource_file)) goto ResfileError;
 
 		if (!strcmp(resname, resource_in_file))
 		{
-			if (fseek(resource_file, (long)startofdata+resposition, SEEK_SET))
+			if (hugo_fseek(resource_file, (long)startofdata+resposition, SEEK_SET))
 				goto ResfileError;
 			return reslength;
 		}
@@ -445,7 +445,7 @@ ResfileError:
 	DebugMessageBox("Resource Error", debug_line);
 	SwitchtoGame();
 #endif
-	fclose(resource_file);
+	hugo_fclose(resource_file);
 	resource_file = NULL;
 
 
@@ -485,12 +485,12 @@ NotinResourceFile:
 	/* resource_file here refers to a resource in an individual
 	   on-disk file, not a consolidated resource file
 	*/
-	fseek(resource_file, 0, SEEK_END);
-	reslength = ftell(resource_file);
-	fseek(resource_file, 0, SEEK_SET);
-	if (ferror(resource_file))
+	hugo_fseek(resource_file, 0, SEEK_END);
+	reslength = hugo_ftell(resource_file);
+	hugo_fseek(resource_file, 0, SEEK_SET);
+	if (hugo_ferror(resource_file))
 	{
-		fclose(resource_file);
+		hugo_fclose(resource_file);
 		resource_file = NULL;
 		return false;
 	}

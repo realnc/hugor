@@ -34,6 +34,7 @@
 #include <QTimer>
 #include <QTextCodec>
 #include <QMutexLocker>
+#include <cstdarg>
 
 #include "happlication.h"
 #include "hmainwindow.h"
@@ -42,6 +43,8 @@
 #include "settings.h"
 #include "hugodefs.h"
 #include "hugohandlers.h"
+#include "hugorfile.h"
+#include "opcodeparser.h"
 
 extern "C" {
 #include "heheader.h"
@@ -49,6 +52,9 @@ extern "C" {
 
 
 #define INVOKE_BLOCK Qt::BlockingQueuedConnection
+
+static const char* CONTROL_FNAME = "HrCtlAPI";
+static const char* CHECK_FNAME = "HrCheck";
 
 Q_DECLARE_METATYPE(HUGO_FILE)
 Q_DECLARE_METATYPE(int*)
@@ -69,6 +75,15 @@ static QString* scriptBuffer = 0;
 
 // Buffer for the scrollback. We flush it when needed.
 static QByteArray* scrollbackBuffer = 0;
+
+// Virtual control file for the Hugor handshake.
+static HugorFile checkFile(nullptr);
+
+// Virtual control file for the Hugor extension opcode mechanism.
+static HugorFile ctrlFile(nullptr);
+
+// Opcode parser.
+static OpcodeParser opcodeParser;
 
 
 /* Helper routine. Converts a Hugo color to a Qt color.
@@ -113,8 +128,8 @@ flushScriptBuffer()
     // If wrapping is disabled, or the entire buffer is below our wrap limit,
     // write out all text as-is.
     if (wrapWidth <= 0 or scriptBuffer->length() <= wrapWidth) {
-        fprintf(::script, "%s", scriptBuffer->toLocal8Bit().constData());
-        fflush(::script);
+        fprintf(::script->get(), "%s", scriptBuffer->toLocal8Bit().constData());
+        fflush(::script->get());
         scriptBuffer->clear();
         return;
     }
@@ -124,9 +139,9 @@ flushScriptBuffer()
     while (not (textLine = strm.readLine()).isNull()) {
         // If the line fits and doesn't need wrapping, write it out as-is.
         if (textLine.length() < wrapWidth) {
-            fprintf(::script, "%s", textLine.trimmed().toLocal8Bit().constData());
+            fprintf(::script->get(), "%s", textLine.trimmed().toLocal8Bit().constData());
             if (not strm.atEnd()) {
-                fprintf(::script, "\n");
+                fprintf(::script->get(), "\n");
             }
             continue;
         }
@@ -145,10 +160,10 @@ flushScriptBuffer()
             output.append('\n');
         }
         layout.endLayout();
-        fprintf(::script, "%s", output.toLocal8Bit().constData());
+        fprintf(::script->get(), "%s", output.toLocal8Bit().constData());
     }
 
-    fflush(::script);
+    fflush(::script->get());
     scriptBuffer->clear();
 }
 
@@ -266,14 +281,144 @@ hugo_overwrite( char* )
     return true;
 }
 
+static bool ctrlFileInWriteMode = false;
+
+HUGO_FILE
+hugo_fopen( const char* path, const char* mode )
+{
+    if (QString(path).endsWith(CHECK_FNAME)) {
+        if (mode[0] == 'r') {
+            return &checkFile;
+        }
+        return nullptr;
+    }
+    if (QString(path).endsWith(CONTROL_FNAME)) {
+        ctrlFileInWriteMode = mode[0] == 'w';
+        return &ctrlFile;
+    }
+    auto handle = std::fopen(path, mode);
+    if (handle == nullptr) {
+        return nullptr;
+    }
+    return new HugorFile(handle);
+}
 
 int
 hugo_fclose( HUGO_FILE file )
 {
+    if (file == &checkFile) {
+        return 0;
+    }
+    if (file == &ctrlFile) {
+        if (ctrlFileInWriteMode) {
+            opcodeParser.parse();
+        }
+        return 0;
+    }
     if (file == script) {
         flushScriptBuffer();
     }
-    return fclose(file);
+    auto ret = file->close();
+    delete file;
+    return ret;
+}
+
+int
+hugo_fgetc( HUGO_FILE file )
+{
+    if (file == &checkFile) {
+        return 0x42;
+    }
+    if (file == &ctrlFile) {
+        if (opcodeParser.hasOutput()) {
+            return opcodeParser.getNextOutputByte();
+        }
+        return EOF;
+    }
+    return std::fgetc(file->get());
+}
+
+int
+hugo_fseek(HUGO_FILE file, long offset, int whence )
+{
+    if (file == &ctrlFile) {
+        qDebug() << Q_FUNC_INFO;
+        return 0;
+    }
+    return std::fseek(file->get(), offset, whence);
+}
+
+long
+hugo_ftell(HUGO_FILE file )
+{
+    if (file == &ctrlFile) {
+        qDebug() << Q_FUNC_INFO;
+    }
+    return std::ftell(file->get());
+}
+
+size_t
+hugo_fread(void* ptr, size_t size, size_t nmemb, HUGO_FILE file)
+{
+    if (file == &ctrlFile) {
+        qDebug() << Q_FUNC_INFO;
+        return 0;
+    }
+    return std::fread(ptr, size, nmemb, file->get());
+}
+
+char*
+hugo_fgets(char* s, int size, HUGO_FILE file )
+{
+    if (file == &ctrlFile) {
+        qDebug() << Q_FUNC_INFO;
+        return nullptr;
+    }
+    return std::fgets(s, size, file->get());
+}
+
+int
+hugo_fputc(int c, HUGO_FILE file )
+{
+    if (file == &ctrlFile) {
+        opcodeParser.pushByte(c);
+        return c;
+    }
+    return std::fputc(c, file->get());
+}
+
+int
+hugo_fputs(const char* s, HUGO_FILE file )
+{
+    if (file == &ctrlFile) {
+        qDebug() << Q_FUNC_INFO;
+        return 0;
+    }
+    return std::fputs(s, file->get());
+}
+
+int
+hugo_ferror(HUGO_FILE file )
+{
+    if (file == &ctrlFile) {
+        qDebug() << Q_FUNC_INFO;
+        return 0;
+    }
+    return std::ferror(file->get());
+}
+
+int
+hugo_fprintf(HUGO_FILE file, const char* format, ...)
+{
+    if (file == &ctrlFile) {
+        qDebug() << Q_FUNC_INFO;
+        return 0;
+    }
+    va_list args;
+    va_start(args, format);
+    auto ret = std::vfprintf(file->get(), format, args);
+    va_end(args);
+    return ret;
 }
 
 
@@ -286,14 +431,14 @@ hugo_fclose( HUGO_FILE file )
 void
 hugo_closefiles()
 {
-    fclose(game);
+    delete game;
     if (script) {
         hugo_fclose(script);
     }
     if (io)
-        fclose(io);
+        delete io;
     if (record)
-        fclose(record);
+        delete record;
 }
 
 
@@ -852,7 +997,7 @@ hugo_stopvideo( void )
 int
 hugo_playvideo( HUGO_FILE infile, long, char, char, int )
 {
-    fclose(infile);
+    hugo_fclose(infile);
     return true;
 }
 

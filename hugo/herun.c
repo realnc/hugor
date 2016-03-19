@@ -309,9 +309,9 @@ FreshInput:
 						}
 						else
 						{
-							if (!fgets(buffer, MAXBUFFER, playback))
+							if (!hugo_fgets(buffer, MAXBUFFER, playback))
 							{
-								if (fclose(playback))
+								if (hugo_fclose(playback))
 									FatalError(READ_E);
 								playback = NULL;
 								GetCommand();
@@ -350,17 +350,17 @@ FreshInput:
 								if (!strcmp(word[i], "."))
 								{
 									/* fprintf() this way for Glk */
-									if (fprintf(record, "%s", "\n")<0)
+									if (hugo_fprintf(record, "%s", "\n")<0)
 										FatalError(WRITE_E);
 									if (i==words) goto RecordedNewline;
 								}
-								else if (fputs(word[i], record)<0
-									|| fprintf(record, "%s", " ")<0)
+								else if (hugo_fputs(word[i], record)<0
+									|| hugo_fprintf(record, "%s", " ")<0)
 								{
 									FatalError(WRITE_E);
 								}
 							}
-							if (fprintf(record, "%s", "\n")<0) FatalError(WRITE_E);
+							if (hugo_fprintf(record, "%s", "\n")<0) FatalError(WRITE_E);
 RecordedNewline:;
 						}
 					}
@@ -675,7 +675,7 @@ EndofCommand:
 
 	if (playback)
 	{
-		if (fclose(playback)) FatalError(READ_E);
+		if (hugo_fclose(playback)) FatalError(READ_E);
 		playback = NULL;
 	}
 
@@ -1136,27 +1136,27 @@ int RunRestart()
 	file = game;
 #endif
 
-	if (fseek(file, (objtable-gameseg)*16, SEEK_SET)) goto RestartError;
+	if (hugo_fseek(file, (objtable-gameseg)*16, SEEK_SET)) goto RestartError;
 
 	i = (objtable-gameseg)*16L;
 	do
 	{
 		int val;
 
-		val = fgetc(file);
+		val = hugo_fgetc(file);
 		SETMEM(i++, (unsigned char)val);
-		if (val==EOF || ferror(file)) goto RestartError;
+		if (val==EOF || hugo_ferror(file)) goto RestartError;
 	}
 	while (i < codeend);
 
 #if !defined (GLK)
-	if (fclose(file)) FatalError(READ_E);
+	if (hugo_fclose(file)) FatalError(READ_E);
 #endif
 
 #else
 	if (!(file = HUGO_FOPEN(gamefile, "rb"))) goto RestartError;
 	LoadGameData(true);
-	fclose(file);
+	hugo_fclose(file);
 #endif	/* LOADGAMEDATA_REPLACED */
 
 	defseg = arraytable;
@@ -1179,7 +1179,7 @@ int RunRestart()
 	/* A restart can happen mid-playback from the debugger */
 	if (playback)
 	{
-		if (fclose(playback))
+		if (hugo_fclose(playback))
 			FatalError(READ_E);
 		playback = NULL;
 	}
@@ -1210,7 +1210,7 @@ int RunRestart()
 
 RestartError:
 #if !defined (GLK)
-	if (fclose(file)) FatalError(READ_E);
+	if (hugo_fclose(file)) FatalError(READ_E);
 #endif
 
 	return 0;
@@ -1232,25 +1232,25 @@ int RestoreGameData(void)
 	long i;
 
 	/* Check ID */
-	testid[0] = (char)fgetc(save);
-	testid[1] = (char)fgetc(save);
+	testid[0] = (char)hugo_fgetc(save);
+	testid[1] = (char)hugo_fgetc(save);
 	testid[2] = '\0';
-	if (ferror(save)) goto RestoreError;
+	if (hugo_ferror(save)) goto RestoreError;
 
 	if (strcmp(testid, id))
 	{
 		AP("Incorrect save file.");
-		if (fclose(save)) FatalError(READ_E);
+		if (hugo_fclose(save)) FatalError(READ_E);
 		save = NULL;
 		return 0;
 	}
 
 	/* Check serial number */
-	if (!fgets(testserial, 9, save)) goto RestoreError;
+	if (!hugo_fgets(testserial, 9, save)) goto RestoreError;
 	if (strcmp(testserial, serial))
 	{
 		AP("Save file created by different version.");
-		if (fclose(save)) FatalError(READ_E);
+		if (hugo_fclose(save)) FatalError(READ_E);
 		save = NULL;
 		return 0;
 	}
@@ -1258,35 +1258,35 @@ int RestoreGameData(void)
 	/* Restore variables */
 	for (k=0; k<MAXGLOBALS+MAXLOCALS; k++)
 	{
-		if ((lbyte = fgetc(save))==EOF || (hbyte = fgetc(save))==EOF)
+		if ((lbyte = hugo_fgetc(save))==EOF || (hbyte = hugo_fgetc(save))==EOF)
 			goto RestoreError;
 		var[k] = lbyte + hbyte * 256;
 	}
 
 	/* Restore objtable and above */
 
-	if (fseek(game, objtable*16L, SEEK_SET)) goto RestoreError;
+	if (hugo_fseek(game, objtable*16L, SEEK_SET)) goto RestoreError;
 	i = 0;
 
 	while (i<codeend-(long)(objtable*16L))
 	{
-		if ((hbyte = fgetc(save))==EOF && ferror(save)) goto RestoreError;
+		if ((hbyte = hugo_fgetc(save))==EOF && hugo_ferror(save)) goto RestoreError;
 
 		if (hbyte==0)
 		{
-			if ((lbyte = fgetc(save))==EOF && ferror(save)) goto RestoreError;
+			if ((lbyte = hugo_fgetc(save))==EOF && hugo_ferror(save)) goto RestoreError;
 			SETMEM(objtable*16L+i, (unsigned char)lbyte);
 			i++;
 
 			/* Skip byte in game file */
-			if (fgetc(game)==EOF) goto RestoreError;
+			if (hugo_fgetc(game)==EOF) goto RestoreError;
 		}
 		else
 		{
 			while (hbyte--)
 			{
 				/* Get unchanged game file byte */
-				if ((lbyte = fgetc(game))==EOF) goto RestoreError;
+				if ((lbyte = hugo_fgetc(game))==EOF) goto RestoreError;
 				SETMEM(objtable*16L+i, (unsigned char)lbyte);
 				i++;
 			}
@@ -1294,7 +1294,7 @@ int RestoreGameData(void)
 	}
 
 	/* Restore undo data */
-	if ((lbyte = fgetc(save))==EOF || (hbyte = fgetc(save))==EOF)
+	if ((lbyte = hugo_fgetc(save))==EOF || (hbyte = hugo_fgetc(save))==EOF)
 		goto RestoreError;
 	undosize = lbyte + hbyte*256;
 
@@ -1306,16 +1306,16 @@ int RestoreGameData(void)
 		{
 			for (j=0; j<5; j++)
 			{
-				if ((lbyte = fgetc(save))==EOF || (hbyte = fgetc(save))==EOF)
+				if ((lbyte = hugo_fgetc(save))==EOF || (hbyte = hugo_fgetc(save))==EOF)
 					goto RestoreError;
 				undostack[k][j] = lbyte + hbyte*256;
 			}
 		}
-		if ((lbyte = fgetc(save))==EOF || (hbyte = fgetc(save))==EOF) goto RestoreError;
+		if ((lbyte = hugo_fgetc(save))==EOF || (hbyte = hugo_fgetc(save))==EOF) goto RestoreError;
 		undoptr = lbyte + hbyte*256;
-		if ((lbyte = fgetc(save))==EOF || (hbyte = fgetc(save))==EOF) goto RestoreError;
+		if ((lbyte = hugo_fgetc(save))==EOF || (hbyte = hugo_fgetc(save))==EOF) goto RestoreError;
 		undoturn = lbyte + hbyte*256;
-		if ((lbyte = fgetc(save))==EOF || (hbyte = fgetc(save))==EOF) goto RestoreError;
+		if ((lbyte = hugo_fgetc(save))==EOF || (hbyte = hugo_fgetc(save))==EOF) goto RestoreError;
 		undoinvalid = (unsigned char)lbyte, undorecord = (unsigned char)hbyte;
 	}
 	else undoinvalid = true;
@@ -1359,7 +1359,7 @@ int RunRestore()
 
 	if (!RestoreGameData()) goto RestoreError;
 
-	if (fclose(save)) FatalError(READ_E);
+	if (hugo_fclose(save)) FatalError(READ_E);
 	save = NULL;
 
 #if !defined (GLK)
@@ -1371,7 +1371,7 @@ int RunRestore()
 	return (1);
 
 RestoreError:
-	if ((save) && fclose(save)) FatalError(READ_E);
+	if ((save) && hugo_fclose(save)) FatalError(READ_E);
 	save = NULL;
 	game_reset = false;
 	return 0;
@@ -2154,8 +2154,8 @@ Writevalloop:
 				if (ioblock)
 				{
 					if ((ioblock==2)
-						|| fputc(i%256, io)==EOF
-						|| fputc(i/256, io)==EOF)
+						|| hugo_fputc(i%256, io)==EOF
+						|| hugo_fputc(i/256, io)==EOF)
 					{
 						ioerror = true;
 						retflag = true;
@@ -2334,26 +2334,26 @@ int SaveGameData(void)
 	int samecount = 0;
 
 	/* Write ID */
-	if (fputc(id[0], save)==EOF || fputc(id[1], save)==EOF) goto SaveError;
+	if (hugo_fputc(id[0], save)==EOF || hugo_fputc(id[1], save)==EOF) goto SaveError;
 
 	/* Write serial number */
-	if (fputs(serial, save)==EOF) goto SaveError;
+	if (hugo_fputs(serial, save)==EOF) goto SaveError;
 
 	/* Save variables */
 	for (c=0; c<MAXGLOBALS+MAXLOCALS; c++)
 	{
 		hbyte = (unsigned int)var[c] / 256;
 		lbyte = (unsigned int)var[c] - hbyte * 256;
-		if (fputc(lbyte, save)==EOF || fputc(hbyte, save)==EOF) goto SaveError;
+		if (hugo_fputc(lbyte, save)==EOF || hugo_fputc(hbyte, save)==EOF) goto SaveError;
 	}
 
 	/* Save objtable to end of code space */
 
-	if (fseek(game, objtable*16L, SEEK_SET)) goto SaveError;
+	if (hugo_fseek(game, objtable*16L, SEEK_SET)) goto SaveError;
 
 	for (i=0; i<=codeend-(long)(objtable*16L); i++)
 	{
-		if ((lbyte = fgetc(game))==EOF) goto SaveError;
+		if ((lbyte = hugo_fgetc(game))==EOF) goto SaveError;
 		hbyte = MEM(objtable*16L+i);
 
 		/* If memory same as original game file */
@@ -2363,26 +2363,26 @@ int SaveGameData(void)
 		else
 		{
 			if (samecount)
-				if (fputc(samecount, save)==EOF) goto SaveError;
+				if (hugo_fputc(samecount, save)==EOF) goto SaveError;
 
 			if (lbyte!=hbyte)
 			{
-				if (fputc(0, save)==EOF) goto SaveError;
-				if (fputc(hbyte, save)==EOF) goto SaveError;
+				if (hugo_fputc(0, save)==EOF) goto SaveError;
+				if (hugo_fputc(hbyte, save)==EOF) goto SaveError;
 				samecount = 0;
 			}
 			else samecount = 1;
 		}
 	}
 	if (samecount)
-		if (fputc(samecount, save)==EOF) goto SaveError;
+		if (hugo_fputc(samecount, save)==EOF) goto SaveError;
 
 	/* Save undo data */
 	
 	/* Save the number of turns in this port's undo stack */
 	hbyte = (unsigned int)MAXUNDO / 256;
 	lbyte = (unsigned int)MAXUNDO - hbyte*256;
-	if (fputc(lbyte, save)==EOF || fputc(hbyte, save)==EOF)
+	if (hugo_fputc(lbyte, save)==EOF || hugo_fputc(hbyte, save)==EOF)
 		goto SaveError;
 	for (c=0; c<MAXUNDO; c++)
 	{
@@ -2390,15 +2390,15 @@ int SaveGameData(void)
 		{
 			hbyte = (unsigned int)undostack[c][j] / 256;
 			lbyte = (unsigned int)undostack[c][j] - hbyte*256;
-			if (fputc(lbyte, save)==EOF || fputc(hbyte, save)==EOF)
+			if (hugo_fputc(lbyte, save)==EOF || hugo_fputc(hbyte, save)==EOF)
 				goto SaveError;
 		}
 	}
-	if (fputc(undoptr-(undoptr/256)*256, save)==EOF || fputc(undoptr/256, save)==EOF)
+	if (hugo_fputc(undoptr-(undoptr/256)*256, save)==EOF || hugo_fputc(undoptr/256, save)==EOF)
 		goto SaveError;
-	if (fputc(undoturn-(undoturn/256)*256, save)==EOF || fputc(undoturn/256, save)==EOF)
+	if (hugo_fputc(undoturn-(undoturn/256)*256, save)==EOF || hugo_fputc(undoturn/256, save)==EOF)
 		goto SaveError;
-	if (fputc(undoinvalid, save)==EOF || fputc(undorecord, save)==EOF)
+	if (hugo_fputc(undoinvalid, save)==EOF || hugo_fputc(undorecord, save)==EOF)
 		goto SaveError;
 		
 	return true;
@@ -2447,7 +2447,7 @@ int RunSave()
 
 	if (!SaveGameData()) goto SaveError;
 	
-	if (fclose(save)) FatalError(WRITE_E);
+	if (hugo_fclose(save)) FatalError(WRITE_E);
 	save = NULL;
 
 #if !defined (GLK)
@@ -2457,7 +2457,7 @@ int RunSave()
 	return(1);
 
 SaveError:
-	if ((save) && fclose(save)) FatalError(WRITE_E);
+	if ((save) && hugo_fclose(save)) FatalError(WRITE_E);
 	save = NULL;
 	return 0;
 }

@@ -40,6 +40,7 @@ extern "C" {
 #include "rwopsbundle.h"
 #include "hugohandlers.h"
 #include "hugodefs.h"
+#include "hugorfile.h"
 
 
 // Current music and sample volumes. Needed to restore the volumes
@@ -124,7 +125,7 @@ void
 HugoHandlers::playmusic(HUGO_FILE infile, long reslength, char loop_flag, int* result)
 {
     if (not hApp->settings()->enableMusic) {
-        std::fclose(infile);
+        hugo_fclose(infile);
         *result = false;
         return;
     }
@@ -144,10 +145,10 @@ HugoHandlers::playmusic(HUGO_FILE infile, long reslength, char loop_flag, int* r
     }
 
     // Create an RWops for the embedded media resource.
-    SDL_RWops* rwops = RWFromMediaBundle(infile, reslength);
+    SDL_RWops* rwops = RWFromMediaBundle(infile->get(), reslength);
     if (rwops == 0) {
         qWarning() << "ERROR:" << SDL_GetError();
-        std::fclose(infile);
+        delete infile;
         *result = false;
         return;
     }
@@ -231,7 +232,7 @@ void
 HugoHandlers::playsample(HUGO_FILE infile, long reslength, char loop_flag, int* result)
 {
     if (not hApp->settings()->enableSoundEffects) {
-        std::fclose(infile);
+        delete infile;
         *result = false;
         return;
     }
@@ -253,19 +254,19 @@ HugoHandlers::playsample(HUGO_FILE infile, long reslength, char loop_flag, int* 
 
     // Open 'infile' as a QFile.
     file = new QFile;
-    if (not file->open(infile, QIODevice::ReadOnly)) {
+    if (not file->open(infile->get(), QIODevice::ReadOnly)) {
         qWarning() << "ERROR: Can't open sample sound file";
         file->close();
-        std::fclose(infile);
+        delete infile;
         *result = false;
         return;
     }
 
     // Map the data into memory and create an RWops from that data.
-    SDL_RWops* rwops = SDL_RWFromConstMem(file->map(ftell(infile), reslength), reslength);
+    SDL_RWops* rwops = SDL_RWFromConstMem(file->map(ftell(infile->get()), reslength), reslength);
     // Done with the file.
     file->close();
-    std::fclose(infile);
+    delete infile;
     if (rwops == 0) {
         qWarning() << "ERROR:" << SDL_GetError();
         *result = false;

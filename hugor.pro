@@ -2,7 +2,7 @@ QT += core
 QT_CONFIG -= no-pkg-config
 contains(QT_MAJOR_VERSION, 5):QT += widgets
 TEMPLATE = app
-CONFIG += warn_on link_pkgconfig exceptions
+CONFIG += silent warn_on link_pkgconfig exceptions c++11
 VERSION = 1.0.0.99
 TARGET = hugor
 ICON = mac_icon.icns
@@ -163,6 +163,8 @@ HEADERS += \
     src/videoplayer.h \
     src/enginerunner.h \
     src/hugohandlers.h \
+    src/hugorfile.h \
+    src/opcodeparser.h \
     \
     hugo/heheader.h \
     hugo/htokens.h
@@ -182,6 +184,7 @@ SOURCES += \
     src/settingsoverrides.cc \
     src/enginerunner.cc \
     src/hugohandlers.cc \
+    src/opcodeparser.cc \
     \
     hugo/he.c \
     hugo/hebuffer.c \

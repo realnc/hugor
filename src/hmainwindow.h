@@ -103,6 +103,9 @@ class HMainWindow: public QMainWindow {
 
     void
     toggleFullscreen();
+
+    void
+    setFullscreen(bool f);
 };
 
 

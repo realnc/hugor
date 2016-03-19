@@ -49,7 +49,8 @@
 #define MAXBUFFER 255
 #define MAXUNDO 1024
 
-#define HUGO_FILE FILE*
+typedef struct HugorFile HugorFile;
+#define HUGO_FILE HugorFile*
 
 #if __STDC_VERSION__ >= 199901L
 /* We're using a C99 compiler, meaning 'inline' is supported. */
@@ -68,7 +69,9 @@
 #define USE_SMARTFORMATTING
 #define SCROLLBACK_DEFINED
 #define CUSTOM_SCRIPT_WRITE
+#define HUGO_FOPEN hugo_fopen
 #define HUGO_FCLOSE
+#define HUGO_FSEEK hugo_fseek
 
 #ifdef __cplusplus
 extern "C" {
@@ -84,7 +87,17 @@ void hugo_stopsample(void);
 int hugo_playvideo(HUGO_FILE infile, long len, char loop, char bg, int vol);
 void hugo_stopvideo(void);
 int hugo_writetoscript(const char* s);
+HUGO_FILE hugo_fopen(const char* path, const char* mode);
 int hugo_fclose(HUGO_FILE file);
+int hugo_fgetc(HUGO_FILE file);
+int hugo_fseek(HUGO_FILE file, long offset, int whence);
+long hugo_ftell(HUGO_FILE file);
+size_t hugo_fread(void* ptr, size_t size, size_t nmemb, HUGO_FILE file);
+char* hugo_fgets(char* s, int size, HUGO_FILE file);
+int hugo_fputc(int c, HUGO_FILE file);
+int hugo_fputs(const char* s, HUGO_FILE file);
+int hugo_ferror(HUGO_FILE file);
+int hugo_fprintf(HUGO_FILE file, const char* format, ...);
 #ifdef __cplusplus
 }
 #endif

@@ -678,8 +678,8 @@ int GetVal()
 				int low, high;
 
 				if ((ioblock==1)
-					|| (low = fgetc(io))==EOF
-					|| (high = fgetc(io))==EOF)
+					|| (low = hugo_fgetc(io))==EOF
+					|| (high = hugo_fgetc(io))==EOF)
 				/* fscanf() caused trouble for non-ASCII values
 					(fscanf(io, "%c%c", &a, &b)==EOF) */
 				{

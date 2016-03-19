@@ -979,7 +979,7 @@ void FileIO(void)
 
 	if (ioerror) retflag = 0;
 
-	fclose(io);
+	hugo_fclose(io);
 	io = NULL;
 	ioblock = 0;
 
@@ -1130,17 +1130,17 @@ char *GetText(long textaddr)
 	}
 
 	/* ...Or load the string from disk */
-	if (fseek(game, codeend+textaddr, SEEK_SET)) FatalError(READ_E);
+	if (hugo_fseek(game, codeend+textaddr, SEEK_SET)) FatalError(READ_E);
 
-	tdatal = fgetc(game);
-	tdatah = fgetc(game);
-	if (tdatal==EOF || tdatah==EOF || ferror(game)) FatalError(READ_E);
+	tdatal = hugo_fgetc(game);
+	tdatah = hugo_fgetc(game);
+	if (tdatal==EOF || tdatah==EOF || hugo_ferror(game)) FatalError(READ_E);
 
 	tlen = tdatal + tdatah * 256;
 
 	for (i=0; i<tlen; i++)
 	{
-		if ((a = fgetc(game))==EOF) FatalError(READ_E);
+		if ((a = hugo_fgetc(game))==EOF) FatalError(READ_E);
 		g[i] = (char)(a - CHAR_TRANSLATION);
 	}
 	g[i] = '\0';
@@ -1302,12 +1302,12 @@ void LoadGame(void)
 	}
 #endif
 
-	fseek(game, 0, SEEK_END);
-	filelength = ftell(game);
-	fseek(game, 0, SEEK_SET);
+	hugo_fseek(game, 0, SEEK_END);
+	filelength = hugo_ftell(game);
+	hugo_fseek(game, 0, SEEK_SET);
 
-	if (ferror(game)) FatalError(READ_E);
-	if ((game_version = fgetc(game))==EOF) FatalError(OPEN_E);
+	if (hugo_ferror(game)) FatalError(READ_E);
+	if ((game_version = hugo_fgetc(game))==EOF) FatalError(OPEN_E);
 
 	/* Earlier versions of the compiler wrote the version code as
 	   1 or 2 instead of 10 or 20.
@@ -1370,21 +1370,21 @@ void LoadGame(void)
 	hugo_settextpos(1, physical_windowheight/lineheight);
 
 	if (game_version>=25)
-		fseek(game, H_TEXTBANK, SEEK_SET);
+		hugo_fseek(game, H_TEXTBANK, SEEK_SET);
 	else
 		/* Because pre-v2.5 didn't have performaddr in the header */
-		fseek(game, H_TEXTBANK-2L, SEEK_SET);
+		hugo_fseek(game, H_TEXTBANK-2L, SEEK_SET);
 
-	data = fgetc(game);
-	textbank = fgetc(game);
-	if (data==EOF || textbank==EOF || ferror(game)) FatalError(READ_E);
+	data = hugo_fgetc(game);
+	textbank = hugo_fgetc(game);
+	if (data==EOF || textbank==EOF || hugo_ferror(game)) FatalError(READ_E);
 	textbank = (textbank*256L + (long)data) * 16L;
 	codeend = textbank;
 
 	/* Use a 1024-byte read block */
 	ccount = 1024;
 
-	if (fseek(game, 0, SEEK_SET)) FatalError(READ_E);
+	if (hugo_fseek(game, 0, SEEK_SET)) FatalError(READ_E);
 
 #ifndef LOADGAMEDATA_REPLACED
 	/* Allocate as much memory as is required */
@@ -1408,7 +1408,7 @@ void LoadGame(void)
 		   normally be a problem for fread(), but it caused
 		   a crash under MSVC++.
 		*/
-		i = fread((unsigned char *)&mem[c], sizeof(unsigned char),
+		i = hugo_fread((unsigned char *)&mem[c], sizeof(unsigned char),
 			(loaded_in_memory)?
 				((filelength-c>(long)ccount)?ccount:(size_t)(filelength-c)):
 				((codeend-c>(long)ccount)?ccount:(size_t)(codeend-c)),
@@ -1421,7 +1421,7 @@ void LoadGame(void)
 	if (!LoadGameData(false)) FatalError(READ_E);
 #endif
 
-	if (ferror(game)) FatalError(READ_E);
+	if (hugo_ferror(game)) FatalError(READ_E);
 
 	defseg = gameseg;
 
@@ -1930,7 +1930,7 @@ void PromptMore(void)
 
 	if (playback && k==27)         /* if ESC is pressed during playback */
 	{
-		if (fclose(playback))
+		if (hugo_fclose(playback))
 			FatalError(READ_E);
 		playback = NULL;
 	}
@@ -2008,7 +2008,7 @@ int RecordCommands(void)
 
 			if (record)
 			{
-				if (fclose(record)) return (0);
+				if (hugo_fclose(record)) return (0);
 
 				record = NULL;
 				return 1;

@@ -79,6 +79,8 @@ class HugoHandlers: public QObject {
     void playvideo(HUGO_FILE infile, long len, char loop, char bg, int vol, int* result);
 #endif
 
+    void fadeScreen(int durationMs, int startAlpha, int endAlpha, bool block);
+
   private:
     class VideoPlayer* fVidPlayer;
 };

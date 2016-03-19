@@ -69,15 +69,19 @@ HMarginWidget::mouseMoveEvent( QMouseEvent* e )
 
 
 void
-HMarginWidget::paintEvent(QPaintEvent*)
+HMarginWidget::paintEvent(QPaintEvent* e)
 {
-    const QMargins& m = contentsMargins();
-    if (m.isNull()) {
-        return;
-    }
+    //const QMargins& m = contentsMargins();
+    //if (m.isNull()) {
+    //     return;
+    //}
     QPainter p(this);
-    p.fillRect(0, 0, m.left(), height(), fColor);
-    p.fillRect(width() - m.right(), 0, m.right(), height(), fColor);
+    p.fillRect(e->rect(), fColor);
+    //p.fillRect(rect(), fColor);
+
+    // Previous code, before introducing the fade screen opcode.
+    //p.fillRect(0, 0, m.left(), height(), fColor);
+    //p.fillRect(width() - m.right(), 0, m.right(), height(), fColor);
 }
 
 
