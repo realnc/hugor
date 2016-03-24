@@ -668,7 +668,7 @@ MatchVerb:
 	objstart = 0;
 	object_is_number = false;
 
-	for (i=1; i<=MAXWORDS; i++)
+	for (i=1; i<MAXWORDS; i++)
 		objword_cache[i] = 0;
 
 	var[object] = 0;
