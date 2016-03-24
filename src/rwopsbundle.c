@@ -159,6 +159,9 @@ static int
 RWOpsWriteFunc( SDL_RWops* rwops, const void* ptr, int size, int num )
 #endif
 {
+    (void)ptr;
+    (void)size;
+    (void)num;
     if (!RWOpsCheck(rwops))
         return -1;
     SDL_SetError("Media bundle files are not supposed to be written to");

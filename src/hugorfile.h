@@ -3,7 +3,7 @@
 
 #include <cstdio>
 
-class HugorFile
+struct HugorFile
 {
 public:
     HugorFile(FILE* handle)
