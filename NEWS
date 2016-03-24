@@ -68,6 +68,8 @@ Git - 2015-04-09
     Hugo Engine. (The special permission is needed, since the Hugo Engine uses a
     license that is not compatible with the GPL.)
 
+  - Qt version 5 is now required to build Hugor. Qt 4 is no longer supported.
+
 
 1.0 - 2012-08-15
 ================
