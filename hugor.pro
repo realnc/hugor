@@ -1,6 +1,5 @@
-QT += core
+QT += core widgets
 QT_CONFIG -= no-pkg-config
-contains(QT_MAJOR_VERSION, 5):QT += widgets
 TEMPLATE = app
 CONFIG += silent warn_on link_pkgconfig exceptions c++11
 VERSION = 1.0.0.99
@@ -8,8 +7,8 @@ TARGET = hugor
 ICON = mac_icon.icns
 RC_FILE += hugor.rc
 
-contains(QT_MAJOR_VERSION, 4):lessThan(QT_MINOR_VERSION, 6) {
-    error(Qt $$QT_VERSION is not supported. You need at least version 4.6.)
+lessThan(QT_MAJOR_VERSION, 5) {
+    error(Qt 5 is required to build this application.)
 }
 
 static:DEFINES += STATIC_QT
@@ -74,11 +73,6 @@ static:DEFINES += STATIC_QT
     SOURCES *= src/rwopsbundle.c
 } else {
     DEFINES += DISABLE_VIDEO
-}
-
-# Static OS X builds against Qt4 need to explicitly include the text codec plugins.
-macx:static:contains(QT_MAJOR_VERSION, 4) {
-    QTPLUGIN += qcncodecs qjpcodecs qtwcodecs qkrcodecs
 }
 
 macx {

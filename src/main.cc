@@ -53,15 +53,6 @@ extern "C" {
 #  undef main
 #endif
 
-// Static Qt4 builds on OS X need the text codec plugins.
-#if defined(STATIC_QT) and defined(Q_OS_MAC) and QT_VERSION < 0x050000
-    #include <QtPlugin>
-    Q_IMPORT_PLUGIN(qcncodecs)
-    Q_IMPORT_PLUGIN(qjpcodecs)
-    Q_IMPORT_PLUGIN(qtwcodecs)
-    Q_IMPORT_PLUGIN(qkrcodecs)
-#endif
-
 
 int main( int argc, char* argv[] )
 {
