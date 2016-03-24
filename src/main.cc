@@ -30,6 +30,7 @@
 #include <QStringList>
 #include <QFileInfo>
 #include <QMessageBox>
+#include <QTimer>
 #include <cstdlib>
 
 extern "C" {
@@ -99,7 +100,7 @@ int main( int argc, char* argv[] )
     }
 
     int ret = 0;
-    QMetaObject::invokeMethod(app, "entryPoint", Qt::QueuedConnection, Q_ARG(QString, gameFileName));
+    QTimer::singleShot(0, app, [app, gameFileName]{app->entryPoint(gameFileName);});
     ret = app->exec();
     delete app;
 #ifndef DISABLE_VIDEO

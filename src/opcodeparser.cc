@@ -1,9 +1,10 @@
 #include <QApplication>
-#include <QMetaObject>
 #include <QDesktopServices>
 #include <QUrl>
 #include <QDir>
 #include <QClipboard>
+#include <QGraphicsOpacityEffect>
+#include <QPropertyAnimation>
 #include <QDebug>
 #include "opcodeparser.h"
 extern "C" {
@@ -11,6 +12,9 @@ extern "C" {
 }
 #include "hugohandlers.h"
 #include "hmainwindow.h"
+#include "happlication.h"
+#include "hframe.h"
+#include "util.h"
 
 enum class OpcodeParser::Opcode: std::int16_t {
     GET_VERSION         =   100,
@@ -157,22 +161,63 @@ OpcodeParser::parse()
         auto startAlpha = popValue();
         auto endAlpha = popValue();
         bool block = popValue();
-        QMetaObject::invokeMethod(hHandlers, "fadeScreen", Qt::BlockingQueuedConnection,
-                                  Q_ARG(int, duration), Q_ARG(int, startAlpha), Q_ARG(int, endAlpha),
-                                  Q_ARG(bool, block));
+
+        if (duration < 0) {
+            duration = 0;
+        }
+        startAlpha = std::max(-1, std::min(startAlpha, 255));
+        endAlpha = std::max(0, std::min(endAlpha, 255));
+
+        runInMainThread([duration, startAlpha, endAlpha, block]
+        {
+            qreal startF = (qreal)startAlpha / 255;
+            qreal endF = (qreal)endAlpha / 255;
+
+            static QGraphicsOpacityEffect* eff = nullptr;
+            static QPropertyAnimation* fadeAnim = nullptr;
+            static QEventLoop* idle = nullptr;
+            if (eff == nullptr) {
+                eff = new QGraphicsOpacityEffect(hApp->frameWindow());
+                fadeAnim = new QPropertyAnimation(eff, "opacity", eff);
+                idle = new QEventLoop(fadeAnim);
+                hApp->frameWindow()->setGraphicsEffect(eff);
+                QObject::connect(fadeAnim, &QPropertyAnimation::finished, idle, []{idle->exit();});
+            }
+
+            fadeAnim->stop();
+            fadeAnim->setDuration(duration);
+            if (startAlpha >= 0) {
+                fadeAnim->setStartValue(startF);
+            } else {
+                fadeAnim->setStartValue(eff->opacity());
+            }
+            fadeAnim->setEndValue(endF);
+            fadeAnim->setEasingCurve(QEasingCurve::OutQuad);
+            if (block) {
+                fadeAnim->start();
+                idle->exec();
+            } else {
+                fadeAnim->start();
+            }
+        });
+
         fPushOutput(OpcodeResult::OK);
         break;
     }
 
-    case Opcode::OPEN_URL:
+    case Opcode::OPEN_URL: {
         if (paramCount != 1) {
             fPushOutput(OpcodeResult::WRONG_PARAM_COUNT);
             break;
         }
-        QDesktopServices::openUrl(QUrl::fromUserInput(GetWord(popValue()), QDir::currentPath(),
-                                                      QUrl::AssumeLocalFile));
+        auto url = GetWord(popValue());
+        runInMainThread([url]
+        {
+            QDesktopServices::openUrl(QUrl::fromUserInput(url, QDir::currentPath(), QUrl::AssumeLocalFile));
+        });
         fPushOutput(OpcodeResult::OK);
         break;
+    }
 
     case Opcode::SET_FULLSCREEN: {
         if (paramCount != 1) {
@@ -180,7 +225,7 @@ OpcodeParser::parse()
             break;
         }
         bool f = popValue();
-        QMetaObject::invokeMethod(hMainWin, "setFullscreen", Qt::BlockingQueuedConnection, Q_ARG(bool, f));
+        runInMainThread([f]{hMainWin->setFullscreen(f);});
         fPushOutput(OpcodeResult::OK);
         break;
     }
@@ -190,8 +235,8 @@ OpcodeParser::parse()
             fPushOutput(OpcodeResult::WRONG_PARAM_COUNT);
             break;
         }
-        auto cb = QApplication::clipboard();
-        cb->setText(GetWord(popValue()));
+        auto text = GetWord(popValue());
+        runInMainThread([text]{QApplication::clipboard()->setText(text);});
         fPushOutput(OpcodeResult::OK);
         break;
     }

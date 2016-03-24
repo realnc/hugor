@@ -78,10 +78,10 @@ extern "C" {
 #endif
 void printFatalError(char* a);
 int hugo_displaypicture(HUGO_FILE infile, long len);
-int hugo_playmusic(HUGO_FILE infile, long reslength, char loop_flag);
+int hugo_playmusic(HUGO_FILE infile, long len, char loop_flag);
 void hugo_musicvolume(int vol);
 void hugo_stopmusic(void);
-int hugo_playsample(HUGO_FILE infile, long reslength, char loop_flag);
+int hugo_playsample(HUGO_FILE infile, long len, char loop_flag);
 void hugo_samplevolume(int vol);
 void hugo_stopsample(void);
 int hugo_playvideo(HUGO_FILE infile, long len, char loop, char bg, int vol);

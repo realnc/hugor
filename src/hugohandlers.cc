@@ -29,16 +29,11 @@
 #include <QTextStream>
 #include <QTextLayout>
 #include <QTextCodec>
-#include <QTimer>
-#include <QEventLoop>
-#include <QGraphicsOpacityEffect>
-#include <QPropertyAnimation>
 #include <QDebug>
 #include <algorithm>
 #include <cstdio>
 
 #include "hugohandlers.h"
-#include "happlication.h"
 #include "hmainwindow.h"
 #include "videoplayer.h"
 #include "hframe.h"
@@ -379,42 +374,3 @@ HugoHandlers::playvideo(HUGO_FILE infile, long len, char loop, char bg, int vol,
 }
 
 #endif // !DISABLE_VIDEO
-
-void
-HugoHandlers::fadeScreen(int durationMs, int startAlpha, int endAlpha, bool block)
-{
-    if (durationMs < 0) {
-        durationMs = 0;
-    }
-    startAlpha = std::max(-1, std::min(startAlpha, 255));
-    endAlpha = std::max(0, std::min(endAlpha, 255));
-    qreal startF = (qreal)startAlpha / 255;
-    qreal endF = (qreal)endAlpha / 255;
-
-    static QGraphicsOpacityEffect* eff = nullptr;
-    static QPropertyAnimation* fadeAnim = nullptr;
-    static QEventLoop* idle = nullptr;
-    if (eff == nullptr) {
-        eff = new QGraphicsOpacityEffect(hApp->frameWindow());
-        fadeAnim = new QPropertyAnimation(eff, "opacity", eff);
-        idle = new QEventLoop(fadeAnim);
-        hApp->frameWindow()->setGraphicsEffect(eff);
-        connect(fadeAnim, &QPropertyAnimation::finished, idle, []{idle->exit();});
-    }
-
-    fadeAnim->stop();
-    fadeAnim->setDuration(durationMs);
-    if (startAlpha >= 0) {
-        fadeAnim->setStartValue(startF);
-    } else {
-        fadeAnim->setStartValue(eff->opacity());
-    }
-    fadeAnim->setEndValue(endF);
-    fadeAnim->setEasingCurve(QEasingCurve::OutQuad);
-    if (block) {
-        fadeAnim->start();
-        idle->exec();
-    } else {
-        fadeAnim->start();
-    }
-}

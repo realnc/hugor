@@ -165,6 +165,7 @@ HEADERS += \
     src/hugohandlers.h \
     src/hugorfile.h \
     src/opcodeparser.h \
+    src/util.h \
     \
     hugo/heheader.h \
     hugo/htokens.h

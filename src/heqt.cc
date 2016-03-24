@@ -29,7 +29,6 @@
 #include <QFileInfo>
 #include <QTextCodec>
 #include <QTextLayout>
-#include <QMetaObject>
 #include <QThread>
 #include <QTimer>
 #include <QTextCodec>
@@ -45,6 +44,7 @@
 #include "hugohandlers.h"
 #include "hugorfile.h"
 #include "opcodeparser.h"
+#include "util.h"
 
 extern "C" {
 #include "heheader.h"
@@ -55,10 +55,6 @@ extern "C" {
 
 static const char* CONTROL_FNAME = "HrCtlAPI";
 static const char* CHECK_FNAME = "HrCheck";
-
-Q_DECLARE_METATYPE(HUGO_FILE)
-Q_DECLARE_METATYPE(int*)
-Q_DECLARE_METATYPE(char*)
 
 // Exposes QThread::msleep(), which is protected.
 class SleepFuncs: public QThread {
@@ -171,8 +167,7 @@ flushScriptBuffer()
 static void
 flushScrollbackBuffer()
 {
-    QMetaObject::invokeMethod(hMainWin, "appendToScrollback", INVOKE_BLOCK,
-                              Q_ARG(QByteArray, *scrollbackBuffer));
+    runInMainThread([]{hMainWin->appendToScrollback(*scrollbackBuffer);});
     scrollbackBuffer->clear();
 }
 
@@ -263,7 +258,7 @@ hugo_makepath( char* path, char* drive, char* dir, char* fname, char* ext )
 void
 hugo_getfilename( char* a, char* b )
 {
-    QMetaObject::invokeMethod(hHandlers, "getfilename", INVOKE_BLOCK, Q_ARG(char*, a), Q_ARG(char*, b));
+    runInMainThread([a, b]{hHandlers->getfilename(a, b);});
 }
 
 
@@ -513,10 +508,10 @@ hugo_getline( char* p )
     flushScrollbackBuffer();
 
     QMutexLocker mLocker(waiterMutex);
-    QMetaObject::invokeMethod(hHandlers, "startGetline", INVOKE_BLOCK, Q_ARG(char*, p));
+    runInMainThread([p]{hHandlers->startGetline(p);});
     hFrame->inputLineWaitCond.wait(waiterMutex);
     hFrame->getInput(::buffer, MAXBUFFER);
-    QMetaObject::invokeMethod(hHandlers, "endGetline", INVOKE_BLOCK);
+    runInMainThread([]{hHandlers->endGetline();});
 
     // Also copy the input to the script file (if there is one) and the
     // scrollback.
@@ -554,7 +549,7 @@ int
 hugo_iskeywaiting( void )
 {
     //qDebug(Q_FUNC_INFO);
-    QMetaObject::invokeMethod(hFrame, "updateGameScreen", INVOKE_BLOCK, Q_ARG(bool, false));
+    runInMainThread([]{hFrame->updateGameScreen(false);});
     return hFrame->hasKeyInQueue();
 }
 
@@ -569,7 +564,7 @@ hugo_timewait( int n )
     //qDebug() << Q_FUNC_INFO;
     if (hApp->gameRunning() and n > 0) {
         SleepFuncs::msleep(1000 / n);
-        QMetaObject::invokeMethod(hFrame, "updateGameScreen", INVOKE_BLOCK, Q_ARG(bool, false));
+        runInMainThread([]{hFrame->updateGameScreen(false);});
     }
     return true;
 }
@@ -613,9 +608,6 @@ hugo_timewait( int n )
 void
 hugo_init_screen( void )
 {
-    qRegisterMetaType<char*>("char*");
-    qRegisterMetaType<HUGO_FILE>("HUGO_FILE");
-    qRegisterMetaType<int*>("int*");
     waiterMutex = new QMutex;
     scriptBuffer = new QString;
     scrollbackBuffer = new QByteArray;
@@ -638,8 +630,7 @@ hugo_hasgraphics( void )
 void
 hugo_setgametitle( char* t )
 {
-    QMetaObject::invokeMethod(hMainWin, "setWindowTitle", INVOKE_BLOCK,
-                              Q_ARG(QString, QString::fromLatin1(t)));
+    runInMainThread([t]{hMainWin->setWindowTitle(QLatin1String(t));});
 }
 
 
@@ -660,7 +651,7 @@ hugo_cleanup_screen( void )
 void
 hugo_clearfullscreen( void )
 {
-    QMetaObject::invokeMethod(hHandlers, "clearfullscreen", INVOKE_BLOCK);
+    runInMainThread([]{hHandlers->clearfullscreen();});
     currentpos = 0;
     currentline = 1;
     TB_Clear(0, 0, screenwidth, screenheight);
@@ -673,7 +664,7 @@ hugo_clearfullscreen( void )
 void
 hugo_clearwindow( void )
 {
-    QMetaObject::invokeMethod(hHandlers, "clearwindow", INVOKE_BLOCK);
+    runInMainThread([]{hHandlers->clearwindow();});
     currentpos = 0;
     currentline = 1;
     TB_Clear(physical_windowleft, physical_windowtop,
@@ -715,7 +706,7 @@ hugo_clearwindow( void )
 void
 hugo_settextmode( void )
 {
-    QMetaObject::invokeMethod(hHandlers, "settextmode", INVOKE_BLOCK);
+    runInMainThread([]{hHandlers->settextmode();});
 }
 
 
@@ -737,8 +728,7 @@ hugo_settextmode( void )
 void
 hugo_settextwindow( int left, int top, int right, int bottom )
 {
-    QMetaObject::invokeMethod(hHandlers, "settextwindow", INVOKE_BLOCK, Q_ARG(int, left),
-                              Q_ARG(int, top), Q_ARG(int, right), Q_ARG(int, bottom));
+    runInMainThread([left, top, right, bottom]{hHandlers->settextwindow(left, top, right, bottom);});
 }
 
 
@@ -779,8 +769,7 @@ hugo_settextpos( int x, int y )
 void
 printFatalError( char* a )
 {
-    QMetaObject::invokeMethod(hHandlers, "printFatalError", INVOKE_BLOCK,
-                              Q_ARG(char*, a));
+    runInMainThread([a]{hHandlers->printFatalError(a);});
 }
 
 
@@ -799,7 +788,7 @@ printFatalError( char* a )
 void
 hugo_print( char* a )
 {
-    QMetaObject::invokeMethod(hHandlers, "print", INVOKE_BLOCK, Q_ARG(char*, a));
+    runInMainThread([a]{hHandlers->print(a);});
 }
 
 
@@ -808,9 +797,8 @@ hugo_print( char* a )
 void
 hugo_scrollwindowup()
 {
-    QMetaObject::invokeMethod(hFrame, "scrollUp", INVOKE_BLOCK, Q_ARG(int, physical_windowleft),
-                              Q_ARG(int, physical_windowtop), Q_ARG(int, physical_windowright),
-                              Q_ARG(int, physical_windowbottom), Q_ARG(int, lineheight));
+    runInMainThread([]{hFrame->scrollUp(physical_windowleft, physical_windowtop, physical_windowright,
+                                        physical_windowbottom, lineheight);});
     TB_Scroll();
 }
 
@@ -824,21 +812,21 @@ hugo_scrollwindowup()
 void
 hugo_font( int f )
 {
-    QMetaObject::invokeMethod(hHandlers, "font", INVOKE_BLOCK, Q_ARG(int, f));
+    runInMainThread([f]{hHandlers->font(f);});
 }
 
 
 void
 hugo_settextcolor( int c )
 {
-    QMetaObject::invokeMethod(hHandlers, "settextcolor", INVOKE_BLOCK, Q_ARG(int, c));
+    runInMainThread([c]{hHandlers->settextcolor(c);});
 }
 
 
 void
 hugo_setbackcolor( int c )
 {
-    QMetaObject::invokeMethod(hHandlers, "setbackcolor", INVOKE_BLOCK, Q_ARG(int, c));
+    runInMainThread([c]{hHandlers->setbackcolor(c);});
 }
 
 
@@ -920,19 +908,16 @@ int
 hugo_displaypicture( HUGO_FILE infile, long len )
 {
     int result;
-    QMetaObject::invokeMethod(hHandlers, "displaypicture", INVOKE_BLOCK,
-                              Q_ARG(HUGO_FILE, infile), Q_ARG(long, len), Q_ARG(int*, &result));
+    runInMainThread([infile, len, &result]{hHandlers->displaypicture(infile, len, &result);});
     return result;
 }
 
 
 int
-hugo_playmusic( HUGO_FILE infile, long reslength, char loop_flag )
+hugo_playmusic( HUGO_FILE infile, long len, char loop_flag )
 {
     int result;
-    QMetaObject::invokeMethod(hHandlers, "playmusic", INVOKE_BLOCK,
-                              Q_ARG(HUGO_FILE, infile), Q_ARG(long, reslength),
-                              Q_ARG(char, loop_flag), Q_ARG(int*, &result));
+    runInMainThread([infile, len, loop_flag, &result]{hHandlers->playmusic(infile, len, loop_flag, &result);});
     return result;
 }
 
@@ -940,24 +925,22 @@ hugo_playmusic( HUGO_FILE infile, long reslength, char loop_flag )
 void
 hugo_musicvolume( int vol )
 {
-    QMetaObject::invokeMethod(hHandlers, "musicvolume", INVOKE_BLOCK, Q_ARG(int, vol));
+    runInMainThread([vol]{hHandlers->musicvolume(vol);});
 }
 
 
 void
 hugo_stopmusic( void )
 {
-    QMetaObject::invokeMethod(hHandlers, "stopmusic", INVOKE_BLOCK);
+    runInMainThread([]{hHandlers->stopmusic();});
 }
 
 
 int
-hugo_playsample( HUGO_FILE infile, long reslength, char loop_flag )
+hugo_playsample( HUGO_FILE infile, long len, char loop_flag )
 {
     int result;
-    QMetaObject::invokeMethod(hHandlers, "playsample", INVOKE_BLOCK,
-                              Q_ARG(HUGO_FILE, infile), Q_ARG(long, reslength),
-                              Q_ARG(char, loop_flag), Q_ARG(int*, &result));
+    runInMainThread([infile, len, loop_flag, &result]{hHandlers->playsample(infile, len, loop_flag, &result);});
     return result;
 }
 
@@ -965,14 +948,14 @@ hugo_playsample( HUGO_FILE infile, long reslength, char loop_flag )
 void
 hugo_samplevolume( int vol )
 {
-    QMetaObject::invokeMethod(hHandlers, "samplevolume", INVOKE_BLOCK, Q_ARG(int, vol));
+    runInMainThread([vol]{hHandlers->samplevolume(vol);});
 }
 
 
 void
 hugo_stopsample( void )
 {
-    QMetaObject::invokeMethod(hHandlers, "stopsample", INVOKE_BLOCK);
+    runInMainThread([]{hHandlers->stopsample();});
 }
 
 
@@ -1016,7 +999,7 @@ hugo_hasvideo( void )
 void
 hugo_stopvideo( void )
 {
-    QMetaObject::invokeMethod(hHandlers, "stopvideo", INVOKE_BLOCK);
+    runInMainThread([]{hHandlers->stopvideo();});
 }
 
 
@@ -1024,9 +1007,9 @@ int
 hugo_playvideo( HUGO_FILE infile, long len, char loop, char bg, int vol )
 {
     int result;
-    QMetaObject::invokeMethod(hHandlers, "playvideo", INVOKE_BLOCK,
-                              Q_ARG(HUGO_FILE, infile), Q_ARG(long, len), Q_ARG(char, loop),
-                              Q_ARG(char, bg), Q_ARG(int, vol), Q_ARG(int*, &result));
+    runInMainThread([infile, len, loop, bg, vol, &result]{
+        hHandlers->playvideo(infile, len, loop, bg, vol, &result);
+    });
     return result;
 }
 
