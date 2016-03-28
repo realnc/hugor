@@ -91,7 +91,11 @@ int main( int argc, char* argv[] )
     }
 
     int ret = 0;
+#if QT_VERSION < QT_VERSION_CHECK(5, 4, 0)
+    QMetaObject::invokeMethod(app, "entryPoint", Qt::QueuedConnection, Q_ARG(QString, gameFileName));
+#else
     QTimer::singleShot(0, app, [app, gameFileName]{app->entryPoint(gameFileName);});
+#endif
     ret = app->exec();
     delete app;
 #ifndef DISABLE_VIDEO

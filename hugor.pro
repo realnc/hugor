@@ -11,6 +11,13 @@ lessThan(QT_MAJOR_VERSION, 5) {
     error(Qt 5 is required to build this application.)
 }
 
+# qmake on Qt 5.3 and lower doesn't recognize c++14
+contains(QT_MAJOR_VERSION, 5):lessThan(QT_MINOR_VERSION, 4) {
+    CONFIG += c++11
+    QMAKE_CXXFLAGS_CXX11 = $$replace(QMAKE_CXXFLAGS_CXX11, "std=c\+\+11", "std=c++1y")
+    QMAKE_CXXFLAGS_CXX11 = $$replace(QMAKE_CXXFLAGS_CXX11, "std=c\+\+0x", "std=c++1y")
+}
+
 static:DEFINES += STATIC_QT
 
 !disable-audio {

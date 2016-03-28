@@ -213,7 +213,11 @@ OpcodeParser::parse()
         auto url = GetWord(popValue());
         runInMainThread([url]
         {
+#if QT_VERSION < QT_VERSION_CHECK(5, 4, 0)
+            QDesktopServices::openUrl(QUrl::fromUserInput(url));
+#else
             QDesktopServices::openUrl(QUrl::fromUserInput(url, QDir::currentPath(), QUrl::AssumeLocalFile));
+#endif
         });
         fPushOutput(OpcodeResult::OK);
         break;
