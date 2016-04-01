@@ -1,7 +1,7 @@
 QT += core widgets
 QT_CONFIG -= no-pkg-config
 TEMPLATE = app
-CONFIG += silent warn_on link_pkgconfig exceptions c++14
+CONFIG += silent warn_on link_pkgconfig strict_c++ c++14
 VERSION = 1.0.0.99
 TARGET = hugor
 ICON = mac_icon.icns
