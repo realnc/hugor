@@ -15,6 +15,7 @@ extern "C" {
 #include "happlication.h"
 #include "hframe.h"
 #include "util.h"
+#include "hugodefs.h"
 
 enum class OpcodeParser::Opcode: std::int16_t {
     GET_VERSION         =   100,
@@ -24,6 +25,8 @@ enum class OpcodeParser::Opcode: std::int16_t {
     OPEN_URL            =   500,
     SET_FULLSCREEN      =   600,
     SET_CLIPBOARD       =   700,
+    IS_MUSIC_PLAYING    =   800,
+    IS_SAMPLE_PLAYING   =   900,
 };
 
 enum class OpcodeParser::OpcodeResult: std::int16_t {
@@ -242,6 +245,30 @@ OpcodeParser::parse()
         auto text = GetWord(popValue());
         runInMainThread([text]{QApplication::clipboard()->setText(text);});
         fPushOutput(OpcodeResult::OK);
+        break;
+    }
+
+    case Opcode::IS_MUSIC_PLAYING: {
+        if (paramCount != 0) {
+            fPushOutput(OpcodeResult::WRONG_PARAM_COUNT);
+            break;
+        }
+        bool res;
+        runInMainThread([&res]{res = isMusicPlaying();});
+        fPushOutput(OpcodeResult::OK);
+        fPushOutput(res);
+        break;
+    }
+
+    case Opcode::IS_SAMPLE_PLAYING: {
+        if (paramCount != 0) {
+            fPushOutput(OpcodeResult::WRONG_PARAM_COUNT);
+            break;
+        }
+        bool res;
+        runInMainThread([&res]{res = isSamplePlaying();});
+        fPushOutput(OpcodeResult::OK);
+        fPushOutput(res);
         break;
     }
 

@@ -121,6 +121,20 @@ updateSoundVolume()
 }
 
 
+bool
+isMusicPlaying()
+{
+    return Mix_PlayingMusic();
+}
+
+
+bool
+isSamplePlaying()
+{
+    return Mix_Playing(-1) > 0;
+}
+
+
 void
 HugoHandlers::playmusic(HUGO_FILE infile, long reslength, char loop_flag, int* result)
 {

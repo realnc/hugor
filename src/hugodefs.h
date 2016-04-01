@@ -38,6 +38,8 @@ void closeVideoEngine();
 void muteSound( bool mute );
 void muteVideo( bool mute );
 void updateMusicVolume();
+bool isMusicPlaying();
+bool isSamplePlaying();
 void updateSoundVolume();
 void updateVideoVolume();
 
