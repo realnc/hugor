@@ -33,6 +33,7 @@ enum class OpcodeParser::OpcodeResult: std::int16_t {
     OK                  =  0,
     WRONG_PARAM_COUNT   = 10,
     WRONG_BYTE_COUNT    = 20,
+    UNKNOWN_OPCODE      = 30,
 };
 
 static const int OS_TYPE =
@@ -274,6 +275,12 @@ OpcodeParser::parse()
 
     default:
         qWarning() << "Unrecognized opcode:" << (int)opcode;
+        fPushOutput(OpcodeResult::UNKNOWN_OPCODE);
+        fPushOutput((int)opcode);
+        fPushOutput(paramCount);
+        for (int i = 0; i < paramCount; ++i) {
+            fPushOutput(popValue());
+        }
     }
 
     clearQueue(fBuffer);
