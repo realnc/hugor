@@ -192,14 +192,14 @@ RWFromMediaBundle( FILE* mediaBundle, long resLength )
     errno = 0;
     SDL_RWops* rwops = SDL_AllocRW();
     if (rwops == NULL) {
-        SDL_SetError(errno != 0 ? strerror(errno) : "Cannot allocate memory");
+        SDL_SetError("%s", errno != 0 ? strerror(errno) : "Cannot allocate memory");
         return NULL;
     }
 
     errno = 0;
     info = SDL_malloc(sizeof *info);
     if (info == NULL) {
-        SDL_SetError(errno != 0 ? strerror(errno) : "Cannot allocate memory");
+        SDL_SetError("%s", errno != 0 ? strerror(errno) : "Cannot allocate memory");
         SDL_FreeRW(rwops);
         return NULL;
     }
