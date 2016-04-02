@@ -11,6 +11,11 @@ lessThan(QT_MAJOR_VERSION, 5) {
     error(Qt 5 is required to build this application.)
 }
 
+#SANITIZER_FLAGS = -fsanitize=undefined,integer -fno-omit-frame-pointer
+#QMAKE_CFLAGS += $$SANITIZER_FLAGS
+#QMAKE_CXXFLAGS += $$SANITIZER_FLAGS
+#QMAKE_LFLAGS += $$SANITIZER_FLAGS
+
 # qmake on Qt 5.3 and lower doesn't recognize c++14
 contains(QT_MAJOR_VERSION, 5):lessThan(QT_MINOR_VERSION, 4) {
     CONFIG += c++11
