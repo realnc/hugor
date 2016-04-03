@@ -352,6 +352,7 @@ HMainWindow::closeEvent( QCloseEvent* e )
     if (msgBox->exec() == QMessageBox::Yes) {
         hApp->settings()->saveToDisk();
         closeSoundEngine();
+        hApp->terminateEngineThread();
         exit(0);
     } else {
         e->ignore();

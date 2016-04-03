@@ -38,7 +38,6 @@
 #include <QStyle>
 #include <QMenuBar>
 #include <QDesktopWidget>
-#include <QThread>
 
 extern "C" {
 #include "heheader.h"
@@ -250,9 +249,9 @@ HApplication::fRunGame()
         this->fMainWin->setUpdatesEnabled(true);
         this->fMainWin->raise();
         this->fMainWin->activateWindow();
-        fEngineRunner = new EngineRunner(fGameFile);
-        fHugoThread = new QThread(this);
+        fHugoThread = new EngineThread(this);
         fHugoThread->setObjectName("engine");
+        fEngineRunner = new EngineRunner(fGameFile, fHugoThread);
         fEngineRunner->moveToThread(fHugoThread);
         connect(fEngineRunner, SIGNAL(finished()), fHugoThread, SLOT(quit()));
         connect(fHugoThread, SIGNAL(started()), fEngineRunner, SLOT(runEngine()));
@@ -434,4 +433,12 @@ HApplication::advanceEventLoop()
     working = true;
     this->processEvents(QEventLoop::ExcludeUserInputEvents);
     working = false;
+}
+
+
+void
+HApplication::terminateEngineThread()
+{
+    fHugoThread->terminate();
+    fHugoThread->wait(2000);
 }

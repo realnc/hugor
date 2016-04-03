@@ -69,7 +69,7 @@ class HApplication: public QApplication {
 
     // Hugo engine runner and thread.
     class EngineRunner* fEngineRunner;
-    QThread* fHugoThread;
+    class EngineThread* fHugoThread;
 
     // Run the game file contained in fNextGame.
     void
@@ -161,6 +161,9 @@ class HApplication: public QApplication {
     bool
     desktopIsGnome()
     { return this->fDesktopIsGnome; }
+
+    void
+    terminateEngineThread();
 };
 
 

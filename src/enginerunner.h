@@ -28,15 +28,28 @@
 #ifndef ENGINERUNNER_H
 #define ENGINERUNNER_H
 
-#include <QObject>
+#include <QThread>
+
+
+class EngineThread: public QThread {
+    Q_OBJECT
+
+public:
+    friend class EngineRunner;
+
+    explicit EngineThread(QObject* parent = nullptr)
+        : QThread(parent)
+    { }
+};
 
 
 class EngineRunner: public QObject {
     Q_OBJECT
 
   public:
-    EngineRunner(QString gameFile, QObject* parent = 0)
+    EngineRunner(QString gameFile, EngineThread* thread, QObject* parent = 0)
         : QObject(parent),
+          fThread(thread),
           fGameFile(gameFile)
     { }
 
@@ -47,6 +60,7 @@ class EngineRunner: public QObject {
     void runEngine();
 
   private:
+    EngineThread* fThread;
     QString fGameFile;
 };
 
