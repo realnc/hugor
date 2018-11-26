@@ -28,6 +28,7 @@
 #include <cstdio>
 #include "hugohandlers.h"
 #include "hugodefs.h"
+#include "hugorfile.h"
 
 
 void
@@ -55,10 +56,20 @@ updateSoundVolume()
 { }
 
 
+bool
+isMusicPlaying()
+{ return false; }
+
+
+bool
+isSamplePlaying()
+{ return false; }
+
+
 void
 HugoHandlers::playmusic(HUGO_FILE infile, long, char, int* result)
 {
-    std::fclose(infile);
+    delete infile;
     *result = false;
 }
 
@@ -76,7 +87,7 @@ HugoHandlers::stopmusic()
 void
 HugoHandlers::playsample(HUGO_FILE infile, long, char, int* result)
 {
-    std::fclose(infile);
+    delete infile;
     *result = false;
 }
 
