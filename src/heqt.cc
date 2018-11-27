@@ -45,6 +45,7 @@
 #include "hugorfile.h"
 #include "opcodeparser.h"
 #include "util.h"
+#include "extcolors.h"
 
 extern "C" {
 #include "heheader.h"
@@ -87,7 +88,9 @@ static OpcodeParser opcodeParser;
 QColor
 hugoColorToQt( int color )
 {
+    color = static_cast<std::uint8_t>(color); // [-128..127] -> [0..255]
     QColor qtColor;
+
     switch (color) {
       case HUGO_BLACK:         qtColor.setRgb(0x000000); break;
       case HUGO_BLUE:          qtColor.setRgb(0x00007f); break;
@@ -110,7 +113,14 @@ hugoColorToQt( int color )
       case 18:                 qtColor = hApp->settings()->statusTextColor; break;
       case 19:                 qtColor = hApp->settings()->statusBgColor; break;
       case 20:                 qtColor = hApp->settings()->mainTextColor; break;
-      default:                 qtColor.setRgb(0x000000);
+
+      default:
+        if (color > 99 and color < 255) {
+            qtColor = getExtendedColor(color);
+        } else {
+            qWarning() << Q_FUNC_INFO << "unknown color ID:" << color;
+            qtColor.setRgb(0x000000);
+        }
     }
     return qtColor;
 }

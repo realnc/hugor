@@ -207,6 +207,7 @@ HEADERS += \
     src/hugorfile.h \
     src/opcodeparser.h \
     src/util.h \
+    src/extcolors.h \
     \
     hugo/heheader.h \
     hugo/htokens.h
@@ -227,6 +228,7 @@ SOURCES += \
     src/enginerunner.cc \
     src/hugohandlers.cc \
     src/opcodeparser.cc \
+    src/extcolors.cc \
     \
     hugo/he.c \
     hugo/hebuffer.c \

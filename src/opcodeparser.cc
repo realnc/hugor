@@ -6,6 +6,7 @@
 #include <QGraphicsOpacityEffect>
 #include <QPropertyAnimation>
 #include <QDebug>
+#include <QMetaEnum>
 #include "opcodeparser.h"
 extern "C" {
 #include "heheader.h"
@@ -16,25 +17,7 @@ extern "C" {
 #include "hframe.h"
 #include "util.h"
 #include "hugodefs.h"
-
-enum class OpcodeParser::Opcode: std::int16_t {
-    GET_VERSION         =   100,
-    GET_OS              =   200,
-    ABORT               =   300,
-    FADE_SCREEN         =   400,
-    OPEN_URL            =   500,
-    SET_FULLSCREEN      =   600,
-    SET_CLIPBOARD       =   700,
-    IS_MUSIC_PLAYING    =   800,
-    IS_SAMPLE_PLAYING   =   900,
-};
-
-enum class OpcodeParser::OpcodeResult: std::int16_t {
-    OK                  =  0,
-    WRONG_PARAM_COUNT   = 10,
-    WRONG_BYTE_COUNT    = 20,
-    UNKNOWN_OPCODE      = 30,
-};
+#include "extcolors.h"
 
 static const int OS_TYPE =
 #ifdef Q_OS_WIN32
@@ -129,6 +112,15 @@ OpcodeParser::parse()
     auto paramCount = fBuffer.size() / 2u;
 
     switch (opcode) {
+    case Opcode::IS_OPCODE_AVAILABLE:
+        if (paramCount != 1) {
+            fPushOutput(OpcodeResult::WRONG_PARAM_COUNT);
+            break;
+        }
+        fPushOutput(OpcodeResult::OK);
+        fPushOutput(QMetaEnum::fromType<Opcode>().valueToKey(popValue()) != nullptr);
+        break;
+
     case Opcode::GET_VERSION:
         if (paramCount != 0) {
             fPushOutput(OpcodeResult::WRONG_PARAM_COUNT);
@@ -270,6 +262,97 @@ OpcodeParser::parse()
         runInMainThread([&res]{res = isSamplePlaying();});
         fPushOutput(OpcodeResult::OK);
         fPushOutput(res);
+        break;
+    }
+
+    case Opcode::IS_FLUID_LAYOUT:
+        if (paramCount != 0) {
+            fPushOutput(OpcodeResult::WRONG_PARAM_COUNT);
+            break;
+        }
+        fPushOutput(OpcodeResult::OK);
+        fPushOutput(false);
+        break;
+
+    case Opcode::SET_COLOR: {
+        if (paramCount != 5) {
+            fPushOutput(OpcodeResult::WRONG_PARAM_COUNT);
+            break;
+        }
+        int id, r, g, b, a;
+        id = popValue();
+        r = popValue();
+        g = popValue();
+        b = popValue();
+        a = popValue();
+        setExtendedColor(id, r, g, b, a);
+        fPushOutput(OpcodeResult::OK);
+        break;
+    }
+
+    case Opcode::IS_FULLSCREEN: {
+        if (paramCount != 0) {
+            fPushOutput(OpcodeResult::WRONG_PARAM_COUNT);
+            break;
+        }
+        bool res;
+        runInMainThread([&res]{res = hMainWin->isFullScreen();});
+        fPushOutput(OpcodeResult::OK);
+        fPushOutput(res);
+        break;
+    }
+
+    case Opcode::HIDES_CURSOR:
+        if (paramCount != 0) {
+            fPushOutput(OpcodeResult::WRONG_PARAM_COUNT);
+            break;
+        }
+        fPushOutput(OpcodeResult::OK);
+        fPushOutput(true);
+        break;
+
+    case Opcode::TOP_JUSTIFIED:
+        if (paramCount != 0) {
+            fPushOutput(OpcodeResult::WRONG_PARAM_COUNT);
+            break;
+        }
+        fPushOutput(OpcodeResult::OK);
+        fPushOutput(true);
+        break;
+
+    case Opcode::SCREENREADER_CAPABLE:
+        if (paramCount != 0) {
+            fPushOutput(OpcodeResult::WRONG_PARAM_COUNT);
+            break;
+        }
+        fPushOutput(OpcodeResult::OK);
+        fPushOutput(false);
+        break;
+
+    case Opcode::CHECK_RESOURCE: {
+        if (paramCount != 2) {
+            fPushOutput(OpcodeResult::WRONG_PARAM_COUNT);
+            break;
+        }
+        QString resname = GetWord(popValue());
+        QString file = GetWord(popValue());
+
+        // Back up globals that FindResource() is going to modify.
+        auto prevResFile = resource_file;
+        std::string prevLoadedFname = loaded_filename;
+        std::string prevLoadedResname = loaded_resname;
+        auto prevVarStatus = var[system_status];
+
+        auto res = FindResource(file.toLocal8Bit().data(), resname.toLocal8Bit().data());
+
+        // Restore the globals.
+        resource_file = prevResFile;
+        qstrcpy(loaded_filename, prevLoadedFname.c_str());
+        qstrcpy(loaded_resname, prevLoadedResname.c_str());
+        var[system_status] = prevVarStatus;
+
+        fPushOutput(OpcodeResult::OK);
+        fPushOutput(res != 0);
         break;
     }
 
