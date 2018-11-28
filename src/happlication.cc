@@ -439,6 +439,9 @@ HApplication::advanceEventLoop()
 void
 HApplication::terminateEngineThread()
 {
+    // FIXME This just doesn't work reliably. On Windows it just hangs.
+    /*
     fHugoThread->terminate();
     fHugoThread->wait(2000);
+    */
 }
