@@ -14,6 +14,33 @@ public:
     ~AudioDecoderFluidSynth() override;
 
     int loadSoundfont(const std::string& filename);
+    /*!
+     * \brief Load a soundfont from an rwops.
+     *
+     * Ownership of the rwops is transfered to the decoder. The rwops is closed immediately if an
+     * error occurs.
+     *
+     * \return 0 on success, non-zero if an error occurred.
+     */
+    int loadSoundfont(SDL_RWops* rwops);
+
+    /*!
+     * \brief Get the current master gain.
+     */
+    float gain() const;
+
+    /*!
+     * \brief Set the synthesizer gain.
+     *
+     * Lowering the gain helps reduce clipping in overly loud soundfonts. Some soundfonts however
+     * might be too quiet and thus need a higher gain.
+     *
+     * FluidSynth's default is 0.2. Can be between 0 and 10.
+     *
+     * \param gain
+     * Gain level.
+     */
+    void setGain(float gain);
 
     bool open(SDL_RWops* rwops) override;
     int getChannels() const override;
