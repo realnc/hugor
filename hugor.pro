@@ -26,46 +26,41 @@ contains(QT_MAJOR_VERSION, 5):lessThan(QT_MINOR_VERSION, 4) {
 static:DEFINES += STATIC_QT
 
 !disable-audio {
-    SOURCES *= src/rwopsbundle.c
-    audiolib {
-        INCLUDEPATH += \
-            SDL_audiolib \
-            SDL_audiolib/include \
-            SDL_audiolib/resampler \
-            SDL_audiolib/src
-
-        PKGCONFIG += sdl2 sndfile libmpg123 fluidsynth libopenmpt
-
-        DEFINES += \
-            AULIB_STATIC_DEFINE \
-            SPX_RESAMPLE_EXPORT= \
-            RANDOM_PREFIX=SDL_audiolib \
-            OUTSIDE_SPEEX \
-            FLOATING_POINT
-
-        SOURCES += \
-            src/soundaulib.cc \
-            SDL_audiolib/resampler/resample.c \
-            SDL_audiolib/src/AudioDecoder.cpp \
-            SDL_audiolib/src/AudioDecoderFluidsynth.cpp \
-            SDL_audiolib/src/AudioDecoderOpenmpt.cpp \
-            SDL_audiolib/src/AudioDecoderMpg123.cpp \
-            SDL_audiolib/src/AudioDecoderSndfile.cpp \
-            SDL_audiolib/src/AudioResampler.cpp \
-            SDL_audiolib/src/AudioResamplerSpeex.cpp \
-            SDL_audiolib/src/AudioStream.cpp \
-            SDL_audiolib/src/Stream.cpp \
-            SDL_audiolib/src/audiostream_p.cpp \
-            SDL_audiolib/src/aulib.cpp \
-            SDL_audiolib/src/sampleconv.cpp
-    } else {
-        sdl2 {
-            PKGCONFIG += SDL2_mixer
-        } else {
-            PKGCONFIG += SDL_mixer
-        }
-        SOURCES += src/soundsdl.cc
+    CONFIG(debug, release|debug) {
+        DEFINES += AULIB_DEBUG
     }
+
+    SOURCES *= src/rwopsbundle.c
+    INCLUDEPATH += \
+        SDL_audiolib \
+        SDL_audiolib/include \
+        SDL_audiolib/resampler \
+        SDL_audiolib/src
+
+    PKGCONFIG += sdl2 sndfile libmpg123 fluidsynth libopenmpt
+
+    DEFINES += \
+        AULIB_STATIC_DEFINE \
+        SPX_RESAMPLE_EXPORT= \
+        RANDOM_PREFIX=SDL_audiolib \
+        OUTSIDE_SPEEX \
+        FLOATING_POINT
+
+    SOURCES += \
+        src/soundaulib.cc \
+        SDL_audiolib/resampler/resample.c \
+        SDL_audiolib/src/AudioDecoder.cpp \
+        SDL_audiolib/src/AudioDecoderFluidsynth.cpp \
+        SDL_audiolib/src/AudioDecoderOpenmpt.cpp \
+        SDL_audiolib/src/AudioDecoderMpg123.cpp \
+        SDL_audiolib/src/AudioDecoderSndfile.cpp \
+        SDL_audiolib/src/AudioResampler.cpp \
+        SDL_audiolib/src/AudioResamplerSpeex.cpp \
+        SDL_audiolib/src/AudioStream.cpp \
+        SDL_audiolib/src/Stream.cpp \
+        SDL_audiolib/src/audiostream_p.cpp \
+        SDL_audiolib/src/aulib.cpp \
+        SDL_audiolib/src/sampleconv.cpp
 } else {
     DEFINES += DISABLE_AUDIO
     SOURCES += src/soundnone.cc
@@ -74,11 +69,7 @@ static:DEFINES += STATIC_QT
 !disable-video {
     # We still need SDL for SDL_RWops, even without audio.
     disable-audio {
-        sdl2 {
-            PKGCONFIG += sdl2
-        } else {
-            PKGCONFIG += sdl
-        }
+        PKGCONFIG += sdl2
     }
     qt5-video {
         DEFINES += VIDEO_QT5
@@ -156,7 +147,6 @@ win32 {
         QMAKE_LFLAGS += $$PWD/w32_linkscript
     }
 }
-
 
 # We use warn_off to allow only default warnings, not to supress them all.
 QMAKE_CXXFLAGS_WARN_OFF =
