@@ -28,7 +28,7 @@
 #ifndef HUGODEFS_H
 #define HUGODEFS_H
 
-#include <QColor>
+class QColor;
 
 QColor hugoColorToQt( int color );
 void initSoundEngine();
