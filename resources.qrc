@@ -3,5 +3,7 @@
         <file>he_32-bit_48x48.png</file>
         <file>he_32-bit_72x72.png</file>
         <file>hugologo.png</file>
+        <file>test.mid</file>
+        <file>soundfont.sf2</file>
     </qresource>
 </RCC>

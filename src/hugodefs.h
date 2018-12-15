@@ -41,6 +41,7 @@ void updateMusicVolume();
 bool isMusicPlaying();
 bool isSamplePlaying();
 void updateSoundVolume();
+void updateSynthGain();
 void updateVideoVolume();
 
 // Defined Hugo colors.

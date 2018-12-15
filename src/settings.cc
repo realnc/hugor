@@ -50,6 +50,9 @@ extern "C" {
 #define SETT_VIDEO QString::fromLatin1("video")
 #define SETT_SOUNDS QString::fromLatin1("sounds")
 #define SETT_MUSIC QString::fromLatin1("music")
+#define SETT_USE_CUSTOM_SOUNDFONT QString::fromLatin1("usecustomsoundfont")
+#define SETT_SOUNDFONT QString::fromLatin1("soundfont")
+#define SETT_SYNTH_GAIN QString::fromLatin1("synthgain")
 #define SETT_SMOOTH_IMAGES QString::fromLatin1("smoothImageScaling")
 #define SETT_MUTE_MINIMIZED QString::fromLatin1("muteWhenMinimized")
 #define SETT_SOUND_VOL QString::fromLatin1("soundVolume")
@@ -96,6 +99,9 @@ Settings::loadFromDisk( SettingsOverrides* ovr )
     this->useSmoothScaling = sett.value(SETT_SMOOTH_IMAGES, true).toBool();
     this->muteWhenMinimized = sett.value(SETT_MUTE_MINIMIZED, true).toBool();
     this->soundVolume = sett.value(SETT_SOUND_VOL, 100).toInt();
+    this->useCustomSoundFont = sett.value(SETT_USE_CUSTOM_SOUNDFONT, false).toBool();
+    this->soundFont = sett.value(SETT_SOUNDFONT, QString()).toString();
+    this->synthGain = sett.value(SETT_SYNTH_GAIN, 0.6f).toFloat();
     sett.endGroup();
 
     sett.beginGroup(SETT_COLORS_GRP);
@@ -258,6 +264,9 @@ Settings::saveToDisk()
     sett.setValue(SETT_SMOOTH_IMAGES, this->useSmoothScaling);
     sett.setValue(SETT_MUTE_MINIMIZED, this->muteWhenMinimized);
     sett.setValue(SETT_SOUND_VOL, this->soundVolume);
+    sett.setValue(SETT_USE_CUSTOM_SOUNDFONT, this->useCustomSoundFont);
+    sett.setValue(SETT_SOUNDFONT, this->soundFont);
+    sett.setValue(SETT_SYNTH_GAIN, this->synthGain);
     sett.endGroup();
 
     sett.beginGroup(SETT_COLORS_GRP);

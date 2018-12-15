@@ -29,10 +29,16 @@
 #define CONFDIALOG_H
 
 #include <QDialog>
+#include <memory>
 
 
 namespace Ui {
     class ConfDialog;
+}
+
+namespace Aulib {
+    class AudioStream;
+    class AudioDecoderFluidSynth;
 }
 
 class ConfDialog: public QDialog {
@@ -49,6 +55,11 @@ class ConfDialog: public QDialog {
   private:
     Ui::ConfDialog* ui;
     int fInitialSoundVol;
+    float fInitialGain;
+#ifndef DISABLE_AUDIO
+    std::unique_ptr<Aulib::AudioStream> fMidiStream;
+    Aulib::AudioDecoderFluidSynth* fFluidSynthDec = nullptr;
+#endif
 
     // Makes the dialog's controls apply instantly when they change.
     void
@@ -63,6 +74,18 @@ class ConfDialog: public QDialog {
 
     void
     fSetSoundVolume(int vol);
+
+    void
+    fPlayTestMidi();
+
+    void
+    fStopTestMidi();
+
+    void
+    fSetGain();
+
+    void
+    fBrowseForSoundFont();
 };
 
 

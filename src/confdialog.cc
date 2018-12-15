@@ -29,6 +29,16 @@
 #include <QSignalMapper>
 #include <QPushButton>
 #include <QCheckBox>
+#include <QStyle>
+#include <QResource>
+#include <QFileDialog>
+#include <QDebug>
+#include <SDL_rwops.h>
+#ifndef DISABLE_AUDIO
+#include <Aulib/AudioStream.h>
+#include <Aulib/AudioResamplerSpeex.h>
+#include <Aulib/AudioDecoderFluidsynth.h>
+#endif
 
 #include "confdialog.h"
 #include "ui_confdialog.h"
@@ -46,7 +56,30 @@ ConfDialog::ConfDialog( HMainWindow* parent )
     Settings* sett = hApp->settings();
     sett->loadFromDisk();
 
+    const auto& playIcon = style()->standardIcon(QStyle::SP_MediaPlay);
+    const auto& stopIcon = style()->standardIcon(QStyle::SP_MediaStop);
+    if (playIcon.isNull() or stopIcon.isNull()) {
+        ui->midiPlayButton->setText("Play");
+        ui->midiStopButton->setText("Stop");
+    } else {
+        ui->midiPlayButton->setIcon(playIcon);
+        ui->midiStopButton->setIcon(stopIcon);
+        ui->midiPlayButton->adjustSize();
+        ui->midiStopButton->adjustSize();
+    }
+
+    ui->gainLabel->setToolTip(ui->gainSpinBox->toolTip());
     fInitialSoundVol = sett->soundVolume;
+    fInitialGain = sett->synthGain;
+
+#ifdef DISABLE_AUDIO
+    ui->soundFontGroupBox->setEnabled(false);
+    ui->midiTestLabel->setEnabled(false);
+    ui->midiPlayButton->setEnabled(false);
+    ui->midiStopButton->setEnabled(false);
+    ui->gainLabel->setEnabled(false);
+    ui->gainSpinBox->setEnabled(false);
+#endif
 
 #ifdef Q_OS_MAC
     // On the Mac, make the color selection buttons smaller so that they
@@ -75,6 +108,7 @@ ConfDialog::ConfDialog( HMainWindow* parent )
     ui->muteWhenMinimizedCheckBox->setChecked(sett->muteWhenMinimized);
 #endif
 #if defined(DISABLE_VIDEO) and defined(DISABLE_AUDIO)
+    ui->volumeLabel->setDisabled(true);
     ui->volumeSlider->setValue(0);
     ui->volumeSlider->setDisabled(true);
 #else
@@ -82,6 +116,9 @@ ConfDialog::ConfDialog( HMainWindow* parent )
     connect(ui->volumeSlider, SIGNAL(valueChanged(int)), SLOT(fSetSoundVolume(int)));
 #endif
     ui->smoothScalingCheckBox->setChecked(sett->useSmoothScaling);
+    ui->soundFontGroupBox->setChecked(sett->useCustomSoundFont);
+    ui->soundFontLineEdit->setText(sett->soundFont);
+    ui->gainSpinBox->setValue(sett->synthGain);
 
     ui->mainBgColorButton->setColor(sett->mainBgColor);
     ui->mainTextColorButton->setColor(sett->mainTextColor);
@@ -136,6 +173,12 @@ ConfDialog::ConfDialog( HMainWindow* parent )
         connect(this, SIGNAL(rejected()), SLOT(fCancel()));
     }
 #endif
+
+    connect(ui->midiPlayButton, &QPushButton::clicked, this, &ConfDialog::fPlayTestMidi);
+    connect(ui->midiStopButton, &QPushButton::clicked, this, &ConfDialog::fStopTestMidi);
+    connect(ui->soundFontPushButton, &QPushButton::clicked, this, &ConfDialog::fBrowseForSoundFont);
+    connect(ui->gainSpinBox, qOverload<double>(&QDoubleSpinBox::valueChanged), this,
+        &ConfDialog::fSetGain);
 }
 
 
@@ -179,6 +222,10 @@ ConfDialog::fMakeInstantApply()
     connect(ui->smoothScalingCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
     connect(ui->muteWhenMinimizedCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
     connect(ui->volumeSlider, SIGNAL(valueChanged(int)), SLOT(fApplySettings()));
+    connect(ui->soundFontGroupBox, &QGroupBox::toggled, this, &ConfDialog::fApplySettings);
+    connect(ui->soundFontLineEdit, &QLineEdit::textChanged, this, &ConfDialog::fApplySettings);
+    connect(ui->gainSpinBox, qOverload<double>(&QDoubleSpinBox::valueChanged), this,
+        &ConfDialog::fApplySettings);
     connect(ui->overlayScrollbackCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
     connect(ui->mainTextColorButton, SIGNAL(changed(QColor)), this, SLOT(fApplySettings()));
     connect(ui->mainBgColorButton, SIGNAL(changed(QColor)), this, SLOT(fApplySettings()));
@@ -202,6 +249,9 @@ ConfDialog::fApplySettings()
     sett->useSmoothScaling = ui->smoothScalingCheckBox->isChecked();
     sett->muteWhenMinimized = ui->muteWhenMinimizedCheckBox->isChecked();
     sett->soundVolume = ui->volumeSlider->value();
+    sett->soundFont = ui->soundFontLineEdit->text();
+    sett->useCustomSoundFont = ui->soundFontGroupBox->isChecked() and not sett->soundFont.isEmpty();
+    sett->synthGain = ui->gainSpinBox->value();
     sett->mainBgColor = ui->mainBgColorButton->color();
     sett->mainTextColor = ui->mainTextColorButton->color();
     sett->statusBgColor = ui->bannerBgColorButton->color();
@@ -233,6 +283,7 @@ ConfDialog::fApplySettings()
     sett->saveToDisk();
 
     fInitialSoundVol = sett->soundVolume;
+    fInitialGain = sett->synthGain;
 }
 
 
@@ -240,9 +291,11 @@ void
 ConfDialog::fCancel()
 {
     hApp->settings()->soundVolume = fInitialSoundVol;
+    hApp->settings()->synthGain = fInitialGain;
     updateMusicVolume();
     updateSoundVolume();
     updateVideoVolume();
+    updateSynthGain();
 }
 
 
@@ -253,4 +306,70 @@ ConfDialog::fSetSoundVolume(int vol)
     updateMusicVolume();
     updateSoundVolume();
     updateVideoVolume();
+    if (fMidiStream != nullptr) {
+        fMidiStream->setVolume(std::pow(vol / 100.f, 2.f));
+    }
+}
+
+
+void
+ConfDialog::fPlayTestMidi()
+{
+#ifndef DISABLE_AUDIO
+    if (fMidiStream != nullptr and fMidiStream->isPlaying()) {
+        return;
+    }
+    // Re-create the stream each time because the selected soundfont might have changed.
+    fMidiStream = nullptr;
+    QResource midiRes(":/test.mid");
+    auto fsdec = std::make_unique<Aulib::AudioDecoderFluidSynth>();
+    if (not ui->soundFontGroupBox->isChecked() or ui->soundFontLineEdit->text().isEmpty()) {
+        QResource sf2Res(":/soundfont.sf2");
+        fsdec->loadSoundfont(SDL_RWFromConstMem(sf2Res.data(), sf2Res.size()));
+    } else {
+        fsdec->loadSoundfont(ui->soundFontLineEdit->text().toStdString());
+    }
+    fsdec->setGain(ui->gainSpinBox->value());
+    fFluidSynthDec = fsdec.get();
+    auto resampler = std::make_unique<Aulib::AudioResamplerSpeex>();
+    auto* rwops = SDL_RWFromConstMem(midiRes.data(), midiRes.size());
+    fMidiStream =
+        std::make_unique<Aulib::AudioStream>(rwops, std::move(fsdec), std::move(resampler), true);
+    fMidiStream->setVolume(std::pow(ui->volumeSlider->value() / 100.f, 2.f));
+    fMidiStream->play(1, 1.5f);
+#endif
+}
+
+
+void
+ConfDialog::fStopTestMidi()
+{
+#ifndef DISABLE_AUDIO
+    if (fMidiStream) {
+        fMidiStream->stop(0.5f);
+    }
+#endif
+}
+
+
+void
+ConfDialog::fSetGain()
+{
+    if (fMidiStream) {
+        fFluidSynthDec->setGain(ui->gainSpinBox->value());
+    }
+    hApp->settings()->synthGain = ui->gainSpinBox->value();
+    ::updateSynthGain();
+}
+
+
+void
+ConfDialog::fBrowseForSoundFont()
+{
+    auto file = QFileDialog::getOpenFileName(this, tr("Set SoundFont"),
+                                             QFileInfo(ui->soundFontLineEdit->text()).path(),
+                                             "SoundFonts (*.sf2 *.sf3);;All Files (*)");
+    if (not file.isEmpty()) {
+        ui->soundFontLineEdit->setText(file);
+    }
 }

@@ -29,6 +29,7 @@
 #include <SDL_audio.h>
 #include <QDebug>
 #include <QFile>
+#include <QResource>
 #include <cmath>
 
 #include "aulib.h"
@@ -47,6 +48,7 @@ extern "C" {
 #include "rwopsbundle.h"
 #include "hugohandlers.h"
 #include "hugorfile.h"
+#include "hugodefs.h"
 
 // Current music and sample volumes. Needed to restore the volumes after muting
 // them.
@@ -67,6 +69,13 @@ static std::unique_ptr<Aulib::AudioStream>&
 sampleStream()
 {
     static auto p = std::unique_ptr<Aulib::AudioStream>();
+    return p;
+}
+
+static Aulib::AudioDecoderFluidSynth*&
+fsynthDec()
+{
+    static Aulib::AudioDecoderFluidSynth* p = nullptr;
     return p;
 }
 
@@ -155,6 +164,15 @@ updateSoundVolume()
 }
 
 
+void
+updateSynthGain()
+{
+    if (fsynthDec() != nullptr) {
+        fsynthDec()->setGain(hApp->settings()->synthGain);
+    }
+}
+
+
 bool
 isMusicPlaying()
 {
@@ -200,7 +218,15 @@ playStream( HUGO_FILE infile, long reslength, char loop_flag, bool isMusic )
     } else switch (resource_type) {
         case MIDI_R: {
             auto fsdec = std::make_unique<Aulib::AudioDecoderFluidSynth>();
-            fsdec->loadSoundfont("/usr/local/share/soundfonts/gs.sf2");
+            if (hApp->settings()->soundFont.isEmpty() or not hApp->settings()->useCustomSoundFont) {
+                QResource sf2Res(":/soundfont.sf2");
+                auto* sf2_rwops = SDL_RWFromConstMem(sf2Res.data(), sf2Res.size());
+                fsdec->loadSoundfont(sf2_rwops);
+            } else {
+                fsdec->loadSoundfont(hApp->settings()->soundFont.toStdString());
+            }
+            fsdec->setGain(hApp->settings()->synthGain);
+            fsynthDec() = fsdec.get();
             decoder.reset(fsdec.release());
             break;
         }
@@ -208,9 +234,11 @@ playStream( HUGO_FILE infile, long reslength, char loop_flag, bool isMusic )
         case S3M_R:
         case MOD_R:
             decoder = std::make_unique<Aulib::AudioDecoderOpenmpt>();
+            fsynthDec() = nullptr;
             break;
         case MP3_R:
             decoder = std::make_unique<Aulib::AudioDecoderMpg123>();
+            fsynthDec() = nullptr;
             break;
         default:
             qWarning() << "ERROR: Unknown music resource type";
@@ -235,6 +263,7 @@ playStream( HUGO_FILE infile, long reslength, char loop_flag, bool isMusic )
 
     qWarning() << "ERROR:" << SDL_GetError();
     stream.reset();
+    fsynthDec() = nullptr;
     return false;
 }
 

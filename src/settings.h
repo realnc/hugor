@@ -52,6 +52,9 @@ class Settings {
     bool useSmoothScaling;
     bool muteWhenMinimized;
     int soundVolume;
+    bool useCustomSoundFont;
+    QString soundFont;
+    float synthGain;
 
     QColor mainTextColor;
     QColor mainBgColor;

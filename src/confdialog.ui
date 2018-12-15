@@ -167,7 +167,14 @@
              </widget>
             </item>
             <item row="0" column="1">
-             <widget class="KColorButton" name="mainTextColorButton"/>
+             <widget class="KColorButton" name="mainTextColorButton">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+             </widget>
             </item>
             <item row="1" column="0">
              <widget class="QLabel" name="label_9">
@@ -180,7 +187,14 @@
              </widget>
             </item>
             <item row="1" column="1">
-             <widget class="KColorButton" name="mainBgColorButton"/>
+             <widget class="KColorButton" name="mainBgColorButton">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+             </widget>
             </item>
             <item row="2" column="0">
              <widget class="QCheckBox" name="customFsMarginColorCheckBox">
@@ -203,6 +217,12 @@
               <property name="enabled">
                <bool>false</bool>
               </property>
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
              </widget>
             </item>
            </layout>
@@ -220,7 +240,14 @@
              </widget>
             </item>
             <item row="0" column="1">
-             <widget class="KColorButton" name="bannerTextColorButton"/>
+             <widget class="KColorButton" name="bannerTextColorButton">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+             </widget>
             </item>
             <item row="1" column="0">
              <widget class="QLabel" name="label_11">
@@ -233,7 +260,14 @@
              </widget>
             </item>
             <item row="1" column="1">
-             <widget class="KColorButton" name="bannerBgColorButton"/>
+             <widget class="KColorButton" name="bannerBgColorButton">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+             </widget>
             </item>
            </layout>
           </item>
@@ -262,6 +296,19 @@
            </property>
           </widget>
          </item>
+         <item row="1" column="0" colspan="2">
+          <widget class="QCheckBox" name="allowSoundEffectsCheckBox">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Enable Sound &amp;Effects</string>
+           </property>
+          </widget>
+         </item>
          <item row="2" column="0" colspan="2">
           <widget class="QCheckBox" name="muteWhenMinimizedCheckBox">
            <property name="sizePolicy">
@@ -278,21 +325,8 @@
            </property>
           </widget>
          </item>
-         <item row="1" column="0" colspan="2">
-          <widget class="QCheckBox" name="allowSoundEffectsCheckBox">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text">
-            <string>Enable Sound &amp;Effects</string>
-           </property>
-          </widget>
-         </item>
          <item row="3" column="0" colspan="2">
-          <widget class="QLabel" name="label_5">
+          <widget class="QLabel" name="volumeLabel">
            <property name="text">
             <string>Vo&amp;lume</string>
            </property>
@@ -327,7 +361,20 @@
        </item>
        <item row="0" column="1">
         <layout class="QFormLayout" name="formLayout_7">
-         <item row="1" column="0" colspan="2">
+         <item row="0" column="0">
+          <widget class="QCheckBox" name="allowGraphicsCheckBox">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Enable &amp;Graphics</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
           <widget class="QCheckBox" name="allowVideoCheckBox">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
@@ -340,7 +387,7 @@
            </property>
           </widget>
          </item>
-         <item row="2" column="0" colspan="2">
+         <item row="2" column="0">
           <widget class="QCheckBox" name="smoothScalingCheckBox">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
@@ -356,16 +403,103 @@
            </property>
           </widget>
          </item>
-         <item row="0" column="0" colspan="2">
-          <widget class="QCheckBox" name="allowGraphicsCheckBox">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
+        </layout>
+       </item>
+       <item row="1" column="0" colspan="2">
+        <widget class="QGroupBox" name="soundFontGroupBox">
+         <property name="toolTip">
+          <string>&lt;p&gt;Hugor uses its own internal SoundFont for MIDI playback, but you can use an external one instead. Both normal SF2 as well as Vorbis compressed SF3 SoundFonts are supported.&lt;/p&gt;</string>
+         </property>
+         <property name="title">
+          <string>Use custom MIDI Sound&amp;Font</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="checked">
+          <bool>false</bool>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_6">
+          <item>
+           <widget class="QLineEdit" name="soundFontLineEdit">
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="soundFontPushButton">
+            <property name="text">
+             <string>&amp;Browse...</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="2" column="0" colspan="2">
+        <layout class="QHBoxLayout" name="horizontalLayout_7">
+         <item>
+          <widget class="QLabel" name="midiTestLabel">
            <property name="text">
-            <string>Enable &amp;Graphics</string>
+            <string>MIDI Test</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="midiPlayButton">
+           <property name="accessibleName">
+            <string>Midi test play</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="midiStopButton">
+           <property name="accessibleName">
+            <string>Midi test stop</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_3">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QLabel" name="gainLabel">
+           <property name="text">
+            <string>MI&amp;DI Synth Gain</string>
+           </property>
+           <property name="buddy">
+            <cstring>gainSpinBox</cstring>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QDoubleSpinBox" name="gainSpinBox">
+           <property name="toolTip">
+            <string>&lt;p&gt;This is the MIDI synthesizer's volume gain.&lt;/p&gt;
+
+&lt;p&gt;Some soundfonts can be too loud and will result in clipping and distortion, in which case this value should be lowered. And some soundfonts can be too quiet, in which case it is necessary to raise this value.&lt;/p&gt;
+
+&lt;p&gt;The default is 0.6.&lt;/p&gt;</string>
+           </property>
+           <property name="decimals">
+            <number>2</number>
+           </property>
+           <property name="maximum">
+            <double>2.000000000000000</double>
+           </property>
+           <property name="singleStep">
+            <double>0.010000000000000</double>
            </property>
           </widget>
          </item>
@@ -643,7 +777,6 @@
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>tabWidget</tabstop>
   <tabstop>mainFontBox</tabstop>
   <tabstop>mainFontSizeSpinBox</tabstop>
   <tabstop>fixedFontBox</tabstop>
@@ -679,8 +812,8 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>296</x>
-     <y>286</y>
+     <x>25</x>
+     <y>354</y>
     </hint>
     <hint type="destinationlabel">
      <x>157</x>
@@ -695,8 +828,8 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>368</x>
-     <y>286</y>
+     <x>25</x>
+     <y>354</y>
     </hint>
     <hint type="destinationlabel">
      <x>286</x>
