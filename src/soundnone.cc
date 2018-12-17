@@ -56,6 +56,11 @@ updateSoundVolume()
 { }
 
 
+void
+updateSynthGain()
+{ }
+
+
 bool
 isMusicPlaying()
 { return false; }

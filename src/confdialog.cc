@@ -33,8 +33,8 @@
 #include <QResource>
 #include <QFileDialog>
 #include <QDebug>
-#include <SDL_rwops.h>
 #ifndef DISABLE_AUDIO
+#include <SDL_rwops.h>
 #include <Aulib/AudioStream.h>
 #include <Aulib/AudioResamplerSpeex.h>
 #include <Aulib/AudioDecoderFluidsynth.h>
@@ -306,9 +306,11 @@ ConfDialog::fSetSoundVolume(int vol)
     updateMusicVolume();
     updateSoundVolume();
     updateVideoVolume();
+#ifndef DISABLE_AUDIO
     if (fMidiStream != nullptr) {
         fMidiStream->setVolume(std::pow(vol / 100.f, 2.f));
     }
+#endif
 }
 
 
@@ -355,11 +357,13 @@ ConfDialog::fStopTestMidi()
 void
 ConfDialog::fSetGain()
 {
+#ifndef DISABLE_AUDIO
     if (fMidiStream) {
         fFluidSynthDec->setGain(ui->gainSpinBox->value());
     }
     hApp->settings()->synthGain = ui->gainSpinBox->value();
     ::updateSynthGain();
+#endif
 }
 
 
