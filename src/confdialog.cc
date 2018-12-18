@@ -25,6 +25,7 @@
  * include the source code for the parts of the Hugo Engine used as well as
  * that of the covered work.
  */
+#include <cmath>
 #include <QColorDialog>
 #include <QSignalMapper>
 #include <QPushButton>
