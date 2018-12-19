@@ -46,7 +46,7 @@ class HMarginWidget final: public QWidget {
 
     QWidget*
     bannerWidget() const
-    { return this->fBannerWidget; }
+    { return fBannerWidget; }
 
     void
     addWidget( QWidget* w );

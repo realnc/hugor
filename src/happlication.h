@@ -121,28 +121,28 @@ class HApplication final: public QApplication {
 
     Settings*
     settings() const
-    { return this->fSettings; }
+    { return fSettings; }
 
     HFrame*
     frameWindow() const
-    { return this->fFrameWin; }
+    { return fFrameWin; }
 
     HMarginWidget*
     marginWidget() const
-    { return this->fMarginWidget; }
+    { return fMarginWidget; }
 
     bool
     gameRunning() const
-    { return this->fGameRunning; }
+    { return fGameRunning; }
 
     const QString&
     gameFile() const
-    { return this->fGameFile; }
+    { return fGameFile; }
 
     void
     setGameRunning( bool f )
     {
-        this->fGameRunning = f;
+        fGameRunning = f;
         if (not f) {
             emit gameQuitting();
         }
@@ -159,11 +159,11 @@ class HApplication final: public QApplication {
     // Text codec used by Hugo.
     QTextCodec*
     hugoCodec() const
-    { return this->fHugoCodec; }
+    { return fHugoCodec; }
 
     bool
     desktopIsGnome() const
-    { return this->fDesktopIsGnome; }
+    { return fDesktopIsGnome; }
 
     void
     terminateEngineThread();

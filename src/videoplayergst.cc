@@ -87,7 +87,7 @@ VideoPlayer::VideoPlayer(QWidget *parent)
     d->winId(); // Enforce a native window handle for gstreamer.
     d->setUpdatesEnabled(false); // Don't fight with gstreamer over updates.
     // So that the mouse cursor can be made visible again when moving the mouse.
-    this->setMouseTracking(true);
+    setMouseTracking(true);
     d->setMouseTracking(true);
 }
 
@@ -204,12 +204,12 @@ VideoPlayer::play()
 
     hFrame->updateGameScreen(true);
 
-    this->d->setMaximumSize(this->maximumSize());
+    d->setMaximumSize(maximumSize());
     ::currentVideo = this;
     updateVolume();
     gst_element_set_state(d->fPipeline, GST_STATE_PLAYING);
     hApp->advanceEventLoop();
-    if (this->fLooping) {
+    if (fLooping) {
         // Wait for the pipeline to transition into the playing state.
         gst_element_get_state(d->fPipeline, nullptr, nullptr, GST_CLOCK_TIME_NONE);
         // Seek to the end the first time so that there's no pause before

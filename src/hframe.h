@@ -248,7 +248,7 @@ class HFrame final: public QWidget {
 
     const QFontMetrics&
     currentFontMetrics() const
-    { return this->fFontMetrics; }
+    { return fFontMetrics; }
 
     // Print text using the current foreground and background colors.
     // The Text is might not be printed immediately; call flushText()
@@ -264,21 +264,21 @@ class HFrame final: public QWidget {
     // Change the text cursor position.
     void
     moveCursorPos( const QPoint& pos )
-    { this->fCursorPos = pos; }
+    { fCursorPos = pos; }
 
     // Set the height of the text cursor in pixels.
     void
     setCursorHeight( unsigned height )
-    { this->fHeight = height; }
+    { fHeight = height; }
 
     // Show/hide the text cursor.
     void
     setCursorVisible( bool visible )
-    { this->fCursorVisible = visible; }
+    { fCursorVisible = visible; }
 
     bool
     isCursorVisible() const
-    { return this->fCursorVisible; }
+    { return fCursorVisible; }
 
     void
     updateCursorPos();

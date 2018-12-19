@@ -63,7 +63,7 @@ VideoPlayer::VideoPlayer(QWidget *parent)
     d->fMediaPlayer->setVideoOutput(d->fVideoWidget);
     d->fIODev = new RwopsQIODevice(this);
     // So that the mouse cursor can be made visible again when moving the mouse.
-    this->setMouseTracking(true);
+    setMouseTracking(true);
     d->fVideoWidget->setMouseTracking(true);
 
     connect(d->fMediaPlayer, SIGNAL(mediaStatusChanged(QMediaPlayer::MediaStatus)),
@@ -84,7 +84,7 @@ VideoPlayer::~VideoPlayer()
 bool
 VideoPlayer::loadVideo(FILE* src, long len, bool loop)
 {
-    this->stop();
+    stop();
     if (fRwops != nullptr) {
         d->fIODev->close();
         SDL_RWclose(fRwops);
@@ -130,5 +130,5 @@ void
 VideoPlayer::resizeEvent(QResizeEvent* e)
 {
     QWidget::resizeEvent(e);
-    d->fVideoWidget->resize(this->size());
+    d->fVideoWidget->resize(size());
 }

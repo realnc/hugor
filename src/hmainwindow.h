@@ -88,7 +88,7 @@ class HMainWindow final: public QMainWindow {
 
     QErrorMessage*
     errorMsgObj() const
-    { return this->fErrorMsg; }
+    { return fErrorMsg; }
 
     void
     setScrollbackFont( const QFont& font );

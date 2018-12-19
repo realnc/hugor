@@ -40,10 +40,10 @@ HMarginWidget::HMarginWidget(QWidget* parent )
     , fLayout(new QVBoxLayout)
     , fColor(hugoColorToQt(17))
 {
-    this->fLayout->setContentsMargins(0, 0, 0, 0);
-    this->fLayout->setSpacing(0);
-    this->setLayout(this->fLayout);
-    this->setAttribute(Qt::WA_OpaquePaintEvent);
+    fLayout->setContentsMargins(0, 0, 0, 0);
+    fLayout->setSpacing(0);
+    setLayout(fLayout);
+    setAttribute(Qt::WA_OpaquePaintEvent);
 }
 
 
@@ -60,9 +60,9 @@ HMarginWidget::wheelEvent( QWheelEvent* e )
 void
 HMarginWidget::mouseMoveEvent( QMouseEvent* e )
 {
-    if (this->cursor().shape() == Qt::BlankCursor) {
-        this->unsetCursor();
-        this->setMouseTracking(false);
+    if (cursor().shape() == Qt::BlankCursor) {
+        unsetCursor();
+        setMouseTracking(false);
     }
     QWidget::mouseMoveEvent(e);
 }
@@ -89,14 +89,14 @@ void
 HMarginWidget::setBannerWidget( QWidget* w )
 {
     // If a banner widget is already set, delete it first.
-    if (this->fBannerWidget != nullptr) {
-        this->fLayout->removeWidget(this->fBannerWidget);
-        this->fBannerWidget->deleteLater();
+    if (fBannerWidget != nullptr) {
+        fLayout->removeWidget(fBannerWidget);
+        fBannerWidget->deleteLater();
     }
-    this->fBannerWidget = w;
+    fBannerWidget = w;
     if (w != nullptr) {
         w->setParent(this);
-        this->fLayout->insertWidget(0, w);
+        fLayout->insertWidget(0, w);
         w->show();
     }
 }
@@ -105,14 +105,14 @@ HMarginWidget::setBannerWidget( QWidget* w )
 void
 HMarginWidget::addWidget( QWidget* w )
 {
-    this->fLayout->addWidget(w);
+    fLayout->addWidget(w);
 }
 
 
 void
 HMarginWidget::removeWidget( QWidget* w )
 {
-    this->fLayout->removeWidget(w);
+    fLayout->removeWidget(w);
 }
 
 

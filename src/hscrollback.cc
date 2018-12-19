@@ -36,15 +36,15 @@
 HScrollbackWindow::HScrollbackWindow( QWidget* parent )
     : QTextEdit(parent)
 {
-    this->setWindowTitle(HApplication::applicationName() + ' ' + "Scrollback");
-    this->setReadOnly(true);
-    this->setUndoRedoEnabled(false);
-    this->setTextInteractionFlags(Qt::TextSelectableByMouse);
-    this->setFrameStyle(QFrame::NoFrame | QFrame::Plain);
-    this->setFont(hApp->settings()->scrollbackFont);
+    setWindowTitle(HApplication::applicationName() + ' ' + "Scrollback");
+    setReadOnly(true);
+    setUndoRedoEnabled(false);
+    setTextInteractionFlags(Qt::TextSelectableByMouse);
+    setFrameStyle(QFrame::NoFrame | QFrame::Plain);
+    setFont(hApp->settings()->scrollbackFont);
     // Don't allow the scrollbuffer to grow forever; limit it to fMaximumBlockCount lines.
-    this->document()->setMaximumBlockCount(this->fMaximumBlockCount);
-    this->resize(this->fInitialWidth, this->fInitialHeight);
+    document()->setMaximumBlockCount(fMaximumBlockCount);
+    resize(fInitialWidth, fInitialHeight);
 }
 
 
@@ -52,7 +52,7 @@ void
 HScrollbackWindow::keyPressEvent( QKeyEvent* e )
 {
     if (e->matches(QKeySequence::Close) or e->key() == Qt::Key_Escape) {
-        this->close();
+        close();
         hMainWin->activateWindow();
         hMainWin->raise();
         e->accept();

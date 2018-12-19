@@ -56,11 +56,11 @@ HFrame::HFrame( QWidget* parent )
     , fMinimizeTimer(new QTimer(this))
 {
     // We handle player input, so we need to accept focus.
-    this->setFocusPolicy(Qt::WheelFocus);
+    setFocusPolicy(Qt::WheelFocus);
 
-    connect(this->fBlinkTimer, SIGNAL(timeout()), this, SLOT(fBlinkCursor()));
-    this->resetCursorBlinking();
-    //this->setCursorVisible(true);
+    connect(fBlinkTimer, SIGNAL(timeout()), this, SLOT(fBlinkCursor()));
+    resetCursorBlinking();
+    //setCursorVisible(true);
 
     // We need to check whether the application lost focus.
     connect(qApp, SIGNAL(focusChanged(QWidget*,QWidget*)), SLOT(fHandleFocusChange(QWidget*,QWidget*)));
@@ -72,8 +72,8 @@ HFrame::HFrame( QWidget* parent )
     // Since focus is lost, subsequent scrolling/paging events will work as expected.
     connect(this, SIGNAL(requestScrollback()), hMainWin, SLOT(showScrollback()));
 
-    this->setAttribute(Qt::WA_InputMethodEnabled);
-    this->setAttribute(Qt::WA_OpaquePaintEvent);
+    setAttribute(Qt::WA_InputMethodEnabled);
+    setAttribute(Qt::WA_OpaquePaintEvent);
     hFrame = this;
 }
 
@@ -101,9 +101,9 @@ HFrame::fEnqueueKey(char key, QMouseEvent* e)
 void
 HFrame::fBlinkCursor()
 {
-    this->fBlinkVisible = not this->fBlinkVisible;
-    this->update(this->fCursorPos.x(), this->fCursorPos.y() + 1, this->fCursorPos.x() + 2,
-                 this->fCursorPos.y() + this->fHeight + 2);
+    fBlinkVisible = not fBlinkVisible;
+    update(fCursorPos.x(), fCursorPos.y() + 1, fCursorPos.x() + 2,
+                 fCursorPos.y() + fHeight + 2);
 }
 
 
@@ -121,7 +121,7 @@ HFrame::fHandleFocusChange( QWidget* old, QWidget* now )
 
         // The application window gained focus.  Reset cursor blinking and
         // unmute (just in case we were muted previously.)
-        this->resetCursorBlinking();
+        resetCursorBlinking();
         muteSound(false);
         muteVideo(false);
     }
@@ -131,16 +131,16 @@ void
 HFrame::fHandleFocusLost()
 {
     // The application window lost focus.  Disable cursor blinking.
-    this->fBlinkTimer->stop();
+    fBlinkTimer->stop();
 #ifdef Q_OS_MAC
     // On the Mac, when applications lose focus the cursor must be disabled.
-    if (this->fBlinkVisible) {
-        this->fBlinkCursor();
+    if (fBlinkVisible) {
+        fBlinkCursor();
     }
 #else
     // On all other systems we assume the cursor must stay visible.
-    if (not this->fBlinkVisible) {
-        this->fBlinkCursor();
+    if (not fBlinkVisible) {
+        fBlinkCursor();
     }
 #endif
     // Minimize the application if we're fullscreen (except on OSX.)
@@ -159,24 +159,24 @@ HFrame::fHandleFocusLost()
 void
 HFrame::fEndInputMode( bool addToHistory )
 {
-    this->fInputReady = true;
-    this->fInputMode = InputMode::None;
+    fInputReady = true;
+    fInputMode = InputMode::None;
     // The current command only needs to be appended to the history if
     // it's not empty and differs from the previous command in the history.
-    if (((this->fHistory.isEmpty() and not fInputBuf.isEmpty())
-         or (not this->fHistory.isEmpty()
+    if (((fHistory.isEmpty() and not fInputBuf.isEmpty())
+         or (not fHistory.isEmpty()
              and not fInputBuf.isEmpty()
-             and fInputBuf != this->fHistory.last()))
+             and fInputBuf != fHistory.last()))
         and addToHistory)
     {
-        this->fHistory.append(fInputBuf);
+        fHistory.append(fInputBuf);
         // If we're about to overflow the max history cap, delete the
         // oldest command from the history.
-        if (this->fHistory.size() > this->fMaxHistCap) {
-            this->fHistory.removeFirst();
+        if (fHistory.size() > fMaxHistCap) {
+            fHistory.removeFirst();
         }
     }
-    this->fCurHistIndex = 0;
+    fCurHistIndex = 0;
     // Make the input text part of the display pixmap.
     printText(fInputBuf.toLatin1().constData(), fInputStartX, fInputStartY);
     inputLineWaitCond.wakeAll();
@@ -194,24 +194,24 @@ HFrame::paintEvent( QPaintEvent* e )
     // Draw our current input. We need to do this here, after the pixmap
     // has already been painted, so that the input gets painted on top.
     // Otherwise, we could not erase text during editing.
-    if (this->fInputMode == InputMode::Normal and not this->fInputBuf.isEmpty()) {
-        QFont f(this->fUseFixedFont ? hApp->settings()->fixedFont : hApp->settings()->propFont);
-        f.setUnderline(this->fUseUnderlineFont);
-        f.setItalic(this->fUseItalicFont);
-        f.setBold(this->fUseBoldFont);
+    if (fInputMode == InputMode::Normal and not fInputBuf.isEmpty()) {
+        QFont f(fUseFixedFont ? hApp->settings()->fixedFont : hApp->settings()->propFont);
+        f.setUnderline(fUseUnderlineFont);
+        f.setItalic(fUseItalicFont);
+        f.setBold(fUseBoldFont);
         QFontMetrics m(f);
         p.setFont(f);
-        p.setPen(hugoColorToQt(this->fFgColor));
+        p.setPen(hugoColorToQt(fFgColor));
         p.setBackgroundMode(Qt::OpaqueMode);
-        p.setBackground(QBrush(hugoColorToQt(this->fBgColor)));
-        p.drawText(this->fInputStartX, this->fInputStartY + m.ascent() + 1, this->fInputBuf);
+        p.setBackground(QBrush(hugoColorToQt(fBgColor)));
+        p.drawText(fInputStartX, fInputStartY + m.ascent() + 1, fInputBuf);
     }
 
     // Likewise, the input caret needs to be painted on top of the input text.
-    if (this->fCursorVisible and this->fBlinkVisible) {
-        p.setPen(hugoColorToQt(this->fFgColor));
-        p.drawLine(this->fCursorPos.x(), this->fCursorPos.y() + 1,
-                   this->fCursorPos.x(), this->fCursorPos.y() + 1 + this->fHeight);
+    if (fCursorVisible and fBlinkVisible) {
+        p.setPen(hugoColorToQt(fFgColor));
+        p.drawLine(fCursorPos.x(), fCursorPos.y() + 1,
+                   fCursorPos.x(), fCursorPos.y() + 1 + fHeight);
     }
 }
 
@@ -264,19 +264,19 @@ HFrame::keyPressEvent( QKeyEvent* e )
         emit escKeyPressed();
     }
 
-    if (this->fInputMode == InputMode::None) {
-        this->singleKeyPressEvent(e);
+    if (fInputMode == InputMode::None) {
+        singleKeyPressEvent(e);
         return;
     }
 
     // Just for having shorter identifiers.
-    int& i = this->fInputCurrentChar;
-    QString& buf = this->fInputBuf;
+    int& i = fInputCurrentChar;
+    QString& buf = fInputBuf;
 
     // Enable mouse tracking when hiding the cursor so that we can
     // restore it when the mouse is moved.
     hApp->marginWidget()->setCursor(Qt::BlankCursor);
-    this->setMouseTracking(true);
+    setMouseTracking(true);
     hApp->marginWidget()->setMouseTracking(true);
 
     if (e->matches(QKeySequence::MoveToStartOfLine) or e->matches(QKeySequence::MoveToStartOfBlock)) {
@@ -339,32 +339,32 @@ HFrame::keyPressEvent( QKeyEvent* e )
     } else if (e->matches(QKeySequence::MoveToPreviousLine)) {
         // If we're already at the oldest command in the history, or
         // the history list is empty, don't do anything.
-        if (this->fCurHistIndex == this->fHistory.size() or this->fHistory.isEmpty()) {
+        if (fCurHistIndex == fHistory.size() or fHistory.isEmpty()) {
             return;
         }
         // If the current command is new and not in the history yet,
         // remember it so we can bring it back if the user recalls it.
-        if (this->fCurHistIndex == 0) {
-            this->fInputBufBackup = buf;
+        if (fCurHistIndex == 0) {
+            fInputBufBackup = buf;
         }
         // Recall the previous command from the history.
-        buf = this->fHistory[this->fHistory.size() - 1 - this->fCurHistIndex];
-        ++this->fCurHistIndex;
+        buf = fHistory[fHistory.size() - 1 - fCurHistIndex];
+        ++fCurHistIndex;
         i = buf.length();
     } else if (e->matches(QKeySequence::MoveToNextLine)) {
         // If we're at the latest command, don't do anything.
-        if (this->fCurHistIndex == 0) {
+        if (fCurHistIndex == 0) {
             return;
         }
-        --this->fCurHistIndex;
+        --fCurHistIndex;
         // If the next command is the latest one, it means it's current
         // new command we backed up previously. So restore it. If not,
         // recall the next command from the history.
-        if (this->fCurHistIndex == 0) {
-            buf = this->fInputBufBackup;
-            this->fInputBufBackup.clear();
+        if (fCurHistIndex == 0) {
+            buf = fInputBufBackup;
+            fInputBufBackup.clear();
         } else {
-            buf = this->fHistory[this->fHistory.size() - this->fCurHistIndex];
+            buf = fHistory[fHistory.size() - fCurHistIndex];
             i = buf.length();
         }
         i = buf.length();
@@ -386,7 +386,7 @@ HFrame::keyPressEvent( QKeyEvent* e )
         buf.insert(i, strToAdd);
         i += strToAdd.length();
     }
-    this->updateCursorPos();
+    updateCursorPos();
 }
 
 
@@ -394,7 +394,7 @@ void
 HFrame::inputMethodEvent( QInputMethodEvent* e )
 {
     if (not hApp->gameRunning()
-        or (this->fInputMode == InputMode::Normal and e->commitString().isEmpty()))
+        or (fInputMode == InputMode::Normal and e->commitString().isEmpty()))
     {
         QWidget::inputMethodEvent(e);
         return;
@@ -403,7 +403,7 @@ HFrame::inputMethodEvent( QInputMethodEvent* e )
     // Enable mouse tracking when hiding the cursor so that we can
     // restore it when the mouse is moved.
     hApp->marginWidget()->setCursor(Qt::BlankCursor);
-    this->setMouseTracking(true);
+    setMouseTracking(true);
     hApp->marginWidget()->setMouseTracking(true);
 
     const QByteArray& bytes = hApp->hugoCodec()->fromUnicode(e->commitString());
@@ -421,7 +421,7 @@ void
 HFrame::singleKeyPressEvent( QKeyEvent* event )
 {
     //qDebug() << Q_FUNC_INFO;
-    Q_ASSERT(this->fInputMode == InputMode::None);
+    Q_ASSERT(fInputMode == InputMode::None);
 
     switch (event->key()) {
       case 0:
@@ -464,7 +464,7 @@ HFrame::mousePressEvent( QMouseEvent* e )
         e->ignore();
         return;
     }
-    if (this->fInputMode == InputMode::None) {
+    if (fInputMode == InputMode::None) {
         fEnqueueKey(0, e);
     }
     e->accept();
@@ -474,7 +474,7 @@ HFrame::mousePressEvent( QMouseEvent* e )
 void
 HFrame::mouseDoubleClickEvent( QMouseEvent* e )
 {
-    if (this->fInputMode != InputMode::Normal or e->button() != Qt::LeftButton) {
+    if (fInputMode != InputMode::Normal or e->button() != Qt::LeftButton) {
         return;
     }
     // Get the word at the double click position.
@@ -483,15 +483,15 @@ HFrame::mouseDoubleClickEvent( QMouseEvent* e )
         // No word found.
         return;
     }
-    this->insertInputText(word, false, false);
+    insertInputText(word, false, false);
 }
 
 
 void
 HFrame::mouseMoveEvent( QMouseEvent* e )
 {
-    if (this->cursor().shape() == Qt::BlankCursor) {
-        this->setMouseTracking(false);
+    if (cursor().shape() == Qt::BlankCursor) {
+        setMouseTracking(false);
     }
     // Pass it on to our parent.
     e->ignore();
@@ -503,11 +503,11 @@ HFrame::startInput( int xPos, int yPos )
 {
     //qDebug() << Q_FUNC_INFO;
     updateGameScreen(false);
-    this->fInputReady = false;
-    this->fInputMode = InputMode::Normal;
-    this->fInputStartX = xPos;
-    this->fInputStartY = yPos;
-    this->fInputCurrentChar = 0;
+    fInputReady = false;
+    fInputMode = InputMode::Normal;
+    fInputStartX = xPos;
+    fInputStartY = yPos;
+    fInputCurrentChar = 0;
 
     QMutexLocker mKeyLocker(&fKeyQueueMutex);
     QMutexLocker mClickLocker(&fClickQueueMutex);
@@ -520,7 +520,7 @@ void
 HFrame::getInput(char* buf, size_t buflen)
 {
     Q_ASSERT(buf != nullptr);
-    qstrncpy(buf, this->fInputBuf.toLatin1(), buflen);
+    qstrncpy(buf, fInputBuf.toLatin1(), buflen);
     fInputBuf.clear();
 }
 
@@ -539,8 +539,8 @@ QPoint
 HFrame::getNextClick()
 {
     QMutexLocker mLocker(&fClickQueueMutex);
-    Q_ASSERT(not this->fClickQueue.isEmpty());
-    return this->fClickQueue.dequeue();
+    Q_ASSERT(not fClickQueue.isEmpty());
+    return fClickQueue.dequeue();
 }
 
 
@@ -559,12 +559,12 @@ HFrame::clearRegion( int left, int top, int right, int bottom )
     flushText();
     fNeedScreenUpdate = true;
     if (left == 0 and top == 0 and right == 0 and bottom == 0) {
-        fPixmap.fill(hugoColorToQt(this->fBgColor));
+        fPixmap.fill(hugoColorToQt(fBgColor));
         return;
     }
     QPainter p(&fPixmap);
     QRect rect(left, top, right - left + 1, bottom - top + 1);
-    p.fillRect(rect, hugoColorToQt(this->fBgColor));
+    p.fillRect(rect, hugoColorToQt(fBgColor));
 
     // If this was a fullscreen clear, then also clear the margin color.
     if (rect == fPixmap.rect()) {
@@ -576,54 +576,54 @@ HFrame::clearRegion( int left, int top, int right, int bottom )
 void
 HFrame::setFgColor(int color)
 {
-    this->flushText();
-    this->fFgColor = color;
+    flushText();
+    fFgColor = color;
 }
 
 
 void
 HFrame::setBgColor(int color)
 {
-    this->flushText();
-    this->fBgColor = color;
+    flushText();
+    fBgColor = color;
 }
 
 
 void
 HFrame::setFontType( int hugoFont )
 {
-    this->flushText();
-    this->fUseFixedFont = not (hugoFont & PROP_FONT);
-    this->fUseUnderlineFont = hugoFont & UNDERLINE_FONT;
-    this->fUseItalicFont = hugoFont & ITALIC_FONT;
-    this->fUseBoldFont = hugoFont & BOLD_FONT;
+    flushText();
+    fUseFixedFont = not (hugoFont & PROP_FONT);
+    fUseUnderlineFont = hugoFont & UNDERLINE_FONT;
+    fUseItalicFont = hugoFont & ITALIC_FONT;
+    fUseBoldFont = hugoFont & BOLD_FONT;
 
-    QFont f(this->fUseFixedFont ? hApp->settings()->fixedFont : hApp->settings()->propFont);
-    f.setUnderline(this->fUseUnderlineFont);
-    f.setItalic(this->fUseItalicFont);
-    f.setBold(this->fUseBoldFont);
-    this->fFontMetrics = QFontMetrics(f, &fPixmap);
+    QFont f(fUseFixedFont ? hApp->settings()->fixedFont : hApp->settings()->propFont);
+    f.setUnderline(fUseUnderlineFont);
+    f.setItalic(fUseItalicFont);
+    f.setBold(fUseBoldFont);
+    fFontMetrics = QFontMetrics(f, &fPixmap);
 
     // Adjust text caret for new font.
-    this->setCursorHeight(this->fFontMetrics.height());
+    setCursorHeight(fFontMetrics.height());
 }
 
 
 void
 HFrame::printText( const QString& str, int x, int y )
 {
-    if (this->fPrintBuffer.isEmpty()) {
-        this->fFlushXPos = x;
-        this->fFlushYPos = y;
+    if (fPrintBuffer.isEmpty()) {
+        fFlushXPos = x;
+        fFlushYPos = y;
     }
-    this->fPrintBuffer += str;
+    fPrintBuffer += str;
 }
 
 
 void
 HFrame::printImage( const QImage& img, int x, int y )
 {
-    this->flushText();
+    flushText();
     QPainter p(&fPixmap);
     p.drawImage(x, y, img);
     fNeedScreenUpdate = true;
@@ -646,7 +646,7 @@ HFrame::scrollUp( int left, int top, int right, int bottom, int h )
 
     // Fill exposed region.
     const QRect& r = exposed.boundingRect();
-    this->clearRegion(r.left(), r.top(), r.left() + r.width(), r.top() + r.bottom());
+    clearRegion(r.left(), r.top(), r.left() + r.width(), r.top() + r.bottom());
 
     if (hApp->settings()->softTextScrolling) {
         QEventLoop idleLoop;
@@ -664,22 +664,22 @@ HFrame::scrollUp( int left, int top, int right, int bottom, int h )
 void
 HFrame::flushText()
 {
-    if (this->fPrintBuffer.isEmpty()) {
+    if (fPrintBuffer.isEmpty()) {
         return;
     }
 
-    QFont f(this->fUseFixedFont ? hApp->settings()->fixedFont : hApp->settings()->propFont);
-    f.setUnderline(this->fUseUnderlineFont);
-    f.setItalic(this->fUseItalicFont);
-    f.setBold(this->fUseBoldFont);
+    QFont f(fUseFixedFont ? hApp->settings()->fixedFont : hApp->settings()->propFont);
+    f.setUnderline(fUseUnderlineFont);
+    f.setItalic(fUseItalicFont);
+    f.setBold(fUseBoldFont);
     QPainter p(&fPixmap);
     p.setFont(f);
-    p.setPen(hugoColorToQt(this->fFgColor));
+    p.setPen(hugoColorToQt(fFgColor));
     p.setBackgroundMode(Qt::OpaqueMode);
-    p.setBackground(QBrush(hugoColorToQt(this->fBgColor)));
-    p.drawText(this->fFlushXPos, this->fFlushYPos + currentFontMetrics().ascent() + 1,
-               this->fPrintBuffer);
-    this->fPrintBuffer.clear();
+    p.setBackground(QBrush(hugoColorToQt(fBgColor)));
+    p.drawText(fFlushXPos, fFlushYPos + currentFontMetrics().ascent() + 1,
+               fPrintBuffer);
+    fPrintBuffer.clear();
     fNeedScreenUpdate = true;
 }
 
@@ -690,7 +690,7 @@ HFrame::updateGameScreen(bool force)
     flushText();
     if (fNeedScreenUpdate or force) {
         //qDebug(Q_FUNC_INFO);
-        hApp->updateMargins(this->fBgColor);
+        hApp->updateMargins(fBgColor);
         fNeedScreenUpdate = false;
         hApp->marginWidget()->update();
         update();
@@ -702,27 +702,27 @@ void
 HFrame::updateCursorPos()
 {
     // Reset the blink timer.
-    if (this->fBlinkTimer->isActive()) {
-        this->fBlinkTimer->start();
+    if (fBlinkTimer->isActive()) {
+        fBlinkTimer->start();
     }
 
     // Blink-out first to ensure the cursor won't stay visible at the previous
     // position after we move it.
-    if (this->fBlinkVisible) {
-        this->fBlinkCursor();
+    if (fBlinkVisible) {
+        fBlinkCursor();
     }
 
     // Blink-in.
-    if (not this->fBlinkVisible) {
-        this->fBlinkCursor();
+    if (not fBlinkVisible) {
+        fBlinkCursor();
     }
 
-    int xOffs = this->currentFontMetrics().width(this->fInputBuf.left(this->fInputCurrentChar));
-    this->moveCursorPos(QPoint(this->fInputStartX + xOffs, this->fInputStartY));
+    int xOffs = currentFontMetrics().width(fInputBuf.left(fInputCurrentChar));
+    moveCursorPos(QPoint(fInputStartX + xOffs, fInputStartY));
 
     // Blink-in.
-    if (not this->fBlinkVisible) {
-        this->fBlinkCursor();
+    if (not fBlinkVisible) {
+        fBlinkCursor();
     }
     update();
 }
@@ -733,7 +733,7 @@ HFrame::resetCursorBlinking()
 {
     // Start the timer unless cursor blinking is disabled.
     if (QApplication::cursorFlashTime() > 1) {
-        this->fBlinkTimer->start(QApplication::cursorFlashTime() / 2);
+        fBlinkTimer->start(QApplication::cursorFlashTime() / 2);
     }
 }
 
@@ -741,22 +741,22 @@ HFrame::resetCursorBlinking()
 void
 HFrame::insertInputText( QString txt, bool execute, bool clearCurrent )
 {
-    if (this->fInputMode != InputMode::Normal) {
+    if (fInputMode != InputMode::Normal) {
         return;
     }
     // Clear the current input, if requested.
     if (clearCurrent) {
-        this->fInputBuf.clear();
-        this->fInputCurrentChar = 0;
+        fInputBuf.clear();
+        fInputCurrentChar = 0;
     }
     // If the command is not to be executed, append a space so it won't run
     // together with what the user types next.
     if (not execute) {
         txt.append(' ');
     }
-    this->fInputBuf.insert(this->fInputCurrentChar, txt);
-    this->fInputCurrentChar += txt.length();
-    this->updateCursorPos();
+    fInputBuf.insert(fInputCurrentChar, txt);
+    fInputCurrentChar += txt.length();
+    updateCursorPos();
     if (execute) {
         fEndInputMode(false);
     }

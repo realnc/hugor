@@ -34,33 +34,33 @@ SettingsOverrides::SettingsOverrides( const QString& filename )
     QSettings sett(filename, QSettings::IniFormat);
 
     sett.beginGroup(QString::fromLatin1("identity"));
-    this->appName = sett.value(QString::fromLatin1("appName"), QString::fromLatin1("")).toString();
-    this->authorName = sett.value(QString::fromLatin1("authorName"), QString::fromLatin1("")).toString();
+    appName = sett.value(QString::fromLatin1("appName"), QString::fromLatin1("")).toString();
+    authorName = sett.value(QString::fromLatin1("authorName"), QString::fromLatin1("")).toString();
     sett.endGroup();
 
     sett.beginGroup(QString::fromLatin1("display"));
-    this->fullscreen = sett.value(QString::fromLatin1("fullscreen"), false).toBool();
-    this->hideMenuBar = sett.value(QString::fromLatin1("hideMenuBar"), false).toBool();
-    this->fullscreenWidth = sett.value(QString::fromLatin1("fullscreenWidth"), 0).toInt();
+    fullscreen = sett.value(QString::fromLatin1("fullscreen"), false).toBool();
+    hideMenuBar = sett.value(QString::fromLatin1("hideMenuBar"), false).toBool();
+    fullscreenWidth = sett.value(QString::fromLatin1("fullscreenWidth"), 0).toInt();
     if (fullscreenWidth > 0) {
-        if (this->fullscreenWidth > 100) {
-            this->fullscreenWidth = 100;
-        } else if (this->fullscreenWidth < 10) {
-            this->fullscreenWidth = 10;
+        if (fullscreenWidth > 100) {
+            fullscreenWidth = 100;
+        } else if (fullscreenWidth < 10) {
+            fullscreenWidth = 10;
         }
     }
-    this->marginSize = sett.value(QString::fromLatin1("marginSize"), 0).toInt();
-    this->widthRatio = sett.value(QString::fromLatin1("widthRatio"), 4).toInt();
-    this->heightRatio = sett.value(QString::fromLatin1("heightRatio"), 3).toInt();
-    this->propFontSize = sett.value(QString::fromLatin1("propFontSize"), 0).toInt();
-    this->fixedFontSize = sett.value(QString::fromLatin1("fixedFontSize"), 0).toInt();
-    this->scrollbackFontSize = sett.value(QString::fromLatin1("scrollbackFontSize"), 0).toInt();
-    this->imageSmoothing = sett.value(QString::fromLatin1("imageSmoothing"), true).toBool();
+    marginSize = sett.value(QString::fromLatin1("marginSize"), 0).toInt();
+    widthRatio = sett.value(QString::fromLatin1("widthRatio"), 4).toInt();
+    heightRatio = sett.value(QString::fromLatin1("heightRatio"), 3).toInt();
+    propFontSize = sett.value(QString::fromLatin1("propFontSize"), 0).toInt();
+    fixedFontSize = sett.value(QString::fromLatin1("fixedFontSize"), 0).toInt();
+    scrollbackFontSize = sett.value(QString::fromLatin1("scrollbackFontSize"), 0).toInt();
+    imageSmoothing = sett.value(QString::fromLatin1("imageSmoothing"), true).toBool();
     QString namedColor = sett.value(QString::fromLatin1("fsMarginColor"), QString()).toString();
-    this->fsMarginColor.setNamedColor(namedColor);
+    fsMarginColor.setNamedColor(namedColor);
     sett.endGroup();
 
     sett.beginGroup(QString::fromLatin1("media"));
-    this->muteWhenMinimized = sett.value(QString::fromLatin1("muteWhenMinimized"), true).toBool();
+    muteWhenMinimized = sett.value(QString::fromLatin1("muteWhenMinimized"), true).toBool();
     sett.endGroup();
 }
