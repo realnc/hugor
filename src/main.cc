@@ -61,25 +61,24 @@ int main( int argc, char* argv[] )
     initVideoEngine(argc, argv);
 #endif
 
-    HApplication* app = new HApplication(argc, argv, "Hugor", HUGOR_VERSION,
-                                         "Nikos Chantziaras", "");
+    HApplication app(argc, argv, "Hugor", HUGOR_VERSION, "Nikos Chantziaras", "");
 
     // Filename of the game to run.
     QString gameFileName;
 
     // Check if a game file with the same basename as ours exists in our
     // directory.  If yes, we will run it.
-    gameFileName = app->applicationDirPath();
+    gameFileName = HApplication::applicationDirPath();
     if (not gameFileName.endsWith('/')) {
         gameFileName += '/';
     }
-    gameFileName += QFileInfo(app->applicationFilePath()).baseName();
+    gameFileName += QFileInfo(HApplication::applicationFilePath()).baseName();
     gameFileName += ".hex";
-    if (not QFileInfo(gameFileName).exists()) {
+    if (not QFileInfo::exists(gameFileName)) {
         gameFileName.clear();
     }
 
-    const QStringList& args = app->arguments();
+    const QStringList& args = HApplication::arguments();
     if (args.size() == 2) {
         if (QFile::exists(args.at(1))) {
             gameFileName = args.at(1);
@@ -92,12 +91,11 @@ int main( int argc, char* argv[] )
 
     int ret = 0;
 #if QT_VERSION < QT_VERSION_CHECK(5, 4, 0)
-    QMetaObject::invokeMethod(app, "entryPoint", Qt::QueuedConnection, Q_ARG(QString, gameFileName));
+    QMetaObject::invokeMethod(&app, "entryPoint", Qt::QueuedConnection, Q_ARG(QString, gameFileName));
 #else
-    QTimer::singleShot(0, app, [app, gameFileName]{app->entryPoint(gameFileName);});
+    QTimer::singleShot(0, &app, [&app, gameFileName]{app.entryPoint(gameFileName);});
 #endif
-    ret = app->exec();
-    delete app;
+    ret = HApplication::exec();
 #ifndef DISABLE_VIDEO
     closeVideoEngine();
 #endif

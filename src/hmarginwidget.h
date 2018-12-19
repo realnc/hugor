@@ -25,28 +25,27 @@
  * include the source code for the parts of the Hugo Engine used as well as
  * that of the covered work.
  */
-#ifndef HMARGINWIDGET_H
-#define HMARGINWIDGET_H
-
+#pragma once
 #include <QWidget>
 
+class QVBoxLayout;
 
-class HMarginWidget: public QWidget {
+class HMarginWidget final: public QWidget {
     Q_OBJECT
 
   private:
-    QWidget* fBannerWidget;
-    class QVBoxLayout* fLayout;
+    QWidget* fBannerWidget = nullptr;
+    QVBoxLayout* fLayout;
     QColor fColor;
 
   public:
-    HMarginWidget( QWidget* parent = 0 );
+    HMarginWidget( QWidget* parent = nullptr );
 
     void
     setBannerWidget( QWidget* w );
 
     QWidget*
-    bannerWidget()
+    bannerWidget() const
     { return this->fBannerWidget; }
 
     void
@@ -59,15 +58,12 @@ class HMarginWidget: public QWidget {
     setColor(QColor color);
 
   protected:
-    virtual void
-    wheelEvent( QWheelEvent* e );
+    void
+    wheelEvent( QWheelEvent* e ) override;
 
-    virtual void
-    mouseMoveEvent( QMouseEvent* e );
+    void
+    mouseMoveEvent( QMouseEvent* e ) override;
 
-    virtual void
-    paintEvent(QPaintEvent*);
+    void
+    paintEvent(QPaintEvent* e) override;
 };
-
-
-#endif

@@ -105,13 +105,14 @@ void KColorButton::KColorButtonPrivate::initStyleOption(QStyleOptionButton* opt)
     opt->initFrom(q);
     opt->state |= q->isDown() ? QStyle::State_Sunken : QStyle::State_Raised;
     opt->features = QStyleOptionButton::None;
-    if (q->isDefault())
+    if (q->isDefault()) {
       opt->features |= QStyleOptionButton::DefaultButton;
+    }
     opt->text.clear();
     opt->icon = QIcon();
 }
 
-void KColorButton::paintEvent( QPaintEvent* )
+void KColorButton::paintEvent( QPaintEvent* /*e*/ )
 {
   QPainter painter(this);
 
@@ -135,9 +136,10 @@ void KColorButton::paintEvent( QPaintEvent* )
   }
 
   QColor fillCol = isEnabled() ? d->col : palette().color(backgroundRole());
-  qDrawShadePanel( &painter, x, y, w, h, palette(), true, 1, NULL);
-  if ( fillCol.isValid() )
+  qDrawShadePanel( &painter, x, y, w, h, palette(), true, 1, nullptr);
+  if ( fillCol.isValid() ) {
     painter.fillRect( x+1, y+1, w-2, h-2, fillCol );
+  }
 
   if ( hasFocus() ) {
     QRect focusRect = style()->subElementRect( QStyle::SE_PushButtonFocusRect, &butOpt, this );
@@ -181,7 +183,7 @@ void KColorButton::dropEvent( QDropEvent *event)
 void KColorButton::keyPressEvent( QKeyEvent *e )
 {
   if (e->matches(QKeySequence::Copy)) {
-    QMimeData *mime=new QMimeData;
+    auto *mime=new QMimeData;
     mime->setColorData(color());
     QApplication::clipboard()->setMimeData( mime, QClipboard::Clipboard );
   }
@@ -190,8 +192,9 @@ void KColorButton::keyPressEvent( QKeyEvent *e )
               qvariant_cast<QColor>(QApplication::clipboard()->mimeData(QClipboard::Clipboard)->colorData());
     setColor( color );
   }
-  else
+  else {
     QPushButton::keyPressEvent( e );
+  }
 }
 
 void KColorButton::mousePressEvent( QMouseEvent *e)
@@ -206,8 +209,8 @@ void KColorButton::mouseMoveEvent( QMouseEvent *e)
   if( (e->buttons() & Qt::LeftButton) &&
       (e->pos()-d->mPos).manhattanLength() > QApplication::startDragDistance() )
   {
-    QDrag* drag = new QDrag(this);
-    QMimeData* mime = new QMimeData;
+    auto* drag = new QDrag(this);
+    auto* mime = new QMimeData;
     mime->setColorData(color());
     drag->setMimeData(mime);
     drag->exec(Qt::CopyAction);

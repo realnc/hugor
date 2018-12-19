@@ -25,13 +25,13 @@
  * include the source code for the parts of the Hugo Engine used as well as
  * that of the covered work.
  */
+#include "rwopsbundle.h"
+
 #include <errno.h>
 #include <string.h>
 #include <SDL_version.h>
 #include <SDL_rwops.h>
 #include <SDL_error.h>
-
-#include "rwopsbundle.h"
 
 /* Our custom RWops type id. Not strictly needed, but it helps catching bugs
  * if somehow we end up trying to delete a different type of RWops. */
@@ -70,8 +70,9 @@ RWOpsCheck( SDL_RWops* rwops )
 static Sint64
 RWOpsSizeFunc( SDL_RWops* rwops )
 {
-    if (!RWOpsCheck(rwops))
+    if (!RWOpsCheck(rwops)) {
         return -1;
+    }
     return ((BundleFileInfo*)rwops->hidden.unknown.data1)->size;
 }
 #endif
@@ -93,8 +94,9 @@ RWOpsSeekFunc( SDL_RWops* rwops, int offset, int whence )
 {
     BundleFileInfo* info;
     int seekRet;
-    if (!RWOpsCheck(rwops))
+    if (!RWOpsCheck(rwops)) {
         return -1;
+    }
     info = rwops->hidden.unknown.data1;
     errno = 0;
     if (whence == RW_SEEK_CUR) {
@@ -130,8 +132,9 @@ RWOpsReadFunc( SDL_RWops* rwops, void* ptr, int size, int maxnum )
     long bytesToRead = size * maxnum;
     long curPos;
     size_t itemsRead;
-    if (!RWOpsCheck(rwops))
+    if (!RWOpsCheck(rwops)) {
         return -1;
+    }
     info = rwops->hidden.unknown.data1;
     curPos = ftell(info->file);
     /* Make sure we don't read past the end of the embedded media resource. */
@@ -162,8 +165,9 @@ RWOpsWriteFunc( SDL_RWops* rwops, const void* ptr, int size, int num )
     (void)ptr;
     (void)size;
     (void)num;
-    if (!RWOpsCheck(rwops))
+    if (!RWOpsCheck(rwops)) {
         return -1;
+    }
     SDL_SetError("Media bundle files are not supposed to be written to");
     return -1;
 }
@@ -175,8 +179,9 @@ static int
 RWOpsCloseFunc( SDL_RWops* rwops )
 {
     BundleFileInfo* info;
-    if (!RWOpsCheck(rwops))
+    if (!RWOpsCheck(rwops)) {
         return -1;
+    }
     info = rwops->hidden.unknown.data1;
     fclose(info->file);
     SDL_free(info);

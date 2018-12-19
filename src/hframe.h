@@ -25,9 +25,7 @@
  * include the source code for the parts of the Hugo Engine used as well as
  * that of the covered work.
  */
-#ifndef HFRAME_H
-#define HFRAME_H
-
+#pragma once
 #include <QWidget>
 #include <QQueue>
 #include <QList>
@@ -37,29 +35,31 @@
 
 #include "happlication.h"
 
+class HFrame;
+class QMenu;
+class QTimer;
 
-extern class HFrame* hFrame;
+extern HFrame* hFrame;
 
-
-class HFrame: public QWidget {
+class HFrame final: public QWidget {
     Q_OBJECT
 
   private:
     // These values specify the exact input-mode we are in.
-    enum InputMode {
+    enum class InputMode {
         // We aren't in input-mode. We still enqueue key presses though,
         // so they can be retrieved with getNextKey().
-        NoInput,
+        None,
 
         // Return-terminated input.
-        NormalInput
+        Normal
     };
 
     // The input-mode we are currently in.
-    InputMode fInputMode;
+    InputMode fInputMode = InputMode::None;
 
     // We have a finished user input.
-    bool fInputReady;
+    bool fInputReady = false;
 
     // Keypress input queue. If an element is 0, it means the input was
     // a mouse click.
@@ -76,21 +76,21 @@ class HFrame: public QWidget {
     QString fInputBuf;
 
     // Position at which we started reading input.
-    int fInputStartX;
-    int fInputStartY;
+    int fInputStartX = 0;
+    int fInputStartY = 0;
 
     // Current editor position, in characters. 0 is the start of the
     // current input buffer string.
-    int fInputCurrentChar;
+    int fInputCurrentChar = 0;
 
     // Command history buffer.
     QList<QString> fHistory;
 
     // Maximum history capacity.
-    int fMaxHistCap;
+    int fMaxHistCap = 200;
 
     // Current command index in the history. 0 is the most recent one.
-    int fCurHistIndex;
+    int fCurHistIndex = 0;
 
     // Backup of the current, yet to be committed to history, input line.
     // We need this to back up the current input when the user recalls a
@@ -98,55 +98,55 @@ class HFrame: public QWidget {
     QString fInputBufBackup;
 
     // Current colors.
-    int fFgColor;
-    int fBgColor;
+    int fFgColor = 16;
+    int fBgColor = 17;
 
     // Current font attributes.
-    bool fUseFixedFont;
-    bool fUseUnderlineFont;
-    bool fUseItalicFont;
-    bool fUseBoldFont;
+    bool fUseFixedFont = false;
+    bool fUseUnderlineFont = false;
+    bool fUseItalicFont = false;
+    bool fUseBoldFont = false;
 
     // Current font metrics.
-    QFontMetrics fFontMetrics;
+    QFontMetrics fFontMetrics {QFont()};
 
     // We render game output into a pixmap first instead or painting directly
     // on the widget. We then draw the pixmap in our paintEvent().
-    QPixmap fPixmap;
+    QPixmap fPixmap {1, 1};
 
     // We buffer text printed with printText() so that we can draw
     // whole strings rather than single characters at a time.
     QString fPrintBuffer;
 
     // Position at which to draw the buffered string.
-    int fFlushXPos;
-    int fFlushYPos;
+    int fFlushXPos = 0;
+    int fFlushYPos = 0;
 
     // Position of the text cursor.
-    QPoint fCursorPos;
+    QPoint fCursorPos {0, 0};
 
     // Height of the text cursor in pixels.
     unsigned fHeight;
 
     // Last position of the text cursor.
-    QPoint fLastCursorPos;
+    QPoint fLastCursorPos {0, 0};
 
     // Is the text cursor visible?
-    bool fCursorVisible;
+    bool fCursorVisible = false;
 
     // Text cursor blink visibility.  Changed by a timer to show/hide the
     // cursor at specific intervals if fCursorVisible is true.
-    bool fBlinkVisible;
+    bool fBlinkVisible = false;
 
     // Text cursor blink timer.
-    class QTimer* fBlinkTimer;
+    QTimer* fBlinkTimer;
 
     // Keeps track of whether the game screen needs updating.
-    bool fNeedScreenUpdate;
+    bool fNeedScreenUpdate = false;
 
     // We need a small time delay before minimizing when losing focus while
     // in fullscreen mode.
-    class QTimer* fMinimizeTimer;
+    QTimer* fMinimizeTimer;
 
     // Add a keypress to our input queue.
     void
@@ -170,29 +170,29 @@ class HFrame: public QWidget {
     fEndInputMode( bool addToHistory );
 
   protected:
-    virtual void
-    paintEvent(QPaintEvent* e);
+    void
+    paintEvent(QPaintEvent* e) override;
 
-    virtual void
-    resizeEvent( QResizeEvent* e );
+    void
+    resizeEvent( QResizeEvent* e ) override;
 
-    virtual void
-    keyPressEvent( QKeyEvent* e );
+    void
+    keyPressEvent( QKeyEvent* e ) override;
 
-    virtual void
-    inputMethodEvent( QInputMethodEvent* e );
+    void
+    inputMethodEvent( QInputMethodEvent* e ) override;
 
     void
     singleKeyPressEvent( QKeyEvent* event );
 
-    virtual void
-    mousePressEvent( QMouseEvent* e );
+    void
+    mousePressEvent( QMouseEvent* e ) override;
 
-    virtual void
-    mouseDoubleClickEvent( QMouseEvent* e );
+    void
+    mouseDoubleClickEvent( QMouseEvent* e ) override;
 
-    virtual void
-    mouseMoveEvent( QMouseEvent* e );
+    void
+    mouseMoveEvent( QMouseEvent* e ) override;
 
   signals:
     // Emitted when scrolling or paging up.
@@ -277,7 +277,7 @@ class HFrame: public QWidget {
     { this->fCursorVisible = visible; }
 
     bool
-    isCursorVisible()
+    isCursorVisible() const
     { return this->fCursorVisible; }
 
     void
@@ -297,7 +297,7 @@ class HFrame: public QWidget {
     // Returns a list of current context menu entries set by the game
     // and inserts them into the `dst` menu.
     QList<const QAction*>
-    getGameContextMenuEntries( class QMenu& dst );
+    getGameContextMenuEntries( QMenu& dst );
 
   public slots:
     // Flush any pending text drawing.
@@ -312,6 +312,3 @@ class HFrame: public QWidget {
     void
     updateGameScreen(bool force);
 };
-
-
-#endif // HFRAME_H

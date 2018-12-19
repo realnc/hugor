@@ -25,24 +25,20 @@
  * include the source code for the parts of the Hugo Engine used as well as
  * that of the covered work.
  */
-#ifndef ABOUTDIALOG_H
-#define ABOUTDIALOG_H
-
+#pragma once
 #include <QDialog>
 
 namespace Ui {
     class AboutDialog;
 }
 
-class AboutDialog: public QDialog {
+class AboutDialog final: public QDialog {
     Q_OBJECT
 
   public:
-    explicit AboutDialog(QWidget *parent = 0);
-    ~AboutDialog();
+    explicit AboutDialog(QWidget *parent = nullptr);
+    ~AboutDialog() override;
 
   private:
     Ui::AboutDialog *ui;
 };
-
-#endif // ABOUTDIALOG_H

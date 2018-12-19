@@ -29,7 +29,6 @@
 
 #include <QSettings>
 
-
 SettingsOverrides::SettingsOverrides( const QString& filename )
 {
     QSettings sett(filename, QSettings::IniFormat);

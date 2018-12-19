@@ -50,22 +50,19 @@ extern "C" {
 #include "heheader.h"
 }
 
-class HMainWindow* hMainWin = 0;
+HMainWindow* hMainWin = nullptr;
 
 
 HMainWindow::HMainWindow( QWidget* parent )
-    : QMainWindow(parent),
-      fConfDialog(0),
-      fAboutDialog(0),
-      fMenuBarVisible(true),
-      fFullscreenEnterIcon(QIcon::fromTheme(QString::fromLatin1("view-fullscreen"))),
-      fFullscreenExitIcon(QIcon::fromTheme(QString::fromLatin1("view-restore")))
+    : QMainWindow(parent)
+    , fFullscreenEnterIcon(QIcon::fromTheme(QStringLiteral("view-fullscreen")))
+    , fFullscreenExitIcon(QIcon::fromTheme(QStringLiteral("view-restore")))
 {
-    Q_ASSERT(hMainWin == 0);
+    Q_ASSERT(hMainWin == nullptr);
 
     // We make our menu bar parentless so it will be shared by all our windows
     // in Mac OS X.
-    QMenuBar* menuBar = new QMenuBar(0);
+    auto* menuBar = new QMenuBar(nullptr);
 #ifndef Q_OS_MAC
     this->setMenuBar(menuBar);
 #endif
@@ -128,14 +125,14 @@ HMainWindow::HMainWindow( QWidget* parent )
     menu->addAction(act);
     connect(act, SIGNAL(triggered()), SLOT(fShowAbout()));
 
-    this->fScrollbackWindow = new HScrollbackWindow(0);
+    this->fScrollbackWindow = new HScrollbackWindow(nullptr);
 
     // Use a sane minimum size; by default Qt would allow us to be resized
     // to almost zero.
     this->setMinimumSize(240, 180);
 
     fErrorMsg = new QErrorMessage(this);
-    fErrorMsg->setWindowTitle(hApp->applicationName());
+    fErrorMsg->setWindowTitle(HApplication::applicationName());
 
     hMainWin = this;
 }
@@ -172,13 +169,13 @@ void
 HMainWindow::fShowConfDialog()
 {
     // If the dialog is already open, simply activate and raise it.
-    if (this->fConfDialog != 0) {
+    if (this->fConfDialog != nullptr) {
         this->fConfDialog->activateWindow();
         this->fConfDialog->raise();
         return;
     }
     this->fConfDialog = new ConfDialog(this);
-    this->fConfDialog->setWindowTitle(hApp->applicationName() + ' ' + tr("Preferences"));
+    this->fConfDialog->setWindowTitle(HApplication::applicationName() + ' ' + tr("Preferences"));
     connect(this->fConfDialog, SIGNAL(finished(int)), this, SLOT(fHideConfDialog()));
     this->fConfDialog->show();
 }
@@ -187,9 +184,9 @@ HMainWindow::fShowConfDialog()
 void
 HMainWindow::fHideConfDialog()
 {
-    if (this->fConfDialog != 0) {
+    if (this->fConfDialog != nullptr) {
         this->fConfDialog->deleteLater();
-        this->fConfDialog = 0;
+        this->fConfDialog = nullptr;
     }
 }
 
@@ -198,7 +195,7 @@ void
 HMainWindow::fShowAbout()
 {
     // If the dialog is already open, simply activate and raise it.
-    if (this->fAboutDialog != 0) {
+    if (this->fAboutDialog != nullptr) {
         this->fAboutDialog->activateWindow();
         this->fAboutDialog->raise();
         return;
@@ -213,9 +210,9 @@ HMainWindow::fShowAbout()
 void
 HMainWindow::fHideAbout()
 {
-    if (this->fAboutDialog != 0) {
+    if (this->fAboutDialog != nullptr) {
         this->fAboutDialog->deleteLater();
-        this->fAboutDialog = 0;
+        this->fAboutDialog = nullptr;
     }
 }
 
@@ -231,7 +228,7 @@ HMainWindow::showScrollback()
     if (not hApp->settings()->overlayScrollback) {
         this->hideScrollback();
         // If a widget has no parent, it will be displayed in a new window,
-        this->fScrollbackWindow->setParent(0);
+        this->fScrollbackWindow->setParent(nullptr);
         this->fScrollbackWindow->show();
         this->fScrollbackWindow->activateWindow();
         this->fScrollbackWindow->raise();
@@ -239,8 +236,9 @@ HMainWindow::showScrollback()
     }
 
     // If the overlay is already visible, no need to do anything.
-    if (hApp->marginWidget()->layout()->indexOf(this->fScrollbackWindow) >= 0)
+    if (hApp->marginWidget()->layout()->indexOf(this->fScrollbackWindow) >= 0) {
         return;
+    }
 
     // We need to overlay the scrollback. Remove the game window from view and
     // replace it with the scrollback window if we haven't already done so.
@@ -288,7 +286,7 @@ HMainWindow::hideScrollback()
         return;
     }
 
-    hApp->marginWidget()->setBannerWidget(0);
+    hApp->marginWidget()->setBannerWidget(nullptr);
     hApp->marginWidget()->removeWidget(this->fScrollbackWindow);
     this->fScrollbackWindow->hide();
     hApp->marginWidget()->addWidget(hFrame);
@@ -338,7 +336,7 @@ HMainWindow::closeEvent( QCloseEvent* e )
     }
 
     QMessageBox* msgBox = new QMessageBox(QMessageBox::Question,
-                                          tr("Quit") + ' ' + hApp->applicationName(),
+                                          tr("Quit") + ' ' + HApplication::applicationName(),
                                           tr("Abandon the story and quit the application?"),
                                           QMessageBox::Yes | QMessageBox::Cancel, this);
     msgBox->setDefaultButton(QMessageBox::Cancel);
@@ -370,7 +368,7 @@ HMainWindow::changeEvent( QEvent* e )
         return;
     }
 
-    QWindowStateChangeEvent* chEv = static_cast<QWindowStateChangeEvent*>(e);
+    auto* chEv = static_cast<QWindowStateChangeEvent*>(e);
 
     if ((chEv->oldState().testFlag(Qt::WindowFullScreen) and not this->isFullScreen())
         or (not chEv->oldState().testFlag(Qt::WindowFullScreen) and this->isFullScreen()))
@@ -402,7 +400,7 @@ HMainWindow::contextMenuEvent( QContextMenuEvent* e )
     menu.addAction(fFullscreenAction);
     const QAction* selectedAction = menu.exec(e->globalPos());
     e->accept();
-    if (not selectedAction or not actions.contains(selectedAction)) {
+    if ((selectedAction == nullptr) or not actions.contains(selectedAction)) {
         return;
     }
     QString text(selectedAction->text());

@@ -1,17 +1,13 @@
-#ifndef OPCODEPARSER_H
-#define OPCODEPARSER_H
-
+#pragma once
 #include <queue>
-#include <vector>
-#include <cstddef>
 #include <cstdint>
 #include <QObject>
 
-class OpcodeParser
+class OpcodeParser final
 {
     Q_GADGET
 public:
-    void pushByte(const int c);
+    void pushByte(int c);
 
     bool hasOutput() const
     {
@@ -58,15 +54,10 @@ private:
     // Output bytes. The initial values are two bytes representing the number
     // 12121 (little-endian order), which is the initial Hugor control file
     // handshake.
-    std::queue<int> fOutput = std::queue<int>({0x59, 0x2F});
-
-    static int fParamCount(Opcode opcode);
-    static Opcode fIntToOpcode(int value);
+    std::queue<int> fOutput {{0x59, 0x2F}};
 
     Opcode popOpcode();
     int popValue();
     void fPushOutput(int val);
     void fPushOutput(OpcodeResult res);
 };
-
-#endif // OPCODEPARSER_H

@@ -25,8 +25,7 @@
  * include the source code for the parts of the Hugo Engine used as well as
  * that of the covered work.
  */
-#ifndef HUGODEFS_H
-#define HUGODEFS_H
+#pragma once
 
 class QColor;
 
@@ -45,22 +44,19 @@ void updateSynthGain();
 void updateVideoVolume();
 
 // Defined Hugo colors.
-#define HUGO_BLACK         0
-#define HUGO_BLUE          1
-#define HUGO_GREEN         2
-#define HUGO_CYAN          3
-#define HUGO_RED           4
-#define HUGO_MAGENTA       5
-#define HUGO_BROWN         6
-#define HUGO_WHITE         7
-#define HUGO_DARK_GRAY     8
-#define HUGO_LIGHT_BLUE    9
-#define HUGO_LIGHT_GREEN   10
-#define HUGO_LIGHT_CYAN    11
-#define HUGO_LIGHT_RED     12
-#define HUGO_LIGHT_MAGENTA 13
-#define HUGO_YELLOW        14
-#define HUGO_BRIGHT_WHITE  15
-
-
-#endif // HUGODEFS_H
+constexpr unsigned HUGO_BLACK         =  0;
+constexpr unsigned HUGO_BLUE          =  1;
+constexpr unsigned HUGO_GREEN         =  2;
+constexpr unsigned HUGO_CYAN          =  3;
+constexpr unsigned HUGO_RED           =  4;
+constexpr unsigned HUGO_MAGENTA       =  5;
+constexpr unsigned HUGO_BROWN         =  6;
+constexpr unsigned HUGO_WHITE         =  7;
+constexpr unsigned HUGO_DARK_GRAY     =  8;
+constexpr unsigned HUGO_LIGHT_BLUE    =  9;
+constexpr unsigned HUGO_LIGHT_GREEN   = 10;
+constexpr unsigned HUGO_LIGHT_CYAN    = 11;
+constexpr unsigned HUGO_LIGHT_RED     = 12;
+constexpr unsigned HUGO_LIGHT_MAGENTA = 13;
+constexpr unsigned HUGO_YELLOW        = 14;
+constexpr unsigned HUGO_BRIGHT_WHITE  = 15;

@@ -1,9 +1,7 @@
-#ifndef HUGORFILE_H
-#define HUGORFILE_H
-
+#pragma once
 #include <cstdio>
 
-struct HugorFile
+struct HugorFile final
 {
 public:
     HugorFile(FILE* handle)
@@ -15,6 +13,8 @@ public:
         close();
     }
 
+    HugorFile(const HugorFile&) = delete;
+
     FILE* get() const
     {
         return fHandle;
@@ -22,16 +22,14 @@ public:
 
     int close()
     {
-        if (fHandle) {
-            auto ret = std::fclose(fHandle);
-            fHandle = nullptr;
-            return ret;
+        if (fHandle == nullptr) {
+            return 0;
         }
-        return 0;
+        auto ret = std::fclose(fHandle);
+        fHandle = nullptr;
+        return ret;
     }
 
 private:
     FILE* fHandle;
 };
-
-#endif // HUGORFILE_H

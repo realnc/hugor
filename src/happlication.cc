@@ -43,6 +43,8 @@ extern "C" {
 #include "heheader.h"
 }
 #include "happlication.h"
+
+#include <utility>
 #include "hmainwindow.h"
 #include "hmarginwidget.h"
 #include "hframe.h"
@@ -54,20 +56,17 @@ extern "C" {
 #include "videoplayer.h"
 
 
-HApplication* hApp = 0;
+HApplication* hApp = nullptr;
 
 
 HApplication::HApplication( int& argc, char* argv[], const char* appName,
                             const char* appVersion, const char* orgName,
                             const char* orgDomain )
-    : QApplication(argc, argv),
-      fBottomMarginSize(0),
-      fGameRunning(false),
-      fHugoCodec(QTextCodec::codecForName("Windows-1252")),
-      fDesktopIsGnome(false)
+    : QApplication(argc, argv)
+    , fHugoCodec(QTextCodec::codecForName("Windows-1252"))
 {
     //qDebug() << Q_FUNC_INFO;
-    Q_ASSERT(hApp == 0);
+    Q_ASSERT(hApp == nullptr);
 
     // Check if a config file with the same basename as ours exists in our
     // directory.  If yes, we will override default settings from it.
@@ -77,23 +76,23 @@ HApplication::HApplication( int& argc, char* argv[], const char* appName,
     }
     cfgFname += QFileInfo(QApplication::applicationFilePath()).baseName();
     cfgFname += ".cfg";
-    if (not QFileInfo(cfgFname).exists()) {
+    if (not QFileInfo::exists(cfgFname)) {
         cfgFname.clear();
     }
     SettingsOverrides* settOvr;
     if (cfgFname.isEmpty()) {
-        settOvr = 0;
+        settOvr = nullptr;
     } else {
         settOvr = new SettingsOverrides(cfgFname);
     }
 
-    this->setApplicationName(QString::fromLatin1(appName));
-    this->setApplicationVersion(QString::fromLatin1(appVersion));
-    this->setOrganizationName(QString::fromLatin1(orgName));
-    this->setOrganizationDomain(QString::fromLatin1(orgDomain));
+    HApplication::setApplicationName(QString::fromLatin1(appName));
+    HApplication::setApplicationVersion(QString::fromLatin1(appVersion));
+    HApplication::setOrganizationName(QString::fromLatin1(orgName));
+    HApplication::setOrganizationDomain(QString::fromLatin1(orgDomain));
 
     // Possibly override application and organization names.
-    if (settOvr) {
+    if (settOvr != nullptr) {
         // Make sure that appName and authorName are either both set or unset.
         // This avoids mixing up the system file/registry paths for the settings
         // with our default ones.
@@ -105,17 +104,17 @@ HApplication::HApplication( int& argc, char* argv[], const char* appName,
         }
 
         if (not settOvr->appName.isEmpty()) {
-            this->setApplicationName(settOvr->appName);
+            HApplication::setApplicationName(settOvr->appName);
         }
         if (not settOvr->authorName.isEmpty()) {
-            this->setOrganizationName(settOvr->authorName);
+            HApplication::setOrganizationName(settOvr->authorName);
         }
     }
 
 #ifdef Q_OS_UNIX
     // Detect whether we're running in Gnome.
-    QDialogButtonBox::ButtonLayout layoutPolicy
-        = QDialogButtonBox::ButtonLayout(QApplication::style()->styleHint(QStyle::SH_DialogButtonLayout));
+    auto layoutPolicy = QDialogButtonBox::ButtonLayout(
+        QApplication::style()->styleHint(QStyle::SH_DialogButtonLayout));
     if (layoutPolicy == QDialogButtonBox::GnomeLayout) {
         this->fDesktopIsGnome = true;
     } else {
@@ -134,8 +133,8 @@ HApplication::HApplication( int& argc, char* argv[], const char* appName,
     hApp = this;
 
     // Create our main application window.
-    this->fMainWin = new HMainWindow(0);
-    this->fMainWin->setWindowTitle(this->applicationName());
+    this->fMainWin = new HMainWindow(nullptr);
+    this->fMainWin->setWindowTitle(HApplication::applicationName());
     // Disable screen updates until we're actually ready to run a game. This
     // prevents screen flicker due to the resizing and background color changes
     // if we're starting in fullscreen mode.
@@ -149,7 +148,7 @@ HApplication::HApplication( int& argc, char* argv[], const char* appName,
     this->updateMargins(-1);
     this->fMainWin->setCentralWidget(this->fMarginWidget);
 
-    if (settOvr and settOvr->hideMenuBar) {
+    if ((settOvr != nullptr) and settOvr->hideMenuBar) {
         this->fMainWin->hideMenuBar();
     }
 
@@ -159,7 +158,7 @@ HApplication::HApplication( int& argc, char* argv[], const char* appName,
     // Set application window icon, unless we're on OS X where the bundle
     // icon is used.
 #ifndef Q_OS_MAC
-    this->setWindowIcon(QIcon(":/he_32-bit_48x48.png"));
+    HApplication::setWindowIcon(QIcon(":/he_32-bit_48x48.png"));
 #endif
     delete settOvr;
 
@@ -170,15 +169,15 @@ HApplication::HApplication( int& argc, char* argv[], const char* appName,
 HApplication::~HApplication()
 {
     //qDebug() << Q_FUNC_INFO;
-    Q_ASSERT(hHandlers != 0);
+    Q_ASSERT(hHandlers != nullptr);
     delete hHandlers;
-    hHandlers = 0;
-    Q_ASSERT(hApp != 0);
+    hHandlers = nullptr;
+    Q_ASSERT(hApp != nullptr);
     this->fSettings->saveToDisk();
     delete this->fSettings;
     delete this->fMainWin;
     // We're being destroyed, so our global pointer is no longer valid.
-    hApp = 0;
+    hApp = nullptr;
 }
 
 
@@ -235,7 +234,7 @@ HApplication::fRunGame()
             } else {
                 // It's not in the list.  Prepend it as the most recent item
                 // and, if the list is full, delete the oldest one.
-                if (gamesList.size() >= this->fSettings->recentGamesCapacity) {
+                if (gamesList.size() >= Settings::recentGamesCapacity) {
                     gamesList.removeLast();
                 }
                 gamesList.prepend(finfo.absoluteFilePath());
@@ -266,8 +265,9 @@ HApplication::fRunGame()
 void
 HApplication::fUpdateMarginColor( int color )
 {
-    if (color < 0)
+    if (color < 0) {
         return;
+    }
 
     const Settings* sett = hApp->settings();
     const QColor& qColor = (hMainWin->isFullScreen() and sett->customFsMarginColor)
@@ -337,15 +337,14 @@ HApplication::entryPoint( QString gameFileName )
     }
 
     if (this->fNextGame.isEmpty()) {
-        this->fNextGame = gameFileName;
+        this->fNextGame = std::move(gameFileName);
     }
 
     // If we still don't have a filename, prompt for one.
     if (this->fNextGame.isEmpty() and this->fSettings->askForGameFile) {
-        this->fNextGame = QFileDialog::getOpenFileName(0, QObject::tr("Choose the story file you wish to play"),
-                                                       this->fSettings->lastFileOpenDir,
-                                                       QObject::tr("Hugo Games")
-                                                       + QString::fromLatin1("(*.hex *.Hex *.HEX)"));
+        this->fNextGame = QFileDialog::getOpenFileName(nullptr,
+            QObject::tr("Choose the story file you wish to play"), this->fSettings->lastFileOpenDir,
+            QObject::tr("Hugo Games") + QString::fromLatin1("(*.hex)"));
     }
 
     // Switch to fullscreen, if needed.
@@ -431,7 +430,7 @@ HApplication::advanceEventLoop()
         return;
     }
     working = true;
-    this->processEvents(QEventLoop::ExcludeUserInputEvents);
+    HApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
     working = false;
 }
 

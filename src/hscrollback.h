@@ -25,30 +25,24 @@
  * include the source code for the parts of the Hugo Engine used as well as
  * that of the covered work.
  */
-#ifndef HSCROLLBACK_H
-#define HSCROLLBACK_H
-
+#pragma once
 #include <QTextEdit>
 
-
-class HScrollbackWindow: public QTextEdit {
+class HScrollbackWindow final: public QTextEdit {
     Q_OBJECT
 
   public:
-    HScrollbackWindow( QWidget* parent = 0 );
+    HScrollbackWindow( QWidget* parent = nullptr );
 
   protected:
-    virtual void
-    keyPressEvent( QKeyEvent* e );
+    void
+    keyPressEvent( QKeyEvent* e ) override;
 
-    virtual void
-    closeEvent( QCloseEvent* e );
+    void
+    closeEvent( QCloseEvent* e ) override;
 
   private:
-    int fMaximumBlockCount;
-    int fInitialWidth;
-    int fInitialHeight;
+    int fMaximumBlockCount = 7000;
+    int fInitialWidth = 600;
+    int fInitialHeight = 440;
 };
-
-
-#endif

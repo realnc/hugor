@@ -25,21 +25,18 @@
  * include the source code for the parts of the Hugo Engine used as well as
  * that of the covered work.
  */
-#include <QKeyEvent>
-
 #include "hscrollback.h"
+
 #include "happlication.h"
 #include "hmainwindow.h"
 #include "settings.h"
+#include <QKeyEvent>
 
 
 HScrollbackWindow::HScrollbackWindow( QWidget* parent )
-    : QTextEdit(parent),
-      fMaximumBlockCount(7000),
-      fInitialWidth(600),
-      fInitialHeight(440)
+    : QTextEdit(parent)
 {
-    this->setWindowTitle(hApp->applicationName() + ' ' + "Scrollback");
+    this->setWindowTitle(HApplication::applicationName() + ' ' + "Scrollback");
     this->setReadOnly(true);
     this->setUndoRedoEnabled(false);
     this->setTextInteractionFlags(Qt::TextSelectableByMouse);

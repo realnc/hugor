@@ -25,35 +25,39 @@
  * include the source code for the parts of the Hugo Engine used as well as
  * that of the covered work.
  */
-#ifndef HAPPLICATION_H
-#define HAPPLICATION_H
-
+#pragma once
 #include <QApplication>
 
+class EngineRunner;
+class EngineThread;
+class HApplication;
+class HFrame;
+class HMainWindow;
+class HMarginWidget;
+class Settings;
 
-extern class HApplication*  hApp;
+extern HApplication* hApp;
 
-
-class HApplication: public QApplication {
+class HApplication final: public QApplication {
     Q_OBJECT
 
   private:
     // Preferences (fonts, colors, etc.)
-    class Settings* fSettings;
+    Settings* fSettings;
 
     // Main application window.
-    class HMainWindow* fMainWin;
+    HMainWindow* fMainWin;
 
     // Frame widget containing all subwindows.
-    class HFrame* fFrameWin;
+    HFrame* fFrameWin;
 
     // Parent of fFrameWin, provides margins.
-    class HMarginWidget* fMarginWidget;
+    HMarginWidget* fMarginWidget;
 
-    const int fBottomMarginSize;
+    const int fBottomMarginSize = 0;
 
     // Are we currently executing a game?
-    bool fGameRunning;
+    bool fGameRunning = false;
 
     // Filename of the game we're currently executing.
     QString fGameFile;
@@ -65,11 +69,11 @@ class HApplication: public QApplication {
     QTextCodec* fHugoCodec;
 
     // Are we running in Gnome?
-    bool fDesktopIsGnome;
+    bool fDesktopIsGnome = false;
 
     // Hugo engine runner and thread.
-    class EngineRunner* fEngineRunner;
-    class EngineThread* fHugoThread;
+    EngineRunner* fEngineRunner = nullptr;
+    EngineThread* fHugoThread = nullptr;
 
     // Run the game file contained in fNextGame.
     void
@@ -82,8 +86,8 @@ class HApplication: public QApplication {
   protected:
     // On the Mac, dropping a file on our application icon will generate a
     // FileOpen event, so we override this to be able to handle it.
-    virtual bool
-    event( QEvent* );
+    bool
+    event( QEvent* ) override;
 #endif
 
   signals:
@@ -108,46 +112,45 @@ class HApplication: public QApplication {
     HApplication( int& argc, char* argv[], const char* appName, const char* appVersion,
                   const char* orgName, const char* orgDomain );
 
-    virtual
-    ~HApplication();
+    ~HApplication() override;
 
     /* Passing a negative value as 'color' will keep the current margin color.
      */
     void
     updateMargins( int color );
 
-    class Settings*
-    settings()
+    Settings*
+    settings() const
     { return this->fSettings; }
 
-    class HFrame*
-    frameWindow()
+    HFrame*
+    frameWindow() const
     { return this->fFrameWin; }
 
-    class HMarginWidget*
-    marginWidget()
+    HMarginWidget*
+    marginWidget() const
     { return this->fMarginWidget; }
 
     bool
-    gameRunning()
+    gameRunning() const
     { return this->fGameRunning; }
 
     const QString&
-    gameFile()
+    gameFile() const
     { return this->fGameFile; }
 
     void
     setGameRunning( bool f )
     {
         this->fGameRunning = f;
-        if (f == false) {
+        if (not f) {
             emit gameQuitting();
         }
     }
 
     // Notify the application that preferences have changed.
     void
-    notifyPreferencesChange( const class Settings* sett );
+    notifyPreferencesChange( const Settings* sett );
 
     // Advance the event loop.
     void
@@ -155,16 +158,13 @@ class HApplication: public QApplication {
 
     // Text codec used by Hugo.
     QTextCodec*
-    hugoCodec()
+    hugoCodec() const
     { return this->fHugoCodec; }
 
     bool
-    desktopIsGnome()
+    desktopIsGnome() const
     { return this->fDesktopIsGnome; }
 
     void
     terminateEngineThread();
 };
-
-
-#endif

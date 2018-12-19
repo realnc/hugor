@@ -25,22 +25,21 @@
  * include the source code for the parts of the Hugo Engine used as well as
  * that of the covered work.
  */
-#ifndef SETTINGS_H
-#define SETTINGS_H
-
+#pragma once
 #include <QFont>
 #include <QColor>
 #include <QSize>
 
+class SettingsOverrides;
 
-class Settings {
+class Settings final {
   public:
     Settings()
         : videoSysError(false)
     { }
 
     void
-    loadFromDisk( class SettingsOverrides* ovr = 0 );
+    loadFromDisk( SettingsOverrides* ovr = nullptr );
 
     void
     saveToDisk();
@@ -89,6 +88,3 @@ class Settings {
     // to the current session.
     bool videoSysError;
 };
-
-
-#endif

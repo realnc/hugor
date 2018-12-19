@@ -42,7 +42,7 @@ AboutDialog::AboutDialog( QWidget* parent )
     // Construct a string holding all version info.
     QString str("<p>Hugor v");
     str += HUGOR_VERSION;
-    str += ("<br>Hugo engine v");
+    str += QLatin1String("<br>Hugo engine v");
     str += QString::number(HEVERSION) + "." + QString::number(HEREVISION)
            + HEINTERIM + "</p>";
 

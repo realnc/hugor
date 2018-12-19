@@ -40,7 +40,7 @@
 #include "hmainwindow.h"
 
 
-void initVideoEngine(int&, char*[])
+void initVideoEngine(int& /*argc*/, char* /*argv*/[])
 { }
 
 void closeVideoEngine()
@@ -48,8 +48,7 @@ void closeVideoEngine()
 
 
 VideoPlayer::VideoPlayer(QWidget *parent)
-    : QWidget(parent),
-      fRwops(0)
+    : QWidget(parent)
 {
     d = new VideoPlayer_priv(this, this);
     d->fMediaPlayer = new QMediaPlayer(this, QMediaPlayer::StreamPlayback);
@@ -76,7 +75,7 @@ VideoPlayer::VideoPlayer(QWidget *parent)
 
 VideoPlayer::~VideoPlayer()
 {
-    if (fRwops) {
+    if (fRwops != nullptr) {
         SDL_RWclose(fRwops);
     }
 }
@@ -86,12 +85,12 @@ bool
 VideoPlayer::loadVideo(FILE* src, long len, bool loop)
 {
     this->stop();
-    if (fRwops) {
+    if (fRwops != nullptr) {
         d->fIODev->close();
         SDL_RWclose(fRwops);
     }
     fRwops = RWFromMediaBundle(src, len);
-    if (not fRwops) {
+    if (fRwops == nullptr) {
         hMainWin->errorMsgObj()->showMessage(tr("Unable to read video data from disk: ")
                                              + SDL_GetError());
         return false;

@@ -41,11 +41,11 @@
 #include "hugorfile.h"
 
 
-HugoHandlers* hHandlers = 0;
+HugoHandlers* hHandlers = nullptr;
 
 
 void
-HugoHandlers::calcFontDimensions()
+HugoHandlers::calcFontDimensions() const
 {
     const QFontMetrics& curMetr = hFrame->currentFontMetrics();
     const QFontMetrics fixedMetr(hApp->settings()->fixedFont);
@@ -59,9 +59,9 @@ HugoHandlers::calcFontDimensions()
 
 
 void
-HugoHandlers::getfilename(char* a, char* b)
+HugoHandlers::getfilename(char* a, char* b) const
 {
-    Q_ASSERT(a != 0 and b != 0);
+    Q_ASSERT(a != nullptr and b != nullptr);
 
     QString fname;
     QString filter;
@@ -75,14 +75,14 @@ HugoHandlers::getfilename(char* a, char* b)
         filter = QObject::tr("Hugo Saved Games") + QString::fromLatin1(" (*.sav)");
         caption = "Save current game position";
     } else if (QString::fromLatin1(a).endsWith("to restore")) {
-        filter = QObject::tr("Hugo Saved Games") + QString::fromLatin1(" (*.sav *.Sav *.SAV)");
+        filter = QObject::tr("Hugo Saved Games") + QString::fromLatin1(" (*.sav)");
         caption = "Restore a saved game position";
         saveMode = false;
     } else if (QString::fromLatin1(a).endsWith("for command recording")) {
         filter = QObject::tr("Hugo recording files") + QString::fromLatin1(" (*.rec)");
         caption = "Record commands to a file";
     } else if (QString::fromLatin1(a).endsWith("for command playback")) {
-        filter = QObject::tr("Hugo recording files") + QString::fromLatin1(" (*.rec *.Rec *.REC)");
+        filter = QObject::tr("Hugo recording files") + QString::fromLatin1(" (*.rec)");
         caption = "Play recorded commands from a file";
         saveMode = false;
     } else if (QString::fromLatin1(a).endsWith("transcription (or printer name)")) {
@@ -100,7 +100,7 @@ HugoHandlers::getfilename(char* a, char* b)
 
 
 void
-HugoHandlers::startGetline(char* p)
+HugoHandlers::startGetline(char* p) const
 {
     // Print the prompt in normal text colors.
     settextcolor(fcolor);
@@ -117,23 +117,24 @@ HugoHandlers::startGetline(char* p)
 
 
 void
-HugoHandlers::endGetline()
+HugoHandlers::endGetline() const
 {
     hFrame->setCursorVisible(false);
-    print(const_cast<char*>("\r\n"));
+    char newline[] = "\r\n";
+    print(newline);
     hFrame->updateGameScreen(false);
 }
 
 
 void
-HugoHandlers::clearfullscreen()
+HugoHandlers::clearfullscreen() const
 {
     hFrame->clearRegion(0, 0, 0, 0);
 }
 
 
 void
-HugoHandlers::clearwindow()
+HugoHandlers::clearwindow() const
 {
     hFrame->setBgColor(bgcolor);
     hFrame->clearRegion(physical_windowleft, physical_windowtop,
@@ -142,7 +143,7 @@ HugoHandlers::clearwindow()
 
 
 void
-HugoHandlers::settextmode()
+HugoHandlers::settextmode() const
 {
     calcFontDimensions();
     SCREENWIDTH = hFrame->width();
@@ -154,7 +155,7 @@ HugoHandlers::settextmode()
 
 
 void
-HugoHandlers::settextwindow(int left, int top, int right, int bottom)
+HugoHandlers::settextwindow(int left, int top, int right, int bottom) const
 {
     //qDebug() << "settextwindow" << left << top << right << bottom;
     /* Must be set: */
@@ -166,10 +167,12 @@ HugoHandlers::settextwindow(int left, int top, int right, int bottom)
     // Correct for full-width windows where the right border would
     // otherwise be clipped to a multiple of charwidth, leaving a
     // sliver of the former window at the righthand side.
-    if (right >= SCREENWIDTH / FIXEDCHARWIDTH)
+    if (right >= SCREENWIDTH / FIXEDCHARWIDTH) {
         physical_windowright = hFrame->width() - 1;
-    if (bottom >= SCREENHEIGHT / FIXEDLINEHEIGHT)
+    }
+    if (bottom >= SCREENHEIGHT / FIXEDLINEHEIGHT) {
         physical_windowbottom = hFrame->height() - 1;
+    }
 
     physical_windowwidth = physical_windowright - physical_windowleft + 1;
     physical_windowheight = physical_windowbottom - physical_windowtop + 1;
@@ -181,13 +184,13 @@ HugoHandlers::settextwindow(int left, int top, int right, int bottom)
 
 
 void
-HugoHandlers::printFatalError(char* a)
+HugoHandlers::printFatalError(char* a) const
 {
     print(a);
 }
 
 void
-HugoHandlers::print(char* a)
+HugoHandlers::print(char* a) const
 {
     uint len = qstrlen(a);
     QString ac;
@@ -251,7 +254,7 @@ HugoHandlers::print(char* a)
 
 
 void
-HugoHandlers::font(int f)
+HugoHandlers::font(int f) const
 {
     hFrame->setFontType(f);
     ::charwidth = hFrame->currentFontMetrics().averageCharWidth();
@@ -259,14 +262,14 @@ HugoHandlers::font(int f)
 }
 
 void
-HugoHandlers::settextcolor(int c)
+HugoHandlers::settextcolor(int c) const
 {
     hFrame->setFgColor(c);
 }
 
 
 void
-HugoHandlers::setbackcolor(int c)
+HugoHandlers::setbackcolor(int c) const
 {
     hFrame->setBgColor(c);
 }
@@ -274,7 +277,7 @@ HugoHandlers::setbackcolor(int c)
 
 // FIXME: Check for errors when loading images.
 void
-HugoHandlers::displaypicture(HUGO_FILE infile, long len, int* result)
+HugoHandlers::displaypicture(HUGO_FILE infile, long len, int* result) const
 {
     // Open it as a QFile.
     long pos = ftell(infile->get());
@@ -328,9 +331,9 @@ HugoHandlers::displaypicture(HUGO_FILE infile, long len, int* result)
 #ifndef DISABLE_VIDEO
 
 void
-HugoHandlers::stopvideo()
+HugoHandlers::stopvideo() const
 {
-    if (fVidPlayer) {
+    if (fVidPlayer != nullptr) {
         fVidPlayer->stop();
     }
 }
@@ -344,9 +347,9 @@ HugoHandlers::playvideo(HUGO_FILE infile, long len, char loop, char bg, int vol,
         return;
     }
     stopvideo();
-    if (not fVidPlayer) {
+    if (fVidPlayer == nullptr) {
         fVidPlayer = new VideoPlayer(hFrame);
-        if (not fVidPlayer) {
+        if (fVidPlayer == nullptr) {
             *result = false;
             return;
         }

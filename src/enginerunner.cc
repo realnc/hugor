@@ -26,20 +26,21 @@
  * that of the covered work.
  */
 #include <QThread>
+#include <array>
+#include <memory>
 #include "enginerunner.h"
 extern "C" {
 #include "heheader.h"
 }
 
-
 void
 EngineRunner::runEngine()
 {
     char argv0[] = "hugor";
-    char* argv1 = new char[fGameFile.toLocal8Bit().size() + 1];
-    strcpy(argv1, fGameFile.toLocal8Bit().constData());
-    char* argv[2] = {argv0, argv1};
-    fThread->setTerminationEnabled(true);
-    he_main(2, argv);
+    auto argv1 = std::make_unique<char[]>(fGameFile.toLocal8Bit().size() + 1);
+    memcpy(argv1.get(), fGameFile.toLocal8Bit().constData(), fGameFile.toLocal8Bit().size() + 1);
+    std::array<char*, 2> argv = {argv0, argv1.get()};
+    EngineThread::setTerminationEnabled(true);
+    he_main(2, argv.data());
     emit finished();
 }

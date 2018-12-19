@@ -25,9 +25,7 @@
  * include the source code for the parts of the Hugo Engine used as well as
  * that of the covered work.
  */
-#ifndef HEQTHEADER_H
-#define HEQTHEADER_H
-
+#pragma once
 
 #define PORTER_NAME "Nikos Chantziaras"
 #define PORT_NAME "Hugor"
@@ -101,6 +99,3 @@ int hugo_fprintf(HUGO_FILE file, const char* format, ...);
 #ifdef __cplusplus
 }
 #endif
-
-
-#endif /* HEQTHEADER_H */

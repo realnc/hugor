@@ -25,38 +25,33 @@
  * include the source code for the parts of the Hugo Engine used as well as
  * that of the covered work.
  */
-#ifndef RWOPSQIODEV_H
-#define RWOPSQIODEV_H
-
+#pragma once
 #include <QIODevice>
 
+struct SDL_RWops;
 
-class RwopsQIODevice: public QIODevice {
+class RwopsQIODevice final: public QIODevice {
     Q_OBJECT
 
 public:
     explicit RwopsQIODevice(QObject* parent)
-        : QIODevice(parent),
-          fRwops(0),
-          fSize(0)
+        : QIODevice(parent)
     { }
 
-    bool atEnd();
-    bool isSequential();
-    bool seek(qint64 pos);
-    qint64 size() const;
-    void close();
+    bool atEnd() const override;
+    bool isSequential() const override;
+    bool seek(qint64 pos) override;
+    qint64 size() const override;
+    void close() override;
 
-    bool open(struct SDL_RWops* rwops, OpenMode mode);
+    using QIODevice::open;
+    bool open(SDL_RWops* rwops, OpenMode mode);
 
 protected:
-    qint64 readData(char* data, qint64 len);
-    qint64 writeData(const char*, qint64);
+    qint64 readData(char* data, qint64 len) override;
+    qint64 writeData(const char* /*data*/, qint64 /*len*/) override;
 
 private:
-    struct SDL_RWops* fRwops;
-    long fSize;
+    struct SDL_RWops* fRwops = nullptr;
+    long fSize = 0;
 };
-
-
-#endif

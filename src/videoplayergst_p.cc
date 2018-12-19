@@ -43,43 +43,39 @@
 #include "hmainwindow.h"
 
 
-GMainLoop* VideoPlayer_priv::fGMainLoop = 0;
-GThread* VideoPlayer_priv::fGMainLoopThread = 0;
+GMainLoop* VideoPlayer_priv::fGMainLoop = nullptr;
+GThread* VideoPlayer_priv::fGMainLoopThread = nullptr;
 
 
 extern "C" {
 
 static gpointer
-glibMainLoopThreadFunc(gpointer)
+glibMainLoopThreadFunc(gpointer /*unused*/)
 {
-    VideoPlayer_priv::fGMainLoop = g_main_loop_new(0, false);
+    VideoPlayer_priv::fGMainLoop = g_main_loop_new(nullptr, false);
     g_main_loop_run(VideoPlayer_priv::fGMainLoop);
     g_main_loop_unref(VideoPlayer_priv::fGMainLoop);
-    VideoPlayer_priv::fGMainLoop = 0;
-    return 0;
+    VideoPlayer_priv::fGMainLoop = nullptr;
+    return nullptr;
 }
 
 } // extern "C"
 
 
-VideoPlayer_priv::VideoPlayer_priv(QWidget* parent, class VideoPlayer* qPtr)
-    : QWidget(parent),
-      q(qPtr),
-      fPipeline(0),
-      fAppSrc(0),
-      fBus(0),
-      fVolume(100)
+VideoPlayer_priv::VideoPlayer_priv(QWidget* parent, VideoPlayer* qPtr)
+    : QWidget(parent)
+    , q(qPtr)
 {
     memset(&fAppSrcCbs, 0, sizeof(fAppSrcCbs));
 
     // If the version of Qt we're running in does not use GLib, we need to
     // start a GMainLoop so that gstreamer can dispatch events.
     const QMetaObject* mo = QAbstractEventDispatcher::instance(hApp->thread())->metaObject();
-    if (fGMainLoop == 0
+    if (fGMainLoop == nullptr
         && strcmp(mo->className(), "QEventDispatcherGlib") != 0
         && strcmp(mo->superClass()->className(), "QEventDispatcherGlib") != 0)
     {
-        fGMainLoopThread = g_thread_new(0, glibMainLoopThreadFunc, 0);
+        fGMainLoopThread = g_thread_new(nullptr, glibMainLoopThreadFunc, nullptr);
     }
 }
 
@@ -93,12 +89,12 @@ cbAppsrcNeedData(GstAppSrc* src, guint length, gpointer userData)
         // We're free to push any amount of bytes.
         length = 32768;
     }
-    SDL_RWops* rwops = static_cast<SDL_RWops*>(userData);
+    auto* rwops = static_cast<SDL_RWops*>(userData);
     GstBuffer* buffer;
     void* data;
 
 #if GST_CHECK_VERSION(1, 0, 0)
-    buffer = gst_buffer_new_allocate(NULL, length, NULL);
+    buffer = gst_buffer_new_allocate(nullptr, length, nullptr);
     GstMapInfo mapInf;
     if (not gst_buffer_map(buffer, &mapInf, GST_MAP_WRITE)) {
         qWarning() << "Can't map GstBuffer memory.";
@@ -123,7 +119,7 @@ cbAppsrcNeedData(GstAppSrc* src, guint length, gpointer userData)
 }
 
 static gboolean
-cbAppSrcSeekData(GstAppSrc*, guint64 offset, gpointer rwops)
+cbAppSrcSeekData(GstAppSrc* /*appsrc*/, guint64 offset, gpointer rwops)
 {
     return SDL_RWseek(static_cast<SDL_RWops*>(rwops), offset, RW_SEEK_SET) == (int)offset;
 }
@@ -153,9 +149,9 @@ VideoPlayer_priv::cbOnSourceSetup(GstAppSrc* source, VideoPlayer_priv* d)
     g_object_set(G_OBJECT(source), "format", GST_FORMAT_BYTES, NULL);
     memset(&d->fAppSrcCbs, 0, sizeof(d->fAppSrcCbs));
     d->fAppSrcCbs.need_data = cbAppsrcNeedData;
-    d->fAppSrcCbs.enough_data = 0;
+    d->fAppSrcCbs.enough_data = nullptr;
     d->fAppSrcCbs.seek_data = cbAppSrcSeekData;
-    gst_app_src_set_callbacks(source, &d->fAppSrcCbs, d->q->fRwops, 0);
+    gst_app_src_set_callbacks(source, &d->fAppSrcCbs, d->q->fRwops, nullptr);
     gst_app_src_set_size(source, d->q->fDataLen);
 }
 
@@ -163,7 +159,8 @@ VideoPlayer_priv::cbOnSourceSetup(GstAppSrc* source, VideoPlayer_priv* d)
 void
 VideoPlayer_priv::cbOnBusMessage(GstMessage* message, VideoPlayer_priv* d)
 {
-    Qt::ConnectionType conType = fGMainLoop ? Qt::BlockingQueuedConnection : Qt::DirectConnection;
+    Qt::ConnectionType conType =
+        fGMainLoop == nullptr ? Qt::DirectConnection : Qt::BlockingQueuedConnection;
 
     switch (GST_MESSAGE_TYPE(message)) {
         case GST_MESSAGE_STATE_CHANGED: {
@@ -181,9 +178,9 @@ VideoPlayer_priv::cbOnBusMessage(GstMessage* message, VideoPlayer_priv* d)
             if (newState == GST_STATE_PLAYING) {
                 QMetaObject::invokeMethod(d->q, "show", conType);
             } if (newState == GST_STATE_PAUSED) {
-                GstPad* vidpad = 0;
+                GstPad* vidpad = nullptr;
                 g_signal_emit_by_name(d->fPipeline, "get-video-pad", 0, &vidpad, 0);
-                if (vidpad == 0) {
+                if (vidpad == nullptr) {
                     break;
                 }
 #if GST_CHECK_VERSION(1, 0, 0)
@@ -191,7 +188,7 @@ VideoPlayer_priv::cbOnBusMessage(GstMessage* message, VideoPlayer_priv* d)
 #else
                 GstCaps* caps = gst_pad_get_negotiated_caps(vidpad);
 #endif
-                if (caps == 0) {
+                if (caps == nullptr) {
                     break;
                 }
                 gst_caps_unref(caps);
@@ -230,8 +227,8 @@ VideoPlayer_priv::cbOnBusMessage(GstMessage* message, VideoPlayer_priv* d)
 
         case GST_MESSAGE_ERROR: {
             QString errorStr(tr("Unable to play video: "));
-            GError* gErr = 0;
-            gst_message_parse_error(message, &gErr, 0);
+            GError* gErr = nullptr;
+            gst_message_parse_error(message, &gErr, nullptr);
             errorStr += gErr->message;
             QMetaObject::invokeMethod(hMainWin->errorMsgObj(), "showMessage", Q_ARG(QString, errorStr));
             QMetaObject::invokeMethod(d->q, "stop", conType);

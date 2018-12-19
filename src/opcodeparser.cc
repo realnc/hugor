@@ -59,7 +59,7 @@ OpcodeParser::popValue()
 
 
 void
-OpcodeParser::fPushOutput(int val)
+OpcodeParser::fPushOutput(const int val)
 {
     fOutput.push(val & 0xFF);
     fOutput.push((val >> 8) & 0xFF);
@@ -67,7 +67,7 @@ OpcodeParser::fPushOutput(int val)
 
 
 void
-OpcodeParser::fPushOutput(OpcodeParser::OpcodeResult res)
+OpcodeParser::fPushOutput(const OpcodeParser::OpcodeResult res)
 {
     fPushOutput(static_cast<int>(res));
 }
@@ -361,7 +361,7 @@ OpcodeParser::parse()
         fPushOutput(OpcodeResult::UNKNOWN_OPCODE);
         fPushOutput((int)opcode);
         fPushOutput(paramCount);
-        for (int i = 0; i < paramCount; ++i) {
+        for (size_t i = 0; i < paramCount; ++i) {
             fPushOutput(popValue());
         }
     }

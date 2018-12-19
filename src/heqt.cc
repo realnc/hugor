@@ -54,33 +54,48 @@ extern "C" {
 
 #define INVOKE_BLOCK Qt::BlockingQueuedConnection
 
-static const char* CONTROL_FNAME = "HrCtlAPI";
-static const char* CHECK_FNAME = "HrCheck";
+static const QLatin1String CONTROL_FNAME("HrCtlAPI");
+static const QLatin1String CHECK_FNAME("HrCheck");
 
 // Exposes QThread::msleep(), which is protected.
-class SleepFuncs: public QThread {
+class SleepFuncs final: public QThread {
 public:
     using QThread::msleep;
 };
 
 // Used to wait on the GUI thread for a condition.
-static QMutex* waiterMutex = 0;
+static QMutex* waiterMutex = nullptr;
 
 // Buffer for the script file. We don't immediately write text to the script
 // file. We write to the buffer instead and flush it to the file when needed.
-static QString* scriptBuffer = 0;
+static QString* scriptBuffer = nullptr;
 
 // Buffer for the scrollback. We flush it when needed.
-static QByteArray* scrollbackBuffer = 0;
+static QByteArray* scrollbackBuffer = nullptr;
 
 // Virtual control file for the Hugor handshake.
-static HugorFile checkFile(nullptr);
+HugorFile&
+checkFile()
+{
+    static HugorFile f(nullptr);
+    return f;
+}
 
 // Virtual control file for the Hugor extension opcode mechanism.
-static HugorFile ctrlFile(nullptr);
+HugorFile&
+ctrlFile()
+{
+    static HugorFile f(nullptr);
+    return f;
+}
 
 // Opcode parser.
-static OpcodeParser opcodeParser;
+OpcodeParser&
+opcodeParser()
+{
+    static OpcodeParser parser;
+    return parser;
+}
 
 
 /* Helper routine. Converts a Hugo color to a Qt color.
@@ -162,7 +177,7 @@ flushScriptBuffer()
         QString output;
         while ((layoutLine = layout.createLine()).isValid()) {
             layoutLine.setNumColumns(wrapWidth);
-            output.append(textLine.mid(layoutLine.textStart(), layoutLine.textLength()));
+            output.append(textLine.midRef(layoutLine.textStart(), layoutLine.textLength()));
             output.append('\n');
         }
         layout.endLayout();
@@ -228,8 +243,9 @@ hugo_splitpath( char* path, char* drive, char* dir, char* fname, char* ext )
     fname[0] = '\0';
     ext[0] = '\0';
 
-    if (path[0] == '\0')
+    if (path[0] == '\0') {
         return;
+    }
 
     QFileInfo inf(QString::fromLocal8Bit(path));
     qstrcpy(ext, inf.suffix().toLocal8Bit().constData());
@@ -280,7 +296,7 @@ hugo_getfilename( char* a, char* b )
     Again, it may be preferable to replace this with something fancier.
 */
 int
-hugo_overwrite( char* )
+hugo_overwrite( char* /*f*/)
 {
     // We handle this in hugo_getfilename().
     return true;
@@ -293,13 +309,13 @@ hugo_fopen( const char* path, const char* mode )
 {
     if (QString(path).endsWith(CHECK_FNAME)) {
         if (mode[0] == 'r') {
-            return &checkFile;
+            return &checkFile();
         }
         return nullptr;
     }
     if (QString(path).endsWith(CONTROL_FNAME)) {
         ctrlFileInWriteMode = mode[0] == 'w';
-        return &ctrlFile;
+        return &ctrlFile();
     }
     auto handle = std::fopen(path, mode);
     if (handle == nullptr) {
@@ -311,12 +327,12 @@ hugo_fopen( const char* path, const char* mode )
 int
 hugo_fclose( HUGO_FILE file )
 {
-    if (file == &checkFile) {
+    if (file == nullptr or file == &checkFile()) {
         return 0;
     }
-    if (file == &ctrlFile) {
+    if (file == &ctrlFile()) {
         if (ctrlFileInWriteMode) {
-            opcodeParser.parse();
+            opcodeParser().parse();
         }
         return 0;
     }
@@ -331,12 +347,12 @@ hugo_fclose( HUGO_FILE file )
 int
 hugo_fgetc( HUGO_FILE file )
 {
-    if (file == &checkFile) {
+    if (file == &checkFile()) {
         return 0x42;
     }
-    if (file == &ctrlFile) {
-        if (opcodeParser.hasOutput()) {
-            return opcodeParser.getNextOutputByte();
+    if (file == &ctrlFile()) {
+        if (opcodeParser().hasOutput()) {
+            return opcodeParser().getNextOutputByte();
         }
         return EOF;
     }
@@ -346,7 +362,7 @@ hugo_fgetc( HUGO_FILE file )
 int
 hugo_fseek(HUGO_FILE file, long offset, int whence )
 {
-    if (file == &ctrlFile) {
+    if (file == &ctrlFile()) {
         qDebug() << Q_FUNC_INFO;
         return 0;
     }
@@ -356,7 +372,7 @@ hugo_fseek(HUGO_FILE file, long offset, int whence )
 long
 hugo_ftell(HUGO_FILE file )
 {
-    if (file == &ctrlFile) {
+    if (file == &ctrlFile()) {
         qDebug() << Q_FUNC_INFO;
     }
     return std::ftell(file->get());
@@ -365,7 +381,7 @@ hugo_ftell(HUGO_FILE file )
 size_t
 hugo_fread(void* ptr, size_t size, size_t nmemb, HUGO_FILE file)
 {
-    if (file == &ctrlFile) {
+    if (file == &ctrlFile()) {
         qDebug() << Q_FUNC_INFO;
         return 0;
     }
@@ -375,7 +391,7 @@ hugo_fread(void* ptr, size_t size, size_t nmemb, HUGO_FILE file)
 char*
 hugo_fgets(char* s, int size, HUGO_FILE file )
 {
-    if (file == &ctrlFile) {
+    if (file == &ctrlFile()) {
         qDebug() << Q_FUNC_INFO;
         return nullptr;
     }
@@ -385,8 +401,8 @@ hugo_fgets(char* s, int size, HUGO_FILE file )
 int
 hugo_fputc(int c, HUGO_FILE file )
 {
-    if (file == &ctrlFile) {
-        opcodeParser.pushByte(c);
+    if (file == &ctrlFile()) {
+        opcodeParser().pushByte(c);
         return c;
     }
     return std::fputc(c, file->get());
@@ -395,7 +411,7 @@ hugo_fputc(int c, HUGO_FILE file )
 int
 hugo_fputs(const char* s, HUGO_FILE file )
 {
-    if (file == &ctrlFile) {
+    if (file == &ctrlFile()) {
         qDebug() << Q_FUNC_INFO;
         return 0;
     }
@@ -405,7 +421,7 @@ hugo_fputs(const char* s, HUGO_FILE file )
 int
 hugo_ferror(HUGO_FILE file )
 {
-    if (file == &ctrlFile) {
+    if (file == &ctrlFile()) {
         qDebug() << Q_FUNC_INFO;
         return 0;
     }
@@ -415,7 +431,7 @@ hugo_ferror(HUGO_FILE file )
 int
 hugo_fprintf(HUGO_FILE file, const char* format, ...)
 {
-    if (file == &ctrlFile) {
+    if (file == &ctrlFile()) {
         qDebug() << Q_FUNC_INFO;
         return 0;
     }
@@ -437,13 +453,9 @@ void
 hugo_closefiles()
 {
     delete game;
-    if (script) {
-        hugo_fclose(script);
-    }
-    if (io)
-        delete io;
-    if (record)
-        delete record;
+    hugo_fclose(script);
+    delete io;
+    delete record;
 }
 
 
@@ -480,7 +492,7 @@ hugo_writetoscript(const char* s)
 int
 hugo_getkey( void )
 {
-    if (::script != 0) {
+    if (::script != nullptr) {
         flushScriptBuffer();
     }
     flushScrollbackBuffer();
@@ -510,7 +522,7 @@ hugo_getkey( void )
 void
 hugo_getline( char* p )
 {
-    if (::script != NULL) {
+    if (::script != nullptr) {
         hugo_writetoscript(p);
         flushScriptBuffer();
     }
@@ -525,13 +537,14 @@ hugo_getline( char* p )
 
     // Also copy the input to the script file (if there is one) and the
     // scrollback.
-    if (script != NULL) {
+    if (script != nullptr) {
         hugo_writetoscript(buffer);
         hugo_writetoscript("\n");
         flushScriptBuffer();
     }
     hugo_sendtoscrollback(buffer);
-    hugo_sendtoscrollback(const_cast<char*>("\n"));
+    char newline[] = "\n";
+    hugo_sendtoscrollback(newline);
 }
 
 

@@ -28,6 +28,7 @@
 #include <QVBoxLayout>
 #include <QWheelEvent>
 #include <QPainter>
+#include <utility>
 
 #include "hmarginwidget.h"
 #include "hmainwindow.h"
@@ -35,11 +36,10 @@
 
 
 HMarginWidget::HMarginWidget(QWidget* parent )
-    : QWidget(parent),
-      fBannerWidget(0),
-      fColor(hugoColorToQt(17))
+    : QWidget(parent)
+    , fLayout(new QVBoxLayout)
+    , fColor(hugoColorToQt(17))
 {
-    this->fLayout = new QVBoxLayout;
     this->fLayout->setContentsMargins(0, 0, 0, 0);
     this->fLayout->setSpacing(0);
     this->setLayout(this->fLayout);
@@ -89,12 +89,12 @@ void
 HMarginWidget::setBannerWidget( QWidget* w )
 {
     // If a banner widget is already set, delete it first.
-    if (this->fBannerWidget != 0) {
+    if (this->fBannerWidget != nullptr) {
         this->fLayout->removeWidget(this->fBannerWidget);
         this->fBannerWidget->deleteLater();
     }
     this->fBannerWidget = w;
-    if (w != 0) {
+    if (w != nullptr) {
         w->setParent(this);
         this->fLayout->insertWidget(0, w);
         w->show();
@@ -119,5 +119,5 @@ HMarginWidget::removeWidget( QWidget* w )
 void
 HMarginWidget::setColor(QColor color)
 {
-    fColor = color;
+    fColor = std::move(color);
 }

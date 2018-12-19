@@ -25,13 +25,10 @@
  * include the source code for the parts of the Hugo Engine used as well as
  * that of the covered work.
  */
-#ifndef ENGINERUNNER_H
-#define ENGINERUNNER_H
-
+#pragma once
 #include <QThread>
 
-
-class EngineThread: public QThread {
+class EngineThread final: public QThread {
     Q_OBJECT
 
 public:
@@ -42,15 +39,14 @@ public:
     { }
 };
 
-
-class EngineRunner: public QObject {
+class EngineRunner final: public QObject {
     Q_OBJECT
 
   public:
-    EngineRunner(QString gameFile, EngineThread* thread, QObject* parent = 0)
+    EngineRunner(QString gameFile, EngineThread* thread, QObject* parent = nullptr)
         : QObject(parent),
           fThread(thread),
-          fGameFile(gameFile)
+          fGameFile(std::move(gameFile))
     { }
 
   signals:
@@ -63,6 +59,3 @@ class EngineRunner: public QObject {
     EngineThread* fThread;
     QString fGameFile;
 };
-
-
-#endif

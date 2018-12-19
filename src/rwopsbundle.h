@@ -25,9 +25,7 @@
  * include the source code for the parts of the Hugo Engine used as well as
  * that of the covered work.
  */
-#ifndef RWOPSBUNDLE_H
-#define RWOPSBUNDLE_H
-
+#pragma once
 #include <stdio.h>
 
 #ifdef __cplusplus
@@ -44,11 +42,9 @@ extern "C" {
  * In case or errors, NULL is returned and 'mediaBundle' is not closed.
  * SDL_GetError() can be used to obtain an error string.
  */
-SDL_RWops*
+struct SDL_RWops*
 RWFromMediaBundle( FILE* mediaBundle, long resLength );
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

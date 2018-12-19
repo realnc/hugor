@@ -25,12 +25,9 @@
  * include the source code for the parts of the Hugo Engine used as well as
  * that of the covered work.
  */
-#ifndef CONFDIALOG_H
-#define CONFDIALOG_H
-
+#pragma once
 #include <QDialog>
 #include <memory>
-
 
 namespace Ui {
     class ConfDialog;
@@ -41,16 +38,18 @@ namespace Aulib {
     class AudioDecoderFluidSynth;
 }
 
-class ConfDialog: public QDialog {
+class HMainWindow;
+
+class ConfDialog final: public QDialog {
     Q_OBJECT
 
   public:
-    ConfDialog( class HMainWindow* parent = 0 );
-    ~ConfDialog();
+    ConfDialog( HMainWindow* parent = nullptr );
+    ~ConfDialog() override;
 
   protected:
     void
-    changeEvent( QEvent* e );
+    changeEvent( QEvent* e ) override;
 
   private:
     Ui::ConfDialog* ui;
@@ -87,6 +86,3 @@ class ConfDialog: public QDialog {
     void
     fBrowseForSoundFont();
 };
-
-
-#endif

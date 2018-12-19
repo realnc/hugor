@@ -19,7 +19,7 @@ getExtendedColor(int id)
 {
     if (id < 100 or id > 254) {
         qWarning() << Q_FUNC_INFO << "Invalid color ID:" << id;
-        return QColor();
+        return {};
     }
     const auto& rgb = colors[id - 100];
     return QColor::fromRgb(rgb.r, rgb.g, rgb.b, rgb.a);

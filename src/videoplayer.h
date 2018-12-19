@@ -25,20 +25,20 @@
  * include the source code for the parts of the Hugo Engine used as well as
  * that of the covered work.
  */
-#ifndef VIDEOPLAYER_H
-#define VIDEOPLAYER_H
+#pragma once
 #ifndef DISABLE_VIDEO
 
 #include <QWidget>
-#include <cstdio>
 
+struct SDL_RWops;
+class VideoPlayer_priv;
 
-class VideoPlayer: public QWidget {
+class VideoPlayer final: public QWidget {
     Q_OBJECT
 
 public:
-    VideoPlayer( QWidget* parent = 0 );
-    ~VideoPlayer();
+    VideoPlayer( QWidget* parent = nullptr );
+    ~VideoPlayer() override;
 
     bool loadVideo(FILE* src, long len, bool loop);
 
@@ -54,16 +54,14 @@ signals:
     void errorOccurred();
 
 protected:
-    void resizeEvent(QResizeEvent* e);
+    void resizeEvent(QResizeEvent* e) override;
 
 private:
-    struct SDL_RWops* fRwops;
-    long fDataLen;
-    bool fLooping;
+    SDL_RWops* fRwops = nullptr;
+    long fDataLen = 0;
+    bool fLooping = false;
     friend class VideoPlayer_priv;
-    class VideoPlayer_priv* d;
+    VideoPlayer_priv* d = nullptr;
 };
 
-
-#endif
 #endif

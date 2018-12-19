@@ -46,35 +46,14 @@ extern "C" {
 #include "hugohandlers.h"
 
 
-HFrame* hFrame = 0;
+HFrame* hFrame = nullptr;
 
 
 HFrame::HFrame( QWidget* parent )
-    : QWidget(parent),
-      fInputMode(NoInput),
-      fInputReady(false),
-      fInputStartX(0),
-      fInputStartY(0),
-      fInputCurrentChar(0),
-      fMaxHistCap(200),
-      fCurHistIndex(0),
-      fFgColor(16), // Default text color
-      fBgColor(17), // Default background color
-      fUseFixedFont(false),
-      fUseUnderlineFont(false),
-      fUseItalicFont(false),
-      fUseBoldFont(false),
-      fFontMetrics(QFont()),
-      fPixmap(1, 1),
-      fFlushXPos(0),
-      fFlushYPos(0),
-      fCursorPos(0, 0),
-      fLastCursorPos(0, 0),
-      fCursorVisible(false),
-      fBlinkVisible(false),
-      fBlinkTimer(new QTimer(this)),
-      fNeedScreenUpdate(false),
-      fMinimizeTimer(new QTimer(this))
+    : QWidget(parent)
+    , fHeight(QFontMetrics(hApp->settings()->propFont).height())
+    , fBlinkTimer(new QTimer(this))
+    , fMinimizeTimer(new QTimer(this))
 {
     // We handle player input, so we need to accept focus.
     this->setFocusPolicy(Qt::WheelFocus);
@@ -82,9 +61,6 @@ HFrame::HFrame( QWidget* parent )
     connect(this->fBlinkTimer, SIGNAL(timeout()), this, SLOT(fBlinkCursor()));
     this->resetCursorBlinking();
     //this->setCursorVisible(true);
-
-    // Our initial height is the height of the current proportional font.
-    this->fHeight = QFontMetrics(hApp->settings()->propFont).height();
 
     // We need to check whether the application lost focus.
     connect(qApp, SIGNAL(focusChanged(QWidget*,QWidget*)), SLOT(fHandleFocusChange(QWidget*,QWidget*)));
@@ -112,7 +88,7 @@ HFrame::fEnqueueKey(char key, QMouseEvent* e)
     // multiple keys/clicks to queue up, if the need for that arises.
     if (fKeyQueue.empty()) {
         fKeyQueue.enqueue(key);
-        if (e) {
+        if (e != nullptr) {
             fClickQueue.append(e->pos());
         }
     }
@@ -134,11 +110,11 @@ HFrame::fBlinkCursor()
 void
 HFrame::fHandleFocusChange( QWidget* old, QWidget* now )
 {
-    if (now == 0) {
+    if (now == nullptr) {
         // Minimize a bit later, in case we only lose focus for a very short
         // time.
         fMinimizeTimer->start(40);
-    } else if (old == 0 and now != 0) {
+    } else if (old == nullptr and now != nullptr) {
         // In case we only lost focus only for a short time, abort any pending
         // minimize operation.
         fMinimizeTimer->stop();
@@ -184,7 +160,7 @@ void
 HFrame::fEndInputMode( bool addToHistory )
 {
     this->fInputReady = true;
-    this->fInputMode = NoInput;
+    this->fInputMode = InputMode::None;
     // The current command only needs to be appended to the history if
     // it's not empty and differs from the previous command in the history.
     if (((this->fHistory.isEmpty() and not fInputBuf.isEmpty())
@@ -218,7 +194,7 @@ HFrame::paintEvent( QPaintEvent* e )
     // Draw our current input. We need to do this here, after the pixmap
     // has already been painted, so that the input gets painted on top.
     // Otherwise, we could not erase text during editing.
-    if (this->fInputMode == NormalInput and not this->fInputBuf.isEmpty()) {
+    if (this->fInputMode == InputMode::Normal and not this->fInputBuf.isEmpty()) {
         QFont f(this->fUseFixedFont ? hApp->settings()->fixedFont : hApp->settings()->propFont);
         f.setUnderline(this->fUseUnderlineFont);
         f.setItalic(this->fUseItalicFont);
@@ -288,7 +264,7 @@ HFrame::keyPressEvent( QKeyEvent* e )
         emit escKeyPressed();
     }
 
-    if (this->fInputMode == NoInput) {
+    if (this->fInputMode == InputMode::None) {
         this->singleKeyPressEvent(e);
         return;
     }
@@ -335,11 +311,13 @@ HFrame::keyPressEvent( QKeyEvent* e )
             --i;
         }
     } else if (e->matches(QKeySequence::MoveToPreviousChar)) {
-        if (i > 0)
+        if (i > 0) {
             --i;
+        }
     } else if (e->matches(QKeySequence::MoveToNextChar)) {
-        if (i < buf.length())
+        if (i < buf.length()) {
             ++i;
+        }
     } else if (e->matches(QKeySequence::MoveToPreviousWord)) {
         // Skip all non-alphanumerics first.
         while (i > 0 and not buf.at(i - 1).isLetterOrNumber()) {
@@ -391,7 +369,7 @@ HFrame::keyPressEvent( QKeyEvent* e )
         }
         i = buf.length();
     } else if (e->matches(QKeySequence::MoveToPreviousPage)) {
-        this->requestScrollback();
+        emit requestScrollback();
     } else if (e->key() == Qt::Key_Backspace) {
         if (i > 0 and not buf.isEmpty()) {
             buf.remove(i - 1, 1);
@@ -415,7 +393,9 @@ HFrame::keyPressEvent( QKeyEvent* e )
 void
 HFrame::inputMethodEvent( QInputMethodEvent* e )
 {
-    if (not hApp->gameRunning() or (this->fInputMode == NormalInput and e->commitString().isEmpty())) {
+    if (not hApp->gameRunning()
+        or (this->fInputMode == InputMode::Normal and e->commitString().isEmpty()))
+    {
         QWidget::inputMethodEvent(e);
         return;
     }
@@ -433,7 +413,7 @@ HFrame::inputMethodEvent( QInputMethodEvent* e )
         QWidget::inputMethodEvent(e);
         return;
     }
-    fEnqueueKey(bytes[0], 0);
+    fEnqueueKey(bytes[0], nullptr);
 }
 
 
@@ -441,7 +421,7 @@ void
 HFrame::singleKeyPressEvent( QKeyEvent* event )
 {
     //qDebug() << Q_FUNC_INFO;
-    Q_ASSERT(this->fInputMode == NoInput);
+    Q_ASSERT(this->fInputMode == InputMode::None);
 
     switch (event->key()) {
       case 0:
@@ -450,19 +430,19 @@ HFrame::singleKeyPressEvent( QKeyEvent* event )
         return;
 
       case Qt::Key_Left:
-        fEnqueueKey(8, 0);
+        fEnqueueKey(8, nullptr);
         break;
 
       case Qt::Key_Up:
-        fEnqueueKey(11, 0);
+        fEnqueueKey(11, nullptr);
         break;
 
       case Qt::Key_Right:
-        fEnqueueKey(21, 0);
+        fEnqueueKey(21, nullptr);
         break;
 
       case Qt::Key_Down:
-        fEnqueueKey(10, 0);
+        fEnqueueKey(10, nullptr);
         break;
 
       default:
@@ -472,7 +452,7 @@ HFrame::singleKeyPressEvent( QKeyEvent* event )
             QWidget::keyPressEvent(event);
             return;
         }
-        fEnqueueKey(event->text().at(0).toLatin1(), 0);
+        fEnqueueKey(event->text().at(0).toLatin1(), nullptr);
     }
 }
 
@@ -484,7 +464,7 @@ HFrame::mousePressEvent( QMouseEvent* e )
         e->ignore();
         return;
     }
-    if (this->fInputMode == NoInput) {
+    if (this->fInputMode == InputMode::None) {
         fEnqueueKey(0, e);
     }
     e->accept();
@@ -494,7 +474,7 @@ HFrame::mousePressEvent( QMouseEvent* e )
 void
 HFrame::mouseDoubleClickEvent( QMouseEvent* e )
 {
-    if (this->fInputMode != NormalInput or e->button() != Qt::LeftButton) {
+    if (this->fInputMode != InputMode::Normal or e->button() != Qt::LeftButton) {
         return;
     }
     // Get the word at the double click position.
@@ -524,7 +504,7 @@ HFrame::startInput( int xPos, int yPos )
     //qDebug() << Q_FUNC_INFO;
     updateGameScreen(false);
     this->fInputReady = false;
-    this->fInputMode = NormalInput;
+    this->fInputMode = InputMode::Normal;
     this->fInputStartX = xPos;
     this->fInputStartY = yPos;
     this->fInputCurrentChar = 0;
@@ -539,7 +519,7 @@ HFrame::startInput( int xPos, int yPos )
 void
 HFrame::getInput(char* buf, size_t buflen)
 {
-    Q_ASSERT(buf != 0);
+    Q_ASSERT(buf != nullptr);
     qstrncpy(buf, this->fInputBuf.toLatin1(), buflen);
     fInputBuf.clear();
 }
@@ -684,8 +664,9 @@ HFrame::scrollUp( int left, int top, int right, int bottom, int h )
 void
 HFrame::flushText()
 {
-    if (this->fPrintBuffer.isEmpty())
+    if (this->fPrintBuffer.isEmpty()) {
         return;
+    }
 
     QFont f(this->fUseFixedFont ? hApp->settings()->fixedFont : hApp->settings()->propFont);
     f.setUnderline(this->fUseUnderlineFont);
@@ -760,7 +741,7 @@ HFrame::resetCursorBlinking()
 void
 HFrame::insertInputText( QString txt, bool execute, bool clearCurrent )
 {
-    if (this->fInputMode != NormalInput) {
+    if (this->fInputMode != InputMode::Normal) {
         return;
     }
     // Clear the current input, if requested.
@@ -786,7 +767,7 @@ QList<const QAction*>
 HFrame::getGameContextMenuEntries( QMenu& dst )
 {
     QList<const QAction*> actions;
-    if (fInputMode != NormalInput) {
+    if (fInputMode != InputMode::Normal) {
         return actions;
     }
     for (int i = 0; i < context_commands; ++i) {

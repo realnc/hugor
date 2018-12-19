@@ -25,27 +25,29 @@
  * include the source code for the parts of the Hugo Engine used as well as
  * that of the covered work.
  */
-#ifndef HMAINWINDOW_H
-#define HMAINWINDOW_H
-
+#pragma once
 #include <QMainWindow>
 
+class AboutDialog;
+class ConfDialog;
+class HMainWindow;
+class HScrollbackWindow;
+class QErrorMessage;
 
-extern class HMainWindow* hMainWin;
+extern HMainWindow* hMainWin;
 
-
-class HMainWindow: public QMainWindow {
+class HMainWindow final: public QMainWindow {
     Q_OBJECT
 
   private:
-    class QErrorMessage* fErrorMsg;
-    class ConfDialog* fConfDialog;
-    class AboutDialog* fAboutDialog;
-    class HScrollbackWindow* fScrollbackWindow;
-    class QAction* fPreferencesAction;
-    class QAction* fFullscreenAction;
-    class QAction* fScrollbackAction;
-    bool fMenuBarVisible;
+    QErrorMessage* fErrorMsg = nullptr;
+    ConfDialog* fConfDialog = nullptr;
+    AboutDialog* fAboutDialog = nullptr;
+    HScrollbackWindow* fScrollbackWindow = nullptr;
+    QAction* fPreferencesAction = nullptr;
+    QAction* fFullscreenAction = nullptr;
+    QAction* fScrollbackAction = nullptr;
+    bool fMenuBarVisible = true;
     QIcon fFullscreenEnterIcon;
     QIcon fFullscreenExitIcon;
 
@@ -66,14 +68,14 @@ class HMainWindow: public QMainWindow {
     fHideAbout();
 
   protected:
-    virtual void
-    closeEvent( QCloseEvent* e );
+    void
+    closeEvent( QCloseEvent* e ) override;
 
-    virtual void
-    changeEvent( QEvent* e );
+    void
+    changeEvent( QEvent* e ) override;
 
-    virtual void
-    contextMenuEvent( QContextMenuEvent* e );
+    void
+    contextMenuEvent( QContextMenuEvent* e ) override;
 
   public:
     HMainWindow( QWidget* parent );
@@ -85,7 +87,7 @@ class HMainWindow: public QMainWindow {
     showMenuBar();
 
     QErrorMessage*
-    errorMsgObj()
+    errorMsgObj() const
     { return this->fErrorMsg; }
 
     void
@@ -107,6 +109,3 @@ class HMainWindow: public QMainWindow {
     void
     setFullscreen(bool f);
 };
-
-
-#endif // HMAINWINDOW_H

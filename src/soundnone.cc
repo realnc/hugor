@@ -42,7 +42,7 @@ closeSoundEngine()
 
 
 void
-muteSound(bool)
+muteSound(bool /*mute*/)
 { }
 
 
@@ -72,7 +72,7 @@ isSamplePlaying()
 
 
 void
-HugoHandlers::playmusic(HUGO_FILE infile, long, char, int* result)
+HugoHandlers::playmusic(HUGO_FILE infile, long /*reslength*/, char /*loop_flag*/, int* result) const
 {
     delete infile;
     *result = false;
@@ -80,17 +80,17 @@ HugoHandlers::playmusic(HUGO_FILE infile, long, char, int* result)
 
 
 void
-HugoHandlers::musicvolume(int)
+HugoHandlers::musicvolume(int /*vol*/) const
 { }
 
 
 void
-HugoHandlers::stopmusic()
+HugoHandlers::stopmusic() const
 { }
 
 
 void
-HugoHandlers::playsample(HUGO_FILE infile, long, char, int* result)
+HugoHandlers::playsample(HUGO_FILE infile, long /*reslength*/, char /*loop_flag*/, int* result) const
 {
     delete infile;
     *result = false;
@@ -98,10 +98,10 @@ HugoHandlers::playsample(HUGO_FILE infile, long, char, int* result)
 
 
 void
-HugoHandlers::samplevolume(int)
+HugoHandlers::samplevolume(int /*vol*/) const
 { }
 
 
 void
-HugoHandlers::stopsample()
+HugoHandlers::stopsample() const
 { }

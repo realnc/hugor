@@ -25,14 +25,11 @@
  * include the source code for the parts of the Hugo Engine used as well as
  * that of the covered work.
  */
-#ifndef SETTINGSOVERRIDES_H
-#define SETTINGSOVERRIDES_H
-
+#pragma once
 #include <QString>
 #include <QColor>
 
-
-class SettingsOverrides {
+class SettingsOverrides final {
   public:
     SettingsOverrides( const QString& filename );
 
@@ -51,6 +48,3 @@ class SettingsOverrides {
     bool imageSmoothing;
     bool muteWhenMinimized;
 };
-
-
-#endif // SETTINGSOVERRIDES_H

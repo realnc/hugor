@@ -16,10 +16,7 @@
     the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
     Boston, MA 02110-1301, USA.
 */
-
-#ifndef KCOLORBUTTON_H
-#define KCOLORBUTTON_H
-
+#pragma once
 #include <QPushButton>
 
 class KColorButtonPrivate;
@@ -32,7 +29,7 @@ class KColorButtonPrivate;
 *
 * \image html kcolorbutton.png "KDE Color Button"
 */
-class KColorButton: public QPushButton
+class KColorButton final: public QPushButton
 {
     Q_OBJECT
     Q_PROPERTY( QColor color READ color WRITE setColor USER true )
@@ -42,19 +39,19 @@ public:
     /**
      * Creates a color button.
      */
-    explicit KColorButton( QWidget *parent = 0 );
+    explicit KColorButton( QWidget *parent = nullptr );
 
     /**
      * Creates a color button with an initial color @p c.
      */
-    explicit KColorButton( const QColor &c, QWidget *parent = 0 );
+    explicit KColorButton( const QColor &c, QWidget *parent = nullptr );
 
     /**
      * Creates a color button with an initial color @p c and default color @p defaultColor.
      */
-    KColorButton( const QColor &c, const QColor &defaultColor, QWidget *parent = 0 );
+    KColorButton( const QColor &c, const QColor &defaultColor, QWidget *parent = nullptr );
 
-    virtual ~KColorButton();
+    ~KColorButton() override;
 
     /**
      * Returns the currently chosen color.
@@ -77,8 +74,8 @@ public:
      */
     void setDefaultColor( const QColor &c );
 
-    QSize sizeHint() const;
-    QSize minimumSizeHint() const;
+    QSize sizeHint() const override;
+    QSize minimumSizeHint() const override;
 
 Q_SIGNALS:
     /**
@@ -88,15 +85,15 @@ Q_SIGNALS:
     void changed( const QColor &newColor );
 
 protected:
-    virtual void paintEvent( QPaintEvent *pe );
-    virtual void dragEnterEvent( QDragEnterEvent *);
-    virtual void dropEvent( QDropEvent *);
-    virtual void mousePressEvent( QMouseEvent *e );
-    virtual void mouseMoveEvent( QMouseEvent *e);
-    virtual void keyPressEvent( QKeyEvent *e );
+    void paintEvent( QPaintEvent *pe ) override;
+    void dragEnterEvent( QDragEnterEvent * /*event*/) override;
+    void dropEvent( QDropEvent * /*event*/) override;
+    void mousePressEvent( QMouseEvent *e ) override;
+    void mouseMoveEvent( QMouseEvent *e) override;
+    void keyPressEvent( QKeyEvent *e ) override;
 
 private:
-    class KColorButtonPrivate
+    class KColorButtonPrivate final
     {
     public:
         KColorButtonPrivate(KColorButton *q): q(q) {}
@@ -118,6 +115,3 @@ private:
 
     Q_PRIVATE_SLOT( d, void _k_chooseColor() )
 };
-
-
-#endif

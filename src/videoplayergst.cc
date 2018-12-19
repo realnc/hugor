@@ -53,19 +53,19 @@
 
 
 static bool isMuted = false;
-static VideoPlayer* currentVideo = 0;
+static VideoPlayer* currentVideo = nullptr;
 
 
 void muteVideo(bool mute)
 {
     if (mute and not isMuted) {
         isMuted = true;
-        if (currentVideo) {
+        if (currentVideo != nullptr) {
             currentVideo->setMute(true);
         }
     } else if (not mute and isMuted) {
         isMuted = false;
-        if (currentVideo) {
+        if (currentVideo != nullptr) {
             currentVideo->setMute(false);
         }
     }
@@ -74,17 +74,16 @@ void muteVideo(bool mute)
 
 void updateVideoVolume()
 {
-    if (currentVideo) {
+    if (currentVideo != nullptr) {
         currentVideo->updateVolume();
     }
 }
 
 
 VideoPlayer::VideoPlayer(QWidget *parent)
-    : QWidget(parent),
-      fRwops(0)
+    : QWidget(parent)
+    , d(new VideoPlayer_priv(this, this))
 {
-    this->d = new VideoPlayer_priv(this, this);
     d->winId(); // Enforce a native window handle for gstreamer.
     d->setUpdatesEnabled(false); // Don't fight with gstreamer over updates.
     // So that the mouse cursor can be made visible again when moving the mouse.
@@ -95,8 +94,8 @@ VideoPlayer::VideoPlayer(QWidget *parent)
 
 VideoPlayer::~VideoPlayer()
 {
-    if (d->fPipeline) {
-        ::currentVideo = 0;
+    if (d->fPipeline != nullptr) {
+        ::currentVideo = nullptr;
         gst_bus_remove_signal_watch(d->fBus);
 #if not GST_CHECK_VERSION(1, 0, 0)
         gst_bus_disable_sync_message_emission(d->fBus);
@@ -105,7 +104,7 @@ VideoPlayer::~VideoPlayer()
         gst_object_unref(d->fBus);
         gst_object_unref(d->fPipeline);
     }
-    if (fRwops) {
+    if (fRwops != nullptr) {
         SDL_RWclose(fRwops);
     }
 }
@@ -130,16 +129,16 @@ cbSyncMessage(GstBus*, GstMessage* message, gpointer userData)
 
 
 static void
-cbOnBusMessage(GstBus*, GstMessage* message, gpointer d)
+cbOnBusMessage(GstBus* /*bus*/, GstMessage* message, gpointer d)
 {
     VideoPlayer_priv::cbOnBusMessage(message, static_cast<VideoPlayer_priv*>(d));
 }
 
 
 static void
-cbOnSourceSetup(GstPipeline*, GstAppSrc* source, gpointer d)
+cbOnSourceSetup(GstPipeline* /*pipeline*/, GstAppSrc* source, gpointer d)
 {
-    static_cast<VideoPlayer_priv*>(d)->cbOnSourceSetup(source, static_cast<VideoPlayer_priv*>(d));
+    VideoPlayer_priv::cbOnSourceSetup(source, static_cast<VideoPlayer_priv*>(d));
 }
 
 } // extern "C"
@@ -148,15 +147,15 @@ cbOnSourceSetup(GstPipeline*, GstAppSrc* source, gpointer d)
 bool
 VideoPlayer::loadVideo(FILE* src, long len, bool loop)
 {
-    if (not d->fPipeline) {
+    if (d->fPipeline == nullptr) {
         const char* playbinName =
 #if GST_CHECK_VERSION(1, 0, 0)
                 "playbin";
 #else
                 "playbin2";
 #endif
-        d->fPipeline = gst_element_factory_make(playbinName, 0);
-        if (not d->fPipeline) {
+        d->fPipeline = gst_element_factory_make(playbinName, nullptr);
+        if (d->fPipeline == nullptr) {
             hMainWin->errorMsgObj()->showMessage(tr("Unable to play video. You are "
                                                     "probably missing the GStreamer plugins "
                                                     "from the \"gst-plugins-base\" set."));
@@ -180,11 +179,11 @@ VideoPlayer::loadVideo(FILE* src, long len, bool loop)
 #endif
         g_signal_connect(d->fPipeline, "source-setup", G_CALLBACK(cbOnSourceSetup), d);
     }
-    if (fRwops) {
+    if (fRwops != nullptr) {
         SDL_RWclose(fRwops);
     }
     fRwops = RWFromMediaBundle(src, len);
-    if (not fRwops) {
+    if (fRwops == nullptr) {
         hMainWin->errorMsgObj()->showMessage(tr("Unable to read video data from disk: ")
                                              + SDL_GetError());
         return false;
@@ -199,7 +198,7 @@ VideoPlayer::loadVideo(FILE* src, long len, bool loop)
 void
 VideoPlayer::play()
 {
-    if (d->fPipeline == 0) {
+    if (d->fPipeline == nullptr) {
         return;
     }
 
@@ -212,7 +211,7 @@ VideoPlayer::play()
     hApp->advanceEventLoop();
     if (this->fLooping) {
         // Wait for the pipeline to transition into the playing state.
-        gst_element_get_state(d->fPipeline, 0, 0, GST_CLOCK_TIME_NONE);
+        gst_element_get_state(d->fPipeline, nullptr, nullptr, GST_CLOCK_TIME_NONE);
         // Seek to the end the first time so that there's no pause before
         // the first segment message arrives.
         if (not gst_element_seek(d->fPipeline, 1.0, GST_FORMAT_TIME,
@@ -229,7 +228,7 @@ VideoPlayer::play()
 void
 VideoPlayer::stop()
 {
-    if (d->fPipeline) {
+    if (d->fPipeline != nullptr) {
         gst_element_set_state(d->fPipeline, GST_STATE_NULL);
         emit videoFinished();
         hide();
@@ -240,7 +239,7 @@ VideoPlayer::stop()
 void
 VideoPlayer::updateVolume()
 {
-    if (d->fPipeline) {
+    if (d->fPipeline != nullptr) {
         setVolume(d->fVolume);
     }
 }
@@ -249,7 +248,7 @@ VideoPlayer::updateVolume()
 void
 VideoPlayer::setVolume(int vol)
 {
-    if (not d->fPipeline) {
+    if (d->fPipeline == nullptr) {
         return;
     }
     if (vol < 0) {
@@ -271,7 +270,7 @@ VideoPlayer::setVolume(int vol)
 void
 VideoPlayer::setMute(bool mute)
 {
-    if (d->fPipeline) {
+    if (d->fPipeline != nullptr) {
         g_object_set(d->fPipeline, "mute", mute, NULL);
     }
 }

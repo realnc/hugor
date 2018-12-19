@@ -25,33 +25,28 @@
  * include the source code for the parts of the Hugo Engine used as well as
  * that of the covered work.
  */
-#ifndef VIDEOPLAYERQT5_P
-#define VIDEOPLAYERQT5_P
-
+#pragma once
 #include <QWidget>
 #include <QMediaPlayer>
 
+class VideoPlayer;
+class RwopsQIODevice;
 
-class VideoPlayer_priv: public QWidget {
+class VideoPlayer_priv final: public QWidget {
     Q_OBJECT
 
 public:
-    VideoPlayer_priv(QWidget* parent, class VideoPlayer* qPtr)
+    VideoPlayer_priv(QWidget* parent, VideoPlayer* qPtr)
         : QWidget(parent),
-          q(qPtr),
-          fMediaPlayer(0),
-          fVideoWidget(0)
+          q(qPtr)
     { }
 
-    class VideoPlayer* q;
-    class QMediaPlayer* fMediaPlayer;
-    class QVideoWidget* fVideoWidget;
-    class RwopsQIODevice* fIODev;
+    VideoPlayer* q;
+    QMediaPlayer* fMediaPlayer = nullptr;
+    QVideoWidget* fVideoWidget = nullptr;
+    RwopsQIODevice* fIODev;
 
 public slots:
     void onStatusChange(QMediaPlayer::MediaStatus status);
     void onError(QMediaPlayer::Error error);
 };
-
-
-#endif

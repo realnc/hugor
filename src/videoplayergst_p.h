@@ -25,26 +25,25 @@
  * include the source code for the parts of the Hugo Engine used as well as
  * that of the covered work.
  */
-#ifndef VIDEOPLAYERGST_P
-#define VIDEOPLAYERGST_P
-
+#pragma once
 #include <QWidget>
 #include <gst/gstelement.h>
 #include <gst/gstpipeline.h>
 #include <gst/app/gstappsrc.h>
 
+class VideoPlayer;
 
-class VideoPlayer_priv: public QWidget {
+class VideoPlayer_priv final: public QWidget {
     Q_OBJECT
 
 public:
-    VideoPlayer_priv(QWidget *parent, class VideoPlayer* qPtr);
-    class VideoPlayer* q;
-    GstElement* fPipeline;
-    GstAppSrc* fAppSrc;
-    GstBus* fBus;
+    VideoPlayer_priv(QWidget *parent, VideoPlayer* qPtr);
+    VideoPlayer* q;
+    GstElement* fPipeline = nullptr;
+    GstAppSrc* fAppSrc = nullptr;
+    GstBus* fBus = nullptr;
     GstAppSrcCallbacks fAppSrcCbs;
-    int fVolume;
+    int fVolume = 100;
 
     static GMainLoop* fGMainLoop;
     static GThread* fGMainLoopThread;
@@ -55,6 +54,3 @@ public:
 public slots:
     void adjustForVideoSize(QSize vidSize);
 };
-
-
-#endif

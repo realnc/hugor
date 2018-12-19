@@ -207,7 +207,7 @@ playStream( HUGO_FILE infile, long reslength, char loop_flag, bool isMusic )
 
     // Create an RWops for the embedded media resource.
     SDL_RWops* rwops = RWFromMediaBundle(infile->get(), reslength);
-    if (rwops == 0) {
+    if (rwops == nullptr) {
         qWarning() << "ERROR:" << SDL_GetError();
         delete infile;
         return false;
@@ -215,7 +215,8 @@ playStream( HUGO_FILE infile, long reslength, char loop_flag, bool isMusic )
 
     if (not isMusic) {
         decoder = std::make_unique<Aulib::AudioDecoderSndfile>();
-    } else switch (resource_type) {
+    } else {
+        switch (resource_type) {
         case MIDI_R: {
             auto fsdec = std::make_unique<Aulib::AudioDecoderFluidSynth>();
             if (hApp->settings()->soundFont.isEmpty() or not hApp->settings()->useCustomSoundFont) {
@@ -227,7 +228,7 @@ playStream( HUGO_FILE infile, long reslength, char loop_flag, bool isMusic )
             }
             fsdec->setGain(hApp->settings()->synthGain);
             fsynthDec() = fsdec.get();
-            decoder.reset(fsdec.release());
+            decoder = std::move(fsdec);
             break;
         }
         case XM_R:
@@ -243,6 +244,7 @@ playStream( HUGO_FILE infile, long reslength, char loop_flag, bool isMusic )
         default:
             qWarning() << "ERROR: Unknown music resource type";
             return false;
+        }
     }
 
     stream = std::make_unique<Aulib::AudioStream>(rwops, std::move(decoder),
@@ -269,14 +271,14 @@ playStream( HUGO_FILE infile, long reslength, char loop_flag, bool isMusic )
 
 
 void
-HugoHandlers::playmusic(HUGO_FILE infile, long reslength, char loop_flag, int* result)
+HugoHandlers::playmusic(HUGO_FILE infile, long reslength, char loop_flag, int* result) const
 {
     *result = playStream(infile, reslength, loop_flag, true);
 }
 
 
 void
-HugoHandlers::musicvolume(int vol)
+HugoHandlers::musicvolume(int vol) const
 {
     if (vol < 0) {
         vol = 0;
@@ -294,7 +296,7 @@ HugoHandlers::musicvolume(int vol)
 
 
 void
-HugoHandlers::stopmusic()
+HugoHandlers::stopmusic() const
 {
     if (musicStream()) {
         musicStream()->stop();
@@ -303,14 +305,14 @@ HugoHandlers::stopmusic()
 
 
 void
-HugoHandlers::playsample(HUGO_FILE infile, long reslength, char loop_flag, int* result)
+HugoHandlers::playsample(HUGO_FILE infile, long reslength, char loop_flag, int* result) const
 {
     *result = playStream(infile, reslength, loop_flag, false);
 }
 
 
 void
-HugoHandlers::samplevolume(int vol)
+HugoHandlers::samplevolume(int vol) const
 {
     if (vol < 0) {
         vol = 0;
@@ -325,7 +327,7 @@ HugoHandlers::samplevolume(int vol)
 
 
 void
-HugoHandlers::stopsample()
+HugoHandlers::stopsample() const
 {
     if (sampleStream()) {
         sampleStream()->stop();
