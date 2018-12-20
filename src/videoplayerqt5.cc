@@ -46,6 +46,17 @@ void initVideoEngine(int& /*argc*/, char* /*argv*/[])
 void closeVideoEngine()
 { }
 
+void
+muteVideo(bool /*mute*/)
+{
+    // TODO
+}
+
+void
+updateVideoVolume()
+{
+    // TODO
+}
 
 VideoPlayer::VideoPlayer(QWidget *parent)
     : QWidget(parent)
@@ -118,6 +129,11 @@ VideoPlayer::stop()
     d->fMediaPlayer->stop();
 }
 
+void
+VideoPlayer::updateVolume()
+{
+    // TODO
+}
 
 void
 VideoPlayer::setVolume(int vol)
@@ -125,6 +141,11 @@ VideoPlayer::setVolume(int vol)
     d->fMediaPlayer->setVolume(vol);
 }
 
+void
+VideoPlayer::setMute(bool /*mute*/)
+{
+    // TODO
+}
 
 void
 VideoPlayer::resizeEvent(QResizeEvent* e)
