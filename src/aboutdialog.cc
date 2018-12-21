@@ -25,17 +25,17 @@
  * include the source code for the parts of the Hugo Engine used as well as
  * that of the covered work.
  */
+#include "aboutdialog.h"
+
 extern "C" {
 #include "heheader.h"
 }
-#include "version.h"
-#include "aboutdialog.h"
 #include "ui_aboutdialog.h"
+#include "version.h"
 
-
-AboutDialog::AboutDialog( QWidget* parent )
-    : QDialog(parent, Qt::WindowTitleHint | Qt::WindowSystemMenuHint),
-      ui(new Ui::AboutDialog)
+AboutDialog::AboutDialog(QWidget* parent)
+    : QDialog(parent, Qt::WindowTitleHint | Qt::WindowSystemMenuHint)
+    , ui(new Ui::AboutDialog)
 {
     ui->setupUi(this);
 
@@ -43,15 +43,14 @@ AboutDialog::AboutDialog( QWidget* parent )
     QString str("<p>Hugor v");
     str += HUGOR_VERSION;
     str += QLatin1String("<br>Hugo engine v");
-    str += QString::number(HEVERSION) + "." + QString::number(HEREVISION)
-           + HEINTERIM + "</p>";
+    str += QString::number(HEVERSION) + "." + QString::number(HEREVISION) + HEINTERIM + "</p>";
 
-    str += "<p>For bug reports or any other form of feedback, you can send email"
-            " to <a href=\"mailto:realnc@gmail.com\">realnc@gmail.com</a></p>";
+    str +=
+        "<p>For bug reports or any other form of feedback, you can send email"
+        " to <a href=\"mailto:realnc@gmail.com\">realnc@gmail.com</a></p>";
 
     ui->aboutLabel->setText(ui->aboutLabel->text() + str);
 }
-
 
 AboutDialog::~AboutDialog()
 {

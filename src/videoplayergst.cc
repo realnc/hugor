@@ -25,36 +25,34 @@
  * include the source code for the parts of the Hugo Engine used as well as
  * that of the covered work.
  */
+#include "hugodefs.h"
 #include "videoplayer.h"
-#include "videoplayergst_p.h"
 
-#include <QResizeEvent>
-#include <QErrorMessage>
 #include <QDebug>
+#include <QErrorMessage>
+#include <QResizeEvent>
+#include <SDL_rwops.h>
 #include <cmath>
 #include <glib.h>
-#include <gst/gstversion.h>
 #include <gst/gstelement.h>
 #include <gst/gstpipeline.h>
+#include <gst/gstversion.h>
+#include <gst/video/video.h>
 #if GST_CHECK_VERSION(1, 0, 0)
 #include <gst/video/videooverlay.h>
 #else
 #include <gst/interfaces/xoverlay.h>
 #endif
-#include <gst/video/video.h>
-#include <SDL_rwops.h>
 
 #include "happlication.h"
-#include "hmainwindow.h"
 #include "hframe.h"
-#include "settings.h"
+#include "hmainwindow.h"
 #include "rwopsbundle.h"
-#include "hugodefs.h"
-
+#include "settings.h"
+#include "videoplayergst_p.h"
 
 static bool isMuted = false;
 static VideoPlayer* currentVideo = nullptr;
-
 
 void muteVideo(bool mute)
 {
@@ -71,7 +69,6 @@ void muteVideo(bool mute)
     }
 }
 
-
 void updateVideoVolume()
 {
     if (currentVideo != nullptr) {
@@ -79,8 +76,7 @@ void updateVideoVolume()
     }
 }
 
-
-VideoPlayer::VideoPlayer(QWidget *parent)
+VideoPlayer::VideoPlayer(QWidget* parent)
     : QWidget(parent)
     , d(new VideoPlayer_priv(this, this))
 {
@@ -90,7 +86,6 @@ VideoPlayer::VideoPlayer(QWidget *parent)
     setMouseTracking(true);
     d->setMouseTracking(true);
 }
-
 
 VideoPlayer::~VideoPlayer()
 {
@@ -109,56 +104,48 @@ VideoPlayer::~VideoPlayer()
     }
 }
 
-
 extern "C" {
 
 #if not GST_CHECK_VERSION(1, 0, 0)
-static void
-cbSyncMessage(GstBus*, GstMessage* message, gpointer userData)
+static void cbSyncMessage(GstBus*, GstMessage* message, gpointer userData)
 {
     if (GST_MESSAGE_TYPE(message) == GST_MESSAGE_ELEMENT
-        and gst_structure_has_name(message->structure, "prepare-xwindow-id"))
-    {
-         GstElement* sink = GST_ELEMENT(GST_MESSAGE_SRC(message));
-         gst_x_overlay_set_window_handle(GST_X_OVERLAY(GST_MESSAGE_SRC(message)),
-                                         (guintptr)static_cast<QWidget*>(userData)->winId());
-         g_object_set(sink, "force-aspect-ratio", true, NULL);
-     }
+        and gst_structure_has_name(message->structure, "prepare-xwindow-id")) {
+        GstElement* sink = GST_ELEMENT(GST_MESSAGE_SRC(message));
+        gst_x_overlay_set_window_handle(GST_X_OVERLAY(GST_MESSAGE_SRC(message)),
+                                        (guintptr) static_cast<QWidget*>(userData)->winId());
+        g_object_set(sink, "force-aspect-ratio", true, NULL);
+    }
 }
 #endif
 
-
-static void
-cbOnBusMessage(GstBus* /*bus*/, GstMessage* message, gpointer d)
+static void cbOnBusMessage(GstBus* /*bus*/, GstMessage* message, gpointer d)
 {
     VideoPlayer_priv::cbOnBusMessage(message, static_cast<VideoPlayer_priv*>(d));
 }
 
-
-static void
-cbOnSourceSetup(GstPipeline* /*pipeline*/, GstAppSrc* source, gpointer d)
+static void cbOnSourceSetup(GstPipeline* /*pipeline*/, GstAppSrc* source, gpointer d)
 {
     VideoPlayer_priv::cbOnSourceSetup(source, static_cast<VideoPlayer_priv*>(d));
 }
 
 } // extern "C"
 
-
-bool
-VideoPlayer::loadVideo(FILE* src, long len, bool loop)
+bool VideoPlayer::loadVideo(FILE* src, long len, bool loop)
 {
     if (d->fPipeline == nullptr) {
         const char* playbinName =
 #if GST_CHECK_VERSION(1, 0, 0)
-                "playbin";
+            "playbin";
 #else
-                "playbin2";
+            "playbin2";
 #endif
         d->fPipeline = gst_element_factory_make(playbinName, nullptr);
         if (d->fPipeline == nullptr) {
-            hMainWin->errorMsgObj()->showMessage(tr("Unable to play video. You are "
-                                                    "probably missing the GStreamer plugins "
-                                                    "from the \"gst-plugins-base\" set."));
+            hMainWin->errorMsgObj()->showMessage(
+                tr("Unable to play video. You are "
+                   "probably missing the GStreamer plugins "
+                   "from the \"gst-plugins-base\" set."));
             return false;
         }
 
@@ -172,8 +159,8 @@ VideoPlayer::loadVideo(FILE* src, long len, bool loop)
         g_object_set(d->fPipeline, "force-aspect-ratio", true, NULL);
         gst_video_overlay_set_window_handle(GST_VIDEO_OVERLAY(d->fPipeline), (guintptr)d->winId());
 #else
-        // With gst 0.10, we need to be informed when a video sink is added
-        // so we can configure it later.
+        // With gst 0.10, we need to be informed when a video sink is added so we can configure it
+        // later.
         gst_bus_enable_sync_message_emission(d->fBus);
         g_signal_connect(d->fBus, "sync-message", G_CALLBACK(cbSyncMessage), d);
 #endif
@@ -194,9 +181,7 @@ VideoPlayer::loadVideo(FILE* src, long len, bool loop)
     return true;
 }
 
-
-void
-VideoPlayer::play()
+void VideoPlayer::play()
 {
     if (d->fPipeline == nullptr) {
         return;
@@ -212,21 +197,19 @@ VideoPlayer::play()
     if (fLooping) {
         // Wait for the pipeline to transition into the playing state.
         gst_element_get_state(d->fPipeline, nullptr, nullptr, GST_CLOCK_TIME_NONE);
-        // Seek to the end the first time so that there's no pause before
-        // the first segment message arrives.
-        if (not gst_element_seek(d->fPipeline, 1.0, GST_FORMAT_TIME,
-                                 (GstSeekFlags)((int)GST_SEEK_FLAG_FLUSH | (int)GST_SEEK_FLAG_SEGMENT),
-                                 GST_SEEK_TYPE_END, 0, GST_SEEK_TYPE_NONE, GST_CLOCK_TIME_NONE))
-        {
+        // Seek to the end the first time so that there's no pause before the first segment message
+        // arrives.
+        if (not gst_element_seek(
+                d->fPipeline, 1.0, GST_FORMAT_TIME,
+                (GstSeekFlags)((int)GST_SEEK_FLAG_FLUSH | (int)GST_SEEK_FLAG_SEGMENT),
+                GST_SEEK_TYPE_END, 0, GST_SEEK_TYPE_NONE, GST_CLOCK_TIME_NONE)) {
             qWarning() << "Sending initial video seek event failed.";
             stop();
         }
     }
 }
 
-
-void
-VideoPlayer::stop()
+void VideoPlayer::stop()
 {
     if (d->fPipeline != nullptr) {
         gst_element_set_state(d->fPipeline, GST_STATE_NULL);
@@ -235,18 +218,14 @@ VideoPlayer::stop()
     }
 }
 
-
-void
-VideoPlayer::updateVolume()
+void VideoPlayer::updateVolume()
 {
     if (d->fPipeline != nullptr) {
         setVolume(d->fVolume);
     }
 }
 
-
-void
-VideoPlayer::setVolume(int vol)
+void VideoPlayer::setVolume(int vol)
 {
     if (d->fPipeline == nullptr) {
         return;
@@ -258,25 +237,20 @@ VideoPlayer::setVolume(int vol)
     }
     d->fVolume = vol;
 
-    // Attenuate the result by the global volume setting. Use an exponential
-    // volume scale. Use the second power instead of the third to be consistent
-    // with the SDL audio volume.
+    // Attenuate the result by the global volume setting. Use an exponential volume scale. Use the
+    // second power instead of the third to be consistent with the SDL audio volume.
     g_object_set(d->fPipeline, "volume",
-                 std::pow(((gdouble)vol * hApp->settings()->soundVolume) / 10000.0, 2),
-                 NULL);
+                 std::pow(((gdouble)vol * hApp->settings()->soundVolume) / 10000.0, 2), NULL);
 }
 
-
-void
-VideoPlayer::setMute(bool mute)
+void VideoPlayer::setMute(bool mute)
 {
     if (d->fPipeline != nullptr) {
         g_object_set(d->fPipeline, "mute", mute, NULL);
     }
 }
 
-void
-VideoPlayer::resizeEvent(QResizeEvent* e)
+void VideoPlayer::resizeEvent(QResizeEvent* e)
 {
     QWidget::resizeEvent(e);
     d->resize(e->size());

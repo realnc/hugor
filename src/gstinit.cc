@@ -32,10 +32,9 @@
 #include "happlication.h"
 #include "settings.h"
 
-
 #ifdef Q_OS_WIN
 extern "C" {
-//GST_PLUGIN_STATIC_DECLARE(accurip);
+// GST_PLUGIN_STATIC_DECLARE(accurip);
 GST_PLUGIN_STATIC_DECLARE(adder);
 GST_PLUGIN_STATIC_DECLARE(adpcmdec);
 GST_PLUGIN_STATIC_DECLARE(adpcmenc);
@@ -52,23 +51,23 @@ GST_PLUGIN_STATIC_DECLARE(audioparsers);
 GST_PLUGIN_STATIC_DECLARE(audiorate);
 GST_PLUGIN_STATIC_DECLARE(audioresample);
 GST_PLUGIN_STATIC_DECLARE(audiotestsrc);
-//GST_PLUGIN_STATIC_DECLARE(audiovisualizers);
+// GST_PLUGIN_STATIC_DECLARE(audiovisualizers);
 GST_PLUGIN_STATIC_DECLARE(auparse);
 GST_PLUGIN_STATIC_DECLARE(autoconvert);
 GST_PLUGIN_STATIC_DECLARE(autodetect);
 GST_PLUGIN_STATIC_DECLARE(avi);
 GST_PLUGIN_STATIC_DECLARE(bayer);
-//GST_PLUGIN_STATIC_DECLARE(bz2);
-//GST_PLUGIN_STATIC_DECLARE(cairo);
+// GST_PLUGIN_STATIC_DECLARE(bz2);
+// GST_PLUGIN_STATIC_DECLARE(cairo);
 GST_PLUGIN_STATIC_DECLARE(camerabin);
 GST_PLUGIN_STATIC_DECLARE(coloreffects);
 GST_PLUGIN_STATIC_DECLARE(compositor);
 GST_PLUGIN_STATIC_DECLARE(coreelements);
 GST_PLUGIN_STATIC_DECLARE(cutter);
 GST_PLUGIN_STATIC_DECLARE(d3dsinkwrapper);
-//GST_PLUGIN_STATIC_DECLARE(dataurisrc);
-//GST_PLUGIN_STATIC_DECLARE(debug);
-//GST_PLUGIN_STATIC_DECLARE(debugutilsbad);
+// GST_PLUGIN_STATIC_DECLARE(dataurisrc);
+// GST_PLUGIN_STATIC_DECLARE(debug);
+// GST_PLUGIN_STATIC_DECLARE(debugutilsbad);
 GST_PLUGIN_STATIC_DECLARE(directsound);
 GST_PLUGIN_STATIC_DECLARE(directsoundsrc);
 GST_PLUGIN_STATIC_DECLARE(dtmf);
@@ -106,19 +105,19 @@ GST_PLUGIN_STATIC_DECLARE(libav);
 GST_PLUGIN_STATIC_DECLARE(liveadder);
 GST_PLUGIN_STATIC_DECLARE(matroska);
 GST_PLUGIN_STATIC_DECLARE(midi);
-//GST_PLUGIN_STATIC_DECLARE(modplug);
+// GST_PLUGIN_STATIC_DECLARE(modplug);
 GST_PLUGIN_STATIC_DECLARE(mpegpsdemux);
 GST_PLUGIN_STATIC_DECLARE(mpegpsmux);
 GST_PLUGIN_STATIC_DECLARE(mpegtsdemux);
 GST_PLUGIN_STATIC_DECLARE(mpegtsmux);
-//GST_PLUGIN_STATIC_DECLARE(mpg123);
+// GST_PLUGIN_STATIC_DECLARE(mpg123);
 GST_PLUGIN_STATIC_DECLARE(mulaw);
 GST_PLUGIN_STATIC_DECLARE(multifile);
 GST_PLUGIN_STATIC_DECLARE(multipart);
 GST_PLUGIN_STATIC_DECLARE(mxf);
 GST_PLUGIN_STATIC_DECLARE(navigationtest);
-//GST_PLUGIN_STATIC_DECLARE(ogg);
-//GST_PLUGIN_STATIC_DECLARE(opengl);
+// GST_PLUGIN_STATIC_DECLARE(ogg);
+// GST_PLUGIN_STATIC_DECLARE(opengl);
 GST_PLUGIN_STATIC_DECLARE(pcapparse);
 GST_PLUGIN_STATIC_DECLARE(playback);
 GST_PLUGIN_STATIC_DECLARE(png);
@@ -134,8 +133,8 @@ GST_PLUGIN_STATIC_DECLARE(segmentclip);
 GST_PLUGIN_STATIC_DECLARE(shapewipe);
 GST_PLUGIN_STATIC_DECLARE(smooth);
 GST_PLUGIN_STATIC_DECLARE(smpte);
-//GST_PLUGIN_STATIC_DECLARE(sndfile);
-//GST_PLUGIN_STATIC_DECLARE(spectrum);
+// GST_PLUGIN_STATIC_DECLARE(sndfile);
+// GST_PLUGIN_STATIC_DECLARE(spectrum);
 GST_PLUGIN_STATIC_DECLARE(speed);
 GST_PLUGIN_STATIC_DECLARE(stereo);
 GST_PLUGIN_STATIC_DECLARE(subenc);
@@ -156,7 +155,7 @@ GST_PLUGIN_STATIC_DECLARE(videosignal);
 GST_PLUGIN_STATIC_DECLARE(videotestsrc);
 GST_PLUGIN_STATIC_DECLARE(vmnc);
 GST_PLUGIN_STATIC_DECLARE(volume);
-//GST_PLUGIN_STATIC_DECLARE(vorbis);
+// GST_PLUGIN_STATIC_DECLARE(vorbis);
 GST_PLUGIN_STATIC_DECLARE(wasapi);
 GST_PLUGIN_STATIC_DECLARE(waveform);
 GST_PLUGIN_STATIC_DECLARE(wavenc);
@@ -168,11 +167,9 @@ GST_PLUGIN_STATIC_DECLARE(y4menc);
 GST_PLUGIN_STATIC_DECLARE(yadif);
 } // extern "C"
 
-
-static void
-registerGstStaticPlugins()
+static void registerGstStaticPlugins()
 {
-//    GST_PLUGIN_STATIC_REGISTER(accurip);
+    //    GST_PLUGIN_STATIC_REGISTER(accurip);
     GST_PLUGIN_STATIC_REGISTER(adder);
     GST_PLUGIN_STATIC_REGISTER(adpcmdec);
     GST_PLUGIN_STATIC_REGISTER(adpcmenc);
@@ -189,23 +186,23 @@ registerGstStaticPlugins()
     GST_PLUGIN_STATIC_REGISTER(audiorate);
     GST_PLUGIN_STATIC_REGISTER(audioresample);
     GST_PLUGIN_STATIC_REGISTER(audiotestsrc);
-//    GST_PLUGIN_STATIC_REGISTER(audiovisualizers);
+    //    GST_PLUGIN_STATIC_REGISTER(audiovisualizers);
     GST_PLUGIN_STATIC_REGISTER(auparse);
     GST_PLUGIN_STATIC_REGISTER(autoconvert);
     GST_PLUGIN_STATIC_REGISTER(autodetect);
     GST_PLUGIN_STATIC_REGISTER(avi);
     GST_PLUGIN_STATIC_REGISTER(bayer);
-//    GST_PLUGIN_STATIC_REGISTER(bz2);
-//    GST_PLUGIN_STATIC_REGISTER(cairo);
+    //    GST_PLUGIN_STATIC_REGISTER(bz2);
+    //    GST_PLUGIN_STATIC_REGISTER(cairo);
     GST_PLUGIN_STATIC_REGISTER(camerabin);
     GST_PLUGIN_STATIC_REGISTER(coloreffects);
     GST_PLUGIN_STATIC_REGISTER(compositor);
     GST_PLUGIN_STATIC_REGISTER(coreelements);
     GST_PLUGIN_STATIC_REGISTER(cutter);
     GST_PLUGIN_STATIC_REGISTER(d3dsinkwrapper);
-//    GST_PLUGIN_STATIC_REGISTER(dataurisrc);
-//    GST_PLUGIN_STATIC_REGISTER(debug);
-//    GST_PLUGIN_STATIC_REGISTER(debugutilsbad);
+    //    GST_PLUGIN_STATIC_REGISTER(dataurisrc);
+    //    GST_PLUGIN_STATIC_REGISTER(debug);
+    //    GST_PLUGIN_STATIC_REGISTER(debugutilsbad);
     GST_PLUGIN_STATIC_REGISTER(directsound);
     GST_PLUGIN_STATIC_REGISTER(directsoundsrc);
     GST_PLUGIN_STATIC_REGISTER(dtmf);
@@ -243,19 +240,19 @@ registerGstStaticPlugins()
     GST_PLUGIN_STATIC_REGISTER(liveadder);
     GST_PLUGIN_STATIC_REGISTER(matroska);
     GST_PLUGIN_STATIC_REGISTER(midi);
-//    GST_PLUGIN_STATIC_REGISTER(modplug);
+    //    GST_PLUGIN_STATIC_REGISTER(modplug);
     GST_PLUGIN_STATIC_REGISTER(mpegpsdemux);
     GST_PLUGIN_STATIC_REGISTER(mpegpsmux);
     GST_PLUGIN_STATIC_REGISTER(mpegtsdemux);
     GST_PLUGIN_STATIC_REGISTER(mpegtsmux);
-//    GST_PLUGIN_STATIC_REGISTER(mpg123);
+    //    GST_PLUGIN_STATIC_REGISTER(mpg123);
     GST_PLUGIN_STATIC_REGISTER(mulaw);
     GST_PLUGIN_STATIC_REGISTER(multifile);
     GST_PLUGIN_STATIC_REGISTER(multipart);
     GST_PLUGIN_STATIC_REGISTER(mxf);
     GST_PLUGIN_STATIC_REGISTER(navigationtest);
-//    GST_PLUGIN_STATIC_REGISTER(ogg);
-//    GST_PLUGIN_STATIC_REGISTER(opengl);
+    //    GST_PLUGIN_STATIC_REGISTER(ogg);
+    //    GST_PLUGIN_STATIC_REGISTER(opengl);
     GST_PLUGIN_STATIC_REGISTER(pcapparse);
     GST_PLUGIN_STATIC_REGISTER(playback);
     GST_PLUGIN_STATIC_REGISTER(png);
@@ -271,8 +268,8 @@ registerGstStaticPlugins()
     GST_PLUGIN_STATIC_REGISTER(shapewipe);
     GST_PLUGIN_STATIC_REGISTER(smooth);
     GST_PLUGIN_STATIC_REGISTER(smpte);
-//    GST_PLUGIN_STATIC_REGISTER(sndfile);
-//    GST_PLUGIN_STATIC_REGISTER(spectrum);
+    //    GST_PLUGIN_STATIC_REGISTER(sndfile);
+    //    GST_PLUGIN_STATIC_REGISTER(spectrum);
     GST_PLUGIN_STATIC_REGISTER(speed);
     GST_PLUGIN_STATIC_REGISTER(stereo);
     GST_PLUGIN_STATIC_REGISTER(subenc);
@@ -293,7 +290,7 @@ registerGstStaticPlugins()
     GST_PLUGIN_STATIC_REGISTER(videotestsrc);
     GST_PLUGIN_STATIC_REGISTER(vmnc);
     GST_PLUGIN_STATIC_REGISTER(volume);
-//    GST_PLUGIN_STATIC_REGISTER(vorbis);
+    //    GST_PLUGIN_STATIC_REGISTER(vorbis);
     GST_PLUGIN_STATIC_REGISTER(wasapi);
     GST_PLUGIN_STATIC_REGISTER(waveform);
     GST_PLUGIN_STATIC_REGISTER(wavenc);
@@ -306,16 +303,17 @@ registerGstStaticPlugins()
 }
 #endif // Q_OS_WIN
 
-
 void initVideoEngine(int& argc, char* argv[])
 {
     GError* gstError = nullptr;
 
     if (not gst_init_check(&argc, &argv, &gstError)) {
-        QString errMsg(QObject::tr("Unable to use GStreamer. Video support will be "
-                                   "disabled."));
+        QString errMsg(
+            QObject::tr("Unable to use GStreamer. Video support will be "
+                        "disabled."));
         if (gstError->message != nullptr && qstrlen(gstError->message) > 0) {
-            errMsg += QObject::tr("The GStreamer error was: ") + QString::fromLocal8Bit(gstError->message);
+            errMsg += QObject::tr("The GStreamer error was: ")
+                      + QString::fromLocal8Bit(gstError->message);
         }
         g_error_free(gstError);
         QMessageBox::critical(nullptr, HApplication::applicationName(), errMsg);
@@ -327,6 +325,5 @@ void initVideoEngine(int& argc, char* argv[])
 #endif
 }
 
-
 void closeVideoEngine()
-{ }
+{}

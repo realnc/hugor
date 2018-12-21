@@ -27,31 +27,32 @@
  */
 #pragma once
 #include <QDialog>
+
 #include <memory>
 
 namespace Ui {
-    class ConfDialog;
+class ConfDialog;
 }
 
 namespace Aulib {
-    class AudioStream;
-    class AudioDecoderFluidSynth;
-}
+class AudioStream;
+class AudioDecoderFluidSynth;
+} // namespace Aulib
 
 class HMainWindow;
 
-class ConfDialog final: public QDialog {
+class ConfDialog final: public QDialog
+{
     Q_OBJECT
 
-  public:
-    ConfDialog( HMainWindow* parent = nullptr );
+public:
+    ConfDialog(HMainWindow* parent = nullptr);
     ~ConfDialog() override;
 
-  protected:
-    void
-    changeEvent( QEvent* e ) override;
+protected:
+    void changeEvent(QEvent* e) override;
 
-  private:
+private:
     Ui::ConfDialog* ui;
     int fInitialSoundVol;
     float fInitialGain;
@@ -61,28 +62,14 @@ class ConfDialog final: public QDialog {
 #endif
 
     // Makes the dialog's controls apply instantly when they change.
-    void
-    fMakeInstantApply();
+    void fMakeInstantApply();
 
-  private slots:
-    void
-    fApplySettings();
-
-    void
-    fCancel();
-
-    void
-    fSetSoundVolume(int vol);
-
-    void
-    fPlayTestMidi();
-
-    void
-    fStopTestMidi();
-
-    void
-    fSetGain();
-
-    void
-    fBrowseForSoundFont();
+private slots:
+    void fApplySettings();
+    void fCancel();
+    void fSetSoundVolume(int vol);
+    void fPlayTestMidi();
+    void fStopTestMidi();
+    void fSetGain();
+    void fBrowseForSoundFont();
 };

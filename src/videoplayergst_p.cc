@@ -26,31 +26,28 @@
  * that of the covered work.
  */
 #include "videoplayergst_p.h"
-#include "videoplayer.h"
 
 #include <QAbstractEventDispatcher>
-#include <QErrorMessage>
 #include <QDebug>
+#include <QErrorMessage>
 #include <QThread>
 #include <SDL_rwops.h>
+#include <cstring>
 #include <glib.h>
+#include <gst/app/gstappsrc.h>
 #include <gst/gstversion.h>
 #include <gst/video/video.h>
-#include <gst/app/gstappsrc.h>
-#include <cstring>
 
 #include "happlication.h"
 #include "hmainwindow.h"
-
+#include "videoplayer.h"
 
 GMainLoop* VideoPlayer_priv::fGMainLoop = nullptr;
 GThread* VideoPlayer_priv::fGMainLoopThread = nullptr;
 
-
 extern "C" {
 
-static gpointer
-glibMainLoopThreadFunc(gpointer /*unused*/)
+static gpointer glibMainLoopThreadFunc(gpointer /*unused*/)
 {
     VideoPlayer_priv::fGMainLoop = g_main_loop_new(nullptr, false);
     g_main_loop_run(VideoPlayer_priv::fGMainLoop);
@@ -61,29 +58,24 @@ glibMainLoopThreadFunc(gpointer /*unused*/)
 
 } // extern "C"
 
-
 VideoPlayer_priv::VideoPlayer_priv(QWidget* parent, VideoPlayer* qPtr)
     : QWidget(parent)
     , q(qPtr)
 {
     memset(&fAppSrcCbs, 0, sizeof(fAppSrcCbs));
 
-    // If the version of Qt we're running in does not use GLib, we need to
-    // start a GMainLoop so that gstreamer can dispatch events.
+    // If the version of Qt we're running in does not use GLib, we need to start a GMainLoop so that
+    // gstreamer can dispatch events.
     const QMetaObject* mo = QAbstractEventDispatcher::instance(hApp->thread())->metaObject();
-    if (fGMainLoop == nullptr
-        && strcmp(mo->className(), "QEventDispatcherGlib") != 0
-        && strcmp(mo->superClass()->className(), "QEventDispatcherGlib") != 0)
-    {
+    if (fGMainLoop == nullptr && strcmp(mo->className(), "QEventDispatcherGlib") != 0
+        && strcmp(mo->superClass()->className(), "QEventDispatcherGlib") != 0) {
         fGMainLoopThread = g_thread_new(nullptr, glibMainLoopThreadFunc, nullptr);
     }
 }
 
-
 extern "C" {
 
-static void
-cbAppsrcNeedData(GstAppSrc* src, guint length, gpointer userData)
+static void cbAppsrcNeedData(GstAppSrc* src, guint length, gpointer userData)
 {
     if (length == (guint)-1) {
         // We're free to push any amount of bytes.
@@ -118,31 +110,26 @@ cbAppsrcNeedData(GstAppSrc* src, guint length, gpointer userData)
     }
 }
 
-static gboolean
-cbAppSrcSeekData(GstAppSrc* /*appsrc*/, guint64 offset, gpointer rwops)
+static gboolean cbAppSrcSeekData(GstAppSrc* /*appsrc*/, guint64 offset, gpointer rwops)
 {
     return SDL_RWseek(static_cast<SDL_RWops*>(rwops), offset, RW_SEEK_SET) == (int)offset;
 }
 
 } // extern "C"
 
-
-void
-VideoPlayer_priv::adjustForVideoSize(QSize vidSize)
+void VideoPlayer_priv::adjustForVideoSize(QSize vidSize)
 {
     if (vidSize.width() > maximumWidth() or vidSize.height() > maximumHeight()) {
         vidSize.scale(maximumSize(), Qt::KeepAspectRatio);
     }
     q->setGeometry(q->x() + (maximumWidth() - vidSize.width()) / 2,
-                   q->y() + (maximumHeight() - vidSize.height()) / 2,
-                   vidSize.width(), vidSize.height());
+                   q->y() + (maximumHeight() - vidSize.height()) / 2, vidSize.width(),
+                   vidSize.height());
     q->setMaximumSize(vidSize);
     setMaximumSize(vidSize);
 }
 
-
-void
-VideoPlayer_priv::cbOnSourceSetup(GstAppSrc* source, VideoPlayer_priv* d)
+void VideoPlayer_priv::cbOnSourceSetup(GstAppSrc* source, VideoPlayer_priv* d)
 {
     d->fAppSrc = source;
     gst_app_src_set_stream_type(source, GST_APP_STREAM_TYPE_RANDOM_ACCESS);
@@ -155,89 +142,87 @@ VideoPlayer_priv::cbOnSourceSetup(GstAppSrc* source, VideoPlayer_priv* d)
     gst_app_src_set_size(source, d->q->fDataLen);
 }
 
-
-void
-VideoPlayer_priv::cbOnBusMessage(GstMessage* message, VideoPlayer_priv* d)
+void VideoPlayer_priv::cbOnBusMessage(GstMessage* message, VideoPlayer_priv* d)
 {
     Qt::ConnectionType conType =
         fGMainLoop == nullptr ? Qt::DirectConnection : Qt::BlockingQueuedConnection;
 
     switch (GST_MESSAGE_TYPE(message)) {
-        case GST_MESSAGE_STATE_CHANGED: {
-            if (GST_MESSAGE_SRC(message) != GST_OBJECT(d->fPipeline)) {
-                // The state change doesn't belong to our pipeline.
+    case GST_MESSAGE_STATE_CHANGED: {
+        if (GST_MESSAGE_SRC(message) != GST_OBJECT(d->fPipeline)) {
+            // The state change doesn't belong to our pipeline.
+            break;
+        }
+        // If the video is now ready to play, the pipeline will be in the paused state and will have
+        // negotiated the caps. Extract the video resolution from the caps object so that we can
+        // resize our window in case it's smaller than us (we don't allow the video to scale to a
+        // larger size than its own resolution.)
+        GstState oldState, newState, pendingState;
+        gst_message_parse_state_changed(message, &oldState, &newState, &pendingState);
+        if (newState == GST_STATE_PLAYING) {
+            QMetaObject::invokeMethod(d->q, "show", conType);
+        }
+        if (newState == GST_STATE_PAUSED) {
+            GstPad* vidpad = nullptr;
+            g_signal_emit_by_name(d->fPipeline, "get-video-pad", 0, &vidpad, 0);
+            if (vidpad == nullptr) {
                 break;
             }
-            // If the video is now ready to play, the pipeline will be in the
-            // paused state and will have negotiated the caps. Extract the video
-            // resolution from the caps object so that we can resize our window
-            // in case it's smaller than us (we don't allow the video to scale
-            // to a larger size than its own resolution.)
-            GstState oldState, newState, pendingState;
-            gst_message_parse_state_changed(message, &oldState, &newState, &pendingState);
-            if (newState == GST_STATE_PLAYING) {
-                QMetaObject::invokeMethod(d->q, "show", conType);
-            } if (newState == GST_STATE_PAUSED) {
-                GstPad* vidpad = nullptr;
-                g_signal_emit_by_name(d->fPipeline, "get-video-pad", 0, &vidpad, 0);
-                if (vidpad == nullptr) {
-                    break;
-                }
 #if GST_CHECK_VERSION(1, 0, 0)
-                GstCaps* caps = gst_pad_get_current_caps(vidpad);
+            GstCaps* caps = gst_pad_get_current_caps(vidpad);
 #else
-                GstCaps* caps = gst_pad_get_negotiated_caps(vidpad);
+            GstCaps* caps = gst_pad_get_negotiated_caps(vidpad);
 #endif
-                if (caps == nullptr) {
-                    break;
-                }
-                gst_caps_unref(caps);
-                gint vidWidth, vidHeight;
+            if (caps == nullptr) {
+                break;
+            }
+            gst_caps_unref(caps);
+            gint vidWidth, vidHeight;
 #if GST_CHECK_VERSION(1, 0, 0)
-                GstVideoInfo vidInfo;
-                gst_video_info_init(&vidInfo);
-                if (gst_video_info_from_caps(&vidInfo, caps)) {
-                    vidWidth = vidInfo.width;
-                    vidHeight = vidInfo.height;
-                } else {
-                    break;
-                }
+            GstVideoInfo vidInfo;
+            gst_video_info_init(&vidInfo);
+            if (gst_video_info_from_caps(&vidInfo, caps)) {
+                vidWidth = vidInfo.width;
+                vidHeight = vidInfo.height;
+            } else {
+                break;
+            }
 #else
-                if (not gst_video_get_size(vidpad, &vidWidth, &vidHeight)) {
-                    break;
-                }
+            if (not gst_video_get_size(vidpad, &vidWidth, &vidHeight)) {
+                break;
+            }
 #endif
-                // Make sure that we won't end up being enlarged; we only allow our
-                // window to shrink. The video must be scaled down if it's too large.
-                QMetaObject::invokeMethod(d, "adjustForVideoSize", conType,
-                                          Q_ARG(QSize, QSize(vidWidth, vidHeight)));
-            }
-            break;
+            // Make sure that we won't end up being enlarged; we only allow our window to shrink.
+            // The video must be scaled down if it's too large.
+            QMetaObject::invokeMethod(d, "adjustForVideoSize", conType,
+                                      Q_ARG(QSize, QSize(vidWidth, vidHeight)));
         }
+        break;
+    }
 
-        case GST_MESSAGE_SEGMENT_DONE:
-            if (not gst_element_seek_simple(d->fPipeline, GST_FORMAT_TIME, GST_SEEK_FLAG_SEGMENT, 0)) {
-                qWarning() << "Sending video seek event failed.";
-            }
-            break;
-
-        case GST_MESSAGE_EOS:
-            QMetaObject::invokeMethod(d->q, "stop", conType);
-            break;
-
-        case GST_MESSAGE_ERROR: {
-            QString errorStr(tr("Unable to play video: "));
-            GError* gErr = nullptr;
-            gst_message_parse_error(message, &gErr, nullptr);
-            errorStr += gErr->message;
-            QMetaObject::invokeMethod(hMainWin->errorMsgObj(), "showMessage", Q_ARG(QString, errorStr));
-            QMetaObject::invokeMethod(d->q, "stop", conType);
-            g_error_free(gErr);
-            emit d->q->errorOccurred();
-            break;
+    case GST_MESSAGE_SEGMENT_DONE:
+        if (not gst_element_seek_simple(d->fPipeline, GST_FORMAT_TIME, GST_SEEK_FLAG_SEGMENT, 0)) {
+            qWarning() << "Sending video seek event failed.";
         }
+        break;
 
-        default:
-            break;
+    case GST_MESSAGE_EOS:
+        QMetaObject::invokeMethod(d->q, "stop", conType);
+        break;
+
+    case GST_MESSAGE_ERROR: {
+        QString errorStr(tr("Unable to play video: "));
+        GError* gErr = nullptr;
+        gst_message_parse_error(message, &gErr, nullptr);
+        errorStr += gErr->message;
+        QMetaObject::invokeMethod(hMainWin->errorMsgObj(), "showMessage", Q_ARG(QString, errorStr));
+        QMetaObject::invokeMethod(d->q, "stop", conType);
+        g_error_free(gErr);
+        emit d->q->errorOccurred();
+        break;
+    }
+
+    default:
+        break;
     }
 }

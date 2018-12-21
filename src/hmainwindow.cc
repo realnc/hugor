@@ -25,43 +25,42 @@
  * include the source code for the parts of the Hugo Engine used as well as
  * that of the covered work.
  */
+#include "hmainwindow.h"
+
+#include <QCloseEvent>
 #include <QDebug>
+#include <QErrorMessage>
+#include <QLabel>
+#include <QLayout>
 #include <QMenuBar>
 #include <QMessageBox>
-#include <QCloseEvent>
-#include <QLayout>
-#include <QTextEdit>
-#include <QTextCodec>
 #include <QScrollBar>
-#include <QLabel>
+#include <QTextCodec>
+#include <QTextEdit>
 #include <QWindowStateChangeEvent>
-#include <QErrorMessage>
 
-#include "hmainwindow.h"
-#include "happlication.h"
-#include "hframe.h"
-#include "hscrollback.h"
-#include "hmarginwidget.h"
-#include "confdialog.h"
 #include "aboutdialog.h"
-#include "settings.h"
-#include "hugodefs.h"
+#include "confdialog.h"
+#include "happlication.h"
 extern "C" {
 #include "heheader.h"
 }
+#include "hframe.h"
+#include "hmarginwidget.h"
+#include "hscrollback.h"
+#include "hugodefs.h"
+#include "settings.h"
 
 HMainWindow* hMainWin = nullptr;
 
-
-HMainWindow::HMainWindow( QWidget* parent )
+HMainWindow::HMainWindow(QWidget* parent)
     : QMainWindow(parent)
     , fFullscreenEnterIcon(QIcon::fromTheme(QStringLiteral("view-fullscreen")))
     , fFullscreenExitIcon(QIcon::fromTheme(QStringLiteral("view-restore")))
 {
     Q_ASSERT(hMainWin == nullptr);
 
-    // We make our menu bar parentless so it will be shared by all our windows
-    // in Mac OS X.
+    // We make our menu bar parentless so it will be shared by all our windows in Mac OS X.
     auto* menuBar = new QMenuBar(nullptr);
 #ifndef Q_OS_MAC
     setMenuBar(menuBar);
@@ -127,8 +126,7 @@ HMainWindow::HMainWindow( QWidget* parent )
 
     fScrollbackWindow = new HScrollbackWindow(nullptr);
 
-    // Use a sane minimum size; by default Qt would allow us to be resized
-    // to almost zero.
+    // Use a sane minimum size; by default Qt would allow us to be resized to almost zero.
     setMinimumSize(240, 180);
 
     fErrorMsg = new QErrorMessage(this);
@@ -137,9 +135,7 @@ HMainWindow::HMainWindow( QWidget* parent )
     hMainWin = this;
 }
 
-
-void
-HMainWindow::fFullscreenAdjust()
+void HMainWindow::fFullscreenAdjust()
 {
     if (isFullScreen()) {
         fFullscreenAction->setIcon(fFullscreenExitIcon);
@@ -164,9 +160,7 @@ HMainWindow::fFullscreenAdjust()
     hFrame->updateGameScreen(true);
 }
 
-
-void
-HMainWindow::fShowConfDialog()
+void HMainWindow::fShowConfDialog()
 {
     // If the dialog is already open, simply activate and raise it.
     if (fConfDialog != nullptr) {
@@ -180,9 +174,7 @@ HMainWindow::fShowConfDialog()
     fConfDialog->show();
 }
 
-
-void
-HMainWindow::fHideConfDialog()
+void HMainWindow::fHideConfDialog()
 {
     if (fConfDialog != nullptr) {
         fConfDialog->deleteLater();
@@ -190,9 +182,7 @@ HMainWindow::fHideConfDialog()
     }
 }
 
-
-void
-HMainWindow::fShowAbout()
+void HMainWindow::fShowAbout()
 {
     // If the dialog is already open, simply activate and raise it.
     if (fAboutDialog != nullptr) {
@@ -206,9 +196,7 @@ HMainWindow::fShowAbout()
     fAboutDialog->show();
 }
 
-
-void
-HMainWindow::fHideAbout()
+void HMainWindow::fHideAbout()
 {
     if (fAboutDialog != nullptr) {
         fAboutDialog->deleteLater();
@@ -216,15 +204,13 @@ HMainWindow::fHideAbout()
     }
 }
 
-
-void
-HMainWindow::showScrollback()
+void HMainWindow::showScrollback()
 {
     // Make sure the mouse cursor is visible.
     hApp->marginWidget()->unsetCursor();
 
-    // If no overlay was requested and the scrollback is currently in its
-    // overlay mode, make it a regular window again.
+    // If no overlay was requested and the scrollback is currently in its overlay mode, make it a
+    // regular window again.
     if (not hApp->settings()->overlayScrollback) {
         hideScrollback();
         // If a widget has no parent, it will be displayed in a new window,
@@ -240,34 +226,33 @@ HMainWindow::showScrollback()
         return;
     }
 
-    // We need to overlay the scrollback. Remove the game window from view and
-    // replace it with the scrollback window if we haven't already done so.
+    // We need to overlay the scrollback. Remove the game window from view and replace it with the
+    // scrollback window if we haven't already done so.
     hApp->marginWidget()->removeWidget(hFrame);
     hApp->marginWidget()->setContentsMargins(0, 0, 0, 0);
     hApp->marginWidget()->addWidget(fScrollbackWindow);
     hApp->marginWidget()->setPalette(QApplication::palette(hApp->marginWidget()));
 
-    // Add a banner at the top so the user knows how to exit
-    // scrollback mode.
+    // Add a banner at the top so the user knows how to exit scrollback mode.
     QLabel* banner = new QLabel(fScrollbackWindow);
     banner->setAlignment(Qt::AlignCenter);
     banner->setContentsMargins(0, 3, 0, 3);
 
-    // Display the banner in reverse colors so that it's visible
-    // regardless of the desktop's color theme.
+    // Display the banner in reverse colors so that it's visible regardless of the desktop's color
+    // theme.
     QPalette pal = banner->palette();
     pal.setColor(QPalette::Window, fScrollbackWindow->palette().color(QPalette::WindowText));
     pal.setBrush(QPalette::WindowText, fScrollbackWindow->palette().color(QPalette::Base));
     banner->setPalette(pal);
     banner->setAutoFillBackground(true);
 
-    // Make the informational message clickable by displaying it as a
-    // link that closes the scrollback when clicked.
+    // Make the informational message clickable by displaying it as a link that closes the
+    // scrollback when clicked.
     QString bannerText("<html><style>a {text-decoration: none; color: ");
     bannerText += pal.color(QPalette::WindowText).name()
-               +  ";}</style><body>Scrollback (<a href='close'>Esc, "
-               +  QKeySequence(QKeySequence::Close).toString(QKeySequence::NativeText)
-               +  " or click here to exit</a>)</body></html>";
+                  + ";}</style><body>Scrollback (<a href='close'>Esc, "
+                  + QKeySequence(QKeySequence::Close).toString(QKeySequence::NativeText)
+                  + " or click here to exit</a>)</body></html>";
     banner->setText(bannerText);
     connect(banner, SIGNAL(linkActivated(QString)), SLOT(hideScrollback()));
 
@@ -277,9 +262,7 @@ HMainWindow::showScrollback()
     fScrollbackWindow->setFocus();
 }
 
-
-void
-HMainWindow::hideScrollback()
+void HMainWindow::hideScrollback()
 {
     // We only have cleanup work if a scrollback overlay is currently active.
     if (hApp->marginWidget()->layout()->indexOf(fScrollbackWindow) < 0) {
@@ -295,9 +278,7 @@ HMainWindow::hideScrollback()
     hFrame->setFocus();
 }
 
-
-void
-HMainWindow::toggleFullscreen()
+void HMainWindow::toggleFullscreen()
 {
     if (isFullScreen()) {
         showNormal();
@@ -316,9 +297,7 @@ HMainWindow::toggleFullscreen()
     fFullscreenAdjust();
 }
 
-
-void
-HMainWindow::setFullscreen( bool f )
+void HMainWindow::setFullscreen(bool f)
 {
     if ((f and isFullScreen()) or (not f and not isFullScreen())) {
         return;
@@ -326,19 +305,17 @@ HMainWindow::setFullscreen( bool f )
     toggleFullscreen();
 }
 
-
-void
-HMainWindow::closeEvent( QCloseEvent* e )
+void HMainWindow::closeEvent(QCloseEvent* e)
 {
     if (not hApp->gameRunning()) {
         QMainWindow::closeEvent(e);
         return;
     }
 
-    QMessageBox* msgBox = new QMessageBox(QMessageBox::Question,
-                                          tr("Quit") + ' ' + HApplication::applicationName(),
-                                          tr("Abandon the story and quit the application?"),
-                                          QMessageBox::Yes | QMessageBox::Cancel, this);
+    QMessageBox* msgBox =
+        new QMessageBox(QMessageBox::Question, tr("Quit") + ' ' + HApplication::applicationName(),
+                        tr("Abandon the story and quit the application?"),
+                        QMessageBox::Yes | QMessageBox::Cancel, this);
     msgBox->setDefaultButton(QMessageBox::Cancel);
     msgBox->setInformativeText(tr("Any unsaved progress in the story will be lost."));
 #ifdef Q_OS_MAC
@@ -357,12 +334,9 @@ HMainWindow::closeEvent( QCloseEvent* e )
     }
 }
 
-
-void
-HMainWindow::changeEvent( QEvent* e )
+void HMainWindow::changeEvent(QEvent* e)
 {
-    // Don't do anything special if the window state was not changed by the
-    // environment.
+    // Don't do anything special if the window state was not changed by the environment.
     if (e->type() != QEvent::WindowStateChange or not e->spontaneous()) {
         QMainWindow::changeEvent(e);
         return;
@@ -371,24 +345,20 @@ HMainWindow::changeEvent( QEvent* e )
     auto* chEv = static_cast<QWindowStateChangeEvent*>(e);
 
     if ((chEv->oldState().testFlag(Qt::WindowFullScreen) and not isFullScreen())
-        or (not chEv->oldState().testFlag(Qt::WindowFullScreen) and isFullScreen()))
-    {
+        or (not chEv->oldState().testFlag(Qt::WindowFullScreen) and isFullScreen())) {
         fFullscreenAdjust();
     } else if (chEv->oldState().testFlag(Qt::WindowMinimized) and not isMinimized()) {
         muteSound(false);
         muteVideo(false);
     } else if (hApp->settings()->muteWhenMinimized
-               and not chEv->oldState().testFlag(Qt::WindowMinimized) and isMinimized())
-    {
+               and not chEv->oldState().testFlag(Qt::WindowMinimized) and isMinimized()) {
         muteSound(true);
         muteVideo(true);
     }
     QMainWindow::changeEvent(e);
 }
 
-
-void
-HMainWindow::contextMenuEvent( QContextMenuEvent* e )
+void HMainWindow::contextMenuEvent(QContextMenuEvent* e)
 {
     QMenu menu(this);
     QList<const QAction*> actions = hFrame->getGameContextMenuEntries(menu);
@@ -413,9 +383,7 @@ HMainWindow::contextMenuEvent( QContextMenuEvent* e )
     hFrame->insertInputText(text, execute, true);
 }
 
-
-void
-HMainWindow::appendToScrollback( const QByteArray& str )
+void HMainWindow::appendToScrollback(const QByteArray& str)
 {
     if (str.isEmpty()) {
         return;
@@ -426,25 +394,19 @@ HMainWindow::appendToScrollback( const QByteArray& str )
     fScrollbackWindow->verticalScrollBar()->triggerAction(QScrollBar::SliderToMaximum);
 }
 
-
-void
-HMainWindow::hideMenuBar()
+void HMainWindow::hideMenuBar()
 {
     fMenuBarVisible = false;
     menuBar()->hide();
 }
 
-
-void
-HMainWindow::showMenuBar()
+void HMainWindow::showMenuBar()
 {
     fMenuBarVisible = true;
     menuBar()->show();
 }
 
-
-void
-HMainWindow::setScrollbackFont( const QFont& font )
+void HMainWindow::setScrollbackFont(const QFont& font)
 {
     fScrollbackWindow->setFont(font);
 }

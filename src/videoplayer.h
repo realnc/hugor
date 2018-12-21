@@ -27,17 +27,17 @@
  */
 #pragma once
 #ifndef DISABLE_VIDEO
-
 #include <QWidget>
 
 struct SDL_RWops;
 class VideoPlayer_priv;
 
-class VideoPlayer final: public QWidget {
+class VideoPlayer final: public QWidget
+{
     Q_OBJECT
 
 public:
-    VideoPlayer( QWidget* parent = nullptr );
+    VideoPlayer(QWidget* parent = nullptr);
     ~VideoPlayer() override;
 
     bool loadVideo(FILE* src, long len, bool loop);

@@ -25,27 +25,25 @@
  * include the source code for the parts of the Hugo Engine used as well as
  * that of the covered work.
  */
-#include <QFileDialog>
-#include <QTextStream>
-#include <QTextLayout>
-#include <QTextCodec>
+#include "hugohandlers.h"
+
 #include <QDebug>
+#include <QFileDialog>
+#include <QTextCodec>
+#include <QTextLayout>
+#include <QTextStream>
 #include <algorithm>
 #include <cstdio>
 
-#include "hugohandlers.h"
-#include "hmainwindow.h"
-#include "videoplayer.h"
 #include "hframe.h"
-#include "settings.h"
+#include "hmainwindow.h"
 #include "hugorfile.h"
-
+#include "settings.h"
+#include "videoplayer.h"
 
 HugoHandlers* hHandlers = nullptr;
 
-
-void
-HugoHandlers::calcFontDimensions() const
+void HugoHandlers::calcFontDimensions() const
 {
     const QFontMetrics& curMetr = hFrame->currentFontMetrics();
     const QFontMetrics fixedMetr(hApp->settings()->fixedFont);
@@ -57,9 +55,7 @@ HugoHandlers::calcFontDimensions() const
     lineheight = curMetr.height();
 }
 
-
-void
-HugoHandlers::getfilename(char* a, char* b) const
+void HugoHandlers::getfilename(char* a, char* b) const
 {
     Q_ASSERT(a != nullptr and b != nullptr);
 
@@ -67,8 +63,8 @@ HugoHandlers::getfilename(char* a, char* b) const
     QString filter;
     // Fallback message in case we won't recognize the 'a' string.
     QString caption("Select a file");
-    // Assume save mode. We do this in order to get a confirmation dialog
-    // on existing files, in case we won't recognize the 'a' string.
+    // Assume save mode. We do this in order to get a confirmation dialog on existing files, in case
+    // we won't recognize the 'a' string.
     bool saveMode = true;
 
     if (QString::fromLatin1(a).endsWith("to save")) {
@@ -98,9 +94,7 @@ HugoHandlers::getfilename(char* a, char* b) const
     qstrcpy(line, fname.toLocal8Bit().constData());
 }
 
-
-void
-HugoHandlers::startGetline(char* p) const
+void HugoHandlers::startGetline(char* p) const
 {
     // Print the prompt in normal text colors.
     settextcolor(fcolor);
@@ -115,9 +109,7 @@ HugoHandlers::startGetline(char* p) const
     hFrame->startInput(current_text_x, current_text_y);
 }
 
-
-void
-HugoHandlers::endGetline() const
+void HugoHandlers::endGetline() const
 {
     hFrame->setCursorVisible(false);
     char newline[] = "\r\n";
@@ -125,25 +117,19 @@ HugoHandlers::endGetline() const
     hFrame->updateGameScreen(false);
 }
 
-
-void
-HugoHandlers::clearfullscreen() const
+void HugoHandlers::clearfullscreen() const
 {
     hFrame->clearRegion(0, 0, 0, 0);
 }
 
-
-void
-HugoHandlers::clearwindow() const
+void HugoHandlers::clearwindow() const
 {
     hFrame->setBgColor(bgcolor);
-    hFrame->clearRegion(physical_windowleft, physical_windowtop,
-                        physical_windowright, physical_windowbottom);
+    hFrame->clearRegion(physical_windowleft, physical_windowtop, physical_windowright,
+                        physical_windowbottom);
 }
 
-
-void
-HugoHandlers::settextmode() const
+void HugoHandlers::settextmode() const
 {
     calcFontDimensions();
     SCREENWIDTH = hFrame->width();
@@ -153,20 +139,17 @@ HugoHandlers::settextmode() const
     settextwindow(1, 1, SCREENWIDTH / FIXEDCHARWIDTH, SCREENHEIGHT / FIXEDLINEHEIGHT);
 }
 
-
-void
-HugoHandlers::settextwindow(int left, int top, int right, int bottom) const
+void HugoHandlers::settextwindow(int left, int top, int right, int bottom) const
 {
-    //qDebug() << "settextwindow" << left << top << right << bottom;
+    // qDebug() << "settextwindow" << left << top << right << bottom;
     /* Must be set: */
     physical_windowleft = (left - 1) * FIXEDCHARWIDTH;
     physical_windowtop = (top - 1) * FIXEDLINEHEIGHT;
     physical_windowright = right * FIXEDCHARWIDTH - 1;
     physical_windowbottom = bottom * FIXEDLINEHEIGHT - 1;
 
-    // Correct for full-width windows where the right border would
-    // otherwise be clipped to a multiple of charwidth, leaving a
-    // sliver of the former window at the righthand side.
+    // Correct for full-width windows where the right border would otherwise be clipped to a
+    // multiple of charwidth, leaving a sliver of the former window at the righthand side.
     if (right >= SCREENWIDTH / FIXEDCHARWIDTH) {
         physical_windowright = hFrame->width() - 1;
     }
@@ -182,15 +165,12 @@ HugoHandlers::settextwindow(int left, int top, int right, int bottom) const
     hFrame->setFontType(currentfont);
 }
 
-
-void
-HugoHandlers::printFatalError(char* a) const
+void HugoHandlers::printFatalError(char* a) const
 {
     print(a);
 }
 
-void
-HugoHandlers::print(char* a) const
+void HugoHandlers::print(char* a) const
 {
     uint len = qstrlen(a);
     QString ac;
@@ -211,13 +191,13 @@ HugoHandlers::print(char* a) const
         }
 
         switch (a[i]) {
-          case '\n':
+        case '\n':
             hFrame->flushText();
             current_text_y += lineheight;
-            //last_was_italic = false;
+            // last_was_italic = false;
             break;
 
-          case '\r':
+        case '\r':
             hFrame->flushText();
             if (!inwindow) {
                 current_text_x = physical_windowleft - FIXEDCHARWIDTH;
@@ -225,12 +205,12 @@ HugoHandlers::print(char* a) const
                 current_text_x = 0;
             }
             current_text_x = physical_windowleft;
-            //last_was_italic = false;
+            // last_was_italic = false;
             break;
 
-          default: {
+        default: {
             ac += hApp->hugoCodec()->toUnicode(a + i, 1);
-          }
+        }
         }
     }
 
@@ -252,32 +232,25 @@ HugoHandlers::print(char* a) const
     }
 }
 
-
-void
-HugoHandlers::font(int f) const
+void HugoHandlers::font(int f) const
 {
     hFrame->setFontType(f);
     ::charwidth = hFrame->currentFontMetrics().averageCharWidth();
     lineheight = hFrame->currentFontMetrics().height();
 }
 
-void
-HugoHandlers::settextcolor(int c) const
+void HugoHandlers::settextcolor(int c) const
 {
     hFrame->setFgColor(c);
 }
 
-
-void
-HugoHandlers::setbackcolor(int c) const
+void HugoHandlers::setbackcolor(int c) const
 {
     hFrame->setBgColor(c);
 }
 
-
 // FIXME: Check for errors when loading images.
-void
-HugoHandlers::displaypicture(HUGO_FILE infile, long len, int* result) const
+void HugoHandlers::displaypicture(HUGO_FILE infile, long len, int* result) const
 {
     // Open it as a QFile.
     long pos = ftell(infile->get());
@@ -289,8 +262,8 @@ HugoHandlers::displaypicture(HUGO_FILE infile, long len, int* result) const
     const QByteArray& data = file.read(len);
 
     // Create the image from the data.
-    // FIXME: Allow only JPEG images. By default, QImage supports
-    // all image formats recognized by Qt.
+    // FIXME: Allow only JPEG images. By default, QImage supports all image formats recognized by
+    // Qt.
     QImage img;
     img.loadFromData(data);
 
@@ -308,8 +281,7 @@ HugoHandlers::displaypicture(HUGO_FILE infile, long len, int* result) const
     }
     // Make sure to keep the aspect ratio (don't stretch.)
     if (imgSize != img.size()) {
-        // Only apply a smoothing filter if that setting is enabled
-        // in the settings.
+        // Only apply a smoothing filter if that setting is enabled in the settings.
         Qt::TransformationMode mode;
         if (hApp->settings()->useSmoothScaling) {
             mode = Qt::SmoothTransformation;
@@ -327,20 +299,16 @@ HugoHandlers::displaypicture(HUGO_FILE infile, long len, int* result) const
     *result = true;
 }
 
-
 #ifndef DISABLE_VIDEO
 
-void
-HugoHandlers::stopvideo() const
+void HugoHandlers::stopvideo() const
 {
     if (fVidPlayer != nullptr) {
         fVidPlayer->stop();
     }
 }
 
-
-void
-HugoHandlers::playvideo(HUGO_FILE infile, long len, char loop, char bg, int vol, int* result)
+void HugoHandlers::playvideo(HUGO_FILE infile, long len, char loop, char bg, int vol, int* result)
 {
     if (not hApp->settings()->enableVideo or hApp->settings()->videoSysError) {
         *result = false;
@@ -360,8 +328,8 @@ HugoHandlers::playvideo(HUGO_FILE infile, long len, char loop, char bg, int vol,
     }
     fVidPlayer->setVolume(vol);
     fVidPlayer->setMaximumSize(QSize(physical_windowwidth, physical_windowheight));
-    fVidPlayer->setGeometry(physical_windowleft, physical_windowtop,
-                            physical_windowwidth, physical_windowheight);
+    fVidPlayer->setGeometry(physical_windowleft, physical_windowtop, physical_windowwidth,
+                            physical_windowheight);
     if (not bg) {
         QEventLoop idleLoop;
         QObject::connect(fVidPlayer, SIGNAL(videoFinished()), &idleLoop, SLOT(quit()));

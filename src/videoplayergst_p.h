@@ -27,17 +27,19 @@
  */
 #pragma once
 #include <QWidget>
+
+#include <gst/app/gstappsrc.h>
 #include <gst/gstelement.h>
 #include <gst/gstpipeline.h>
-#include <gst/app/gstappsrc.h>
 
 class VideoPlayer;
 
-class VideoPlayer_priv final: public QWidget {
+class VideoPlayer_priv final: public QWidget
+{
     Q_OBJECT
 
 public:
-    VideoPlayer_priv(QWidget *parent, VideoPlayer* qPtr);
+    VideoPlayer_priv(QWidget* parent, VideoPlayer* qPtr);
     VideoPlayer* q;
     GstElement* fPipeline = nullptr;
     GstAppSrc* fAppSrc = nullptr;

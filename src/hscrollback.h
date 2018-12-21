@@ -28,20 +28,18 @@
 #pragma once
 #include <QTextEdit>
 
-class HScrollbackWindow final: public QTextEdit {
+class HScrollbackWindow final: public QTextEdit
+{
     Q_OBJECT
 
-  public:
-    HScrollbackWindow( QWidget* parent = nullptr );
+public:
+    HScrollbackWindow(QWidget* parent = nullptr);
 
-  protected:
-    void
-    keyPressEvent( QKeyEvent* e ) override;
+protected:
+    void keyPressEvent(QKeyEvent* e) override;
+    void closeEvent(QCloseEvent* e) override;
 
-    void
-    closeEvent( QCloseEvent* e ) override;
-
-  private:
+private:
     int fMaximumBlockCount = 7000;
     int fInitialWidth = 600;
     int fInitialHeight = 440;

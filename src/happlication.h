@@ -38,10 +38,11 @@ class Settings;
 
 extern HApplication* hApp;
 
-class HApplication final: public QApplication {
+class HApplication final: public QApplication
+{
     Q_OBJECT
 
-  private:
+private:
     // Preferences (fonts, colors, etc.)
     Settings* fSettings;
 
@@ -76,71 +77,67 @@ class HApplication final: public QApplication {
     EngineThread* fHugoThread = nullptr;
 
     // Run the game file contained in fNextGame.
-    void
-    fRunGame();
+    void fRunGame();
 
-    void
-    fUpdateMarginColor( int color );
+    void fUpdateMarginColor(int color);
 
 #ifdef Q_OS_MAC
-  protected:
-    // On the Mac, dropping a file on our application icon will generate a
-    // FileOpen event, so we override this to be able to handle it.
-    bool
-    event( QEvent* ) override;
+protected:
+    // On the Mac, dropping a file on our application icon will generate a FileOpen event, so we
+    // override this to be able to handle it.
+    bool event(QEvent*) override;
 #endif
 
-  signals:
-    // Emitted prior to quitting a game.  The game has not quit yet when this
-    // is emitted.
+signals:
+    // Emitted prior to quitting a game.  The game has not quit yet when this is emitted.
     void gameQuitting();
 
-    // Emitted after quiting a game.  The game has already quit when this is
-    // emitted.
+    // Emitted after quiting a game.  The game has already quit when this is emitted.
     void gameHasQuit();
 
-  public slots:
-    // Replacement for main().  We need this so that we can start the
-    // Hugo engine after the QApplication main event loop has started.
-    void
-    entryPoint( QString gameFileName );
+public slots:
+    // Replacement for main().  We need this so that we can start the Hugo engine after the
+    // QApplication main event loop has started.
+    void entryPoint(QString gameFileName);
 
-    void
-    handleEngineFinished();
+    void handleEngineFinished();
 
-  public:
-    HApplication( int& argc, char* argv[], const char* appName, const char* appVersion,
-                  const char* orgName, const char* orgDomain );
+public:
+    HApplication(int& argc, char* argv[], const char* appName, const char* appVersion,
+                 const char* orgName, const char* orgDomain);
 
     ~HApplication() override;
 
     /* Passing a negative value as 'color' will keep the current margin color.
      */
-    void
-    updateMargins( int color );
+    void updateMargins(int color);
 
-    Settings*
-    settings() const
-    { return fSettings; }
+    Settings* settings() const
+    {
+        return fSettings;
+    }
 
-    HFrame*
-    frameWindow() const
-    { return fFrameWin; }
+    HFrame* frameWindow() const
+    {
+        return fFrameWin;
+    }
 
-    HMarginWidget*
-    marginWidget() const
-    { return fMarginWidget; }
+    HMarginWidget* marginWidget() const
+    {
+        return fMarginWidget;
+    }
 
-    bool
-    gameRunning() const
-    { return fGameRunning; }
+    bool gameRunning() const
+    {
+        return fGameRunning;
+    }
 
-    const QString&
-    gameFile() const
-    { return fGameFile; }
+    const QString& gameFile() const
+    {
+        return fGameFile;
+    }
 
-    void
-    setGameRunning( bool f )
+    void setGameRunning(bool f)
     {
         fGameRunning = f;
         if (not f) {
@@ -149,22 +146,21 @@ class HApplication final: public QApplication {
     }
 
     // Notify the application that preferences have changed.
-    void
-    notifyPreferencesChange( const Settings* sett );
+    void notifyPreferencesChange(const Settings* sett);
 
     // Advance the event loop.
-    void
-    advanceEventLoop();
+    void advanceEventLoop();
 
     // Text codec used by Hugo.
-    QTextCodec*
-    hugoCodec() const
-    { return fHugoCodec; }
+    QTextCodec* hugoCodec() const
+    {
+        return fHugoCodec;
+    }
 
-    bool
-    desktopIsGnome() const
-    { return fDesktopIsGnome; }
+    bool desktopIsGnome() const
+    {
+        return fDesktopIsGnome;
+    }
 
-    void
-    terminateEngineThread();
+    void terminateEngineThread();
 };

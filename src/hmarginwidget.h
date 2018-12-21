@@ -30,40 +30,31 @@
 
 class QVBoxLayout;
 
-class HMarginWidget final: public QWidget {
+class HMarginWidget final: public QWidget
+{
     Q_OBJECT
 
-  private:
+private:
     QWidget* fBannerWidget = nullptr;
     QVBoxLayout* fLayout;
     QColor fColor;
 
-  public:
-    HMarginWidget( QWidget* parent = nullptr );
+public:
+    HMarginWidget(QWidget* parent = nullptr);
 
-    void
-    setBannerWidget( QWidget* w );
+    void setBannerWidget(QWidget* w);
 
-    QWidget*
-    bannerWidget() const
-    { return fBannerWidget; }
+    QWidget* bannerWidget() const
+    {
+        return fBannerWidget;
+    }
 
-    void
-    addWidget( QWidget* w );
+    void addWidget(QWidget* w);
+    void removeWidget(QWidget* w);
+    void setColor(QColor color);
 
-    void
-    removeWidget( QWidget* w );
-
-    void
-    setColor(QColor color);
-
-  protected:
-    void
-    wheelEvent( QWheelEvent* e ) override;
-
-    void
-    mouseMoveEvent( QMouseEvent* e ) override;
-
-    void
-    paintEvent(QPaintEvent* e) override;
+protected:
+    void wheelEvent(QWheelEvent* e) override;
+    void mouseMoveEvent(QMouseEvent* e) override;
+    void paintEvent(QPaintEvent* e) override;
 };

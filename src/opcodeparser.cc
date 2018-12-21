@@ -1,53 +1,49 @@
-#include <QApplication>
-#include <QDesktopServices>
-#include <QUrl>
-#include <QDir>
-#include <QClipboard>
-#include <QGraphicsOpacityEffect>
-#include <QPropertyAnimation>
-#include <QDebug>
-#include <QMetaEnum>
 #include "opcodeparser.h"
+
+#include <QApplication>
+#include <QClipboard>
+#include <QDebug>
+#include <QDesktopServices>
+#include <QDir>
+#include <QGraphicsOpacityEffect>
+#include <QMetaEnum>
+#include <QPropertyAnimation>
+#include <QUrl>
+
+#include "extcolors.h"
+#include "happlication.h"
 extern "C" {
 #include "heheader.h"
 }
-#include "hugohandlers.h"
-#include "hmainwindow.h"
-#include "happlication.h"
 #include "hframe.h"
-#include "util.h"
+#include "hmainwindow.h"
 #include "hugodefs.h"
-#include "extcolors.h"
+#include "hugohandlers.h"
+#include "util.h"
 
 static const int OS_TYPE =
 #ifdef Q_OS_WIN32
-        1;
+    1;
 #elif defined(Q_OS_OSX)
-        2;
+    2;
 #elif defined(Q_OS_LINUX)
-        3;
+    3;
 #else
-        0;
+    0;
 #endif
 
-
-static void
-clearQueue(std::queue<int>& q)
+static void clearQueue(std::queue<int>& q)
 {
     std::queue<int> empty;
     std::swap(q, empty);
 }
 
-
-OpcodeParser::Opcode
-OpcodeParser::popOpcode()
+OpcodeParser::Opcode OpcodeParser::popOpcode()
 {
     return static_cast<Opcode>(popValue());
 }
 
-
-int
-OpcodeParser::popValue()
+int OpcodeParser::popValue()
 {
     Q_ASSERT(fBuffer.size() > 1);
     auto byte1 = fBuffer.front();
@@ -57,40 +53,30 @@ OpcodeParser::popValue()
     return byte1 + (byte2 << 8);
 }
 
-
-void
-OpcodeParser::fPushOutput(const int val)
+void OpcodeParser::fPushOutput(const int val)
 {
     fOutput.push(val & 0xFF);
     fOutput.push((val >> 8) & 0xFF);
 }
 
-
-void
-OpcodeParser::fPushOutput(const OpcodeParser::OpcodeResult res)
+void OpcodeParser::fPushOutput(const OpcodeParser::OpcodeResult res)
 {
     fPushOutput(static_cast<int>(res));
 }
 
-
-void
-OpcodeParser::pushByte(const int c)
+void OpcodeParser::pushByte(const int c)
 {
     fBuffer.push(c);
 }
 
-
-int
-OpcodeParser::getNextOutputByte()
+int OpcodeParser::getNextOutputByte()
 {
     auto ret = fOutput.front();
     fOutput.pop();
     return ret;
 }
 
-
-void
-OpcodeParser::parse()
+void OpcodeParser::parse()
 {
     clearQueue(fOutput);
 
@@ -98,9 +84,9 @@ OpcodeParser::parse()
         return;
     }
 
-    if(fBuffer.size() % 2) {
-        // Opcodes and parameters are always byte pairs. We got an odd number
-        // of bytes, so discard the input as incomplete.
+    if (fBuffer.size() % 2) {
+        // Opcodes and parameters are always byte pairs. We got an odd number of bytes, so discard
+        // the input as incomplete.
         clearQueue(fBuffer);
         fPushOutput(OpcodeResult::WRONG_BYTE_COUNT);
         qWarning() << "Incomplete opcode input.";
@@ -164,8 +150,7 @@ OpcodeParser::parse()
         startAlpha = std::max(-1, std::min(startAlpha, 255));
         endAlpha = std::max(0, std::min(endAlpha, 255));
 
-        runInMainThread([duration, startAlpha, endAlpha, block]
-        {
+        runInMainThread([duration, startAlpha, endAlpha, block] {
             qreal startF = (qreal)startAlpha / 255;
             qreal endF = (qreal)endAlpha / 255;
 
@@ -177,7 +162,8 @@ OpcodeParser::parse()
                 fadeAnim = new QPropertyAnimation(eff, "opacity", eff);
                 idle = new QEventLoop(fadeAnim);
                 hApp->frameWindow()->setGraphicsEffect(eff);
-                QObject::connect(fadeAnim, &QPropertyAnimation::finished, idle, []{idle->exit();});
+                QObject::connect(fadeAnim, &QPropertyAnimation::finished, idle,
+                                 [] { idle->exit(); });
             }
 
             fadeAnim->stop();
@@ -207,12 +193,12 @@ OpcodeParser::parse()
             break;
         }
         auto url = GetWord(popValue());
-        runInMainThread([url]
-        {
+        runInMainThread([url] {
 #if QT_VERSION < QT_VERSION_CHECK(5, 4, 0)
             QDesktopServices::openUrl(QUrl::fromUserInput(url));
 #else
-            QDesktopServices::openUrl(QUrl::fromUserInput(url, QDir::currentPath(), QUrl::AssumeLocalFile));
+            QDesktopServices::openUrl(
+                QUrl::fromUserInput(url, QDir::currentPath(), QUrl::AssumeLocalFile));
 #endif
         });
         fPushOutput(OpcodeResult::OK);
@@ -225,7 +211,7 @@ OpcodeParser::parse()
             break;
         }
         bool f = popValue();
-        runInMainThread([f]{hMainWin->setFullscreen(f);});
+        runInMainThread([f] { hMainWin->setFullscreen(f); });
         fPushOutput(OpcodeResult::OK);
         break;
     }
@@ -236,7 +222,7 @@ OpcodeParser::parse()
             break;
         }
         auto text = GetWord(popValue());
-        runInMainThread([text]{QApplication::clipboard()->setText(text);});
+        runInMainThread([text] { QApplication::clipboard()->setText(text); });
         fPushOutput(OpcodeResult::OK);
         break;
     }
@@ -247,7 +233,7 @@ OpcodeParser::parse()
             break;
         }
         bool res;
-        runInMainThread([&res]{res = isMusicPlaying();});
+        runInMainThread([&res] { res = isMusicPlaying(); });
         fPushOutput(OpcodeResult::OK);
         fPushOutput(res);
         break;
@@ -259,7 +245,7 @@ OpcodeParser::parse()
             break;
         }
         bool res;
-        runInMainThread([&res]{res = isSamplePlaying();});
+        runInMainThread([&res] { res = isSamplePlaying(); });
         fPushOutput(OpcodeResult::OK);
         fPushOutput(res);
         break;
@@ -296,7 +282,7 @@ OpcodeParser::parse()
             break;
         }
         bool res;
-        runInMainThread([&res]{res = hMainWin->isFullScreen();});
+        runInMainThread([&res] { res = hMainWin->isFullScreen(); });
         fPushOutput(OpcodeResult::OK);
         fPushOutput(res);
         break;

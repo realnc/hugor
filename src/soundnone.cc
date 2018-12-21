@@ -25,83 +25,63 @@
  * include the source code for the parts of the Hugo Engine used as well as
  * that of the covered work.
  */
-#include <cstdio>
-#include "hugohandlers.h"
 #include "hugodefs.h"
+#include "hugohandlers.h"
+
+#include <cstdio>
+
 #include "hugorfile.h"
 
+void initSoundEngine()
+{}
 
-void
-initSoundEngine()
-{ }
+void closeSoundEngine()
+{}
 
+void muteSound(bool /*mute*/)
+{}
 
-void
-closeSoundEngine()
-{ }
+void updateMusicVolume()
+{}
 
+void updateSoundVolume()
+{}
 
-void
-muteSound(bool /*mute*/)
-{ }
+void updateSynthGain()
+{}
 
+bool isMusicPlaying()
+{
+    return false;
+}
 
-void
-updateMusicVolume()
-{ }
+bool isSamplePlaying()
+{
+    return false;
+}
 
-
-void
-updateSoundVolume()
-{ }
-
-
-void
-updateSynthGain()
-{ }
-
-
-bool
-isMusicPlaying()
-{ return false; }
-
-
-bool
-isSamplePlaying()
-{ return false; }
-
-
-void
-HugoHandlers::playmusic(HUGO_FILE infile, long /*reslength*/, char /*loop_flag*/, int* result) const
+void HugoHandlers::playmusic(HUGO_FILE infile, long /*reslength*/, char /*loop_flag*/,
+                             int* result) const
 {
     delete infile;
     *result = false;
 }
 
+void HugoHandlers::musicvolume(int /*vol*/) const
+{}
 
-void
-HugoHandlers::musicvolume(int /*vol*/) const
-{ }
+void HugoHandlers::stopmusic() const
+{}
 
-
-void
-HugoHandlers::stopmusic() const
-{ }
-
-
-void
-HugoHandlers::playsample(HUGO_FILE infile, long /*reslength*/, char /*loop_flag*/, int* result) const
+void HugoHandlers::playsample(HUGO_FILE infile, long /*reslength*/, char /*loop_flag*/,
+                              int* result) const
 {
     delete infile;
     *result = false;
 }
 
+void HugoHandlers::samplevolume(int /*vol*/) const
+{}
 
-void
-HugoHandlers::samplevolume(int /*vol*/) const
-{ }
-
-
-void
-HugoHandlers::stopsample() const
-{ }
+void HugoHandlers::stopsample() const
+{}

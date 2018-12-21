@@ -25,33 +25,33 @@
  * include the source code for the parts of the Hugo Engine used as well as
  * that of the covered work.
  */
-#include <cmath>
-#include <QColorDialog>
-#include <QSignalMapper>
-#include <QPushButton>
-#include <QCheckBox>
-#include <QStyle>
-#include <QResource>
-#include <QFileDialog>
-#include <QDebug>
-#ifndef DISABLE_AUDIO
-#include <SDL_rwops.h>
-#include <Aulib/AudioStream.h>
-#include <Aulib/AudioResamplerSpeex.h>
-#include <Aulib/AudioDecoderFluidsynth.h>
-#endif
-
 #include "confdialog.h"
-#include "ui_confdialog.h"
-#include "settings.h"
+
+#include <QCheckBox>
+#include <QColorDialog>
+#include <QDebug>
+#include <QFileDialog>
+#include <QPushButton>
+#include <QResource>
+#include <QSignalMapper>
+#include <QStyle>
+#ifndef DISABLE_AUDIO
+#include <Aulib/AudioDecoderFluidsynth.h>
+#include <Aulib/AudioResamplerSpeex.h>
+#include <Aulib/AudioStream.h>
+#include <SDL_rwops.h>
+#endif
+#include <cmath>
+
 #include "happlication.h"
 #include "hmainwindow.h"
 #include "hugodefs.h"
+#include "settings.h"
+#include "ui_confdialog.h"
 
-
-ConfDialog::ConfDialog( HMainWindow* parent )
-    : QDialog(parent, Qt::WindowTitleHint | Qt::WindowSystemMenuHint),
-      ui(new Ui::ConfDialog)
+ConfDialog::ConfDialog(HMainWindow* parent)
+    : QDialog(parent, Qt::WindowTitleHint | Qt::WindowSystemMenuHint)
+    , ui(new Ui::ConfDialog)
 {
     ui->setupUi(this);
     Settings* sett = hApp->settings();
@@ -126,7 +126,8 @@ ConfDialog::ConfDialog( HMainWindow* parent )
     ui->bannerBgColorButton->setColor(sett->statusBgColor);
     ui->bannerTextColorButton->setColor(sett->statusTextColor);
     ui->fsMarginColorButton->setColor(sett->fsMarginColor);
-    connect(ui->customFsMarginColorCheckBox, SIGNAL(toggled(bool)), ui->fsMarginColorButton, SLOT(setEnabled(bool)));
+    connect(ui->customFsMarginColorCheckBox, SIGNAL(toggled(bool)), ui->fsMarginColorButton,
+            SLOT(setEnabled(bool)));
     ui->customFsMarginColorCheckBox->setChecked(sett->customFsMarginColor);
 
     ui->mainFontSizeSpinBox->setValue(sett->propFont.pointSize());
@@ -160,16 +161,16 @@ ConfDialog::ConfDialog( HMainWindow* parent )
     ui->buttonBox->setStandardButtons(QDialogButtonBox::NoButton);
 #else
     if (hApp->desktopIsGnome()) {
-        // On Gnome (and other Gtk-based environments, like XFCE), we follow
-        // Gnome standards. We only provide a "Close" button and settings
-        // changes should apply instantly.
+        // On Gnome (and other Gtk-based environments, like XFCE), we follow Gnome standards. We
+        // only provide a "Close" button and settings changes should apply instantly.
         fMakeInstantApply();
         ui->buttonBox->setStandardButtons(QDialogButtonBox::Close);
     } else {
-        // Assume KDE/MS Windows standards. No instant apply, and use OK/Apply/Cancel
-        // buttons.
-        ui->buttonBox->setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Apply | QDialogButtonBox::Cancel);
-        connect(ui->buttonBox->button(QDialogButtonBox::Apply), SIGNAL(clicked()), this, SLOT(fApplySettings()));
+        // Assume KDE/MS Windows standards. No instant apply, and use OK/Apply/Cancel buttons.
+        ui->buttonBox->setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Apply
+                                          | QDialogButtonBox::Cancel);
+        connect(ui->buttonBox->button(QDialogButtonBox::Apply), SIGNAL(clicked()), this,
+                SLOT(fApplySettings()));
         connect(this, SIGNAL(accepted()), this, SLOT(fApplySettings()));
         connect(this, SIGNAL(rejected()), SLOT(fCancel()));
     }
@@ -179,17 +180,15 @@ ConfDialog::ConfDialog( HMainWindow* parent )
     connect(ui->midiStopButton, &QPushButton::clicked, this, &ConfDialog::fStopTestMidi);
     connect(ui->soundFontPushButton, &QPushButton::clicked, this, &ConfDialog::fBrowseForSoundFont);
     connect(ui->gainSpinBox, qOverload<double>(&QDoubleSpinBox::valueChanged), this,
-        &ConfDialog::fSetGain);
+            &ConfDialog::fSetGain);
 }
-
 
 ConfDialog::~ConfDialog()
 {
     delete ui;
 }
 
-
-void ConfDialog::changeEvent(QEvent *e)
+void ConfDialog::changeEvent(QEvent* e)
 {
     QDialog::changeEvent(e);
     switch (e->type()) {
@@ -201,9 +200,7 @@ void ConfDialog::changeEvent(QEvent *e)
     }
 }
 
-
-void
-ConfDialog::fMakeInstantApply()
+void ConfDialog::fMakeInstantApply()
 {
     connect(ui->mainFontBox, SIGNAL(currentFontChanged(QFont)), this, SLOT(fApplySettings()));
     connect(ui->fixedFontBox, SIGNAL(currentFontChanged(QFont)), this, SLOT(fApplySettings()));
@@ -226,7 +223,7 @@ ConfDialog::fMakeInstantApply()
     connect(ui->soundFontGroupBox, &QGroupBox::toggled, this, &ConfDialog::fApplySettings);
     connect(ui->soundFontLineEdit, &QLineEdit::textChanged, this, &ConfDialog::fApplySettings);
     connect(ui->gainSpinBox, qOverload<double>(&QDoubleSpinBox::valueChanged), this,
-        &ConfDialog::fApplySettings);
+            &ConfDialog::fApplySettings);
     connect(ui->overlayScrollbackCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
     connect(ui->mainTextColorButton, SIGNAL(changed(QColor)), this, SLOT(fApplySettings()));
     connect(ui->mainBgColorButton, SIGNAL(changed(QColor)), this, SLOT(fApplySettings()));
@@ -237,9 +234,7 @@ ConfDialog::fMakeInstantApply()
     connect(ui->startInButtonGroup, SIGNAL(buttonClicked(int)), SLOT(fApplySettings()));
 }
 
-
-void
-ConfDialog::fApplySettings()
+void ConfDialog::fApplySettings()
 {
     Settings* sett = hApp->settings();
 
@@ -287,9 +282,7 @@ ConfDialog::fApplySettings()
     fInitialGain = sett->synthGain;
 }
 
-
-void
-ConfDialog::fCancel()
+void ConfDialog::fCancel()
 {
     hApp->settings()->soundVolume = fInitialSoundVol;
     hApp->settings()->synthGain = fInitialGain;
@@ -299,9 +292,7 @@ ConfDialog::fCancel()
     updateSynthGain();
 }
 
-
-void
-ConfDialog::fSetSoundVolume(int vol)
+void ConfDialog::fSetSoundVolume(int vol)
 {
     hApp->settings()->soundVolume = vol;
     updateMusicVolume();
@@ -314,9 +305,7 @@ ConfDialog::fSetSoundVolume(int vol)
 #endif
 }
 
-
-void
-ConfDialog::fPlayTestMidi()
+void ConfDialog::fPlayTestMidi()
 {
 #ifndef DISABLE_AUDIO
     if (fMidiStream != nullptr and fMidiStream->isPlaying()) {
@@ -343,9 +332,7 @@ ConfDialog::fPlayTestMidi()
 #endif
 }
 
-
-void
-ConfDialog::fStopTestMidi()
+void ConfDialog::fStopTestMidi()
 {
 #ifndef DISABLE_AUDIO
     if (fMidiStream) {
@@ -354,9 +341,7 @@ ConfDialog::fStopTestMidi()
 #endif
 }
 
-
-void
-ConfDialog::fSetGain()
+void ConfDialog::fSetGain()
 {
 #ifndef DISABLE_AUDIO
     if (fMidiStream) {
@@ -367,9 +352,7 @@ ConfDialog::fSetGain()
 #endif
 }
 
-
-void
-ConfDialog::fBrowseForSoundFont()
+void ConfDialog::fBrowseForSoundFont()
 {
     auto file = QFileDialog::getOpenFileName(this, tr("Set SoundFont"),
                                              QFileInfo(ui->soundFontLineEdit->text()).path(),

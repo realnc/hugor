@@ -29,20 +29,15 @@
 
 #include <SDL_rwops.h>
 
-
-bool
-RwopsQIODevice::atEnd() const
+bool RwopsQIODevice::atEnd() const
 {
     return (fRwops != nullptr) and (fSize == SDL_RWtell(fRwops));
 }
 
-
-bool
-RwopsQIODevice::isSequential() const
+bool RwopsQIODevice::isSequential() const
 {
     return (fRwops != nullptr) and (fRwops->seek != nullptr);
 }
-
 
 bool RwopsQIODevice::seek(qint64 pos)
 {
@@ -54,9 +49,7 @@ bool RwopsQIODevice::seek(qint64 pos)
     return newPos == pos;
 }
 
-
-qint64
-RwopsQIODevice::size() const
+qint64 RwopsQIODevice::size() const
 {
     if (fRwops != nullptr) {
         return fSize;
@@ -64,18 +57,14 @@ RwopsQIODevice::size() const
     return 0;
 }
 
-
-void
-RwopsQIODevice::close()
+void RwopsQIODevice::close()
 {
     fRwops = nullptr;
     fSize = 0;
     QIODevice::close();
 }
 
-
-bool
-RwopsQIODevice::open(SDL_RWops* rwops, QIODevice::OpenMode mode)
+bool RwopsQIODevice::open(SDL_RWops* rwops, QIODevice::OpenMode mode)
 {
     if (rwops == nullptr) {
         return false;
@@ -88,9 +77,7 @@ RwopsQIODevice::open(SDL_RWops* rwops, QIODevice::OpenMode mode)
     return QIODevice::open(mode);
 }
 
-
-qint64
-RwopsQIODevice::readData(char* data, qint64 len)
+qint64 RwopsQIODevice::readData(char* data, qint64 len)
 {
     if (fRwops == nullptr) {
         return -1;
@@ -105,9 +92,7 @@ RwopsQIODevice::readData(char* data, qint64 len)
     return cnt;
 }
 
-
-qint64
-RwopsQIODevice::writeData(const char* /*data*/, qint64 /*len*/)
+qint64 RwopsQIODevice::writeData(const char* /*data*/, qint64 /*len*/)
 {
     return -1;
 }

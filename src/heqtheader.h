@@ -33,16 +33,16 @@
 
 #define DEF_PRN ""
 
-#define MAXPATH         256
-#define MAXDRIVE        256
-#define MAXDIR          256
-#define MAXFILENAME     256
-#define MAXEXT          256
+#define MAXPATH 256
+#define MAXDRIVE 256
+#define MAXDIR 256
+#define MAXFILENAME 256
+#define MAXEXT 256
 
-#define DEF_FCOLOR      7
-#define DEF_BGCOLOR     1
-#define DEF_SLFCOLOR	15
-#define DEF_SLBGCOLOR	0
+#define DEF_FCOLOR 7
+#define DEF_BGCOLOR 1
+#define DEF_SLFCOLOR 15
+#define DEF_SLBGCOLOR 0
 
 #define MAXBUFFER 255
 #define MAXUNDO 1024

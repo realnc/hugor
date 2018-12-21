@@ -25,51 +25,48 @@
  * include the source code for the parts of the Hugo Engine used as well as
  * that of the covered work.
  */
-#include <QDebug>
-#include <QLayout>
-#include <QLabel>
-#include <QIcon>
-#include <QStatusBar>
-#include <QDir>
-#include <QTextCodec>
-#include <QMessageBox>
-#include <QFileDialog>
-#include <QDialogButtonBox>
-#include <QStyle>
-#include <QMenuBar>
-#include <QDesktopWidget>
+#include "happlication.h"
 
+#include <QDebug>
+#include <QDesktopWidget>
+#include <QDialogButtonBox>
+#include <QDir>
+#include <QFileDialog>
+#include <QIcon>
+#include <QLabel>
+#include <QLayout>
+#include <QMenuBar>
+#include <QMessageBox>
+#include <QStatusBar>
+#include <QStyle>
+#include <QTextCodec>
+#include <utility>
+
+#include "enginerunner.h"
 extern "C" {
 #include "heheader.h"
 }
-#include "happlication.h"
-
-#include <utility>
+#include "hframe.h"
 #include "hmainwindow.h"
 #include "hmarginwidget.h"
-#include "hframe.h"
+#include "hugodefs.h"
+#include "hugohandlers.h"
 #include "settings.h"
 #include "settingsoverrides.h"
-#include "hugodefs.h"
-#include "enginerunner.h"
-#include "hugohandlers.h"
 #include "videoplayer.h"
-
 
 HApplication* hApp = nullptr;
 
-
-HApplication::HApplication( int& argc, char* argv[], const char* appName,
-                            const char* appVersion, const char* orgName,
-                            const char* orgDomain )
+HApplication::HApplication(int& argc, char* argv[], const char* appName, const char* appVersion,
+                           const char* orgName, const char* orgDomain)
     : QApplication(argc, argv)
     , fHugoCodec(QTextCodec::codecForName("Windows-1252"))
 {
-    //qDebug() << Q_FUNC_INFO;
+    // qDebug() << Q_FUNC_INFO;
     Q_ASSERT(hApp == nullptr);
 
-    // Check if a config file with the same basename as ours exists in our
-    // directory.  If yes, we will override default settings from it.
+    // Check if a config file with the same basename as ours exists in our directory. If yes, we
+    // will override default settings from it.
     QString cfgFname = QApplication::applicationDirPath();
     if (not cfgFname.endsWith('/')) {
         cfgFname += '/';
@@ -93,12 +90,10 @@ HApplication::HApplication( int& argc, char* argv[], const char* appName,
 
     // Possibly override application and organization names.
     if (settOvr != nullptr) {
-        // Make sure that appName and authorName are either both set or unset.
-        // This avoids mixing up the system file/registry paths for the settings
-        // with our default ones.
+        // Make sure that appName and authorName are either both set or unset. This avoids mixing up
+        // the system file/registry paths for the settings with our default ones.
         if ((settOvr->appName.isEmpty() and not settOvr->authorName.isEmpty())
-            or (settOvr->authorName.isEmpty() and not settOvr->appName.isEmpty()))
-        {
+            or (settOvr->authorName.isEmpty() and not settOvr->appName.isEmpty())) {
             settOvr->appName.clear();
             settOvr->authorName.clear();
         }
@@ -135,9 +130,9 @@ HApplication::HApplication( int& argc, char* argv[], const char* appName,
     // Create our main application window.
     fMainWin = new HMainWindow(nullptr);
     fMainWin->setWindowTitle(HApplication::applicationName());
-    // Disable screen updates until we're actually ready to run a game. This
-    // prevents screen flicker due to the resizing and background color changes
-    // if we're starting in fullscreen mode.
+
+    // Disable screen updates until we're actually ready to run a game. This prevents screen flicker
+    // due to the resizing and background color changes if we're starting in fullscreen mode.
     fMainWin->setUpdatesEnabled(false);
 
     // This widget provides margins for fFrameWin.
@@ -155,8 +150,7 @@ HApplication::HApplication( int& argc, char* argv[], const char* appName,
     // Restore the application's size.
     fMainWin->resize(fSettings->appSize);
 
-    // Set application window icon, unless we're on OS X where the bundle
-    // icon is used.
+    // Set application window icon, unless we're on OS X where the bundle icon is used.
 #ifndef Q_OS_MAC
     HApplication::setWindowIcon(QIcon(":/he_32-bit_48x48.png"));
 #endif
@@ -165,10 +159,9 @@ HApplication::HApplication( int& argc, char* argv[], const char* appName,
     hHandlers = new HugoHandlers(this);
 }
 
-
 HApplication::~HApplication()
 {
-    //qDebug() << Q_FUNC_INFO;
+    // qDebug() << Q_FUNC_INFO;
     Q_ASSERT(hHandlers != nullptr);
     delete hHandlers;
     hHandlers = nullptr;
@@ -180,9 +173,7 @@ HApplication::~HApplication()
     hApp = nullptr;
 }
 
-
-void
-HApplication::fRunGame()
+void HApplication::fRunGame()
 {
     if (fNextGame.isEmpty()) {
         // Nothing to run.
@@ -199,28 +190,28 @@ HApplication::fRunGame()
         // Change to the game file's directory.
         QDir::setCurrent(finfo.absolutePath());
 
-        // Set the application's window title to contain the filename of
-        // the game we're running. The game is free to change that later on.
+        // Set the application's window title to contain the filename of the game we're running. The
+        // game is free to change that later on.
 #ifdef Q_OS_MAC
         // Just use the filename on OS X.  Seems to be the norm there.
-        //qWinGroup->setWindowTitle(finfo.fileName());
+        // qWinGroup->setWindowTitle(finfo.fileName());
 #else
         // On all other systems, also append the application name.
-        //qWinGroup->setWindowTitle(finfo.fileName() + QString::fromLatin1(" - ") + qFrame->applicationName());
+        // qWinGroup->setWindowTitle(finfo.fileName() + QString::fromLatin1(" - ") +
+        // qFrame->applicationName());
 #endif
 
         // Add the game file to our "recent games" list.
         QStringList& gamesList = fSettings->recentGamesList;
         int recentIdx = gamesList.indexOf(finfo.absoluteFilePath());
         if (recentIdx > 0) {
-            // It's already in the list and it's not the first item.  Make
-            // it the first item so that it becomes the most recent entry.
+            // It's already in the list and it's not the first item. Make it the first item so that
+            // it becomes the most recent entry.
             gamesList.move(recentIdx, 0);
         } else if (recentIdx < 0) {
-            // We didn't find it in the list by absoluteFilePath(). Try to
-            // find it by canonicalFilePath() instead. This way, we avoid
-            // listing the same game twice if the user opened it through a
-            // different path (through a symlink that leads to the same
+            // We didn't find it in the list by absoluteFilePath(). Try to find it by
+            // canonicalFilePath() instead. This way, we avoid listing the same game twice if the
+            // user opened it through a different path (through a symlink that leads to the same
             // file, for instance.)
             bool found = false;
             const QString& canonPath = finfo.canonicalFilePath();
@@ -232,8 +223,8 @@ HApplication::fRunGame()
             if (found) {
                 gamesList.move(recentIdx - 1, 0);
             } else {
-                // It's not in the list.  Prepend it as the most recent item
-                // and, if the list is full, delete the oldest one.
+                // It's not in the list. Prepend it as the most recent item and, if the list is
+                // full, delete the oldest one.
                 if (gamesList.size() >= Settings::recentGamesCapacity) {
                     gamesList.removeLast();
                 }
@@ -261,9 +252,7 @@ HApplication::fRunGame()
     }
 }
 
-
-void
-HApplication::fUpdateMarginColor( int color )
+void HApplication::fUpdateMarginColor(int color)
 {
     if (color < 0) {
         return;
@@ -271,14 +260,12 @@ HApplication::fUpdateMarginColor( int color )
 
     const Settings* sett = hApp->settings();
     const QColor& qColor = (hMainWin->isFullScreen() and sett->customFsMarginColor)
-                           ? sett->fsMarginColor
-                           : hugoColorToQt(color);
+                               ? sett->fsMarginColor
+                               : hugoColorToQt(color);
     fMarginWidget->setColor(qColor);
 }
 
-
-void
-HApplication::updateMargins( int color )
+void HApplication::updateMargins(int color)
 {
     int scrWidth = QApplication::desktop()->screenGeometry().width();
     int margin;
@@ -287,13 +274,12 @@ HApplication::updateMargins( int color )
     if (hMainWin->isFullScreen()) {
         int maxWidth = fSettings->fullscreenWidth * scrWidth / 100;
 
-        // Calculate how big the margin should be to get the specified
-        // width.
+        // Calculate how big the margin should be to get the specified width.
         int targetWidth = qMin(maxWidth, fMarginWidget->width());
         margin = (fMarginWidget->width() - targetWidth) / 2;
     } else {
-        // In windowed mode, do not update the margins if we're currently
-        // displaying scrollback as an overlay.
+        // In windowed mode, do not update the margins if we're currently displaying scrollback as
+        // an overlay.
         if (fMarginWidget->layout()->indexOf(fFrameWin) < 0) {
             return;
         }
@@ -303,11 +289,9 @@ HApplication::updateMargins( int color )
     fUpdateMarginColor(color);
 }
 
-
 #ifdef Q_OS_MAC
 #include <QFileOpenEvent>
-bool
-HApplication::event( QEvent* e )
+bool HApplication::event(QEvent* e)
 {
     // We only handle the FileOpen event and only when no game
     // is currently running.
@@ -324,14 +308,11 @@ HApplication::event( QEvent* e )
 }
 #endif
 
-
-void
-HApplication::entryPoint( QString gameFileName )
+void HApplication::entryPoint(QString gameFileName)
 {
-    // Process pending events in case we have a FileOpen event. Freeze user
-    // input while doing so; we don't want to leave a way to mess with the
-    // GUI when we don't have a game running yet.  We do this a bunch of
-    // times to make sure the FileOpen event can propagate properly.
+    // Process pending events in case we have a FileOpen event. Freeze user input while doing so; we
+    // don't want to leave a way to mess with the GUI when we don't have a game running yet. We do
+    // this a bunch of times to make sure the FileOpen event can propagate properly.
     for (int i = 0; i < 100; ++i) {
         advanceEventLoop();
     }
@@ -342,17 +323,17 @@ HApplication::entryPoint( QString gameFileName )
 
     // If we still don't have a filename, prompt for one.
     if (fNextGame.isEmpty() and fSettings->askForGameFile) {
-        fNextGame = QFileDialog::getOpenFileName(nullptr,
-            QObject::tr("Choose the story file you wish to play"), fSettings->lastFileOpenDir,
-            QObject::tr("Hugo Games") + QString::fromLatin1("(*.hex)"));
+        fNextGame = QFileDialog::getOpenFileName(
+            nullptr, QObject::tr("Choose the story file you wish to play"),
+            fSettings->lastFileOpenDir, QObject::tr("Hugo Games") + QString::fromLatin1("(*.hex)"));
     }
 
     // Switch to fullscreen, if needed.
     if (fSettings->isFullscreen) {
         fMainWin->toggleFullscreen();
-        // If we don't let the event loop run for a while, for some reason
-        // the screen will be flashing when the window first becomes visible.
-        // The reason is unknown, but this seems to work around the issue.
+        // If we don't let the event loop run for a while, for some reason the screen will be
+        // flashing when the window first becomes visible. The reason is unknown, but this seems to
+        // work around the issue.
         for (int i = 0; i < 5000; ++i) {
             advanceEventLoop();
         }
@@ -375,7 +356,6 @@ HApplication::entryPoint( QString gameFileName )
     }
 }
 
-
 void HApplication::handleEngineFinished()
 {
     fGameRunning = false;
@@ -384,9 +364,7 @@ void HApplication::handleEngineFinished()
     fMainWin->close();
 }
 
-
-void
-HApplication::notifyPreferencesChange( const Settings* sett )
+void HApplication::notifyPreferencesChange(const Settings* sett)
 {
     smartformatting = sett->smartFormatting;
 
@@ -420,9 +398,7 @@ HApplication::notifyPreferencesChange( const Settings* sett )
     fFrameWin->updateGameScreen(true);
 }
 
-
-void
-HApplication::advanceEventLoop()
+void HApplication::advanceEventLoop()
 {
     // Guard against re-entrancy.
     static volatile bool working = false;
@@ -434,9 +410,7 @@ HApplication::advanceEventLoop()
     working = false;
 }
 
-
-void
-HApplication::terminateEngineThread()
+void HApplication::terminateEngineThread()
 {
     // FIXME This just doesn't work reliably. On Windows it just hangs.
     /*

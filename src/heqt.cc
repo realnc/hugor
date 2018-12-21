@@ -27,30 +27,27 @@
  */
 #include <QDebug>
 #include <QFileInfo>
+#include <QMutexLocker>
 #include <QTextCodec>
 #include <QTextLayout>
 #include <QThread>
 #include <QTimer>
-#include <QTextCodec>
-#include <QMutexLocker>
 #include <cstdarg>
 
+#include "extcolors.h"
 #include "happlication.h"
+extern "C" {
+#include "heheader.h"
+}
+#include "hframe.h"
 #include "hmainwindow.h"
 #include "hmarginwidget.h"
-#include "hframe.h"
-#include "settings.h"
 #include "hugodefs.h"
 #include "hugohandlers.h"
 #include "hugorfile.h"
 #include "opcodeparser.h"
+#include "settings.h"
 #include "util.h"
-#include "extcolors.h"
-
-extern "C" {
-#include "heheader.h"
-}
-
 
 #define INVOKE_BLOCK Qt::BlockingQueuedConnection
 
@@ -58,7 +55,8 @@ static const QLatin1String CONTROL_FNAME("HrCtlAPI");
 static const QLatin1String CHECK_FNAME("HrCheck");
 
 // Exposes QThread::msleep(), which is protected.
-class SleepFuncs final: public QThread {
+class SleepFuncs final: public QThread
+{
 public:
     using QThread::msleep;
 };
@@ -66,70 +64,107 @@ public:
 // Used to wait on the GUI thread for a condition.
 static QMutex* waiterMutex = nullptr;
 
-// Buffer for the script file. We don't immediately write text to the script
-// file. We write to the buffer instead and flush it to the file when needed.
+// Buffer for the script file. We don't immediately write text to the script file. We write to the
+// buffer instead and flush it to the file when needed.
 static QString* scriptBuffer = nullptr;
 
 // Buffer for the scrollback. We flush it when needed.
 static QByteArray* scrollbackBuffer = nullptr;
 
 // Virtual control file for the Hugor handshake.
-HugorFile&
-checkFile()
+HugorFile& checkFile()
 {
     static HugorFile f(nullptr);
     return f;
 }
 
 // Virtual control file for the Hugor extension opcode mechanism.
-HugorFile&
-ctrlFile()
+HugorFile& ctrlFile()
 {
     static HugorFile f(nullptr);
     return f;
 }
 
 // Opcode parser.
-OpcodeParser&
-opcodeParser()
+OpcodeParser& opcodeParser()
 {
     static OpcodeParser parser;
     return parser;
 }
 
-
 /* Helper routine. Converts a Hugo color to a Qt color.
  */
-QColor
-hugoColorToQt( int color )
+QColor hugoColorToQt(int color)
 {
     color = static_cast<std::uint8_t>(color); // [-128..127] -> [0..255]
     QColor qtColor;
 
     switch (color) {
-      case HUGO_BLACK:         qtColor.setRgb(0x000000); break;
-      case HUGO_BLUE:          qtColor.setRgb(0x00007f); break;
-      case HUGO_GREEN:         qtColor.setRgb(0x007f00); break;
-      case HUGO_CYAN:          qtColor.setRgb(0x007f7f); break;
-      case HUGO_RED:           qtColor.setRgb(0x7f0000); break;
-      case HUGO_MAGENTA:       qtColor.setRgb(0x7f007f); break;
-      case HUGO_BROWN:         qtColor.setRgb(0x7f5f00); break;
-      case HUGO_WHITE:         qtColor.setRgb(0xcfcfcf); break;
-      case HUGO_DARK_GRAY:     qtColor.setRgb(0x3f3f3f); break;
-      case HUGO_LIGHT_BLUE:    qtColor.setRgb(0x0000ff); break;
-      case HUGO_LIGHT_GREEN:   qtColor.setRgb(0x00ff00); break;
-      case HUGO_LIGHT_CYAN:    qtColor.setRgb(0x00ffff); break;
-      case HUGO_LIGHT_RED:     qtColor.setRgb(0xff0000); break;
-      case HUGO_LIGHT_MAGENTA: qtColor.setRgb(0xff00ff); break;
-      case HUGO_YELLOW:        qtColor.setRgb(0xffff00); break;
-      case HUGO_BRIGHT_WHITE:  qtColor.setRgb(0xffffff); break;
-      case 16:                 qtColor = hApp->settings()->mainTextColor; break;
-      case 17:                 qtColor = hApp->settings()->mainBgColor; break;
-      case 18:                 qtColor = hApp->settings()->statusTextColor; break;
-      case 19:                 qtColor = hApp->settings()->statusBgColor; break;
-      case 20:                 qtColor = hApp->settings()->mainTextColor; break;
+    case HUGO_BLACK:
+        qtColor.setRgb(0x000000);
+        break;
+    case HUGO_BLUE:
+        qtColor.setRgb(0x00007f);
+        break;
+    case HUGO_GREEN:
+        qtColor.setRgb(0x007f00);
+        break;
+    case HUGO_CYAN:
+        qtColor.setRgb(0x007f7f);
+        break;
+    case HUGO_RED:
+        qtColor.setRgb(0x7f0000);
+        break;
+    case HUGO_MAGENTA:
+        qtColor.setRgb(0x7f007f);
+        break;
+    case HUGO_BROWN:
+        qtColor.setRgb(0x7f5f00);
+        break;
+    case HUGO_WHITE:
+        qtColor.setRgb(0xcfcfcf);
+        break;
+    case HUGO_DARK_GRAY:
+        qtColor.setRgb(0x3f3f3f);
+        break;
+    case HUGO_LIGHT_BLUE:
+        qtColor.setRgb(0x0000ff);
+        break;
+    case HUGO_LIGHT_GREEN:
+        qtColor.setRgb(0x00ff00);
+        break;
+    case HUGO_LIGHT_CYAN:
+        qtColor.setRgb(0x00ffff);
+        break;
+    case HUGO_LIGHT_RED:
+        qtColor.setRgb(0xff0000);
+        break;
+    case HUGO_LIGHT_MAGENTA:
+        qtColor.setRgb(0xff00ff);
+        break;
+    case HUGO_YELLOW:
+        qtColor.setRgb(0xffff00);
+        break;
+    case HUGO_BRIGHT_WHITE:
+        qtColor.setRgb(0xffffff);
+        break;
+    case 16:
+        qtColor = hApp->settings()->mainTextColor;
+        break;
+    case 17:
+        qtColor = hApp->settings()->mainBgColor;
+        break;
+    case 18:
+        qtColor = hApp->settings()->statusTextColor;
+        break;
+    case 19:
+        qtColor = hApp->settings()->statusBgColor;
+        break;
+    case 20:
+        qtColor = hApp->settings()->mainTextColor;
+        break;
 
-      default:
+    default:
         if (color > 99 and color < 255) {
             qtColor = getExtendedColor(color);
         } else {
@@ -140,14 +175,12 @@ hugoColorToQt( int color )
     return qtColor;
 }
 
-
-static void
-flushScriptBuffer()
+static void flushScriptBuffer()
 {
     const int wrapWidth = hApp->settings()->scriptWrap;
 
-    // If wrapping is disabled, or the entire buffer is below our wrap limit,
-    // write out all text as-is.
+    // If wrapping is disabled, or the entire buffer is below our wrap limit, write out all text
+    // as-is.
     if (wrapWidth <= 0 or scriptBuffer->length() <= wrapWidth) {
         fprintf(::script->get(), "%s", scriptBuffer->toLocal8Bit().constData());
         fflush(::script->get());
@@ -157,7 +190,7 @@ flushScriptBuffer()
 
     QTextStream strm(scriptBuffer);
     QString textLine;
-    while (not (textLine = strm.readLine()).isNull()) {
+    while (not(textLine = strm.readLine()).isNull()) {
         // If the line fits and doesn't need wrapping, write it out as-is.
         if (textLine.length() < wrapWidth) {
             fprintf(::script->get(), "%s", textLine.trimmed().toLocal8Bit().constData());
@@ -188,28 +221,21 @@ flushScriptBuffer()
     scriptBuffer->clear();
 }
 
-
-static void
-flushScrollbackBuffer()
+static void flushScrollbackBuffer()
 {
-    runInMainThread([]{hMainWin->appendToScrollback(*scrollbackBuffer);});
+    runInMainThread([] { hMainWin->appendToScrollback(*scrollbackBuffer); });
     scrollbackBuffer->clear();
 }
 
-
-void*
-hugo_blockalloc( long num )
+void* hugo_blockalloc(long num)
 {
     return new char[num];
 }
 
-
-void
-hugo_blockfree( void* block )
+void hugo_blockfree(void* block)
 {
     delete[] static_cast<char*>(block);
 }
-
 
 /*
     FILENAME MANAGEMENT:
@@ -235,8 +261,7 @@ hugo_blockfree( void* block )
 
 /* The following supplied functions will work for Unix-style pathnames: */
 
-void
-hugo_splitpath( char* path, char* drive, char* dir, char* fname, char* ext )
+void hugo_splitpath(char* path, char* drive, char* dir, char* fname, char* ext)
 {
     drive[0] = '\0';
     dir[0] = '\0';
@@ -251,12 +276,10 @@ hugo_splitpath( char* path, char* drive, char* dir, char* fname, char* ext )
     qstrcpy(ext, inf.suffix().toLocal8Bit().constData());
     qstrcpy(fname, inf.completeBaseName().toLocal8Bit().constData());
     qstrcpy(dir, inf.absolutePath().toLocal8Bit().constData());
-    //qDebug() << "splitpath:" << drive << dir << fname << ext;
+    // qDebug() << "splitpath:" << drive << dir << fname << ext;
 }
 
-
-void
-hugo_makepath( char* path, char* drive, char* dir, char* fname, char* ext )
+void hugo_makepath(char* path, char* drive, char* dir, char* fname, char* ext)
 {
     QByteArray result(drive);
     result += dir;
@@ -271,7 +294,6 @@ hugo_makepath( char* path, char* drive, char* dir, char* fname, char* ext )
     qstrcpy(path, result.constData());
 }
 
-
 /* hugo_getfilename
 
     Loads the name of the filename to save or restore (as specified by
@@ -281,12 +303,10 @@ hugo_makepath( char* path, char* drive, char* dir, char* fname, char* ext )
     preferable to replace it with, for example, a dialog-based file
     selector.
 */
-void
-hugo_getfilename( char* a, char* b )
+void hugo_getfilename(char* a, char* b)
 {
-    runInMainThread([a, b]{hHandlers->getfilename(a, b);});
+    runInMainThread([a, b] { hHandlers->getfilename(a, b); });
 }
-
 
 /* hugo_overwrite
 
@@ -295,8 +315,7 @@ hugo_getfilename( char* a, char* b )
 
     Again, it may be preferable to replace this with something fancier.
 */
-int
-hugo_overwrite( char* /*f*/)
+int hugo_overwrite(char* /*f*/)
 {
     // We handle this in hugo_getfilename().
     return true;
@@ -305,7 +324,7 @@ hugo_overwrite( char* /*f*/)
 static bool ctrlFileInWriteMode = false;
 
 HUGO_FILE
-hugo_fopen( const char* path, const char* mode )
+hugo_fopen(const char* path, const char* mode)
 {
     if (QString(path).endsWith(CHECK_FNAME)) {
         if (mode[0] == 'r') {
@@ -324,8 +343,7 @@ hugo_fopen( const char* path, const char* mode )
     return new HugorFile(handle);
 }
 
-int
-hugo_fclose( HUGO_FILE file )
+int hugo_fclose(HUGO_FILE file)
 {
     if (file == nullptr or file == &checkFile()) {
         return 0;
@@ -344,8 +362,7 @@ hugo_fclose( HUGO_FILE file )
     return ret;
 }
 
-int
-hugo_fgetc( HUGO_FILE file )
+int hugo_fgetc(HUGO_FILE file)
 {
     if (file == &checkFile()) {
         return 0x42;
@@ -359,8 +376,7 @@ hugo_fgetc( HUGO_FILE file )
     return std::fgetc(file->get());
 }
 
-int
-hugo_fseek(HUGO_FILE file, long offset, int whence )
+int hugo_fseek(HUGO_FILE file, long offset, int whence)
 {
     if (file == &ctrlFile()) {
         qDebug() << Q_FUNC_INFO;
@@ -369,8 +385,7 @@ hugo_fseek(HUGO_FILE file, long offset, int whence )
     return std::fseek(file->get(), offset, whence);
 }
 
-long
-hugo_ftell(HUGO_FILE file )
+long hugo_ftell(HUGO_FILE file)
 {
     if (file == &ctrlFile()) {
         qDebug() << Q_FUNC_INFO;
@@ -378,8 +393,7 @@ hugo_ftell(HUGO_FILE file )
     return std::ftell(file->get());
 }
 
-size_t
-hugo_fread(void* ptr, size_t size, size_t nmemb, HUGO_FILE file)
+size_t hugo_fread(void* ptr, size_t size, size_t nmemb, HUGO_FILE file)
 {
     if (file == &ctrlFile()) {
         qDebug() << Q_FUNC_INFO;
@@ -388,8 +402,7 @@ hugo_fread(void* ptr, size_t size, size_t nmemb, HUGO_FILE file)
     return std::fread(ptr, size, nmemb, file->get());
 }
 
-char*
-hugo_fgets(char* s, int size, HUGO_FILE file )
+char* hugo_fgets(char* s, int size, HUGO_FILE file)
 {
     if (file == &ctrlFile()) {
         qDebug() << Q_FUNC_INFO;
@@ -398,8 +411,7 @@ hugo_fgets(char* s, int size, HUGO_FILE file )
     return std::fgets(s, size, file->get());
 }
 
-int
-hugo_fputc(int c, HUGO_FILE file )
+int hugo_fputc(int c, HUGO_FILE file)
 {
     if (file == &ctrlFile()) {
         opcodeParser().pushByte(c);
@@ -408,8 +420,7 @@ hugo_fputc(int c, HUGO_FILE file )
     return std::fputc(c, file->get());
 }
 
-int
-hugo_fputs(const char* s, HUGO_FILE file )
+int hugo_fputs(const char* s, HUGO_FILE file)
 {
     if (file == &ctrlFile()) {
         qDebug() << Q_FUNC_INFO;
@@ -418,8 +429,7 @@ hugo_fputs(const char* s, HUGO_FILE file )
     return std::fputs(s, file->get());
 }
 
-int
-hugo_ferror(HUGO_FILE file )
+int hugo_ferror(HUGO_FILE file)
 {
     if (file == &ctrlFile()) {
         qDebug() << Q_FUNC_INFO;
@@ -428,8 +438,7 @@ hugo_ferror(HUGO_FILE file )
     return std::ferror(file->get());
 }
 
-int
-hugo_fprintf(HUGO_FILE file, const char* format, ...)
+int hugo_fprintf(HUGO_FILE file, const char* format, ...)
 {
     if (file == &ctrlFile()) {
         qDebug() << Q_FUNC_INFO;
@@ -442,15 +451,13 @@ hugo_fprintf(HUGO_FILE file, const char* format, ...)
     return ret;
 }
 
-
 /* hugo_closefiles
 
     Closes all open files.  Note:  If the operating system automatically
     closes any open streams upon exit from the program, this function may
     be left empty.
 */
-void
-hugo_closefiles()
+void hugo_closefiles()
 {
     delete game;
     hugo_fclose(script);
@@ -458,25 +465,20 @@ hugo_closefiles()
     delete record;
 }
 
-
 /* hugo_sendtoscrollback
 
    Stores a given line in the scrollback buffer (optional).
 */
-void
-hugo_sendtoscrollback( char* a )
+void hugo_sendtoscrollback(char* a)
 {
     scrollbackBuffer->append(a);
 }
 
-
-int
-hugo_writetoscript(const char* s)
+int hugo_writetoscript(const char* s)
 {
     scriptBuffer->append(hApp->hugoCodec()->toUnicode(s));
     return 0;
 }
-
 
 /* hugo_getkey
 
@@ -489,8 +491,7 @@ hugo_writetoscript(const char* s)
     left-arrow       8 (CTRL-H)
     right-arrow     21 (CTRL-U)
 */
-int
-hugo_getkey( void )
+int hugo_getkey(void)
 {
     if (::script != nullptr) {
         flushScriptBuffer();
@@ -514,13 +515,11 @@ hugo_getkey( void )
     return key;
 }
 
-
 /* hugo_getline
 
     Gets a line of input from the keyboard, storing it in <buffer>.
 */
-void
-hugo_getline( char* p )
+void hugo_getline(char* p)
 {
     if (::script != nullptr) {
         hugo_writetoscript(p);
@@ -530,13 +529,12 @@ hugo_getline( char* p )
     flushScrollbackBuffer();
 
     QMutexLocker mLocker(waiterMutex);
-    runInMainThread([p]{hHandlers->startGetline(p);});
+    runInMainThread([p] { hHandlers->startGetline(p); });
     hFrame->inputLineWaitCond.wait(waiterMutex);
     hFrame->getInput(::buffer, MAXBUFFER);
-    runInMainThread([]{hHandlers->endGetline();});
+    runInMainThread([] { hHandlers->endGetline(); });
 
-    // Also copy the input to the script file (if there is one) and the
-    // scrollback.
+    // Also copy the input to the script file (if there is one) and the scrollback.
     if (script != nullptr) {
         hugo_writetoscript(buffer);
         hugo_writetoscript("\n");
@@ -547,7 +545,6 @@ hugo_getline( char* p )
     hugo_sendtoscrollback(newline);
 }
 
-
 /* hugo_waitforkey
 
     Provided to be replaced by multitasking systems where cycling while
@@ -557,41 +554,35 @@ hugo_getline( char* p )
     implications (i.e., on a multitasking system), this will have to
     be modified.
 */
-int
-hugo_waitforkey( void )
+int hugo_waitforkey(void)
 {
     return hugo_getkey();
 }
-
 
 /* hugo_iskeywaiting
 
     Returns true if a keypress is waiting to be retrieved.
 */
-int
-hugo_iskeywaiting( void )
+int hugo_iskeywaiting(void)
 {
-    //qDebug(Q_FUNC_INFO);
-    runInMainThread([]{hFrame->updateGameScreen(false);});
+    // qDebug(Q_FUNC_INFO);
+    runInMainThread([] { hFrame->updateGameScreen(false); });
     return hFrame->hasKeyInQueue();
 }
-
 
 /* hugo_timewait
 
     Waits for 1/n seconds.  Returns false if waiting is unsupported.
 */
-int
-hugo_timewait( int n )
+int hugo_timewait(int n)
 {
-    //qDebug() << Q_FUNC_INFO;
+    // qDebug() << Q_FUNC_INFO;
     if (hApp->gameRunning() and n > 0) {
         SleepFuncs::msleep(1000 / n);
-        runInMainThread([]{hFrame->updateGameScreen(false);});
+        runInMainThread([] { hFrame->updateGameScreen(false); });
     }
     return true;
 }
-
 
 /* DISPLAY CONTROL:
 
@@ -625,23 +616,19 @@ hugo_timewait( int n )
     currentpos, currentline
 */
 
-
 /* Does whatever has to be done to initially set up the display.
  */
-void
-hugo_init_screen( void )
+void hugo_init_screen(void)
 {
     waiterMutex = new QMutex;
     scriptBuffer = new QString;
     scrollbackBuffer = new QByteArray;
 }
 
-
 /* Returns true if the current display is capable of graphics display;
  * returns 2 if graphics are being routed to an external window other
  * than the main display. */
-int
-hugo_hasgraphics( void )
+int hugo_hasgraphics(void)
 {
     if (hApp->settings()->enableGraphics) {
         return 1;
@@ -649,51 +636,41 @@ hugo_hasgraphics( void )
     return false;
 }
 
-
-void
-hugo_setgametitle( char* t )
+void hugo_setgametitle(char* t)
 {
-    runInMainThread([t]{hMainWin->setWindowTitle(QLatin1String(t));});
+    runInMainThread([t] { hMainWin->setWindowTitle(QLatin1String(t)); });
 }
-
 
 /* Does whatever has to be done to clean up the display pre-termination.
  */
-void
-hugo_cleanup_screen( void )
+void hugo_cleanup_screen(void)
 {
     delete waiterMutex;
     delete scriptBuffer;
     delete scrollbackBuffer;
 }
 
-
 /* Clears everything on the screen, moving the cursor to the top-left
  * corner of the screen.
  */
-void
-hugo_clearfullscreen( void )
+void hugo_clearfullscreen(void)
 {
-    runInMainThread([]{hHandlers->clearfullscreen();});
+    runInMainThread([] { hHandlers->clearfullscreen(); });
     currentpos = 0;
     currentline = 1;
     TB_Clear(0, 0, screenwidth, screenheight);
 }
 
-
 /* Clears the currently defined window, moving the cursor to the top-left
  * corner of the window.
  */
-void
-hugo_clearwindow( void )
+void hugo_clearwindow(void)
 {
-    runInMainThread([]{hHandlers->clearwindow();});
+    runInMainThread([] { hHandlers->clearwindow(); });
     currentpos = 0;
     currentline = 1;
-    TB_Clear(physical_windowleft, physical_windowtop,
-             physical_windowright, physical_windowbottom);
+    TB_Clear(physical_windowleft, physical_windowtop, physical_windowright, physical_windowbottom);
 }
-
 
 /* This function does whatever is necessary to set the system up for
    a standard text display */
@@ -726,12 +703,10 @@ hugo_clearwindow( void )
     Both charwidth and lineheight must change dynamically if the
     metrics for the currently selected font change
 */
-void
-hugo_settextmode( void )
+void hugo_settextmode(void)
 {
-    runInMainThread([]{hHandlers->settextmode();});
+    runInMainThread([] { hHandlers->settextmode(); });
 }
-
 
 /* Once again, the arguments for the window are passed using character
    coordinates--a system setting a window using pixel coordinates will
@@ -748,12 +723,11 @@ hugo_settextmode( void )
 /* Create a text window from (column, row) character-coordinates
 (left, top) to (right, bottom)
 */
-void
-hugo_settextwindow( int left, int top, int right, int bottom )
+void hugo_settextwindow(int left, int top, int right, int bottom)
 {
-    runInMainThread([left, top, right, bottom]{hHandlers->settextwindow(left, top, right, bottom);});
+    runInMainThread(
+        [left, top, right, bottom] { hHandlers->settextwindow(left, top, right, bottom); });
 }
-
 
 /* The top-left corner of the current active window is (1, 1).
 
@@ -773,12 +747,11 @@ hugo_settextwindow( int left, int top, int right, int bottom )
    screen location will need to calculate pixel coordinates to
    simulate text-screen coordinates.
 */
-void
-hugo_settextpos( int x, int y )
+void hugo_settextpos(int x, int y)
 {
     // Must be set:
     currentline = y;
-    currentpos = (x - 1) * ::charwidth;   // Note:  zero-based
+    currentpos = (x - 1) * ::charwidth; // Note:  zero-based
 
     // current_text_x/row are calculated assuming that the
     // character position (1, 1) is the pixel position (0, 0)
@@ -786,15 +759,12 @@ hugo_settextpos( int x, int y )
     current_text_y = physical_windowtop + (y - 1) * lineheight;
 }
 
-
 /* PRINTFATALERROR may be #defined in heheader.h.
  */
-void
-printFatalError( char* a )
+void printFatalError(char* a)
 {
-    runInMainThread([a]{hHandlers->printFatalError(a);});
+    runInMainThread([a] { hHandlers->printFatalError(a); });
 }
-
 
 /* Essentially the same as printf() without formatting, since printf()
    generally doesn't take into account color setting, font changes,
@@ -808,23 +778,21 @@ printFatalError( char* a )
 /* Output <a>, taking into account fore/background color,
    font, current window, etc.
 */
-void
-hugo_print( char* a )
+void hugo_print(char* a)
 {
-    runInMainThread([a]{hHandlers->print(a);});
+    runInMainThread([a] { hHandlers->print(a); });
 }
-
 
 /* Scroll the current text window up one line.
  */
-void
-hugo_scrollwindowup()
+void hugo_scrollwindowup()
 {
-    runInMainThread([]{hFrame->scrollUp(physical_windowleft, physical_windowtop, physical_windowright,
-                                        physical_windowbottom, lineheight);});
+    runInMainThread([] {
+        hFrame->scrollUp(physical_windowleft, physical_windowtop, physical_windowright,
+                         physical_windowbottom, lineheight);
+    });
     TB_Scroll();
 }
-
 
 /* The <f> argument is a mask containing any or none of:
    BOLD_FONT, UNDERLINE_FONT, ITALIC_FONT, PROP_FONT.
@@ -832,26 +800,20 @@ hugo_scrollwindowup()
    If charwidth and lineheight change with a font change, these must be
    reset here as well.
 */
-void
-hugo_font( int f )
+void hugo_font(int f)
 {
-    runInMainThread([f]{hHandlers->font(f);});
+    runInMainThread([f] { hHandlers->font(f); });
 }
 
-
-void
-hugo_settextcolor( int c )
+void hugo_settextcolor(int c)
 {
-    runInMainThread([c]{hHandlers->settextcolor(c);});
+    runInMainThread([c] { hHandlers->settextcolor(c); });
 }
 
-
-void
-hugo_setbackcolor( int c )
+void hugo_setbackcolor(int c)
 {
-    runInMainThread([c]{hHandlers->setbackcolor(c);});
+    runInMainThread([c] { hHandlers->setbackcolor(c); });
 }
-
 
 /* CHARACTER AND TEXT MEASUREMENT
 
@@ -865,8 +827,7 @@ hugo_setbackcolor( int c )
     The hugo_strlen() function is used to give the length of
     the string not including any non-printing control characters.
 */
-int
-hugo_charwidth( char a )
+int hugo_charwidth(char a)
 {
     if (a == FORCED_SPACE) {
         a = ' ';
@@ -880,14 +841,11 @@ hugo_charwidth( char a )
     return FIXEDCHARWIDTH;
 }
 
-
-int
-hugo_textwidth( char* a )
+int hugo_textwidth(char* a)
 {
-    // With a fixed-width font, we know the width of the string is equal
-    // to its length times the width of a character (all chars have the
-    // same width.)
-    if (not (currentfont & PROP_FONT)) {
+    // With a fixed-width font, we know the width of the string is equal to its length times the
+    // width of a character (all chars have the same width.)
+    if (not(currentfont & PROP_FONT)) {
         return hugo_strlen(a) * FIXEDCHARWIDTH;
     }
 
@@ -907,9 +865,7 @@ hugo_textwidth( char* a )
     return hFrame->currentFontMetrics().width(str);
 }
 
-
-int
-hugo_strlen( char* a )
+int hugo_strlen(char* a)
 {
     size_t len = 0;
     size_t slen = qstrlen(a);
@@ -926,82 +882,68 @@ hugo_strlen( char* a )
     return len;
 }
 
-
-int
-hugo_displaypicture( HUGO_FILE infile, long len )
+int hugo_displaypicture(HUGO_FILE infile, long len)
 {
     int result;
-    runInMainThread([infile, len, &result]{hHandlers->displaypicture(infile, len, &result);});
+    runInMainThread([infile, len, &result] { hHandlers->displaypicture(infile, len, &result); });
     return result;
 }
 
-
-int
-hugo_playmusic( HUGO_FILE infile, long len, char loop_flag )
+int hugo_playmusic(HUGO_FILE infile, long len, char loop_flag)
 {
     int result;
-    runInMainThread([infile, len, loop_flag, &result]{hHandlers->playmusic(infile, len, loop_flag, &result);});
+    runInMainThread([infile, len, loop_flag, &result] {
+        hHandlers->playmusic(infile, len, loop_flag, &result);
+    });
     return result;
 }
 
-
-void
-hugo_musicvolume( int vol )
+void hugo_musicvolume(int vol)
 {
-    runInMainThread([vol]{hHandlers->musicvolume(vol);});
+    runInMainThread([vol] { hHandlers->musicvolume(vol); });
 }
 
-
-void
-hugo_stopmusic( void )
+void hugo_stopmusic(void)
 {
-    runInMainThread([]{hHandlers->stopmusic();});
+    runInMainThread([] { hHandlers->stopmusic(); });
 }
 
-
-int
-hugo_playsample( HUGO_FILE infile, long len, char loop_flag )
+int hugo_playsample(HUGO_FILE infile, long len, char loop_flag)
 {
     int result;
-    runInMainThread([infile, len, loop_flag, &result]{hHandlers->playsample(infile, len, loop_flag, &result);});
+    runInMainThread([infile, len, loop_flag, &result] {
+        hHandlers->playsample(infile, len, loop_flag, &result);
+    });
     return result;
 }
 
-
-void
-hugo_samplevolume( int vol )
+void hugo_samplevolume(int vol)
 {
-    runInMainThread([vol]{hHandlers->samplevolume(vol);});
+    runInMainThread([vol] { hHandlers->samplevolume(vol); });
 }
 
-
-void
-hugo_stopsample( void )
+void hugo_stopsample(void)
 {
-    runInMainThread([]{hHandlers->stopsample();});
+    runInMainThread([] { hHandlers->stopsample(); });
 }
-
 
 #ifdef DISABLE_VIDEO
 
-void
-muteVideo(bool)
-{ }
+void muteVideo(bool)
+{}
 
-void
-updateVideoVolume()
-{ }
+void updateVideoVolume()
+{}
 
-int
-hugo_hasvideo( void )
-{ return false; }
+int hugo_hasvideo(void)
+{
+    return false;
+}
 
-void
-hugo_stopvideo( void )
-{ }
+void hugo_stopvideo(void)
+{}
 
-int
-hugo_playvideo( HUGO_FILE infile, long, char, char, int )
+int hugo_playvideo(HUGO_FILE infile, long, char, char, int)
 {
     hugo_fclose(infile);
     return true;
@@ -1009,8 +951,7 @@ hugo_playvideo( HUGO_FILE infile, long, char, char, int )
 
 #else
 
-int
-hugo_hasvideo( void )
+int hugo_hasvideo(void)
 {
     if (hApp->settings()->enableVideo and not hApp->settings()->videoSysError) {
         return true;
@@ -1018,19 +959,15 @@ hugo_hasvideo( void )
     return false;
 }
 
-
-void
-hugo_stopvideo( void )
+void hugo_stopvideo(void)
 {
-    runInMainThread([]{hHandlers->stopvideo();});
+    runInMainThread([] { hHandlers->stopvideo(); });
 }
 
-
-int
-hugo_playvideo( HUGO_FILE infile, long len, char loop, char bg, int vol )
+int hugo_playvideo(HUGO_FILE infile, long len, char loop, char bg, int vol)
 {
     int result;
-    runInMainThread([infile, len, loop, bg, vol, &result]{
+    runInMainThread([infile, len, loop, bg, vol, &result] {
         hHandlers->playvideo(infile, len, loop, bg, vol, &result);
     });
     return result;

@@ -27,6 +27,7 @@
  */
 #pragma once
 #include <QObject>
+
 extern "C" {
 #include "heheader.h"
 }
@@ -37,22 +38,22 @@ class HugoHandlers;
 extern HugoHandlers* hHandlers;
 
 /*
- * Handles hugo callbacks from heqt.cc that we want executed in the main thread.
- * The hugo engine runs in a separate thread, so the heqt.cc callbacks will
- * delegate some work to us in order to ensure it runs in the main thrad (like
- * GUI operations.)
+ * Handles hugo callbacks from heqt.cc that we want executed in the main thread. The hugo engine
+ * runs in a separate thread, so the heqt.cc callbacks will delegate some work to us in order to
+ * ensure it runs in the main thrad (like GUI operations.)
  */
-class HugoHandlers final: public QObject {
+class HugoHandlers final: public QObject
+{
     Q_OBJECT
 
-  public:
+public:
     HugoHandlers(QObject* parent = nullptr)
         : QObject(parent)
-    { }
+    {}
 
     void calcFontDimensions() const;
 
-  public slots:
+public slots:
     void getfilename(char* a, char* b) const;
     void startGetline(char* p) const;
     void endGetline() const;
@@ -77,6 +78,6 @@ class HugoHandlers final: public QObject {
     void playvideo(HUGO_FILE infile, long len, char loop, char bg, int vol, int* result);
 #endif
 
-  private:
+private:
     VideoPlayer* fVidPlayer = nullptr;
 };

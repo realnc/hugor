@@ -25,17 +25,17 @@
  * include the source code for the parts of the Hugo Engine used as well as
  * that of the covered work.
  */
+#include "hmarginwidget.h"
+
+#include <QPainter>
 #include <QVBoxLayout>
 #include <QWheelEvent>
-#include <QPainter>
 #include <utility>
 
-#include "hmarginwidget.h"
 #include "hmainwindow.h"
 #include "hugodefs.h"
 
-
-HMarginWidget::HMarginWidget(QWidget* parent )
+HMarginWidget::HMarginWidget(QWidget* parent)
     : QWidget(parent)
     , fLayout(new QVBoxLayout)
     , fColor(hugoColorToQt(17))
@@ -46,9 +46,7 @@ HMarginWidget::HMarginWidget(QWidget* parent )
     setAttribute(Qt::WA_OpaquePaintEvent);
 }
 
-
-void
-HMarginWidget::wheelEvent( QWheelEvent* e )
+void HMarginWidget::wheelEvent(QWheelEvent* e)
 {
     if (e->delta() > 0) {
         hMainWin->showScrollback();
@@ -56,9 +54,7 @@ HMarginWidget::wheelEvent( QWheelEvent* e )
     e->accept();
 }
 
-
-void
-HMarginWidget::mouseMoveEvent( QMouseEvent* e )
+void HMarginWidget::mouseMoveEvent(QMouseEvent* e)
 {
     if (cursor().shape() == Qt::BlankCursor) {
         unsetCursor();
@@ -67,26 +63,22 @@ HMarginWidget::mouseMoveEvent( QMouseEvent* e )
     QWidget::mouseMoveEvent(e);
 }
 
-
-void
-HMarginWidget::paintEvent(QPaintEvent* e)
+void HMarginWidget::paintEvent(QPaintEvent* e)
 {
-    //const QMargins& m = contentsMargins();
-    //if (m.isNull()) {
+    // const QMargins& m = contentsMargins();
+    // if (m.isNull()) {
     //     return;
     //}
     QPainter p(this);
     p.fillRect(e->rect(), fColor);
-    //p.fillRect(rect(), fColor);
+    // p.fillRect(rect(), fColor);
 
     // Previous code, before introducing the fade screen opcode.
-    //p.fillRect(0, 0, m.left(), height(), fColor);
-    //p.fillRect(width() - m.right(), 0, m.right(), height(), fColor);
+    // p.fillRect(0, 0, m.left(), height(), fColor);
+    // p.fillRect(width() - m.right(), 0, m.right(), height(), fColor);
 }
 
-
-void
-HMarginWidget::setBannerWidget( QWidget* w )
+void HMarginWidget::setBannerWidget(QWidget* w)
 {
     // If a banner widget is already set, delete it first.
     if (fBannerWidget != nullptr) {
@@ -101,23 +93,17 @@ HMarginWidget::setBannerWidget( QWidget* w )
     }
 }
 
-
-void
-HMarginWidget::addWidget( QWidget* w )
+void HMarginWidget::addWidget(QWidget* w)
 {
     fLayout->addWidget(w);
 }
 
-
-void
-HMarginWidget::removeWidget( QWidget* w )
+void HMarginWidget::removeWidget(QWidget* w)
 {
     fLayout->removeWidget(w);
 }
 
-
-void
-HMarginWidget::setColor(QColor color)
+void HMarginWidget::setColor(QColor color)
 {
     fColor = std::move(color);
 }

@@ -25,16 +25,17 @@
  * include the source code for the parts of the Hugo Engine used as well as
  * that of the covered work.
  */
+#include "enginerunner.h"
+
 #include <QThread>
 #include <array>
 #include <memory>
-#include "enginerunner.h"
+
 extern "C" {
 #include "heheader.h"
 }
 
-void
-EngineRunner::runEngine()
+void EngineRunner::runEngine()
 {
     char argv0[] = "hugor";
     auto argv1 = std::make_unique<char[]>(fGameFile.toLocal8Bit().size() + 1);

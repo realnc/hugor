@@ -28,7 +28,8 @@
 #pragma once
 #include <QThread>
 
-class EngineThread final: public QThread {
+class EngineThread final: public QThread
+{
     Q_OBJECT
 
 public:
@@ -36,26 +37,27 @@ public:
 
     explicit EngineThread(QObject* parent = nullptr)
         : QThread(parent)
-    { }
+    {}
 };
 
-class EngineRunner final: public QObject {
+class EngineRunner final: public QObject
+{
     Q_OBJECT
 
-  public:
+public:
     EngineRunner(QString gameFile, EngineThread* thread, QObject* parent = nullptr)
-        : QObject(parent),
-          fThread(thread),
-          fGameFile(std::move(gameFile))
-    { }
+        : QObject(parent)
+        , fThread(thread)
+        , fGameFile(std::move(gameFile))
+    {}
 
-  signals:
+signals:
     void finished();
 
-  public slots:
+public slots:
     void runEngine();
 
-  private:
+private:
     EngineThread* fThread;
     QString fGameFile;
 };

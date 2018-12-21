@@ -36,10 +36,11 @@ class QErrorMessage;
 
 extern HMainWindow* hMainWin;
 
-class HMainWindow final: public QMainWindow {
+class HMainWindow final: public QMainWindow
+{
     Q_OBJECT
 
-  private:
+private:
     QErrorMessage* fErrorMsg = nullptr;
     ConfDialog* fConfDialog = nullptr;
     AboutDialog* fAboutDialog = nullptr;
@@ -51,61 +52,36 @@ class HMainWindow final: public QMainWindow {
     QIcon fFullscreenEnterIcon;
     QIcon fFullscreenExitIcon;
 
-    void
-    fFullscreenAdjust();
+    void fFullscreenAdjust();
 
-  private slots:
-    void
-    fShowConfDialog();
+private slots:
+    void fShowConfDialog();
+    void fHideConfDialog();
+    void fShowAbout();
+    void fHideAbout();
 
-    void
-    fHideConfDialog();
+protected:
+    void closeEvent(QCloseEvent* e) override;
+    void changeEvent(QEvent* e) override;
+    void contextMenuEvent(QContextMenuEvent* e) override;
 
-    void
-    fShowAbout();
+public:
+    HMainWindow(QWidget* parent);
 
-    void
-    fHideAbout();
+    void hideMenuBar();
+    void showMenuBar();
 
-  protected:
-    void
-    closeEvent( QCloseEvent* e ) override;
+    QErrorMessage* errorMsgObj() const
+    {
+        return fErrorMsg;
+    }
 
-    void
-    changeEvent( QEvent* e ) override;
+    void setScrollbackFont(const QFont& font);
 
-    void
-    contextMenuEvent( QContextMenuEvent* e ) override;
-
-  public:
-    HMainWindow( QWidget* parent );
-
-    void
-    hideMenuBar();
-
-    void
-    showMenuBar();
-
-    QErrorMessage*
-    errorMsgObj() const
-    { return fErrorMsg; }
-
-    void
-    setScrollbackFont( const QFont& font );
-
-  public slots:
-    void
-    appendToScrollback( const QByteArray& str );
-
-    void
-    showScrollback();
-
-    void
-    hideScrollback();
-
-    void
-    toggleFullscreen();
-
-    void
-    setFullscreen(bool f);
+public slots:
+    void appendToScrollback(const QByteArray& str);
+    void showScrollback();
+    void hideScrollback();
+    void toggleFullscreen();
+    void setFullscreen(bool f);
 };

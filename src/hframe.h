@@ -27,10 +27,11 @@
  */
 #pragma once
 #include <QWidget>
-#include <QQueue>
-#include <QList>
+
 #include <QFontMetrics>
+#include <QList>
 #include <QMutex>
+#include <QQueue>
 #include <QWaitCondition>
 
 #include "happlication.h"
@@ -41,14 +42,15 @@ class QTimer;
 
 extern HFrame* hFrame;
 
-class HFrame final: public QWidget {
+class HFrame final: public QWidget
+{
     Q_OBJECT
 
-  private:
+private:
     // These values specify the exact input-mode we are in.
     enum class InputMode {
-        // We aren't in input-mode. We still enqueue key presses though,
-        // so they can be retrieved with getNextKey().
+        // We aren't in input-mode. We still enqueue key presses though, so they can be retrieved
+        // with getNextKey().
         None,
 
         // Return-terminated input.
@@ -61,8 +63,7 @@ class HFrame final: public QWidget {
     // We have a finished user input.
     bool fInputReady = false;
 
-    // Keypress input queue. If an element is 0, it means the input was
-    // a mouse click.
+    // Keypress input queue. If an element is 0, it means the input was a mouse click.
     QQueue<char> fKeyQueue;
 
     // Mouse click input queue.
@@ -79,8 +80,7 @@ class HFrame final: public QWidget {
     int fInputStartX = 0;
     int fInputStartY = 0;
 
-    // Current editor position, in characters. 0 is the start of the
-    // current input buffer string.
+    // Current editor position, in characters. 0 is the start of the current input buffer string.
     int fInputCurrentChar = 0;
 
     // Command history buffer.
@@ -92,9 +92,8 @@ class HFrame final: public QWidget {
     // Current command index in the history. 0 is the most recent one.
     int fCurHistIndex = 0;
 
-    // Backup of the current, yet to be committed to history, input line.
-    // We need this to back up the current input when the user recalls a
-    // previous command from the history.
+    // Backup of the current, yet to be committed to history, input line. We need this to back up
+    // the current input when the user recalls a previous command from the history.
     QString fInputBufBackup;
 
     // Current colors.
@@ -110,12 +109,12 @@ class HFrame final: public QWidget {
     // Current font metrics.
     QFontMetrics fFontMetrics {QFont()};
 
-    // We render game output into a pixmap first instead or painting directly
-    // on the widget. We then draw the pixmap in our paintEvent().
+    // We render game output into a pixmap first instead or painting directly on the widget. We then
+    // draw the pixmap in our paintEvent().
     QPixmap fPixmap {1, 1};
 
-    // We buffer text printed with printText() so that we can draw
-    // whole strings rather than single characters at a time.
+    // We buffer text printed with printText() so that we can draw whole strings rather than single
+    // characters at a time.
     QString fPrintBuffer;
 
     // Position at which to draw the buffered string.
@@ -134,8 +133,8 @@ class HFrame final: public QWidget {
     // Is the text cursor visible?
     bool fCursorVisible = false;
 
-    // Text cursor blink visibility.  Changed by a timer to show/hide the
-    // cursor at specific intervals if fCursorVisible is true.
+    // Text cursor blink visibility.  Changed by a timer to show/hide the cursor at specific
+    // intervals if fCursorVisible is true.
     bool fBlinkVisible = false;
 
     // Text cursor blink timer.
@@ -144,65 +143,44 @@ class HFrame final: public QWidget {
     // Keeps track of whether the game screen needs updating.
     bool fNeedScreenUpdate = false;
 
-    // We need a small time delay before minimizing when losing focus while
-    // in fullscreen mode.
+    // We need a small time delay before minimizing when losing focus while in fullscreen mode.
     QTimer* fMinimizeTimer;
 
     // Add a keypress to our input queue.
-    void
-    fEnqueueKey(char key, QMouseEvent* e);
+    void fEnqueueKey(char key, QMouseEvent* e);
 
-  private slots:
+private slots:
     // Called by the timer to blink the text cursor.
-    void
-    fBlinkCursor();
+    void fBlinkCursor();
 
-    // We need to know when the application loses focus entirely so that we
-    // can disable keyboard cursor blinking when we lose focus.
-    void
-    fHandleFocusChange( QWidget* old, QWidget* now );
+    // We need to know when the application loses focus entirely so that we can disable keyboard
+    // cursor blinking when we lose focus.
+    void fHandleFocusChange(QWidget* old, QWidget* now);
 
-    void
-    fHandleFocusLost();
+    void fHandleFocusLost();
 
     // End line input mode and send the command to the game.
-    void
-    fEndInputMode( bool addToHistory );
+    void fEndInputMode(bool addToHistory);
 
-  protected:
-    void
-    paintEvent(QPaintEvent* e) override;
+protected:
+    void paintEvent(QPaintEvent* e) override;
+    void resizeEvent(QResizeEvent* e) override;
+    void keyPressEvent(QKeyEvent* e) override;
+    void inputMethodEvent(QInputMethodEvent* e) override;
+    void singleKeyPressEvent(QKeyEvent* event);
+    void mousePressEvent(QMouseEvent* e) override;
+    void mouseDoubleClickEvent(QMouseEvent* e) override;
+    void mouseMoveEvent(QMouseEvent* e) override;
 
-    void
-    resizeEvent( QResizeEvent* e ) override;
-
-    void
-    keyPressEvent( QKeyEvent* e ) override;
-
-    void
-    inputMethodEvent( QInputMethodEvent* e ) override;
-
-    void
-    singleKeyPressEvent( QKeyEvent* event );
-
-    void
-    mousePressEvent( QMouseEvent* e ) override;
-
-    void
-    mouseDoubleClickEvent( QMouseEvent* e ) override;
-
-    void
-    mouseMoveEvent( QMouseEvent* e ) override;
-
-  signals:
+signals:
     // Emitted when scrolling or paging up.
     void requestScrollback();
 
     // Emitted when the escape key is pressed on the keyboard.
     void escKeyPressed();
 
-  public:
-    HFrame( QWidget* parent );
+public:
+    HFrame(QWidget* parent);
 
     // The engine thread waits on this until an input line has been entered.
     QWaitCondition inputLineWaitCond;
@@ -211,104 +189,86 @@ class HFrame final: public QWidget {
     QWaitCondition keypressAvailableWaitCond;
 
     // Start reading an input line.
-    void
-    startInput( int xPos, int yPos );
+    void startInput(int xPos, int yPos);
 
     // Get the most recently entered input line and clear it.
-    void
-    getInput(char* buf, size_t buflen);
+    void getInput(char* buf, size_t buflen);
 
-    // Returns the next character waiting in the queue. If the queue is
-    // empty, it will wait for a character to become available.
-    // Note: if this returns 0, it means the next "key" is a mouse click;
-    // call getNextClick() to get the position of the mouse click.
-    int
-    getNextKey();
+    // Returns the next character waiting in the queue. If the queue is empty, it will wait for a
+    // character to become available. Note: if this returns 0, it means the next "key" is a mouse
+    // click; call getNextClick() to get the position of the mouse click.
+    int getNextKey();
 
-    QPoint
-    getNextClick();
-
-    bool
-    hasKeyInQueue();
+    QPoint getNextClick();
+    bool hasKeyInQueue();
 
     // Clear a region of the window using the current background color.
-    void
-    clearRegion( int left, int top, int right, int bottom );
+    void clearRegion(int left, int top, int right, int bottom);
 
     // Set the current foreground color.
-    void
-    setFgColor( int color );
+    void setFgColor(int color);
 
     // Set the current background color.
-    void
-    setBgColor( int color );
+    void setBgColor(int color);
 
-    void
-    setFontType( int hugoFont );
+    void setFontType(int hugoFont);
 
-    const QFontMetrics&
-    currentFontMetrics() const
-    { return fFontMetrics; }
+    const QFontMetrics& currentFontMetrics() const
+    {
+        return fFontMetrics;
+    }
 
-    // Print text using the current foreground and background colors.
-    // The Text is might not be printed immediately; call flushText()
-    // to flush the accumulated text to the screen.
-    void
-    printText( const QString& str, int x, int y );
+    // Print text using the current foreground and background colors. The Text is might not be
+    // printed immediately; call flushText() to flush the accumulated text to the screen.
+    void printText(const QString& str, int x, int y);
 
-    // Print an image to the screen. The image is printed immediately
-    // (no buffering is performed.)
-    void
-    printImage( const QImage& img, int x, int y );
+    // Print an image to the screen. The image is printed immediately (no buffering is performed.)
+    void printImage(const QImage& img, int x, int y);
 
     // Change the text cursor position.
-    void
-    moveCursorPos( const QPoint& pos )
-    { fCursorPos = pos; }
+    void moveCursorPos(const QPoint& pos)
+    {
+        fCursorPos = pos;
+    }
 
     // Set the height of the text cursor in pixels.
-    void
-    setCursorHeight( unsigned height )
-    { fHeight = height; }
+    void setCursorHeight(unsigned height)
+    {
+        fHeight = height;
+    }
 
     // Show/hide the text cursor.
-    void
-    setCursorVisible( bool visible )
-    { fCursorVisible = visible; }
+    void setCursorVisible(bool visible)
+    {
+        fCursorVisible = visible;
+    }
 
-    bool
-    isCursorVisible() const
-    { return fCursorVisible; }
+    bool isCursorVisible() const
+    {
+        return fCursorVisible;
+    }
 
-    void
-    updateCursorPos();
+    void updateCursorPos();
 
-    // Reset cursor blink timer.  This will read the blinking rate from the
-    // desktop environment and ajust the blink timer as needed.
-    void
-    resetCursorBlinking();
+    // Reset cursor blink timer.  This will read the blinking rate from the desktop environment and
+    // ajust the blink timer as needed.
+    void resetCursorBlinking();
 
-    // Insert text at the current command input position. If 'execute' is set,
-    // the command is also executed. If 'clear' is set, the current command
-    // will be cleared before adding the text.
-    void
-    insertInputText( QString txt, bool execute, bool clearCurrent );
+    // Insert text at the current command input position. If 'execute' is set, the command is also
+    // executed. If 'clear' is set, the current command will be cleared before adding the text.
+    void insertInputText(QString txt, bool execute, bool clearCurrent);
 
-    // Returns a list of current context menu entries set by the game
-    // and inserts them into the `dst` menu.
-    QList<const QAction*>
-    getGameContextMenuEntries( QMenu& dst );
+    // Returns a list of current context menu entries set by the game and inserts them into the
+    // `dst` menu.
+    QList<const QAction*> getGameContextMenuEntries(QMenu& dst);
 
-  public slots:
+public slots:
     // Flush any pending text drawing.
-    void
-    flushText();
+    void flushText();
 
     // Scroll a region of the screen up by 'h' pixels.
-    void
-    scrollUp( int left, int top, int right, int bottom, int h );
+    void scrollUp(int left, int top, int right, int bottom, int h);
 
     // Update the game screen, if needed.
-    void
-    updateGameScreen(bool force);
+    void updateGameScreen(bool force);
 };

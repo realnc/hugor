@@ -26,12 +26,13 @@
  * that of the covered work.
  */
 #pragma once
-#include <QString>
 #include <QColor>
+#include <QString>
 
-class SettingsOverrides final {
-  public:
-    SettingsOverrides( const QString& filename );
+class SettingsOverrides final
+{
+public:
+    SettingsOverrides(const QString& filename);
 
     QString appName;
     QString authorName;

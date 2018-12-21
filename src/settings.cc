@@ -25,20 +25,20 @@
  * include the source code for the parts of the Hugo Engine used as well as
  * that of the covered work.
  */
-#include <QSettings>
-#include <QDebug>
-#include <QFileInfo>
-#include <QApplication>
-#include <QDesktopWidget>
-
 #include "settings.h"
-#include "hmainwindow.h"
-#include "hugodefs.h"
+
+#include <QApplication>
+#include <QDebug>
+#include <QDesktopWidget>
+#include <QFileInfo>
+#include <QSettings>
+
 extern "C" {
 #include "heheader.h"
 }
+#include "hmainwindow.h"
+#include "hugodefs.h"
 #include "settingsoverrides.h"
-
 
 #define SETT_MEDIA_GRP QString::fromLatin1("media")
 #define SETT_COLORS_GRP QString::fromLatin1("colors")
@@ -80,9 +80,7 @@ extern "C" {
 #define SETT_START_FULLSCREEN QString::fromLatin1("startFullscreen")
 #define SETT_START_WINDOWED QString::fromLatin1("startWindowed")
 
-
-void
-Settings::loadFromDisk( SettingsOverrides* ovr )
+void Settings::loadFromDisk(SettingsOverrides* ovr)
 {
     QSettings sett;
 
@@ -108,7 +106,8 @@ Settings::loadFromDisk( SettingsOverrides* ovr )
     mainBgColor = sett.value(SETT_MAIN_BG_COLOR, hugoColorToQt(DEF_BGCOLOR)).value<QColor>();
     mainTextColor = sett.value(SETT_MAIN_TXT_COLOR, hugoColorToQt(DEF_FCOLOR)).value<QColor>();
     statusBgColor = sett.value(SETT_STATUS_BG_COLOR, hugoColorToQt(DEF_SLBGCOLOR)).value<QColor>();
-    statusTextColor = sett.value(SETT_STATUS_TXT_COLOR, hugoColorToQt(DEF_SLFCOLOR)).value<QColor>();
+    statusTextColor =
+        sett.value(SETT_STATUS_TXT_COLOR, hugoColorToQt(DEF_SLFCOLOR)).value<QColor>();
     customFsMarginColor = sett.value(SETT_CUSTOM_FS_MARGIN_COLOR, false).toBool();
     fsMarginColor = sett.value(SETT_MARGIN_COLOR, hugoColorToQt(DEF_BGCOLOR)).value<QColor>();
     sett.endGroup();
@@ -132,7 +131,8 @@ Settings::loadFromDisk( SettingsOverrides* ovr )
 #endif
     sett.beginGroup(SETT_FONTS_GRP);
     QFont::StyleStrategy strat;
-    strat = QFont::StyleStrategy(QFont::PreferOutline | QFont::PreferQuality | QFont::ForceIntegerMetrics);
+    strat = QFont::StyleStrategy(QFont::PreferOutline | QFont::PreferQuality
+                                 | QFont::ForceIntegerMetrics);
     propFont.setStyleStrategy(strat);
     QFont tmp;
     tmp.fromString(sett.value(SETT_MAIN_FONT, DEFAULT_PROP).toString());
@@ -162,7 +162,7 @@ Settings::loadFromDisk( SettingsOverrides* ovr )
     // Remove any files that don't exist or aren't readable.
     for (int i = 0; i < recentGamesList.size(); ++i) {
         QFileInfo file(recentGamesList.at(i));
-        if (not file.exists() or not (file.isFile() or file.isSymLink()) or not file.isReadable()) {
+        if (not file.exists() or not(file.isFile() or file.isSymLink()) or not file.isReadable()) {
             recentGamesList.removeAt(i);
             --i;
         }
@@ -189,8 +189,9 @@ Settings::loadFromDisk( SettingsOverrides* ovr )
     int scrHeight = QApplication::desktop()->screenGeometry().height();
     int scrWidth = QApplication::desktop()->screenGeometry().width();
     fullscreenWidth = sett.value(SETT_FULLSCREEN_WIDTH,
-                                       (double)scrHeight * ((double)widthRatio / (double)heightRatio)
-                                       * 100.0 / (double)scrWidth).toInt();
+                                 (double)scrHeight * ((double)widthRatio / (double)heightRatio)
+                                     * 100.0 / (double)scrWidth)
+                          .toInt();
     if (fullscreenWidth > 100) {
         fullscreenWidth = 100;
     } else if (fullscreenWidth < 10) {
@@ -250,9 +251,7 @@ Settings::loadFromDisk( SettingsOverrides* ovr )
     }
 }
 
-
-void
-Settings::saveToDisk()
+void Settings::saveToDisk()
 {
     QSettings sett;
 
@@ -297,8 +296,8 @@ Settings::saveToDisk()
     sett.endGroup();
 
     sett.beginGroup(SETT_GEOMETRY_GRP);
-    // Do not save current application size if we're in fullscreen mode, since
-    // we need to restore the windowed, non-fullscreen size next time we run.
+    // Do not save current application size if we're in fullscreen mode, since we need to restore
+    // the windowed, non-fullscreen size next time we run.
     if (hMainWin->isFullScreen()) {
         sett.setValue(SETT_APP_SIZE, appSize);
     } else {

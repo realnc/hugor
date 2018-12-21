@@ -30,13 +30,14 @@
 
 struct SDL_RWops;
 
-class RwopsQIODevice final: public QIODevice {
+class RwopsQIODevice final: public QIODevice
+{
     Q_OBJECT
 
 public:
     explicit RwopsQIODevice(QObject* parent)
         : QIODevice(parent)
-    { }
+    {}
 
     bool atEnd() const override;
     bool isSequential() const override;

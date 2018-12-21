@@ -29,13 +29,13 @@
 
 class QColor;
 
-QColor hugoColorToQt( int color );
+QColor hugoColorToQt(int color);
 void initSoundEngine();
-void initVideoEngine( int& argc, char* argv[] );
+void initVideoEngine(int& argc, char* argv[]);
 void closeSoundEngine();
 void closeVideoEngine();
-void muteSound( bool mute );
-void muteVideo( bool mute );
+void muteSound(bool mute);
+void muteVideo(bool mute);
 void updateMusicVolume();
 bool isMusicPlaying();
 bool isSamplePlaying();
@@ -44,19 +44,19 @@ void updateSynthGain();
 void updateVideoVolume();
 
 // Defined Hugo colors.
-constexpr unsigned HUGO_BLACK         =  0;
-constexpr unsigned HUGO_BLUE          =  1;
-constexpr unsigned HUGO_GREEN         =  2;
-constexpr unsigned HUGO_CYAN          =  3;
-constexpr unsigned HUGO_RED           =  4;
-constexpr unsigned HUGO_MAGENTA       =  5;
-constexpr unsigned HUGO_BROWN         =  6;
-constexpr unsigned HUGO_WHITE         =  7;
-constexpr unsigned HUGO_DARK_GRAY     =  8;
-constexpr unsigned HUGO_LIGHT_BLUE    =  9;
-constexpr unsigned HUGO_LIGHT_GREEN   = 10;
-constexpr unsigned HUGO_LIGHT_CYAN    = 11;
-constexpr unsigned HUGO_LIGHT_RED     = 12;
+constexpr unsigned HUGO_BLACK = 0;
+constexpr unsigned HUGO_BLUE = 1;
+constexpr unsigned HUGO_GREEN = 2;
+constexpr unsigned HUGO_CYAN = 3;
+constexpr unsigned HUGO_RED = 4;
+constexpr unsigned HUGO_MAGENTA = 5;
+constexpr unsigned HUGO_BROWN = 6;
+constexpr unsigned HUGO_WHITE = 7;
+constexpr unsigned HUGO_DARK_GRAY = 8;
+constexpr unsigned HUGO_LIGHT_BLUE = 9;
+constexpr unsigned HUGO_LIGHT_GREEN = 10;
+constexpr unsigned HUGO_LIGHT_CYAN = 11;
+constexpr unsigned HUGO_LIGHT_RED = 12;
 constexpr unsigned HUGO_LIGHT_MAGENTA = 13;
-constexpr unsigned HUGO_YELLOW        = 14;
-constexpr unsigned HUGO_BRIGHT_WHITE  = 15;
+constexpr unsigned HUGO_YELLOW = 14;
+constexpr unsigned HUGO_BRIGHT_WHITE = 15;

@@ -26,23 +26,22 @@
  * that of the covered work.
  */
 #pragma once
-#include <QFont>
 #include <QColor>
+#include <QFont>
 #include <QSize>
 
 class SettingsOverrides;
 
-class Settings final {
-  public:
+class Settings final
+{
+public:
     Settings()
         : videoSysError(false)
-    { }
+    {}
 
-    void
-    loadFromDisk( SettingsOverrides* ovr = nullptr );
+    void loadFromDisk(SettingsOverrides* ovr = nullptr);
 
-    void
-    saveToDisk();
+    void saveToDisk();
 
     bool enableGraphics;
     bool enableVideo;
@@ -84,7 +83,6 @@ class Settings final {
     bool startFullscreen;
     bool startWindowed;
 
-    // These are not saved. Used for temporary overrides that only apply
-    // to the current session.
+    // These are not saved. Used for temporary overrides that only apply to the current session.
     bool videoSysError;
 };

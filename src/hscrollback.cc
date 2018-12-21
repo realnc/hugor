@@ -27,13 +27,13 @@
  */
 #include "hscrollback.h"
 
+#include <QKeyEvent>
+
 #include "happlication.h"
 #include "hmainwindow.h"
 #include "settings.h"
-#include <QKeyEvent>
 
-
-HScrollbackWindow::HScrollbackWindow( QWidget* parent )
+HScrollbackWindow::HScrollbackWindow(QWidget* parent)
     : QTextEdit(parent)
 {
     setWindowTitle(HApplication::applicationName() + ' ' + "Scrollback");
@@ -47,9 +47,7 @@ HScrollbackWindow::HScrollbackWindow( QWidget* parent )
     resize(fInitialWidth, fInitialHeight);
 }
 
-
-void
-HScrollbackWindow::keyPressEvent( QKeyEvent* e )
+void HScrollbackWindow::keyPressEvent(QKeyEvent* e)
 {
     if (e->matches(QKeySequence::Close) or e->key() == Qt::Key_Escape) {
         close();
@@ -61,9 +59,7 @@ HScrollbackWindow::keyPressEvent( QKeyEvent* e )
     }
 }
 
-
-void
-HScrollbackWindow::closeEvent( QCloseEvent* e )
+void HScrollbackWindow::closeEvent(QCloseEvent* e)
 {
     QTextEdit::closeEvent(e);
     hMainWin->hideScrollback();

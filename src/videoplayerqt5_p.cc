@@ -25,16 +25,14 @@
  * include the source code for the parts of the Hugo Engine used as well as
  * that of the covered work.
  */
-#include "videoplayer.h"
 #include "videoplayerqt5_p.h"
 
 #include <QErrorMessage>
 
 #include "hmainwindow.h"
+#include "videoplayer.h"
 
-
-void
-VideoPlayer_priv::onStatusChange(QMediaPlayer::MediaStatus status)
+void VideoPlayer_priv::onStatusChange(QMediaPlayer::MediaStatus status)
 {
     if (status != QMediaPlayer::EndOfMedia) {
         return;
@@ -46,9 +44,7 @@ VideoPlayer_priv::onStatusChange(QMediaPlayer::MediaStatus status)
     }
 }
 
-
-void
-VideoPlayer_priv::onError(QMediaPlayer::Error error)
+void VideoPlayer_priv::onError(QMediaPlayer::Error error)
 {
     if (error == QMediaPlayer::NoError) {
         return;

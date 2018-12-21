@@ -27,19 +27,21 @@
  */
 #pragma once
 #include <QWidget>
+
 #include <QMediaPlayer>
 
 class VideoPlayer;
 class RwopsQIODevice;
 
-class VideoPlayer_priv final: public QWidget {
+class VideoPlayer_priv final: public QWidget
+{
     Q_OBJECT
 
 public:
     VideoPlayer_priv(QWidget* parent, VideoPlayer* qPtr)
-        : QWidget(parent),
-          q(qPtr)
-    { }
+        : QWidget(parent)
+        , q(qPtr)
+    {}
 
     VideoPlayer* q;
     QMediaPlayer* fMediaPlayer = nullptr;

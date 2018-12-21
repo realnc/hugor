@@ -6,7 +6,7 @@ struct HugorFile final
 public:
     HugorFile(FILE* handle)
         : fHandle(handle)
-    { }
+    {}
 
     ~HugorFile()
     {

@@ -26,35 +26,32 @@
  * that of the covered work.
  */
 #include <QDebug>
-#include <QString>
-#include <QStringList>
 #include <QFileInfo>
 #include <QMessageBox>
+#include <QString>
+#include <QStringList>
 #include <QTimer>
 #include <cstdlib>
 
+#include "happlication.h"
 extern "C" {
 #include "heheader.h"
 }
 #include "hugodefs.h"
-#include "version.h"
-#include "happlication.h"
 #include "settings.h"
+#include "version.h"
 
-
-// On some platforms, SDL redefines main in order to provide a
-// platform-specific main() implementation.  However, Qt handles this too,
-// so things can get weird.  We need to make sure main is not redefined so
-// that Qt can find our own implementation and SDL will not try to do
-// platform-specific initialization work (like launching the Cocoa event-loop
-// or setting up the application menu on OS X, or redirecting stdout and stderr
-// to text files on Windows), which would break things.
+// On some platforms, SDL redefines main in order to provide a platform-specific main()
+// implementation. However, Qt handles this too, so things can get weird. We need to make sure main
+// is not redefined so that Qt can find our own implementation and SDL will not try to do
+// platform-specific initialization work (like launching the Cocoa event-loop or setting up the
+// application menu on OS X, or redirecting stdout and stderr to text files on Windows), which would
+// break things.
 #ifdef main
-#  undef main
+#undef main
 #endif
 
-
-int main( int argc, char* argv[] )
+int main(int argc, char* argv[])
 {
     initSoundEngine();
 #ifndef DISABLE_VIDEO
@@ -66,8 +63,8 @@ int main( int argc, char* argv[] )
     // Filename of the game to run.
     QString gameFileName;
 
-    // Check if a game file with the same basename as ours exists in our
-    // directory.  If yes, we will run it.
+    // Check if a game file with the same basename as ours exists in our directory.  If yes, we will
+    // run it.
     gameFileName = HApplication::applicationDirPath();
     if (not gameFileName.endsWith('/')) {
         gameFileName += '/';
@@ -91,9 +88,10 @@ int main( int argc, char* argv[] )
 
     int ret = 0;
 #if QT_VERSION < QT_VERSION_CHECK(5, 4, 0)
-    QMetaObject::invokeMethod(&app, "entryPoint", Qt::QueuedConnection, Q_ARG(QString, gameFileName));
+    QMetaObject::invokeMethod(&app, "entryPoint", Qt::QueuedConnection,
+                              Q_ARG(QString, gameFileName));
 #else
-    QTimer::singleShot(0, &app, [&app, gameFileName]{app.entryPoint(gameFileName);});
+    QTimer::singleShot(0, &app, [&app, gameFileName] { app.entryPoint(gameFileName); });
 #endif
     ret = HApplication::exec();
 #ifndef DISABLE_VIDEO

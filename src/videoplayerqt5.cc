@@ -25,51 +25,48 @@
  * include the source code for the parts of the Hugo Engine used as well as
  * that of the covered work.
  */
+#include "hugodefs.h"
 #include "videoplayer.h"
-#include "videoplayerqt5_p.h"
 
 #include <QErrorMessage>
+#include <QFile>
 #include <QMediaPlayer>
 #include <QVideoWidget>
 #include <SDL_rwops.h>
 
-#include <QFile>
-
+#include "hmainwindow.h"
 #include "rwopsbundle.h"
 #include "rwopsqiodev.h"
-#include "hmainwindow.h"
-
+#include "videoplayerqt5_p.h"
 
 void initVideoEngine(int& /*argc*/, char* /*argv*/[])
-{ }
+{}
 
 void closeVideoEngine()
-{ }
+{}
 
-void
-muteVideo(bool /*mute*/)
+void muteVideo(bool /*mute*/)
 {
     // TODO
 }
 
-void
-updateVideoVolume()
+void updateVideoVolume()
 {
     // TODO
 }
 
-VideoPlayer::VideoPlayer(QWidget *parent)
+VideoPlayer::VideoPlayer(QWidget* parent)
     : QWidget(parent)
 {
     d = new VideoPlayer_priv(this, this);
     d->fMediaPlayer = new QMediaPlayer(this, QMediaPlayer::StreamPlayback);
-    //d->fMediaPlayer = new QMediaPlayer(this);
+    // d->fMediaPlayer = new QMediaPlayer(this);
     d->fVideoWidget = new QVideoWidget(this);
 
-    //d->fVideoWidget->setAttribute(Qt::WA_OpaquePaintEvent, true);
-//    d->fVideoWidget->setAttribute(Qt::WA_NoSystemBackground, true);
-//    d->fVideoWidget->setAttribute(Qt::WA_PaintOnScreen, true);
-//    d->fVideoWidget->setAutoFillBackground(false);
+    // d->fVideoWidget->setAttribute(Qt::WA_OpaquePaintEvent, true);
+    //    d->fVideoWidget->setAttribute(Qt::WA_NoSystemBackground, true);
+    //    d->fVideoWidget->setAttribute(Qt::WA_PaintOnScreen, true);
+    //    d->fVideoWidget->setAutoFillBackground(false);
     d->fVideoWidget->setAspectRatioMode(Qt::KeepAspectRatio);
     d->fMediaPlayer->setVideoOutput(d->fVideoWidget);
     d->fIODev = new RwopsQIODevice(this);
@@ -77,12 +74,11 @@ VideoPlayer::VideoPlayer(QWidget *parent)
     setMouseTracking(true);
     d->fVideoWidget->setMouseTracking(true);
 
-    connect(d->fMediaPlayer, SIGNAL(mediaStatusChanged(QMediaPlayer::MediaStatus)),
-            d, SLOT(onStatusChange(QMediaPlayer::MediaStatus)));
-    connect(d->fMediaPlayer, SIGNAL(error(QMediaPlayer::Error)),
-            d, SLOT(onError(QMediaPlayer::Error)));
+    connect(d->fMediaPlayer, SIGNAL(mediaStatusChanged(QMediaPlayer::MediaStatus)), d,
+            SLOT(onStatusChange(QMediaPlayer::MediaStatus)));
+    connect(d->fMediaPlayer, SIGNAL(error(QMediaPlayer::Error)), d,
+            SLOT(onError(QMediaPlayer::Error)));
 }
-
 
 VideoPlayer::~VideoPlayer()
 {
@@ -91,9 +87,7 @@ VideoPlayer::~VideoPlayer()
     }
 }
 
-
-bool
-VideoPlayer::loadVideo(FILE* src, long len, bool loop)
+bool VideoPlayer::loadVideo(FILE* src, long len, bool loop)
 {
     stop();
     if (fRwops != nullptr) {
@@ -113,42 +107,34 @@ VideoPlayer::loadVideo(FILE* src, long len, bool loop)
     return true;
 }
 
-
-void
-VideoPlayer::play()
+void VideoPlayer::play()
 {
     d->fVideoWidget->show();
     d->fVideoWidget->raise();
     d->fMediaPlayer->play();
 }
 
-
-void
-VideoPlayer::stop()
+void VideoPlayer::stop()
 {
     d->fMediaPlayer->stop();
 }
 
-void
-VideoPlayer::updateVolume()
+void VideoPlayer::updateVolume()
 {
     // TODO
 }
 
-void
-VideoPlayer::setVolume(int vol)
+void VideoPlayer::setVolume(int vol)
 {
     d->fMediaPlayer->setVolume(vol);
 }
 
-void
-VideoPlayer::setMute(bool /*mute*/)
+void VideoPlayer::setMute(bool /*mute*/)
 {
     // TODO
 }
 
-void
-VideoPlayer::resizeEvent(QResizeEvent* e)
+void VideoPlayer::resizeEvent(QResizeEvent* e)
 {
     QWidget::resizeEvent(e);
     d->fVideoWidget->resize(size());
