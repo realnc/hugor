@@ -53,23 +53,23 @@ protected:
     void changeEvent(QEvent* e) override;
 
 private:
-    Ui::ConfDialog* ui;
-    int fInitialSoundVol;
-    float fInitialGain;
+    Ui::ConfDialog* ui_;
+    int initial_sound_vol_;
+    float initial_gain_;
 #ifndef DISABLE_AUDIO
-    std::unique_ptr<Aulib::AudioStream> fMidiStream;
-    Aulib::AudioDecoderFluidSynth* fFluidSynthDec = nullptr;
+    std::unique_ptr<Aulib::AudioStream> midi_stream_;
+    Aulib::AudioDecoderFluidSynth* fsynth_dec_ = nullptr;
 #endif
 
     // Makes the dialog's controls apply instantly when they change.
-    void fMakeInstantApply();
+    void makeInstantApply();
 
 private slots:
-    void fApplySettings();
-    void fCancel();
-    void fSetSoundVolume(int vol);
-    void fPlayTestMidi();
-    void fStopTestMidi();
-    void fSetGain();
-    void fBrowseForSoundFont();
+    void applySettings();
+    void cancel();
+    void setSoundVolume(int vol);
+    void playTestMidi();
+    void stopTestMidi();
+    void setGain();
+    void browseForSoundFont();
 };

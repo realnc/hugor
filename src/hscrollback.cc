@@ -41,10 +41,10 @@ HScrollbackWindow::HScrollbackWindow(QWidget* parent)
     setUndoRedoEnabled(false);
     setTextInteractionFlags(Qt::TextSelectableByMouse);
     setFrameStyle(QFrame::NoFrame | QFrame::Plain);
-    setFont(hApp->settings()->scrollbackFont);
+    setFont(hApp->settings()->scrollback_font);
     // Don't allow the scrollbuffer to grow forever; limit it to fMaximumBlockCount lines.
-    document()->setMaximumBlockCount(fMaximumBlockCount);
-    resize(fInitialWidth, fInitialHeight);
+    document()->setMaximumBlockCount(max_block_count_);
+    resize(initial_width_, initial_height_);
 }
 
 void HScrollbackWindow::keyPressEvent(QKeyEvent* e)

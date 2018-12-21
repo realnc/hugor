@@ -60,7 +60,7 @@ HApplication* hApp = nullptr;
 HApplication::HApplication(int& argc, char* argv[], const char* appName, const char* appVersion,
                            const char* orgName, const char* orgDomain)
     : QApplication(argc, argv)
-    , fHugoCodec(QTextCodec::codecForName("Windows-1252"))
+    , hugo_codec_(QTextCodec::codecForName("Windows-1252"))
 {
     // qDebug() << Q_FUNC_INFO;
     Q_ASSERT(hApp == nullptr);
@@ -92,17 +92,17 @@ HApplication::HApplication(int& argc, char* argv[], const char* appName, const c
     if (settOvr != nullptr) {
         // Make sure that appName and authorName are either both set or unset. This avoids mixing up
         // the system file/registry paths for the settings with our default ones.
-        if ((settOvr->appName.isEmpty() and not settOvr->authorName.isEmpty())
-            or (settOvr->authorName.isEmpty() and not settOvr->appName.isEmpty())) {
-            settOvr->appName.clear();
-            settOvr->authorName.clear();
+        if ((settOvr->app_name.isEmpty() and not settOvr->author_name.isEmpty())
+            or (settOvr->author_name.isEmpty() and not settOvr->app_name.isEmpty())) {
+            settOvr->app_name.clear();
+            settOvr->author_name.clear();
         }
 
-        if (not settOvr->appName.isEmpty()) {
-            HApplication::setApplicationName(settOvr->appName);
+        if (not settOvr->app_name.isEmpty()) {
+            HApplication::setApplicationName(settOvr->app_name);
         }
-        if (not settOvr->authorName.isEmpty()) {
-            HApplication::setOrganizationName(settOvr->authorName);
+        if (not settOvr->author_name.isEmpty()) {
+            HApplication::setOrganizationName(settOvr->author_name);
         }
     }
 
@@ -111,44 +111,44 @@ HApplication::HApplication(int& argc, char* argv[], const char* appName, const c
     auto layoutPolicy = QDialogButtonBox::ButtonLayout(
         QApplication::style()->styleHint(QStyle::SH_DialogButtonLayout));
     if (layoutPolicy == QDialogButtonBox::GnomeLayout) {
-        fDesktopIsGnome = true;
+        is_desktop_gnome = true;
     } else {
-        fDesktopIsGnome = false;
+        is_desktop_gnome = false;
     }
 #endif
 
     // Load our persistent settings.
-    fSettings = new Settings;
-    fSettings->loadFromDisk(settOvr);
+    settings_ = new Settings;
+    settings_->loadFromDisk(settOvr);
 
     // Apply the smart formatting setting.
-    smartformatting = fSettings->smartFormatting;
+    smartformatting = settings_->smart_formatting;
 
     // Set our global pointer.
     hApp = this;
 
     // Create our main application window.
-    fMainWin = new HMainWindow(nullptr);
-    fMainWin->setWindowTitle(HApplication::applicationName());
+    main_win_ = new HMainWindow(nullptr);
+    main_win_->setWindowTitle(HApplication::applicationName());
 
     // Disable screen updates until we're actually ready to run a game. This prevents screen flicker
     // due to the resizing and background color changes if we're starting in fullscreen mode.
-    fMainWin->setUpdatesEnabled(false);
+    main_win_->setUpdatesEnabled(false);
 
     // This widget provides margins for fFrameWin.
-    fMarginWidget = new HMarginWidget(fMainWin);
+    margin_widget_ = new HMarginWidget(main_win_);
 
-    fFrameWin = new HFrame(fMarginWidget);
-    fMarginWidget->addWidget(fFrameWin);
+    frame_win_ = new HFrame(margin_widget_);
+    margin_widget_->addWidget(frame_win_);
     updateMargins(-1);
-    fMainWin->setCentralWidget(fMarginWidget);
+    main_win_->setCentralWidget(margin_widget_);
 
-    if ((settOvr != nullptr) and settOvr->hideMenuBar) {
-        fMainWin->hideMenuBar();
+    if ((settOvr != nullptr) and settOvr->hide_menubar) {
+        main_win_->hideMenuBar();
     }
 
     // Restore the application's size.
-    fMainWin->resize(fSettings->appSize);
+    main_win_->resize(settings_->app_size);
 
     // Set application window icon, unless we're on OS X where the bundle icon is used.
 #ifndef Q_OS_MAC
@@ -166,26 +166,26 @@ HApplication::~HApplication()
     delete hHandlers;
     hHandlers = nullptr;
     Q_ASSERT(hApp != nullptr);
-    fSettings->saveToDisk();
-    delete fSettings;
-    delete fMainWin;
+    settings_->saveToDisk();
+    delete settings_;
+    delete main_win_;
     // We're being destroyed, so our global pointer is no longer valid.
     hApp = nullptr;
 }
 
-void HApplication::fRunGame()
+void HApplication::runGame()
 {
-    if (fNextGame.isEmpty()) {
+    if (next_game_.isEmpty()) {
         // Nothing to run.
         return;
     }
 
-    while (not fNextGame.isEmpty()) {
-        QFileInfo finfo(QFileInfo(fNextGame).absoluteFilePath());
-        fNextGame.clear();
+    while (not next_game_.isEmpty()) {
+        QFileInfo finfo(QFileInfo(next_game_).absoluteFilePath());
+        next_game_.clear();
 
         // Remember the directory of the game.
-        fSettings->lastFileOpenDir = finfo.absolutePath();
+        settings_->last_file_open_dir = finfo.absolutePath();
 
         // Change to the game file's directory.
         QDir::setCurrent(finfo.absolutePath());
@@ -202,7 +202,7 @@ void HApplication::fRunGame()
 #endif
 
         // Add the game file to our "recent games" list.
-        QStringList& gamesList = fSettings->recentGamesList;
+        QStringList& gamesList = settings_->recent_games_list;
         int recentIdx = gamesList.indexOf(finfo.absoluteFilePath());
         if (recentIdx > 0) {
             // It's already in the list and it's not the first item. Make it the first item so that
@@ -225,44 +225,44 @@ void HApplication::fRunGame()
             } else {
                 // It's not in the list. Prepend it as the most recent item and, if the list is
                 // full, delete the oldest one.
-                if (gamesList.size() >= Settings::recentGamesCapacity) {
+                if (gamesList.size() >= Settings::recent_games_capacity) {
                     gamesList.removeLast();
                 }
                 gamesList.prepend(finfo.absoluteFilePath());
             }
         }
-        fSettings->saveToDisk();
+        settings_->saveToDisk();
 
         // Run the Hugo engine.
-        fGameRunning = true;
-        fGameFile = finfo.absoluteFilePath();
-        fMainWin->setUpdatesEnabled(true);
-        fMainWin->raise();
-        fMainWin->activateWindow();
-        fHugoThread = new EngineThread(this);
-        fHugoThread->setObjectName("engine");
-        fEngineRunner = new EngineRunner(fGameFile, fHugoThread);
-        fEngineRunner->moveToThread(fHugoThread);
-        connect(fEngineRunner, SIGNAL(finished()), fHugoThread, SLOT(quit()));
-        connect(fHugoThread, SIGNAL(started()), fEngineRunner, SLOT(runEngine()));
-        connect(fHugoThread, SIGNAL(finished()), fEngineRunner, SLOT(deleteLater()));
-        connect(fHugoThread, SIGNAL(finished()), fHugoThread, SLOT(deleteLater()));
-        connect(fHugoThread, SIGNAL(finished()), SLOT(handleEngineFinished()));
-        fHugoThread->start();
+        is_game_running_ = true;
+        gamefile_ = finfo.absoluteFilePath();
+        main_win_->setUpdatesEnabled(true);
+        main_win_->raise();
+        main_win_->activateWindow();
+        hugo_thread_ = new EngineThread(this);
+        hugo_thread_->setObjectName("engine");
+        engine_runner_ = new EngineRunner(gamefile_, hugo_thread_);
+        engine_runner_->moveToThread(hugo_thread_);
+        connect(engine_runner_, SIGNAL(finished()), hugo_thread_, SLOT(quit()));
+        connect(hugo_thread_, SIGNAL(started()), engine_runner_, SLOT(runEngine()));
+        connect(hugo_thread_, SIGNAL(finished()), engine_runner_, SLOT(deleteLater()));
+        connect(hugo_thread_, SIGNAL(finished()), hugo_thread_, SLOT(deleteLater()));
+        connect(hugo_thread_, SIGNAL(finished()), SLOT(handleEngineFinished()));
+        hugo_thread_->start();
     }
 }
 
-void HApplication::fUpdateMarginColor(int color)
+void HApplication::updateMarginColor(int color)
 {
     if (color < 0) {
         return;
     }
 
     const Settings* sett = hApp->settings();
-    const QColor& qColor = (hMainWin->isFullScreen() and sett->customFsMarginColor)
-                               ? sett->fsMarginColor
+    const QColor& qColor = (hMainWin->isFullScreen() and sett->custom_fs_margin_color)
+                               ? sett->fs_margin_color
                                : hugoColorToQt(color);
-    fMarginWidget->setColor(qColor);
+    margin_widget_->setColor(qColor);
 }
 
 void HApplication::updateMargins(int color)
@@ -272,21 +272,21 @@ void HApplication::updateMargins(int color)
 
     // In fullscreen mode, respect the aspect ratio and max width settings.
     if (hMainWin->isFullScreen()) {
-        int maxWidth = fSettings->fullscreenWidth * scrWidth / 100;
+        int maxWidth = settings_->fullscreen_width * scrWidth / 100;
 
         // Calculate how big the margin should be to get the specified width.
-        int targetWidth = qMin(maxWidth, fMarginWidget->width());
-        margin = (fMarginWidget->width() - targetWidth) / 2;
+        int targetWidth = qMin(maxWidth, margin_widget_->width());
+        margin = (margin_widget_->width() - targetWidth) / 2;
     } else {
         // In windowed mode, do not update the margins if we're currently displaying scrollback as
         // an overlay.
-        if (fMarginWidget->layout()->indexOf(fFrameWin) < 0) {
+        if (margin_widget_->layout()->indexOf(frame_win_) < 0) {
             return;
         }
-        margin = fSettings->marginSize;
+        margin = settings_->margin_size;
     }
-    fMarginWidget->setContentsMargins(margin, 0, margin, fBottomMarginSize);
-    fUpdateMarginColor(color);
+    margin_widget_->setContentsMargins(margin, 0, margin, bottom_margin_size_);
+    updateMarginColor(color);
 }
 
 #ifdef Q_OS_MAC
@@ -295,14 +295,14 @@ bool HApplication::event(QEvent* e)
 {
     // We only handle the FileOpen event and only when no game
     // is currently running.
-    if (e->type() != QEvent::FileOpen or fGameRunning) {
+    if (e->type() != QEvent::FileOpen or is_game_running_) {
         return QApplication::event(e);
     }
     QFileOpenEvent* fOpenEv = static_cast<QFileOpenEvent*>(e);
     if (fOpenEv->file().isEmpty()) {
         return QApplication::event(e);
     }
-    fNextGame = fOpenEv->file();
+    next_game_ = fOpenEv->file();
     e->accept();
     return true;
 }
@@ -317,20 +317,21 @@ void HApplication::entryPoint(QString gameFileName)
         advanceEventLoop();
     }
 
-    if (fNextGame.isEmpty()) {
-        fNextGame = std::move(gameFileName);
+    if (next_game_.isEmpty()) {
+        next_game_ = std::move(gameFileName);
     }
 
     // If we still don't have a filename, prompt for one.
-    if (fNextGame.isEmpty() and fSettings->askForGameFile) {
-        fNextGame = QFileDialog::getOpenFileName(
+    if (next_game_.isEmpty() and settings_->ask_for_gamefile) {
+        next_game_ = QFileDialog::getOpenFileName(
             nullptr, QObject::tr("Choose the story file you wish to play"),
-            fSettings->lastFileOpenDir, QObject::tr("Hugo Games") + QString::fromLatin1("(*.hex)"));
+            settings_->last_file_open_dir,
+            QObject::tr("Hugo Games") + QString::fromLatin1("(*.hex)"));
     }
 
     // Switch to fullscreen, if needed.
-    if (fSettings->isFullscreen) {
-        fMainWin->toggleFullscreen();
+    if (settings_->is_fullscreen) {
+        main_win_->toggleFullscreen();
         // If we don't let the event loop run for a while, for some reason the screen will be
         // flashing when the window first becomes visible. The reason is unknown, but this seems to
         // work around the issue.
@@ -343,13 +344,13 @@ void HApplication::entryPoint(QString gameFileName)
     connect(this, SIGNAL(lastWindowClosed()), this, SLOT(quit()));
 
     // If we have a filename, load it.
-    if (not fNextGame.isEmpty()) {
-        if (fSettings->isMaximized) {
-            fMainWin->showMaximized();
+    if (not next_game_.isEmpty()) {
+        if (settings_->is_maximized) {
+            main_win_->showMaximized();
         } else {
-            fMainWin->show();
+            main_win_->show();
         }
-        fRunGame();
+        runGame();
     } else {
         // File dialog was canceled.
         quit();
@@ -358,15 +359,15 @@ void HApplication::entryPoint(QString gameFileName)
 
 void HApplication::handleEngineFinished()
 {
-    fGameRunning = false;
-    fGameFile.clear();
+    is_game_running_ = false;
+    gamefile_.clear();
     emit gameHasQuit();
-    fMainWin->close();
+    main_win_->close();
 }
 
 void HApplication::notifyPreferencesChange(const Settings* sett)
 {
-    smartformatting = sett->smartFormatting;
+    smartformatting = sett->smart_formatting;
 
     // 'bgcolor' is a Hugo engine global.
     updateMargins(::bgcolor);
@@ -376,14 +377,14 @@ void HApplication::notifyPreferencesChange(const Settings* sett)
 
     // The fonts might have changed.
     hFrame->setFontType(currentfont);
-    hMainWin->setScrollbackFont(sett->scrollbackFont);
+    hMainWin->setScrollbackFont(sett->scrollback_font);
 
     display_needs_repaint = true;
 #ifndef DISABLE_AUDIO
-    if (not sett->enableMusic) {
+    if (not sett->enable_music) {
         hHandlers->stopmusic();
     }
-    if (not sett->enableSoundEffects) {
+    if (not sett->enable_sound_effects) {
         hHandlers->stopsample();
     }
     updateMusicVolume();
@@ -391,11 +392,11 @@ void HApplication::notifyPreferencesChange(const Settings* sett)
     updateVideoVolume();
 #endif
 #ifndef DISABLE_VIDEO
-    if (not sett->enableVideo) {
+    if (not sett->enable_video) {
         hHandlers->stopvideo();
     }
 #endif
-    fFrameWin->updateGameScreen(true);
+    frame_win_->updateGameScreen(true);
 }
 
 void HApplication::advanceEventLoop()

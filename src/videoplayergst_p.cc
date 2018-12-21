@@ -42,17 +42,17 @@
 #include "hmainwindow.h"
 #include "videoplayer.h"
 
-GMainLoop* VideoPlayer_priv::fGMainLoop = nullptr;
-GThread* VideoPlayer_priv::fGMainLoopThread = nullptr;
+GMainLoop* VideoPlayer_priv::main_loop = nullptr;
+GThread* VideoPlayer_priv::main_loop_thread = nullptr;
 
 extern "C" {
 
 static gpointer glibMainLoopThreadFunc(gpointer /*unused*/)
 {
-    VideoPlayer_priv::fGMainLoop = g_main_loop_new(nullptr, false);
-    g_main_loop_run(VideoPlayer_priv::fGMainLoop);
-    g_main_loop_unref(VideoPlayer_priv::fGMainLoop);
-    VideoPlayer_priv::fGMainLoop = nullptr;
+    VideoPlayer_priv::main_loop = g_main_loop_new(nullptr, false);
+    g_main_loop_run(VideoPlayer_priv::main_loop);
+    g_main_loop_unref(VideoPlayer_priv::main_loop);
+    VideoPlayer_priv::main_loop = nullptr;
     return nullptr;
 }
 
@@ -62,14 +62,14 @@ VideoPlayer_priv::VideoPlayer_priv(QWidget* parent, VideoPlayer* qPtr)
     : QWidget(parent)
     , q(qPtr)
 {
-    memset(&fAppSrcCbs, 0, sizeof(fAppSrcCbs));
+    memset(&appsrc_cbs, 0, sizeof(appsrc_cbs));
 
     // If the version of Qt we're running in does not use GLib, we need to start a GMainLoop so that
     // gstreamer can dispatch events.
     const QMetaObject* mo = QAbstractEventDispatcher::instance(hApp->thread())->metaObject();
-    if (fGMainLoop == nullptr && strcmp(mo->className(), "QEventDispatcherGlib") != 0
+    if (main_loop == nullptr && strcmp(mo->className(), "QEventDispatcherGlib") != 0
         && strcmp(mo->superClass()->className(), "QEventDispatcherGlib") != 0) {
-        fGMainLoopThread = g_thread_new(nullptr, glibMainLoopThreadFunc, nullptr);
+        main_loop_thread = g_thread_new(nullptr, glibMainLoopThreadFunc, nullptr);
     }
 }
 
@@ -131,25 +131,25 @@ void VideoPlayer_priv::adjustForVideoSize(QSize vidSize)
 
 void VideoPlayer_priv::cbOnSourceSetup(GstAppSrc* source, VideoPlayer_priv* d)
 {
-    d->fAppSrc = source;
+    d->appsrc = source;
     gst_app_src_set_stream_type(source, GST_APP_STREAM_TYPE_RANDOM_ACCESS);
     g_object_set(G_OBJECT(source), "format", GST_FORMAT_BYTES, NULL);
-    memset(&d->fAppSrcCbs, 0, sizeof(d->fAppSrcCbs));
-    d->fAppSrcCbs.need_data = cbAppsrcNeedData;
-    d->fAppSrcCbs.enough_data = nullptr;
-    d->fAppSrcCbs.seek_data = cbAppSrcSeekData;
-    gst_app_src_set_callbacks(source, &d->fAppSrcCbs, d->q->fRwops, nullptr);
-    gst_app_src_set_size(source, d->q->fDataLen);
+    memset(&d->appsrc_cbs, 0, sizeof(d->appsrc_cbs));
+    d->appsrc_cbs.need_data = cbAppsrcNeedData;
+    d->appsrc_cbs.enough_data = nullptr;
+    d->appsrc_cbs.seek_data = cbAppSrcSeekData;
+    gst_app_src_set_callbacks(source, &d->appsrc_cbs, d->q->rwops_, nullptr);
+    gst_app_src_set_size(source, d->q->data_len);
 }
 
 void VideoPlayer_priv::cbOnBusMessage(GstMessage* message, VideoPlayer_priv* d)
 {
     Qt::ConnectionType conType =
-        fGMainLoop == nullptr ? Qt::DirectConnection : Qt::BlockingQueuedConnection;
+        main_loop == nullptr ? Qt::DirectConnection : Qt::BlockingQueuedConnection;
 
     switch (GST_MESSAGE_TYPE(message)) {
     case GST_MESSAGE_STATE_CHANGED: {
-        if (GST_MESSAGE_SRC(message) != GST_OBJECT(d->fPipeline)) {
+        if (GST_MESSAGE_SRC(message) != GST_OBJECT(d->pipeline)) {
             // The state change doesn't belong to our pipeline.
             break;
         }
@@ -164,7 +164,7 @@ void VideoPlayer_priv::cbOnBusMessage(GstMessage* message, VideoPlayer_priv* d)
         }
         if (newState == GST_STATE_PAUSED) {
             GstPad* vidpad = nullptr;
-            g_signal_emit_by_name(d->fPipeline, "get-video-pad", 0, &vidpad, 0);
+            g_signal_emit_by_name(d->pipeline, "get-video-pad", 0, &vidpad, 0);
             if (vidpad == nullptr) {
                 break;
             }
@@ -201,7 +201,7 @@ void VideoPlayer_priv::cbOnBusMessage(GstMessage* message, VideoPlayer_priv* d)
     }
 
     case GST_MESSAGE_SEGMENT_DONE:
-        if (not gst_element_seek_simple(d->fPipeline, GST_FORMAT_TIME, GST_SEEK_FLAG_SEGMENT, 0)) {
+        if (not gst_element_seek_simple(d->pipeline, GST_FORMAT_TIME, GST_SEEK_FLAG_SEGMENT, 0)) {
             qWarning() << "Sending video seek event failed.";
         }
         break;

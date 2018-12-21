@@ -35,9 +35,9 @@ extern "C" {
 
 AboutDialog::AboutDialog(QWidget* parent)
     : QDialog(parent, Qt::WindowTitleHint | Qt::WindowSystemMenuHint)
-    , ui(new Ui::AboutDialog)
+    , ui_(new Ui::AboutDialog)
 {
-    ui->setupUi(this);
+    ui_->setupUi(this);
 
     // Construct a string holding all version info.
     QString str("<p>Hugor v");
@@ -49,10 +49,10 @@ AboutDialog::AboutDialog(QWidget* parent)
         "<p>For bug reports or any other form of feedback, you can send email"
         " to <a href=\"mailto:realnc@gmail.com\">realnc@gmail.com</a></p>";
 
-    ui->aboutLabel->setText(ui->aboutLabel->text() + str);
+    ui_->aboutLabel->setText(ui_->aboutLabel->text() + str);
 }
 
 AboutDialog::~AboutDialog()
 {
-    delete ui;
+    delete ui_;
 }

@@ -34,18 +34,18 @@ class SettingsOverrides final
 public:
     SettingsOverrides(const QString& filename);
 
-    QString appName;
-    QString authorName;
+    QString app_name;
+    QString author_name;
     bool fullscreen;
-    int fullscreenWidth;
-    bool hideMenuBar;
-    int marginSize;
-    QColor fsMarginColor;
-    int widthRatio;
-    int heightRatio;
-    int propFontSize;
-    int fixedFontSize;
-    int scrollbackFontSize;
-    bool imageSmoothing;
-    bool muteWhenMinimized;
+    int fullscreen_width;
+    bool hide_menubar;
+    int margin_size;
+    QColor fs_margin_color;
+    int width_ratio;
+    int height_ratio;
+    int prop_font_size;
+    int fixed_font_size;
+    int scrollback_font_size;
+    bool image_smoothing;
+    bool mute_when_minimized;
 };

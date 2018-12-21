@@ -47,8 +47,8 @@ class EngineRunner final: public QObject
 public:
     EngineRunner(QString gameFile, EngineThread* thread, QObject* parent = nullptr)
         : QObject(parent)
-        , fThread(thread)
-        , fGameFile(std::move(gameFile))
+        , thread_(thread)
+        , gamefile_(std::move(gameFile))
     {}
 
 signals:
@@ -58,6 +58,6 @@ public slots:
     void runEngine();
 
 private:
-    EngineThread* fThread;
-    QString fGameFile;
+    EngineThread* thread_;
+    QString gamefile_;
 };

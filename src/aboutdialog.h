@@ -41,5 +41,5 @@ public:
     ~AboutDialog() override;
 
 private:
-    Ui::AboutDialog* ui;
+    Ui::AboutDialog* ui_;
 };

@@ -34,33 +34,33 @@ SettingsOverrides::SettingsOverrides(const QString& filename)
     QSettings sett(filename, QSettings::IniFormat);
 
     sett.beginGroup(QString::fromLatin1("identity"));
-    appName = sett.value(QString::fromLatin1("appName"), QString::fromLatin1("")).toString();
-    authorName = sett.value(QString::fromLatin1("authorName"), QString::fromLatin1("")).toString();
+    app_name = sett.value(QString::fromLatin1("appName"), QString::fromLatin1("")).toString();
+    author_name = sett.value(QString::fromLatin1("authorName"), QString::fromLatin1("")).toString();
     sett.endGroup();
 
     sett.beginGroup(QString::fromLatin1("display"));
     fullscreen = sett.value(QString::fromLatin1("fullscreen"), false).toBool();
-    hideMenuBar = sett.value(QString::fromLatin1("hideMenuBar"), false).toBool();
-    fullscreenWidth = sett.value(QString::fromLatin1("fullscreenWidth"), 0).toInt();
-    if (fullscreenWidth > 0) {
-        if (fullscreenWidth > 100) {
-            fullscreenWidth = 100;
-        } else if (fullscreenWidth < 10) {
-            fullscreenWidth = 10;
+    hide_menubar = sett.value(QString::fromLatin1("hideMenuBar"), false).toBool();
+    fullscreen_width = sett.value(QString::fromLatin1("fullscreenWidth"), 0).toInt();
+    if (fullscreen_width > 0) {
+        if (fullscreen_width > 100) {
+            fullscreen_width = 100;
+        } else if (fullscreen_width < 10) {
+            fullscreen_width = 10;
         }
     }
-    marginSize = sett.value(QString::fromLatin1("marginSize"), 0).toInt();
-    widthRatio = sett.value(QString::fromLatin1("widthRatio"), 4).toInt();
-    heightRatio = sett.value(QString::fromLatin1("heightRatio"), 3).toInt();
-    propFontSize = sett.value(QString::fromLatin1("propFontSize"), 0).toInt();
-    fixedFontSize = sett.value(QString::fromLatin1("fixedFontSize"), 0).toInt();
-    scrollbackFontSize = sett.value(QString::fromLatin1("scrollbackFontSize"), 0).toInt();
-    imageSmoothing = sett.value(QString::fromLatin1("imageSmoothing"), true).toBool();
+    margin_size = sett.value(QString::fromLatin1("marginSize"), 0).toInt();
+    width_ratio = sett.value(QString::fromLatin1("widthRatio"), 4).toInt();
+    height_ratio = sett.value(QString::fromLatin1("heightRatio"), 3).toInt();
+    prop_font_size = sett.value(QString::fromLatin1("propFontSize"), 0).toInt();
+    fixed_font_size = sett.value(QString::fromLatin1("fixedFontSize"), 0).toInt();
+    scrollback_font_size = sett.value(QString::fromLatin1("scrollbackFontSize"), 0).toInt();
+    image_smoothing = sett.value(QString::fromLatin1("imageSmoothing"), true).toBool();
     QString namedColor = sett.value(QString::fromLatin1("fsMarginColor"), QString()).toString();
-    fsMarginColor.setNamedColor(namedColor);
+    fs_margin_color.setNamedColor(namedColor);
     sett.endGroup();
 
     sett.beginGroup(QString::fromLatin1("media"));
-    muteWhenMinimized = sett.value(QString::fromLatin1("muteWhenMinimized"), true).toBool();
+    mute_when_minimized = sett.value(QString::fromLatin1("muteWhenMinimized"), true).toBool();
     sett.endGroup();
 }

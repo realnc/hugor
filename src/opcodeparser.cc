@@ -45,98 +45,98 @@ OpcodeParser::Opcode OpcodeParser::popOpcode()
 
 int OpcodeParser::popValue()
 {
-    Q_ASSERT(fBuffer.size() > 1);
-    auto byte1 = fBuffer.front();
-    fBuffer.pop();
-    auto byte2 = fBuffer.front();
-    fBuffer.pop();
+    Q_ASSERT(buffer_.size() > 1);
+    auto byte1 = buffer_.front();
+    buffer_.pop();
+    auto byte2 = buffer_.front();
+    buffer_.pop();
     return byte1 + (byte2 << 8);
 }
 
-void OpcodeParser::fPushOutput(const int val)
+void OpcodeParser::pushOutput(const int val)
 {
-    fOutput.push(val & 0xFF);
-    fOutput.push((val >> 8) & 0xFF);
+    output_.push(val & 0xFF);
+    output_.push((val >> 8) & 0xFF);
 }
 
-void OpcodeParser::fPushOutput(const OpcodeParser::OpcodeResult res)
+void OpcodeParser::pushOutput(const OpcodeParser::OpcodeResult res)
 {
-    fPushOutput(static_cast<int>(res));
+    pushOutput(static_cast<int>(res));
 }
 
 void OpcodeParser::pushByte(const int c)
 {
-    fBuffer.push(c);
+    buffer_.push(c);
 }
 
 int OpcodeParser::getNextOutputByte()
 {
-    auto ret = fOutput.front();
-    fOutput.pop();
+    auto ret = output_.front();
+    output_.pop();
     return ret;
 }
 
 void OpcodeParser::parse()
 {
-    clearQueue(fOutput);
+    clearQueue(output_);
 
-    if (fBuffer.empty()) {
+    if (buffer_.empty()) {
         return;
     }
 
-    if (fBuffer.size() % 2) {
+    if (buffer_.size() % 2) {
         // Opcodes and parameters are always byte pairs. We got an odd number of bytes, so discard
         // the input as incomplete.
-        clearQueue(fBuffer);
-        fPushOutput(OpcodeResult::WRONG_BYTE_COUNT);
+        clearQueue(buffer_);
+        pushOutput(OpcodeResult::WRONG_BYTE_COUNT);
         qWarning() << "Incomplete opcode input.";
         return;
     }
 
     // Get the opcode and amount of parameters.
     auto opcode = popOpcode();
-    auto paramCount = fBuffer.size() / 2u;
+    auto paramCount = buffer_.size() / 2u;
 
     switch (opcode) {
     case Opcode::IS_OPCODE_AVAILABLE:
         if (paramCount != 1) {
-            fPushOutput(OpcodeResult::WRONG_PARAM_COUNT);
+            pushOutput(OpcodeResult::WRONG_PARAM_COUNT);
             break;
         }
-        fPushOutput(OpcodeResult::OK);
-        fPushOutput(QMetaEnum::fromType<Opcode>().valueToKey(popValue()) != nullptr);
+        pushOutput(OpcodeResult::OK);
+        pushOutput(QMetaEnum::fromType<Opcode>().valueToKey(popValue()) != nullptr);
         break;
 
     case Opcode::GET_VERSION:
         if (paramCount != 0) {
-            fPushOutput(OpcodeResult::WRONG_PARAM_COUNT);
+            pushOutput(OpcodeResult::WRONG_PARAM_COUNT);
             break;
         }
-        fPushOutput(OpcodeResult::OK);
-        fPushOutput(1);
-        fPushOutput(0);
-        fPushOutput(99);
+        pushOutput(OpcodeResult::OK);
+        pushOutput(1);
+        pushOutput(0);
+        pushOutput(99);
         break;
 
     case Opcode::GET_OS:
         if (paramCount != 0) {
-            fPushOutput(OpcodeResult::WRONG_PARAM_COUNT);
+            pushOutput(OpcodeResult::WRONG_PARAM_COUNT);
             break;
         }
-        fPushOutput(OpcodeResult::OK);
-        fPushOutput(OS_TYPE);
+        pushOutput(OpcodeResult::OK);
+        pushOutput(OS_TYPE);
         break;
 
     case Opcode::ABORT:
         if (paramCount != 0) {
-            fPushOutput(OpcodeResult::WRONG_PARAM_COUNT);
+            pushOutput(OpcodeResult::WRONG_PARAM_COUNT);
             break;
         }
         abort();
 
     case Opcode::FADE_SCREEN: {
         if (paramCount != 4) {
-            fPushOutput(OpcodeResult::WRONG_PARAM_COUNT);
+            pushOutput(OpcodeResult::WRONG_PARAM_COUNT);
             break;
         }
         auto duration = popValue();
@@ -183,13 +183,13 @@ void OpcodeParser::parse()
             }
         });
 
-        fPushOutput(OpcodeResult::OK);
+        pushOutput(OpcodeResult::OK);
         break;
     }
 
     case Opcode::OPEN_URL: {
         if (paramCount != 1) {
-            fPushOutput(OpcodeResult::WRONG_PARAM_COUNT);
+            pushOutput(OpcodeResult::WRONG_PARAM_COUNT);
             break;
         }
         auto url = GetWord(popValue());
@@ -201,68 +201,68 @@ void OpcodeParser::parse()
                 QUrl::fromUserInput(url, QDir::currentPath(), QUrl::AssumeLocalFile));
 #endif
         });
-        fPushOutput(OpcodeResult::OK);
+        pushOutput(OpcodeResult::OK);
         break;
     }
 
     case Opcode::SET_FULLSCREEN: {
         if (paramCount != 1) {
-            fPushOutput(OpcodeResult::WRONG_PARAM_COUNT);
+            pushOutput(OpcodeResult::WRONG_PARAM_COUNT);
             break;
         }
         bool f = popValue();
         runInMainThread([f] { hMainWin->setFullscreen(f); });
-        fPushOutput(OpcodeResult::OK);
+        pushOutput(OpcodeResult::OK);
         break;
     }
 
     case Opcode::SET_CLIPBOARD: {
         if (paramCount != 1) {
-            fPushOutput(OpcodeResult::WRONG_PARAM_COUNT);
+            pushOutput(OpcodeResult::WRONG_PARAM_COUNT);
             break;
         }
         auto text = GetWord(popValue());
         runInMainThread([text] { QApplication::clipboard()->setText(text); });
-        fPushOutput(OpcodeResult::OK);
+        pushOutput(OpcodeResult::OK);
         break;
     }
 
     case Opcode::IS_MUSIC_PLAYING: {
         if (paramCount != 0) {
-            fPushOutput(OpcodeResult::WRONG_PARAM_COUNT);
+            pushOutput(OpcodeResult::WRONG_PARAM_COUNT);
             break;
         }
         bool res;
         runInMainThread([&res] { res = isMusicPlaying(); });
-        fPushOutput(OpcodeResult::OK);
-        fPushOutput(res);
+        pushOutput(OpcodeResult::OK);
+        pushOutput(res);
         break;
     }
 
     case Opcode::IS_SAMPLE_PLAYING: {
         if (paramCount != 0) {
-            fPushOutput(OpcodeResult::WRONG_PARAM_COUNT);
+            pushOutput(OpcodeResult::WRONG_PARAM_COUNT);
             break;
         }
         bool res;
         runInMainThread([&res] { res = isSamplePlaying(); });
-        fPushOutput(OpcodeResult::OK);
-        fPushOutput(res);
+        pushOutput(OpcodeResult::OK);
+        pushOutput(res);
         break;
     }
 
     case Opcode::IS_FLUID_LAYOUT:
         if (paramCount != 0) {
-            fPushOutput(OpcodeResult::WRONG_PARAM_COUNT);
+            pushOutput(OpcodeResult::WRONG_PARAM_COUNT);
             break;
         }
-        fPushOutput(OpcodeResult::OK);
-        fPushOutput(false);
+        pushOutput(OpcodeResult::OK);
+        pushOutput(false);
         break;
 
     case Opcode::SET_COLOR: {
         if (paramCount != 5) {
-            fPushOutput(OpcodeResult::WRONG_PARAM_COUNT);
+            pushOutput(OpcodeResult::WRONG_PARAM_COUNT);
             break;
         }
         int id, r, g, b, a;
@@ -272,52 +272,52 @@ void OpcodeParser::parse()
         b = popValue();
         a = popValue();
         setExtendedColor(id, r, g, b, a);
-        fPushOutput(OpcodeResult::OK);
+        pushOutput(OpcodeResult::OK);
         break;
     }
 
     case Opcode::IS_FULLSCREEN: {
         if (paramCount != 0) {
-            fPushOutput(OpcodeResult::WRONG_PARAM_COUNT);
+            pushOutput(OpcodeResult::WRONG_PARAM_COUNT);
             break;
         }
         bool res;
         runInMainThread([&res] { res = hMainWin->isFullScreen(); });
-        fPushOutput(OpcodeResult::OK);
-        fPushOutput(res);
+        pushOutput(OpcodeResult::OK);
+        pushOutput(res);
         break;
     }
 
     case Opcode::HIDES_CURSOR:
         if (paramCount != 0) {
-            fPushOutput(OpcodeResult::WRONG_PARAM_COUNT);
+            pushOutput(OpcodeResult::WRONG_PARAM_COUNT);
             break;
         }
-        fPushOutput(OpcodeResult::OK);
-        fPushOutput(true);
+        pushOutput(OpcodeResult::OK);
+        pushOutput(true);
         break;
 
     case Opcode::TOP_JUSTIFIED:
         if (paramCount != 0) {
-            fPushOutput(OpcodeResult::WRONG_PARAM_COUNT);
+            pushOutput(OpcodeResult::WRONG_PARAM_COUNT);
             break;
         }
-        fPushOutput(OpcodeResult::OK);
-        fPushOutput(true);
+        pushOutput(OpcodeResult::OK);
+        pushOutput(true);
         break;
 
     case Opcode::SCREENREADER_CAPABLE:
         if (paramCount != 0) {
-            fPushOutput(OpcodeResult::WRONG_PARAM_COUNT);
+            pushOutput(OpcodeResult::WRONG_PARAM_COUNT);
             break;
         }
-        fPushOutput(OpcodeResult::OK);
-        fPushOutput(false);
+        pushOutput(OpcodeResult::OK);
+        pushOutput(false);
         break;
 
     case Opcode::CHECK_RESOURCE: {
         if (paramCount != 2) {
-            fPushOutput(OpcodeResult::WRONG_PARAM_COUNT);
+            pushOutput(OpcodeResult::WRONG_PARAM_COUNT);
             break;
         }
         QString resname = GetWord(popValue());
@@ -337,20 +337,20 @@ void OpcodeParser::parse()
         qstrcpy(loaded_resname, prevLoadedResname.c_str());
         var[system_status] = prevVarStatus;
 
-        fPushOutput(OpcodeResult::OK);
-        fPushOutput(res != 0);
+        pushOutput(OpcodeResult::OK);
+        pushOutput(res != 0);
         break;
     }
 
     default:
         qWarning() << "Unrecognized opcode:" << (int)opcode;
-        fPushOutput(OpcodeResult::UNKNOWN_OPCODE);
-        fPushOutput((int)opcode);
-        fPushOutput(paramCount);
+        pushOutput(OpcodeResult::UNKNOWN_OPCODE);
+        pushOutput((int)opcode);
+        pushOutput(paramCount);
         for (size_t i = 0; i < paramCount; ++i) {
-            fPushOutput(popValue());
+            pushOutput(popValue());
         }
     }
 
-    clearQueue(fBuffer);
+    clearQueue(buffer_);
 }

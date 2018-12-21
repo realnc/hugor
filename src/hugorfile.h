@@ -5,7 +5,7 @@ struct HugorFile final
 {
 public:
     HugorFile(FILE* handle)
-        : fHandle(handle)
+        : handle_(handle)
     {}
 
     ~HugorFile()
@@ -17,19 +17,19 @@ public:
 
     FILE* get() const
     {
-        return fHandle;
+        return handle_;
     }
 
     int close()
     {
-        if (fHandle == nullptr) {
+        if (handle_ == nullptr) {
             return 0;
         }
-        auto ret = std::fclose(fHandle);
-        fHandle = nullptr;
+        auto ret = std::fclose(handle_);
+        handle_ = nullptr;
         return ret;
     }
 
 private:
-    FILE* fHandle;
+    FILE* handle_;
 };

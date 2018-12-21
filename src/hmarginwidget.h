@@ -35,9 +35,9 @@ class HMarginWidget final: public QWidget
     Q_OBJECT
 
 private:
-    QWidget* fBannerWidget = nullptr;
-    QVBoxLayout* fLayout;
-    QColor fColor;
+    QWidget* banner_widget_ = nullptr;
+    QVBoxLayout* layout_;
+    QColor color_;
 
 public:
     HMarginWidget(QWidget* parent = nullptr);
@@ -46,7 +46,7 @@ public:
 
     QWidget* bannerWidget() const
     {
-        return fBannerWidget;
+        return banner_widget_;
     }
 
     void addWidget(QWidget* w);

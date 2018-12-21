@@ -78,29 +78,29 @@ void updateVideoVolume()
 
 VideoPlayer::VideoPlayer(QWidget* parent)
     : QWidget(parent)
-    , d(new VideoPlayer_priv(this, this))
+    , d_(new VideoPlayer_priv(this, this))
 {
-    d->winId(); // Enforce a native window handle for gstreamer.
-    d->setUpdatesEnabled(false); // Don't fight with gstreamer over updates.
+    d_->winId(); // Enforce a native window handle for gstreamer.
+    d_->setUpdatesEnabled(false); // Don't fight with gstreamer over updates.
     // So that the mouse cursor can be made visible again when moving the mouse.
     setMouseTracking(true);
-    d->setMouseTracking(true);
+    d_->setMouseTracking(true);
 }
 
 VideoPlayer::~VideoPlayer()
 {
-    if (d->fPipeline != nullptr) {
+    if (d_->pipeline != nullptr) {
         ::currentVideo = nullptr;
-        gst_bus_remove_signal_watch(d->fBus);
+        gst_bus_remove_signal_watch(d_->bus);
 #if not GST_CHECK_VERSION(1, 0, 0)
-        gst_bus_disable_sync_message_emission(d->fBus);
+        gst_bus_disable_sync_message_emission(d_->bus);
 #endif
-        gst_element_set_state(d->fPipeline, GST_STATE_NULL);
-        gst_object_unref(d->fBus);
-        gst_object_unref(d->fPipeline);
+        gst_element_set_state(d_->pipeline, GST_STATE_NULL);
+        gst_object_unref(d_->bus);
+        gst_object_unref(d_->pipeline);
     }
-    if (fRwops != nullptr) {
-        SDL_RWclose(fRwops);
+    if (rwops_ != nullptr) {
+        SDL_RWclose(rwops_);
     }
 }
 
@@ -133,15 +133,15 @@ static void cbOnSourceSetup(GstPipeline* /*pipeline*/, GstAppSrc* source, gpoint
 
 bool VideoPlayer::loadVideo(FILE* src, long len, bool loop)
 {
-    if (d->fPipeline == nullptr) {
+    if (d_->pipeline == nullptr) {
         const char* playbinName =
 #if GST_CHECK_VERSION(1, 0, 0)
             "playbin";
 #else
             "playbin2";
 #endif
-        d->fPipeline = gst_element_factory_make(playbinName, nullptr);
-        if (d->fPipeline == nullptr) {
+        d_->pipeline = gst_element_factory_make(playbinName, nullptr);
+        if (d_->pipeline == nullptr) {
             hMainWin->errorMsgObj()->showMessage(
                 tr("Unable to play video. You are "
                    "probably missing the GStreamer plugins "
@@ -149,58 +149,58 @@ bool VideoPlayer::loadVideo(FILE* src, long len, bool loop)
             return false;
         }
 
-        d->fBus = gst_pipeline_get_bus(GST_PIPELINE(d->fPipeline));
+        d_->bus = gst_pipeline_get_bus(GST_PIPELINE(d_->pipeline));
         // We need to be informed when the playback state changes.
-        gst_bus_add_signal_watch(d->fBus);
-        g_signal_connect(d->fBus, "message", G_CALLBACK(cbOnBusMessage), d);
+        gst_bus_add_signal_watch(d_->bus);
+        g_signal_connect(d_->bus, "message", G_CALLBACK(cbOnBusMessage), d_);
 #if GST_CHECK_VERSION(1, 0, 0)
         // With gst 1.x, we can configure aspect ratio and set the window ID
         // directly on playbin.
-        g_object_set(d->fPipeline, "force-aspect-ratio", true, NULL);
-        gst_video_overlay_set_window_handle(GST_VIDEO_OVERLAY(d->fPipeline), (guintptr)d->winId());
+        g_object_set(d_->pipeline, "force-aspect-ratio", true, NULL);
+        gst_video_overlay_set_window_handle(GST_VIDEO_OVERLAY(d_->pipeline), (guintptr)d_->winId());
 #else
         // With gst 0.10, we need to be informed when a video sink is added so we can configure it
         // later.
-        gst_bus_enable_sync_message_emission(d->fBus);
-        g_signal_connect(d->fBus, "sync-message", G_CALLBACK(cbSyncMessage), d);
+        gst_bus_enable_sync_message_emission(d_->bus);
+        g_signal_connect(d_->bus, "sync-message", G_CALLBACK(cbSyncMessage), d_);
 #endif
-        g_signal_connect(d->fPipeline, "source-setup", G_CALLBACK(cbOnSourceSetup), d);
+        g_signal_connect(d_->pipeline, "source-setup", G_CALLBACK(cbOnSourceSetup), d_);
     }
-    if (fRwops != nullptr) {
-        SDL_RWclose(fRwops);
+    if (rwops_ != nullptr) {
+        SDL_RWclose(rwops_);
     }
-    fRwops = RWFromMediaBundle(src, len);
-    if (fRwops == nullptr) {
+    rwops_ = RWFromMediaBundle(src, len);
+    if (rwops_ == nullptr) {
         hMainWin->errorMsgObj()->showMessage(tr("Unable to read video data from disk: ")
                                              + SDL_GetError());
         return false;
     }
-    fDataLen = len;
-    fLooping = loop;
-    g_object_set(G_OBJECT(d->fPipeline), "uri", "appsrc://", NULL);
+    data_len = len;
+    is_looping = loop;
+    g_object_set(G_OBJECT(d_->pipeline), "uri", "appsrc://", NULL);
     return true;
 }
 
 void VideoPlayer::play()
 {
-    if (d->fPipeline == nullptr) {
+    if (d_->pipeline == nullptr) {
         return;
     }
 
     hFrame->updateGameScreen(true);
 
-    d->setMaximumSize(maximumSize());
+    d_->setMaximumSize(maximumSize());
     ::currentVideo = this;
     updateVolume();
-    gst_element_set_state(d->fPipeline, GST_STATE_PLAYING);
+    gst_element_set_state(d_->pipeline, GST_STATE_PLAYING);
     hApp->advanceEventLoop();
-    if (fLooping) {
+    if (is_looping) {
         // Wait for the pipeline to transition into the playing state.
-        gst_element_get_state(d->fPipeline, nullptr, nullptr, GST_CLOCK_TIME_NONE);
+        gst_element_get_state(d_->pipeline, nullptr, nullptr, GST_CLOCK_TIME_NONE);
         // Seek to the end the first time so that there's no pause before the first segment message
         // arrives.
         if (not gst_element_seek(
-                d->fPipeline, 1.0, GST_FORMAT_TIME,
+                d_->pipeline, 1.0, GST_FORMAT_TIME,
                 (GstSeekFlags)((int)GST_SEEK_FLAG_FLUSH | (int)GST_SEEK_FLAG_SEGMENT),
                 GST_SEEK_TYPE_END, 0, GST_SEEK_TYPE_NONE, GST_CLOCK_TIME_NONE)) {
             qWarning() << "Sending initial video seek event failed.";
@@ -211,8 +211,8 @@ void VideoPlayer::play()
 
 void VideoPlayer::stop()
 {
-    if (d->fPipeline != nullptr) {
-        gst_element_set_state(d->fPipeline, GST_STATE_NULL);
+    if (d_->pipeline != nullptr) {
+        gst_element_set_state(d_->pipeline, GST_STATE_NULL);
         emit videoFinished();
         hide();
     }
@@ -220,14 +220,14 @@ void VideoPlayer::stop()
 
 void VideoPlayer::updateVolume()
 {
-    if (d->fPipeline != nullptr) {
-        setVolume(d->fVolume);
+    if (d_->pipeline != nullptr) {
+        setVolume(d_->volume);
     }
 }
 
 void VideoPlayer::setVolume(int vol)
 {
-    if (d->fPipeline == nullptr) {
+    if (d_->pipeline == nullptr) {
         return;
     }
     if (vol < 0) {
@@ -235,23 +235,23 @@ void VideoPlayer::setVolume(int vol)
     } else if (vol > 100) {
         vol = 100;
     }
-    d->fVolume = vol;
+    d_->volume = vol;
 
     // Attenuate the result by the global volume setting. Use an exponential volume scale. Use the
     // second power instead of the third to be consistent with the SDL audio volume.
-    g_object_set(d->fPipeline, "volume",
-                 std::pow(((gdouble)vol * hApp->settings()->soundVolume) / 10000.0, 2), NULL);
+    g_object_set(d_->pipeline, "volume",
+                 std::pow(((gdouble)vol * hApp->settings()->sound_volume) / 10000.0, 2), NULL);
 }
 
 void VideoPlayer::setMute(bool mute)
 {
-    if (d->fPipeline != nullptr) {
-        g_object_set(d->fPipeline, "mute", mute, NULL);
+    if (d_->pipeline != nullptr) {
+        g_object_set(d_->pipeline, "mute", mute, NULL);
     }
 }
 
 void VideoPlayer::resizeEvent(QResizeEvent* e)
 {
     QWidget::resizeEvent(e);
-    d->resize(e->size());
+    d_->resize(e->size());
 }

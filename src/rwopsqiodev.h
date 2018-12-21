@@ -53,6 +53,6 @@ protected:
     qint64 writeData(const char* /*data*/, qint64 /*len*/) override;
 
 private:
-    struct SDL_RWops* fRwops = nullptr;
-    long fSize = 0;
+    struct SDL_RWops* rwops_ = nullptr;
+    long size_ = 0;
 };

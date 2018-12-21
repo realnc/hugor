@@ -44,9 +44,9 @@ public:
     {}
 
     VideoPlayer* q;
-    QMediaPlayer* fMediaPlayer = nullptr;
-    QVideoWidget* fVideoWidget = nullptr;
-    RwopsQIODevice* fIODev;
+    QMediaPlayer* media_player = nullptr;
+    QVideoWidget* video_widget = nullptr;
+    RwopsQIODevice* io_dev;
 
 public slots:
     void onStatusChange(QMediaPlayer::MediaStatus status);

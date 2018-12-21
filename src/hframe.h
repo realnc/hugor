@@ -58,109 +58,109 @@ private:
     };
 
     // The input-mode we are currently in.
-    InputMode fInputMode = InputMode::None;
+    InputMode input_mode_ = InputMode::None;
 
     // We have a finished user input.
-    bool fInputReady = false;
+    bool have_input_ready_ = false;
 
     // Keypress input queue. If an element is 0, it means the input was a mouse click.
-    QQueue<char> fKeyQueue;
+    QQueue<char> key_queue_;
 
     // Mouse click input queue.
-    QQueue<QPoint> fClickQueue;
+    QQueue<QPoint> click_queue_;
 
     // The keypress and click queues are also accessed from the engine thread.
-    QMutex fKeyQueueMutex;
-    QMutex fClickQueueMutex;
+    QMutex key_queue_mutex_;
+    QMutex click_queue_mutex_;
 
     // Input buffer.
-    QString fInputBuf;
+    QString input_buf_;
 
     // Position at which we started reading input.
-    int fInputStartX = 0;
-    int fInputStartY = 0;
+    int input_start_x_ = 0;
+    int input_start_y_ = 0;
 
     // Current editor position, in characters. 0 is the start of the current input buffer string.
-    int fInputCurrentChar = 0;
+    int input_current_char_ = 0;
 
     // Command history buffer.
-    QList<QString> fHistory;
+    QList<QString> history_;
 
     // Maximum history capacity.
-    int fMaxHistCap = 200;
+    int max_hist_cap_ = 200;
 
     // Current command index in the history. 0 is the most recent one.
-    int fCurHistIndex = 0;
+    int cur_hist_index_ = 0;
 
     // Backup of the current, yet to be committed to history, input line. We need this to back up
     // the current input when the user recalls a previous command from the history.
     QString fInputBufBackup;
 
     // Current colors.
-    int fFgColor = 16;
-    int fBgColor = 17;
+    int fg_color_ = 16;
+    int bg_color_ = 17;
 
     // Current font attributes.
-    bool fUseFixedFont = false;
-    bool fUseUnderlineFont = false;
-    bool fUseItalicFont = false;
-    bool fUseBoldFont = false;
+    bool use_fixed_font_ = false;
+    bool use_underline_font_ = false;
+    bool use_italic_font_ = false;
+    bool use_bold_font_ = false;
 
     // Current font metrics.
-    QFontMetrics fFontMetrics {QFont()};
+    QFontMetrics font_metrics_ {QFont()};
 
     // We render game output into a pixmap first instead or painting directly on the widget. We then
     // draw the pixmap in our paintEvent().
-    QPixmap fPixmap {1, 1};
+    QPixmap pixmap_ {1, 1};
 
     // We buffer text printed with printText() so that we can draw whole strings rather than single
     // characters at a time.
-    QString fPrintBuffer;
+    QString print_buf_;
 
     // Position at which to draw the buffered string.
-    int fFlushXPos = 0;
-    int fFlushYPos = 0;
+    int flush_pos_x_ = 0;
+    int flush_pos_y_ = 0;
 
     // Position of the text cursor.
-    QPoint fCursorPos {0, 0};
+    QPoint cursor_pos_ {0, 0};
 
     // Height of the text cursor in pixels.
-    unsigned fHeight;
+    unsigned height_;
 
     // Last position of the text cursor.
-    QPoint fLastCursorPos {0, 0};
+    QPoint last_cursor_pos_ {0, 0};
 
     // Is the text cursor visible?
-    bool fCursorVisible = false;
+    bool is_cursor_visible_ = false;
 
     // Text cursor blink visibility.  Changed by a timer to show/hide the cursor at specific
     // intervals if fCursorVisible is true.
-    bool fBlinkVisible = false;
+    bool is_blink_visible_ = false;
 
     // Text cursor blink timer.
-    QTimer* fBlinkTimer;
+    QTimer* blink_timer_;
 
     // Keeps track of whether the game screen needs updating.
-    bool fNeedScreenUpdate = false;
+    bool need_screen_update_ = false;
 
     // We need a small time delay before minimizing when losing focus while in fullscreen mode.
-    QTimer* fMinimizeTimer;
+    QTimer* minimize_timer_;
 
     // Add a keypress to our input queue.
-    void fEnqueueKey(char key, QMouseEvent* e);
+    void enqueueKey(char key, QMouseEvent* e);
 
 private slots:
     // Called by the timer to blink the text cursor.
-    void fBlinkCursor();
+    void blinkCursor();
 
     // We need to know when the application loses focus entirely so that we can disable keyboard
     // cursor blinking when we lose focus.
-    void fHandleFocusChange(QWidget* old, QWidget* now);
+    void handleFocusChange(QWidget* old, QWidget* now);
 
-    void fHandleFocusLost();
+    void handleFocusLost();
 
     // End line input mode and send the command to the game.
-    void fEndInputMode(bool addToHistory);
+    void endInputMode(bool addToHistory);
 
 protected:
     void paintEvent(QPaintEvent* e) override;
@@ -215,7 +215,7 @@ public:
 
     const QFontMetrics& currentFontMetrics() const
     {
-        return fFontMetrics;
+        return font_metrics_;
     }
 
     // Print text using the current foreground and background colors. The Text is might not be
@@ -228,24 +228,24 @@ public:
     // Change the text cursor position.
     void moveCursorPos(const QPoint& pos)
     {
-        fCursorPos = pos;
+        cursor_pos_ = pos;
     }
 
     // Set the height of the text cursor in pixels.
     void setCursorHeight(unsigned height)
     {
-        fHeight = height;
+        height_ = height;
     }
 
     // Show/hide the text cursor.
     void setCursorVisible(bool visible)
     {
-        fCursorVisible = visible;
+        is_cursor_visible_ = visible;
     }
 
     bool isCursorVisible() const
     {
-        return fCursorVisible;
+        return is_cursor_visible_;
     }
 
     void updateCursorPos();

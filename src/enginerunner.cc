@@ -38,8 +38,8 @@ extern "C" {
 void EngineRunner::runEngine()
 {
     char argv0[] = "hugor";
-    auto argv1 = std::make_unique<char[]>(fGameFile.toLocal8Bit().size() + 1);
-    memcpy(argv1.get(), fGameFile.toLocal8Bit().constData(), fGameFile.toLocal8Bit().size() + 1);
+    auto argv1 = std::make_unique<char[]>(gamefile_.toLocal8Bit().size() + 1);
+    memcpy(argv1.get(), gamefile_.toLocal8Bit().constData(), gamefile_.toLocal8Bit().size() + 1);
     std::array<char*, 2> argv = {argv0, argv1.get()};
     EngineThread::setTerminationEnabled(true);
     he_main(2, argv.data());

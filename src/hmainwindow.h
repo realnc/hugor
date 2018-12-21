@@ -41,24 +41,24 @@ class HMainWindow final: public QMainWindow
     Q_OBJECT
 
 private:
-    QErrorMessage* fErrorMsg = nullptr;
-    ConfDialog* fConfDialog = nullptr;
-    AboutDialog* fAboutDialog = nullptr;
-    HScrollbackWindow* fScrollbackWindow = nullptr;
-    QAction* fPreferencesAction = nullptr;
-    QAction* fFullscreenAction = nullptr;
-    QAction* fScrollbackAction = nullptr;
-    bool fMenuBarVisible = true;
-    QIcon fFullscreenEnterIcon;
-    QIcon fFullscreenExitIcon;
+    QErrorMessage* error_msg_ = nullptr;
+    ConfDialog* conf_dialog_ = nullptr;
+    AboutDialog* about_dialog_ = nullptr;
+    HScrollbackWindow* scrollback_window_ = nullptr;
+    QAction* preferences_action_ = nullptr;
+    QAction* fullscreen_action_ = nullptr;
+    QAction* scrollback_action_ = nullptr;
+    bool is_menubar_visible_ = true;
+    QIcon fullscreen_enter_icon_;
+    QIcon fullscreen_exit_icon_;
 
-    void fFullscreenAdjust();
+    void fullscreenAdjust();
 
 private slots:
-    void fShowConfDialog();
-    void fHideConfDialog();
-    void fShowAbout();
-    void fHideAbout();
+    void showConfDialog();
+    void hideConfDialog();
+    void showAbout();
+    void hideAbout();
 
 protected:
     void closeEvent(QCloseEvent* e) override;
@@ -73,7 +73,7 @@ public:
 
     QErrorMessage* errorMsgObj() const
     {
-        return fErrorMsg;
+        return error_msg_;
     }
 
     void setScrollbackFont(const QFont& font);

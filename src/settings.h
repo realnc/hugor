@@ -36,53 +36,53 @@ class Settings final
 {
 public:
     Settings()
-        : videoSysError(false)
+        : video_sys_error(false)
     {}
 
     void loadFromDisk(SettingsOverrides* ovr = nullptr);
 
     void saveToDisk();
 
-    bool enableGraphics;
-    bool enableVideo;
-    bool enableSoundEffects;
-    bool enableMusic;
-    bool useSmoothScaling;
-    bool muteWhenMinimized;
-    int soundVolume;
-    bool useCustomSoundFont;
-    QString soundFont;
-    float synthGain;
+    bool enable_graphics;
+    bool enable_video;
+    bool enable_sound_effects;
+    bool enable_music;
+    bool use_smooth_scaling;
+    bool mute_when_minimized;
+    int sound_volume;
+    bool use_custom_soundfont;
+    QString soundfont;
+    float synth_gain;
 
-    QColor mainTextColor;
-    QColor mainBgColor;
-    QColor statusTextColor;
-    QColor statusBgColor;
-    bool customFsMarginColor;
-    QColor fsMarginColor;
+    QColor main_text_color;
+    QColor main_bg_color;
+    QColor status_text_color;
+    QColor status_bg_color;
+    bool custom_fs_margin_color;
+    QColor fs_margin_color;
 
-    QFont propFont;
-    QFont fixedFont;
-    QFont scrollbackFont;
-    bool softTextScrolling;
-    bool smartFormatting;
-    int scriptWrap;
+    QFont prop_font;
+    QFont fixed_font;
+    QFont scrollback_font;
+    bool soft_text_scrolling;
+    bool smart_formatting;
+    int script_wrap;
 
-    bool askForGameFile;
-    QString lastFileOpenDir;
+    bool ask_for_gamefile;
+    QString last_file_open_dir;
 
-    QStringList recentGamesList;
-    static const int recentGamesCapacity = 10;
+    QStringList recent_games_list;
+    static const int recent_games_capacity = 10;
 
-    QSize appSize;
-    bool isMaximized;
-    bool isFullscreen;
-    bool overlayScrollback;
-    int marginSize;
-    int fullscreenWidth;
-    bool startFullscreen;
-    bool startWindowed;
+    QSize app_size;
+    bool is_maximized;
+    bool is_fullscreen;
+    bool overlay_scrollback;
+    int margin_size;
+    int fullscreen_width;
+    bool start_fullscreen;
+    bool start_windowed;
 
     // These are not saved. Used for temporary overrides that only apply to the current session.
-    bool videoSysError;
+    bool video_sys_error;
 };

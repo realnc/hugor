@@ -37,7 +37,7 @@ void VideoPlayer_priv::onStatusChange(QMediaPlayer::MediaStatus status)
     if (status != QMediaPlayer::EndOfMedia) {
         return;
     }
-    if (q->fLooping) {
+    if (q->is_looping) {
         q->play();
     } else {
         emit q->videoFinished();
@@ -50,9 +50,9 @@ void VideoPlayer_priv::onError(QMediaPlayer::Error error)
         return;
     }
     QString msg(tr("An error occurred while trying to play video"));
-    if (not fMediaPlayer->errorString().isEmpty()) {
+    if (not media_player->errorString().isEmpty()) {
         msg += ": ";
-        msg += fMediaPlayer->errorString();
+        msg += media_player->errorString();
     } else {
         msg += ", but I don't know what went wrong.";
     }

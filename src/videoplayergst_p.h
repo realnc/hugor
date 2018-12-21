@@ -41,14 +41,14 @@ class VideoPlayer_priv final: public QWidget
 public:
     VideoPlayer_priv(QWidget* parent, VideoPlayer* qPtr);
     VideoPlayer* q;
-    GstElement* fPipeline = nullptr;
-    GstAppSrc* fAppSrc = nullptr;
-    GstBus* fBus = nullptr;
-    GstAppSrcCallbacks fAppSrcCbs;
-    int fVolume = 100;
+    GstElement* pipeline = nullptr;
+    GstAppSrc* appsrc = nullptr;
+    GstBus* bus = nullptr;
+    GstAppSrcCallbacks appsrc_cbs;
+    int volume = 100;
 
-    static GMainLoop* fGMainLoop;
-    static GThread* fGMainLoopThread;
+    static GMainLoop* main_loop;
+    static GThread* main_loop_thread;
 
     static void cbOnSourceSetup(GstAppSrc* source, VideoPlayer_priv* d);
     static void cbOnBusMessage(GstMessage* message, VideoPlayer_priv* d);

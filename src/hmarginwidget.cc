@@ -37,12 +37,12 @@
 
 HMarginWidget::HMarginWidget(QWidget* parent)
     : QWidget(parent)
-    , fLayout(new QVBoxLayout)
-    , fColor(hugoColorToQt(17))
+    , layout_(new QVBoxLayout)
+    , color_(hugoColorToQt(17))
 {
-    fLayout->setContentsMargins(0, 0, 0, 0);
-    fLayout->setSpacing(0);
-    setLayout(fLayout);
+    layout_->setContentsMargins(0, 0, 0, 0);
+    layout_->setSpacing(0);
+    setLayout(layout_);
     setAttribute(Qt::WA_OpaquePaintEvent);
 }
 
@@ -70,7 +70,7 @@ void HMarginWidget::paintEvent(QPaintEvent* e)
     //     return;
     //}
     QPainter p(this);
-    p.fillRect(e->rect(), fColor);
+    p.fillRect(e->rect(), color_);
     // p.fillRect(rect(), fColor);
 
     // Previous code, before introducing the fade screen opcode.
@@ -81,29 +81,29 @@ void HMarginWidget::paintEvent(QPaintEvent* e)
 void HMarginWidget::setBannerWidget(QWidget* w)
 {
     // If a banner widget is already set, delete it first.
-    if (fBannerWidget != nullptr) {
-        fLayout->removeWidget(fBannerWidget);
-        fBannerWidget->deleteLater();
+    if (banner_widget_ != nullptr) {
+        layout_->removeWidget(banner_widget_);
+        banner_widget_->deleteLater();
     }
-    fBannerWidget = w;
+    banner_widget_ = w;
     if (w != nullptr) {
         w->setParent(this);
-        fLayout->insertWidget(0, w);
+        layout_->insertWidget(0, w);
         w->show();
     }
 }
 
 void HMarginWidget::addWidget(QWidget* w)
 {
-    fLayout->addWidget(w);
+    layout_->addWidget(w);
 }
 
 void HMarginWidget::removeWidget(QWidget* w)
 {
-    fLayout->removeWidget(w);
+    layout_->removeWidget(w);
 }
 
 void HMarginWidget::setColor(QColor color)
 {
-    fColor = std::move(color);
+    color_ = std::move(color);
 }

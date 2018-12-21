@@ -81,7 +81,7 @@ static float convertHugoVolume(int hugoVol)
     } else if (hugoVol > 100) {
         hugoVol = 100;
     }
-    return (hugoVol / 100.f) * std::pow((float)hApp->settings()->soundVolume / 100.f, 2.f);
+    return (hugoVol / 100.f) * std::pow((float)hApp->settings()->sound_volume / 100.f, 2.f);
 }
 
 void initSoundEngine()
@@ -148,7 +148,7 @@ void updateSoundVolume()
 void updateSynthGain()
 {
     if (fsynthDec() != nullptr) {
-        fsynthDec()->setGain(hApp->settings()->synthGain);
+        fsynthDec()->setGain(hApp->settings()->synth_gain);
     }
 }
 
@@ -164,8 +164,8 @@ bool isSamplePlaying()
 
 static bool playStream(HUGO_FILE infile, long reslength, char loop_flag, bool isMusic)
 {
-    if ((isMusic and not hApp->settings()->enableMusic)
-        or (not isMusic and not hApp->settings()->enableSoundEffects)) {
+    if ((isMusic and not hApp->settings()->enable_music)
+        or (not isMusic and not hApp->settings()->enable_sound_effects)) {
         delete infile;
         return false;
     }
@@ -192,14 +192,15 @@ static bool playStream(HUGO_FILE infile, long reslength, char loop_flag, bool is
         switch (resource_type) {
         case MIDI_R: {
             auto fsdec = std::make_unique<Aulib::AudioDecoderFluidSynth>();
-            if (hApp->settings()->soundFont.isEmpty() or not hApp->settings()->useCustomSoundFont) {
+            if (hApp->settings()->soundfont.isEmpty()
+                or not hApp->settings()->use_custom_soundfont) {
                 QResource sf2Res(":/soundfont.sf2");
                 auto* sf2_rwops = SDL_RWFromConstMem(sf2Res.data(), sf2Res.size());
                 fsdec->loadSoundfont(sf2_rwops);
             } else {
-                fsdec->loadSoundfont(hApp->settings()->soundFont.toStdString());
+                fsdec->loadSoundfont(hApp->settings()->soundfont.toStdString());
             }
-            fsdec->setGain(hApp->settings()->synthGain);
+            fsdec->setGain(hApp->settings()->synth_gain);
             fsynthDec() = fsdec.get();
             decoder = std::move(fsdec);
             break;

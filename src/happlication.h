@@ -44,42 +44,42 @@ class HApplication final: public QApplication
 
 private:
     // Preferences (fonts, colors, etc.)
-    Settings* fSettings;
+    Settings* settings_;
 
     // Main application window.
-    HMainWindow* fMainWin;
+    HMainWindow* main_win_;
 
     // Frame widget containing all subwindows.
-    HFrame* fFrameWin;
+    HFrame* frame_win_;
 
     // Parent of fFrameWin, provides margins.
-    HMarginWidget* fMarginWidget;
+    HMarginWidget* margin_widget_;
 
-    const int fBottomMarginSize = 0;
+    const int bottom_margin_size_ = 0;
 
     // Are we currently executing a game?
-    bool fGameRunning = false;
+    bool is_game_running_ = false;
 
     // Filename of the game we're currently executing.
-    QString fGameFile;
+    QString gamefile_;
 
     // The game we should try to run after the current one ends.
-    QString fNextGame;
+    QString next_game_;
 
     // Text codec used by the Hugo engine.
-    QTextCodec* fHugoCodec;
+    QTextCodec* hugo_codec_;
 
     // Are we running in Gnome?
-    bool fDesktopIsGnome = false;
+    bool is_desktop_gnome = false;
 
     // Hugo engine runner and thread.
-    EngineRunner* fEngineRunner = nullptr;
-    EngineThread* fHugoThread = nullptr;
+    EngineRunner* engine_runner_ = nullptr;
+    EngineThread* hugo_thread_ = nullptr;
 
     // Run the game file contained in fNextGame.
-    void fRunGame();
+    void runGame();
 
-    void fUpdateMarginColor(int color);
+    void updateMarginColor(int color);
 
 #ifdef Q_OS_MAC
 protected:
@@ -114,32 +114,32 @@ public:
 
     Settings* settings() const
     {
-        return fSettings;
+        return settings_;
     }
 
     HFrame* frameWindow() const
     {
-        return fFrameWin;
+        return frame_win_;
     }
 
     HMarginWidget* marginWidget() const
     {
-        return fMarginWidget;
+        return margin_widget_;
     }
 
     bool gameRunning() const
     {
-        return fGameRunning;
+        return is_game_running_;
     }
 
     const QString& gameFile() const
     {
-        return fGameFile;
+        return gamefile_;
     }
 
     void setGameRunning(bool f)
     {
-        fGameRunning = f;
+        is_game_running_ = f;
         if (not f) {
             emit gameQuitting();
         }
@@ -154,12 +154,12 @@ public:
     // Text codec used by Hugo.
     QTextCodec* hugoCodec() const
     {
-        return fHugoCodec;
+        return hugo_codec_;
     }
 
     bool desktopIsGnome() const
     {
-        return fDesktopIsGnome;
+        return is_desktop_gnome;
     }
 
     void terminateEngineThread();

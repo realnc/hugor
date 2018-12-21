@@ -58,65 +58,65 @@ void updateVideoVolume()
 VideoPlayer::VideoPlayer(QWidget* parent)
     : QWidget(parent)
 {
-    d = new VideoPlayer_priv(this, this);
-    d->fMediaPlayer = new QMediaPlayer(this, QMediaPlayer::StreamPlayback);
+    d_ = new VideoPlayer_priv(this, this);
+    d_->media_player = new QMediaPlayer(this, QMediaPlayer::StreamPlayback);
     // d->fMediaPlayer = new QMediaPlayer(this);
-    d->fVideoWidget = new QVideoWidget(this);
+    d_->video_widget = new QVideoWidget(this);
 
     // d->fVideoWidget->setAttribute(Qt::WA_OpaquePaintEvent, true);
     //    d->fVideoWidget->setAttribute(Qt::WA_NoSystemBackground, true);
     //    d->fVideoWidget->setAttribute(Qt::WA_PaintOnScreen, true);
     //    d->fVideoWidget->setAutoFillBackground(false);
-    d->fVideoWidget->setAspectRatioMode(Qt::KeepAspectRatio);
-    d->fMediaPlayer->setVideoOutput(d->fVideoWidget);
-    d->fIODev = new RwopsQIODevice(this);
+    d_->video_widget->setAspectRatioMode(Qt::KeepAspectRatio);
+    d_->media_player->setVideoOutput(d_->video_widget);
+    d_->io_dev = new RwopsQIODevice(this);
     // So that the mouse cursor can be made visible again when moving the mouse.
     setMouseTracking(true);
-    d->fVideoWidget->setMouseTracking(true);
+    d_->video_widget->setMouseTracking(true);
 
-    connect(d->fMediaPlayer, SIGNAL(mediaStatusChanged(QMediaPlayer::MediaStatus)), d,
+    connect(d_->media_player, SIGNAL(mediaStatusChanged(QMediaPlayer::MediaStatus)), d_,
             SLOT(onStatusChange(QMediaPlayer::MediaStatus)));
-    connect(d->fMediaPlayer, SIGNAL(error(QMediaPlayer::Error)), d,
+    connect(d_->media_player, SIGNAL(error(QMediaPlayer::Error)), d_,
             SLOT(onError(QMediaPlayer::Error)));
 }
 
 VideoPlayer::~VideoPlayer()
 {
-    if (fRwops != nullptr) {
-        SDL_RWclose(fRwops);
+    if (rwops_ != nullptr) {
+        SDL_RWclose(rwops_);
     }
 }
 
 bool VideoPlayer::loadVideo(FILE* src, long len, bool loop)
 {
     stop();
-    if (fRwops != nullptr) {
-        d->fIODev->close();
-        SDL_RWclose(fRwops);
+    if (rwops_ != nullptr) {
+        d_->io_dev->close();
+        SDL_RWclose(rwops_);
     }
-    fRwops = RWFromMediaBundle(src, len);
-    if (fRwops == nullptr) {
+    rwops_ = RWFromMediaBundle(src, len);
+    if (rwops_ == nullptr) {
         hMainWin->errorMsgObj()->showMessage(tr("Unable to read video data from disk: ")
                                              + SDL_GetError());
         return false;
     }
-    d->fIODev->open(fRwops, QIODevice::ReadOnly);
-    d->fMediaPlayer->setMedia(QUrl(), d->fIODev);
-    fDataLen = len;
-    fLooping = loop;
+    d_->io_dev->open(rwops_, QIODevice::ReadOnly);
+    d_->media_player->setMedia(QUrl(), d_->io_dev);
+    data_len = len;
+    is_looping = loop;
     return true;
 }
 
 void VideoPlayer::play()
 {
-    d->fVideoWidget->show();
-    d->fVideoWidget->raise();
-    d->fMediaPlayer->play();
+    d_->video_widget->show();
+    d_->video_widget->raise();
+    d_->media_player->play();
 }
 
 void VideoPlayer::stop()
 {
-    d->fMediaPlayer->stop();
+    d_->media_player->stop();
 }
 
 void VideoPlayer::updateVolume()
@@ -126,7 +126,7 @@ void VideoPlayer::updateVolume()
 
 void VideoPlayer::setVolume(int vol)
 {
-    d->fMediaPlayer->setVolume(vol);
+    d_->media_player->setVolume(vol);
 }
 
 void VideoPlayer::setMute(bool /*mute*/)
@@ -137,5 +137,5 @@ void VideoPlayer::setMute(bool /*mute*/)
 void VideoPlayer::resizeEvent(QResizeEvent* e)
 {
     QWidget::resizeEvent(e);
-    d->fVideoWidget->resize(size());
+    d_->video_widget->resize(size());
 }

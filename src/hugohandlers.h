@@ -79,5 +79,5 @@ public slots:
 #endif
 
 private:
-    VideoPlayer* fVidPlayer = nullptr;
+    VideoPlayer* vid_player_ = nullptr;
 };

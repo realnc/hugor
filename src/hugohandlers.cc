@@ -46,7 +46,7 @@ HugoHandlers* hHandlers = nullptr;
 void HugoHandlers::calcFontDimensions() const
 {
     const QFontMetrics& curMetr = hFrame->currentFontMetrics();
-    const QFontMetrics fixedMetr(hApp->settings()->fixedFont);
+    const QFontMetrics fixedMetr(hApp->settings()->fixed_font);
 
     FIXEDCHARWIDTH = fixedMetr.averageCharWidth();
     FIXEDLINEHEIGHT = fixedMetr.height();
@@ -283,7 +283,7 @@ void HugoHandlers::displaypicture(HUGO_FILE infile, long len, int* result) const
     if (imgSize != img.size()) {
         // Only apply a smoothing filter if that setting is enabled in the settings.
         Qt::TransformationMode mode;
-        if (hApp->settings()->useSmoothScaling) {
+        if (hApp->settings()->use_smooth_scaling) {
             mode = Qt::SmoothTransformation;
         } else {
             mode = Qt::FastTransformation;
@@ -303,43 +303,43 @@ void HugoHandlers::displaypicture(HUGO_FILE infile, long len, int* result) const
 
 void HugoHandlers::stopvideo() const
 {
-    if (fVidPlayer != nullptr) {
-        fVidPlayer->stop();
+    if (vid_player_ != nullptr) {
+        vid_player_->stop();
     }
 }
 
 void HugoHandlers::playvideo(HUGO_FILE infile, long len, char loop, char bg, int vol, int* result)
 {
-    if (not hApp->settings()->enableVideo or hApp->settings()->videoSysError) {
+    if (not hApp->settings()->enable_video or hApp->settings()->video_sys_error) {
         *result = false;
         return;
     }
     stopvideo();
-    if (fVidPlayer == nullptr) {
-        fVidPlayer = new VideoPlayer(hFrame);
-        if (fVidPlayer == nullptr) {
+    if (vid_player_ == nullptr) {
+        vid_player_ = new VideoPlayer(hFrame);
+        if (vid_player_ == nullptr) {
             *result = false;
             return;
         }
     }
-    if (not fVidPlayer->loadVideo(infile->get(), len, loop)) {
+    if (not vid_player_->loadVideo(infile->get(), len, loop)) {
         *result = false;
         return;
     }
-    fVidPlayer->setVolume(vol);
-    fVidPlayer->setMaximumSize(QSize(physical_windowwidth, physical_windowheight));
-    fVidPlayer->setGeometry(physical_windowleft, physical_windowtop, physical_windowwidth,
-                            physical_windowheight);
+    vid_player_->setVolume(vol);
+    vid_player_->setMaximumSize(QSize(physical_windowwidth, physical_windowheight));
+    vid_player_->setGeometry(physical_windowleft, physical_windowtop, physical_windowwidth,
+                             physical_windowheight);
     if (not bg) {
         QEventLoop idleLoop;
-        QObject::connect(fVidPlayer, SIGNAL(videoFinished()), &idleLoop, SLOT(quit()));
-        QObject::connect(fVidPlayer, SIGNAL(errorOccurred()), &idleLoop, SLOT(quit()));
+        QObject::connect(vid_player_, SIGNAL(videoFinished()), &idleLoop, SLOT(quit()));
+        QObject::connect(vid_player_, SIGNAL(errorOccurred()), &idleLoop, SLOT(quit()));
         QObject::connect(hApp, SIGNAL(gameQuitting()), &idleLoop, SLOT(quit()));
         QObject::connect(hFrame, SIGNAL(escKeyPressed()), &idleLoop, SLOT(quit()));
-        fVidPlayer->play();
+        vid_player_->play();
         idleLoop.exec();
     } else {
-        fVidPlayer->play();
+        vid_player_->play();
     }
     *result = true;
 }

@@ -317,7 +317,7 @@ void initVideoEngine(int& argc, char* argv[])
         }
         g_error_free(gstError);
         QMessageBox::critical(nullptr, HApplication::applicationName(), errMsg);
-        hApp->settings()->videoSysError = true;
+        hApp->settings()->video_sys_error = true;
     }
 
 #ifdef Q_OS_WIN

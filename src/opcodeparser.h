@@ -11,7 +11,7 @@ public:
 
     bool hasOutput() const
     {
-        return not fOutput.empty();
+        return not output_.empty();
     }
 
     int getNextOutputByte();
@@ -48,14 +48,14 @@ public:
 
 private:
     // Bytes to be parsed.
-    std::queue<int> fBuffer;
+    std::queue<int> buffer_;
 
     // Output bytes. The initial values are two bytes representing the number 12121 (little-endian
     // order), which is the initial Hugor control file handshake.
-    std::queue<int> fOutput {{0x59, 0x2F}};
+    std::queue<int> output_ {{0x59, 0x2F}};
 
     Opcode popOpcode();
     int popValue();
-    void fPushOutput(int val);
-    void fPushOutput(OpcodeResult res);
+    void pushOutput(int val);
+    void pushOutput(OpcodeResult res);
 };

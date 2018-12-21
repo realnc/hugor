@@ -149,19 +149,19 @@ QColor hugoColorToQt(int color)
         qtColor.setRgb(0xffffff);
         break;
     case 16:
-        qtColor = hApp->settings()->mainTextColor;
+        qtColor = hApp->settings()->main_text_color;
         break;
     case 17:
-        qtColor = hApp->settings()->mainBgColor;
+        qtColor = hApp->settings()->main_bg_color;
         break;
     case 18:
-        qtColor = hApp->settings()->statusTextColor;
+        qtColor = hApp->settings()->status_text_color;
         break;
     case 19:
-        qtColor = hApp->settings()->statusBgColor;
+        qtColor = hApp->settings()->status_bg_color;
         break;
     case 20:
-        qtColor = hApp->settings()->mainTextColor;
+        qtColor = hApp->settings()->main_text_color;
         break;
 
     default:
@@ -177,7 +177,7 @@ QColor hugoColorToQt(int color)
 
 static void flushScriptBuffer()
 {
-    const int wrapWidth = hApp->settings()->scriptWrap;
+    const int wrapWidth = hApp->settings()->script_wrap;
 
     // If wrapping is disabled, or the entire buffer is below our wrap limit, write out all text
     // as-is.
@@ -630,7 +630,7 @@ void hugo_init_screen(void)
  * than the main display. */
 int hugo_hasgraphics(void)
 {
-    if (hApp->settings()->enableGraphics) {
+    if (hApp->settings()->enable_graphics) {
         return 1;
     }
     return false;
@@ -953,7 +953,7 @@ int hugo_playvideo(HUGO_FILE infile, long, char, char, int)
 
 int hugo_hasvideo(void)
 {
-    if (hApp->settings()->enableVideo and not hApp->settings()->videoSysError) {
+    if (hApp->settings()->enable_video and not hApp->settings()->video_sys_error) {
         return true;
     }
     return false;

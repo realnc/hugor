@@ -40,7 +40,7 @@ protected:
     void closeEvent(QCloseEvent* e) override;
 
 private:
-    int fMaximumBlockCount = 7000;
-    int fInitialWidth = 600;
-    int fInitialHeight = 440;
+    int max_block_count_ = 7000;
+    int initial_width_ = 600;
+    int initial_height_ = 440;
 };

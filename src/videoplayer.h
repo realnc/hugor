@@ -57,11 +57,11 @@ protected:
     void resizeEvent(QResizeEvent* e) override;
 
 private:
-    SDL_RWops* fRwops = nullptr;
-    long fDataLen = 0;
-    bool fLooping = false;
+    SDL_RWops* rwops_ = nullptr;
+    long data_len = 0;
+    bool is_looping = false;
     friend class VideoPlayer_priv;
-    VideoPlayer_priv* d = nullptr;
+    VideoPlayer_priv* d_ = nullptr;
 };
 
 #endif
