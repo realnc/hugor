@@ -1,4 +1,26 @@
-/* Copyright 2015 Nikos Chantziaras
+// This is copyrighted software. More information is at the end of this file.
+#include "enginerunner.h"
+
+#include <QThread>
+#include <array>
+#include <memory>
+
+extern "C" {
+#include "heheader.h"
+}
+
+void EngineRunner::runEngine()
+{
+    char argv0[] = "hugor";
+    auto argv1 = std::make_unique<char[]>(gamefile_.toLocal8Bit().size() + 1);
+    memcpy(argv1.get(), gamefile_.toLocal8Bit().constData(), gamefile_.toLocal8Bit().size() + 1);
+    std::array<char*, 2> argv = {argv0, argv1.get()};
+    EngineThread::setTerminationEnabled(true);
+    he_main(2, argv.data());
+    emit finished();
+}
+
+/* Copyright (C) 2011-2018 Nikos Chantziaras
  *
  * This file is part of Hugor.
  *
@@ -25,23 +47,3 @@
  * include the source code for the parts of the Hugo Engine used as well as
  * that of the covered work.
  */
-#include "enginerunner.h"
-
-#include <QThread>
-#include <array>
-#include <memory>
-
-extern "C" {
-#include "heheader.h"
-}
-
-void EngineRunner::runEngine()
-{
-    char argv0[] = "hugor";
-    auto argv1 = std::make_unique<char[]>(gamefile_.toLocal8Bit().size() + 1);
-    memcpy(argv1.get(), gamefile_.toLocal8Bit().constData(), gamefile_.toLocal8Bit().size() + 1);
-    std::array<char*, 2> argv = {argv0, argv1.get()};
-    EngineThread::setTerminationEnabled(true);
-    he_main(2, argv.data());
-    emit finished();
-}

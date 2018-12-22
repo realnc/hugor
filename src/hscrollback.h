@@ -1,4 +1,25 @@
-/* Copyright 2015 Nikos Chantziaras
+// This is copyrighted software. More information is at the end of this file.
+#pragma once
+#include <QTextEdit>
+
+class HScrollbackWindow final: public QTextEdit
+{
+    Q_OBJECT
+
+public:
+    HScrollbackWindow(QWidget* parent = nullptr);
+
+protected:
+    void keyPressEvent(QKeyEvent* e) override;
+    void closeEvent(QCloseEvent* e) override;
+
+private:
+    int max_block_count_ = 7000;
+    int initial_width_ = 600;
+    int initial_height_ = 440;
+};
+
+/* Copyright (C) 2011-2018 Nikos Chantziaras
  *
  * This file is part of Hugor.
  *
@@ -25,22 +46,3 @@
  * include the source code for the parts of the Hugo Engine used as well as
  * that of the covered work.
  */
-#pragma once
-#include <QTextEdit>
-
-class HScrollbackWindow final: public QTextEdit
-{
-    Q_OBJECT
-
-public:
-    HScrollbackWindow(QWidget* parent = nullptr);
-
-protected:
-    void keyPressEvent(QKeyEvent* e) override;
-    void closeEvent(QCloseEvent* e) override;
-
-private:
-    int max_block_count_ = 7000;
-    int initial_width_ = 600;
-    int initial_height_ = 440;
-};

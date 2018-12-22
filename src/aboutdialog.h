@@ -1,4 +1,24 @@
-/* Copyright 2015 Nikos Chantziaras
+// This is copyrighted software. More information is at the end of this file.
+#pragma once
+#include <QDialog>
+
+namespace Ui {
+class AboutDialog;
+}
+
+class AboutDialog final: public QDialog
+{
+    Q_OBJECT
+
+public:
+    explicit AboutDialog(QWidget* parent = nullptr);
+    ~AboutDialog() override;
+
+private:
+    Ui::AboutDialog* ui_;
+};
+
+/* Copyright (C) 2011-2018 Nikos Chantziaras
  *
  * This file is part of Hugor.
  *
@@ -25,21 +45,3 @@
  * include the source code for the parts of the Hugo Engine used as well as
  * that of the covered work.
  */
-#pragma once
-#include <QDialog>
-
-namespace Ui {
-class AboutDialog;
-}
-
-class AboutDialog final: public QDialog
-{
-    Q_OBJECT
-
-public:
-    explicit AboutDialog(QWidget* parent = nullptr);
-    ~AboutDialog() override;
-
-private:
-    Ui::AboutDialog* ui_;
-};

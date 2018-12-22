@@ -1,4 +1,10 @@
-/* Copyright 2015 Nikos Chantziaras
+/* This is copyrighted software. More information is at the end of this file. */
+#pragma once
+#define HUGOR_VERSION "1.0 git"
+#define W32_RC_FILEVERSION 1, 0, 0, 99
+#define W32_RC_PRODUCTVERSION 1, 0, 0, 99
+
+/* Copyright (C) 2011-2018 Nikos Chantziaras
  *
  * This file is part of Hugor.
  *
@@ -25,7 +31,3 @@
  * include the source code for the parts of the Hugo Engine used as well as
  * that of the covered work.
  */
-#pragma once
-#define HUGOR_VERSION "1.0 git"
-#define W32_RC_FILEVERSION 1, 0, 0, 99
-#define W32_RC_PRODUCTVERSION 1, 0, 0, 99

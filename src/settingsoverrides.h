@@ -1,4 +1,30 @@
-/* Copyright 2015 Nikos Chantziaras
+// This is copyrighted software. More information is at the end of this file.
+#pragma once
+#include <QColor>
+#include <QString>
+
+class SettingsOverrides final
+{
+public:
+    SettingsOverrides(const QString& filename);
+
+    QString app_name;
+    QString author_name;
+    bool fullscreen;
+    int fullscreen_width;
+    bool hide_menubar;
+    int margin_size;
+    QColor fs_margin_color;
+    int width_ratio;
+    int height_ratio;
+    int prop_font_size;
+    int fixed_font_size;
+    int scrollback_font_size;
+    bool image_smoothing;
+    bool mute_when_minimized;
+};
+
+/* Copyright (C) 2011-2018 Nikos Chantziaras
  *
  * This file is part of Hugor.
  *
@@ -25,27 +51,3 @@
  * include the source code for the parts of the Hugo Engine used as well as
  * that of the covered work.
  */
-#pragma once
-#include <QColor>
-#include <QString>
-
-class SettingsOverrides final
-{
-public:
-    SettingsOverrides(const QString& filename);
-
-    QString app_name;
-    QString author_name;
-    bool fullscreen;
-    int fullscreen_width;
-    bool hide_menubar;
-    int margin_size;
-    QColor fs_margin_color;
-    int width_ratio;
-    int height_ratio;
-    int prop_font_size;
-    int fixed_font_size;
-    int scrollback_font_size;
-    bool image_smoothing;
-    bool mute_when_minimized;
-};
