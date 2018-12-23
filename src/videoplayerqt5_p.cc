@@ -12,7 +12,7 @@ void VideoPlayer_priv::onStatusChange(QMediaPlayer::MediaStatus status)
         return;
     }
     if (q->is_looping) {
-        q->play();
+        media_player->play();
     } else {
         emit q->videoFinished();
     }

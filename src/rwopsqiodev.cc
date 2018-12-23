@@ -10,7 +10,7 @@ bool RwopsQIODevice::atEnd() const
 
 bool RwopsQIODevice::isSequential() const
 {
-    return (rwops_ != nullptr) and (rwops_->seek != nullptr);
+    return (rwops_ == nullptr) or (rwops_->seek == nullptr);
 }
 
 bool RwopsQIODevice::seek(qint64 pos)

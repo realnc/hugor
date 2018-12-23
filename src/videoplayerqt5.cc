@@ -31,22 +31,19 @@ void updateVideoVolume()
 
 VideoPlayer::VideoPlayer(QWidget* parent)
     : QWidget(parent)
+    , d_(new VideoPlayer_priv(this, this))
 {
-    d_ = new VideoPlayer_priv(this, this);
-    d_->media_player = new QMediaPlayer(this, QMediaPlayer::StreamPlayback);
-    // d->fMediaPlayer = new QMediaPlayer(this);
-    d_->video_widget = new QVideoWidget(this);
-
-    // d->fVideoWidget->setAttribute(Qt::WA_OpaquePaintEvent, true);
-    //    d->fVideoWidget->setAttribute(Qt::WA_NoSystemBackground, true);
-    //    d->fVideoWidget->setAttribute(Qt::WA_PaintOnScreen, true);
-    //    d->fVideoWidget->setAutoFillBackground(false);
-    d_->video_widget->setAspectRatioMode(Qt::KeepAspectRatio);
-    d_->media_player->setVideoOutput(d_->video_widget);
+    d_->media_player = new QMediaPlayer(this, QMediaPlayer::LowLatency);
+    d_->setAttribute(Qt::WA_OpaquePaintEvent, true);
+    //d_->setAttribute(Qt::WA_NoSystemBackground, true);
+    //d_->setAttribute(Qt::WA_PaintOnScreen, true);
+    //d_->setAutoFillBackground(false);
+    d_->setAspectRatioMode(Qt::KeepAspectRatio);
+    d_->media_player->setVideoOutput(d_);
     d_->io_dev = new RwopsQIODevice(this);
     // So that the mouse cursor can be made visible again when moving the mouse.
     setMouseTracking(true);
-    d_->video_widget->setMouseTracking(true);
+    d_->setMouseTracking(true);
 
     connect(d_->media_player, SIGNAL(mediaStatusChanged(QMediaPlayer::MediaStatus)), d_,
             SLOT(onStatusChange(QMediaPlayer::MediaStatus)));
@@ -83,14 +80,17 @@ bool VideoPlayer::loadVideo(FILE* src, long len, bool loop)
 
 void VideoPlayer::play()
 {
-    d_->video_widget->show();
-    d_->video_widget->raise();
+    show();
+    d_->show();
+    //raise();
+    //d_->raise();
     d_->media_player->play();
 }
 
 void VideoPlayer::stop()
 {
     d_->media_player->stop();
+    hide();
 }
 
 void VideoPlayer::updateVolume()
@@ -111,7 +111,7 @@ void VideoPlayer::setMute(bool /*mute*/)
 void VideoPlayer::resizeEvent(QResizeEvent* e)
 {
     QWidget::resizeEvent(e);
-    d_->video_widget->resize(size());
+    d_->resize(size());
 }
 
 /* Copyright (C) 2011-2018 Nikos Chantziaras

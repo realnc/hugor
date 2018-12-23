@@ -1,25 +1,24 @@
 // This is copyrighted software. More information is at the end of this file.
 #pragma once
-#include <QWidget>
+#include <QVideoWidget>
 
 #include <QMediaPlayer>
 
 class VideoPlayer;
 class RwopsQIODevice;
 
-class VideoPlayer_priv final: public QWidget
+class VideoPlayer_priv final: public QVideoWidget
 {
     Q_OBJECT
 
 public:
     VideoPlayer_priv(QWidget* parent, VideoPlayer* qPtr)
-        : QWidget(parent)
+        : QVideoWidget(parent)
         , q(qPtr)
     {}
 
     VideoPlayer* q;
     QMediaPlayer* media_player = nullptr;
-    QVideoWidget* video_widget = nullptr;
     RwopsQIODevice* io_dev;
 
 public slots:
