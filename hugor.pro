@@ -114,10 +114,7 @@ static:DEFINES += STATIC_QT
 macx {
     TARGET = Hugor
     QMAKE_INFO_PLIST = Info.plist
-    QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.7
-    QMAKE_CFLAGS += -fvisibility=hidden -fomit-frame-pointer
-    QMAKE_CXXFLAGS += -fvisibility=hidden -fomit-frame-pointer
-    QMAKE_LFLAGS += -dead_strip
+    QMAKE_LFLAGS_RELEASE += -dead_strip
 }
 
 win32 {
@@ -138,9 +135,9 @@ win32 {
         QMAKE_CXXFLAGS += -march=i686 -mtune=generic
 
         # Dead code stripping (requires patched binutils).
-        QMAKE_CFLAGS += -fdata-sections -ffunction-sections
-        QMAKE_CXXFLAGS += -fdata-sections -ffunction-sections
-        QMAKE_LFLAGS += -Wl,--gc-sections
+        QMAKE_CFLAGS_RELEASE += -fdata-sections -ffunction-sections
+        QMAKE_CXXFLAGS_RELEASE += -fdata-sections -ffunction-sections
+        QMAKE_LFLAGS_RELEASE += -Wl,--gc-sections
 
         # Don't dead-strip the resource section (it contains the icon,
         # version strings, etc.)  We use a linker script to do that.
@@ -151,12 +148,6 @@ win32 {
 # We use warn_off to allow only default warnings, not to supress them all.
 QMAKE_CXXFLAGS_WARN_OFF =
 QMAKE_CFLAGS_WARN_OFF =
-
-*-g++* {
-    # Use optimizations that don't interfere with debugging in debug builds.
-    QMAKE_CXXFLAGS_DEBUG += -Og
-    QMAKE_CFLAGS_DEBUG += -Og
-}
 
 *-g++*|*-clang* {
     # Avoid "unused parameter" warnings with C code.
