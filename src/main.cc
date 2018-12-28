@@ -27,12 +27,12 @@ extern "C" {
 
 int main(int argc, char* argv[])
 {
+    HApplication app(argc, argv, "Hugor", HUGOR_VERSION, "Nikos Chantziaras", "");
+
     initSoundEngine();
 #ifndef DISABLE_VIDEO
     initVideoEngine(argc, argv);
 #endif
-
-    HApplication app(argc, argv, "Hugor", HUGOR_VERSION, "Nikos Chantziaras", "");
 
     // Filename of the game to run.
     QString gameFileName;

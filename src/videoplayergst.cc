@@ -230,6 +230,11 @@ void VideoPlayer::resizeEvent(QResizeEvent* e)
     d_->resize(e->size());
 }
 
+QPaintEngine* VideoPlayer::paintEngine() const
+{
+    return QWidget::paintEngine();
+}
+
 /* Copyright (C) 2011-2018 Nikos Chantziaras
  *
  * This file is part of Hugor.

@@ -300,6 +300,7 @@ void HMainWindow::closeEvent(QCloseEvent* e)
 
     if (msgBox->exec() == QMessageBox::Yes) {
         hApp->settings()->saveToDisk();
+        closeVideoEngine();
         closeSoundEngine();
         hApp->terminateEngineThread();
         exit(0);

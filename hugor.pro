@@ -84,6 +84,20 @@ static:DEFINES += STATIC_QT
             src/videoplayerqt5.cc \
             src/videoplayerqt5_p.cc \
             src/rwopsqiodev.cc
+    } else:vlc-video {
+        PKGCONFIG += libvlc
+        DEFINES += VIDEO_VLC
+        win32 {
+            DEFINES += DL_VLC
+        }
+        macos {
+            QMAKE_RPATHDIR += @executable_path/lib
+        }
+        HEADERS += \
+            src/dlvlcdef.h \
+            src/videoplayervlc_p.h
+        SOURCES += \
+            src/videoplayervlc.cc
     } else {
         DEFINES += VIDEO_GSTREAMER
 
@@ -125,6 +139,7 @@ win32 {
         }
         qt5-video {
             QTPLUGIN += dsengine
+        } else:vlc-video {
         } else {
             include(gstreamer-static.pri)
         }

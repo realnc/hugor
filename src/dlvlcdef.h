@@ -1,44 +1,26 @@
 // This is copyrighted software. More information is at the end of this file.
 #pragma once
-#ifndef DISABLE_VIDEO
-#include <QWidget>
-
-struct SDL_RWops;
-class VideoPlayer_priv;
-
-class VideoPlayer final: public QWidget
-{
-    Q_OBJECT
-
-public:
-    VideoPlayer(QWidget* parent = nullptr);
-    ~VideoPlayer() override;
-
-    bool loadVideo(FILE* src, long len, bool loop);
-
-public slots:
-    void play();
-    void stop();
-    void updateVolume();
-    void setVolume(int vol);
-    void setMute(bool mute);
-
-signals:
-    void videoFinished();
-    void errorOccurred();
-
-protected:
-    void resizeEvent(QResizeEvent* e) override;
-    QPaintEngine* paintEngine() const override;
-
-private:
-    SDL_RWops* rwops_ = nullptr;
-    long data_len = 0;
-    bool is_looping = false;
-    friend class VideoPlayer_priv;
-    VideoPlayer_priv* d_ = nullptr;
-};
-
+#ifdef DL_VLC
+#define libvlc_media_add_option libvlc_media_add_option_ptr
+#define libvlc_media_event_manager libvlc_media_event_manager_ptr
+#define libvlc_media_new_callbacks libvlc_media_new_callbacks_ptr
+#define libvlc_media_player_event_manager libvlc_media_player_event_manager_ptr
+#define libvlc_media_player_is_playing libvlc_media_player_is_playing_ptr
+#define libvlc_media_player_new libvlc_media_player_new_ptr
+#define libvlc_media_player_play libvlc_media_player_play_ptr
+#define libvlc_media_player_release libvlc_media_player_release_ptr
+#define libvlc_media_player_set_hwnd libvlc_media_player_set_hwnd_ptr
+#define libvlc_media_player_set_media libvlc_media_player_set_media_ptr
+#define libvlc_media_player_stop libvlc_media_player_stop_ptr
+#define libvlc_media_release libvlc_media_release_ptr
+#define libvlc_new libvlc_new_ptr
+#define libvlc_release libvlc_release_ptr
+#define libvlc_video_get_size libvlc_video_get_size_ptr
+#define libvlc_video_set_key_input libvlc_video_set_key_input_ptr
+#define libvlc_video_set_mouse_input libvlc_video_set_mouse_input_ptr
+#define libvlc_event_attach libvlc_event_attach_ptr
+#define libvlc_media_player_set_nsobject libvlc_media_player_set_nsobject_ptr
+#define libvlc_media_player_set_xwindow libvlc_media_player_set_xwindow_ptr
 #endif
 
 /* Copyright (C) 2011-2018 Nikos Chantziaras
