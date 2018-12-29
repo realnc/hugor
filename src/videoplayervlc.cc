@@ -182,6 +182,7 @@ VideoPlayer::VideoPlayer(QWidget* parent)
         } else {
             msg += QLatin1String(": ") + libvlc_errmsg();
         }
+        hApp->settings()->video_sys_error = true;
         hMainWin->errorMsgObj()->showMessage(msg);
         return;
     }
@@ -193,6 +194,7 @@ VideoPlayer::VideoPlayer(QWidget* parent)
         } else {
             msg += QLatin1String(": ") + libvlc_errmsg();
         }
+        hApp->settings()->video_sys_error = true;
         hMainWin->errorMsgObj()->showMessage(msg);
         return;
     }
