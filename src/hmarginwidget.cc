@@ -80,6 +80,7 @@ void HMarginWidget::removeWidget(QWidget* w)
 void HMarginWidget::setColor(QColor color)
 {
     color_ = std::move(color);
+    update();
 }
 
 /* Copyright (C) 2011-2018 Nikos Chantziaras
