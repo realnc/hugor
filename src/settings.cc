@@ -172,7 +172,7 @@ void Settings::loadFromDisk(SettingsOverrides* ovr)
     } else if (fullscreen_width < 10) {
         fullscreen_width = 10;
     }
-    start_fullscreen = sett.value(SETT_START_FULLSCREEN, true).toBool();
+    start_fullscreen = sett.value(SETT_START_FULLSCREEN, false).toBool();
     if (start_fullscreen) {
         is_fullscreen = true;
     }
