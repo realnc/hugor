@@ -2,10 +2,15 @@ QT += core widgets
 QT_CONFIG -= no-pkg-config
 TEMPLATE = app
 CONFIG += silent warn_on link_pkgconfig strict_c++ c++14
-VERSION = 1.0.0.99
 TARGET = hugor
 ICON = mac_icon.icns
 RC_FILE += hugor.rc
+
+VERSION_MAJOR = 1
+VERSION_MINOR = 0
+VERSION_PATCH = 99
+VERSION = "$$VERSION_MAJOR"."$$VERSION_MINOR"."$$VERSION_PATCH"
+DEFINES += HUGOR_VERSION=\\\"$$VERSION\\\"
 
 lessThan(QT_MAJOR_VERSION, 5) {
     error(Qt 5 is required to build this application.)
@@ -133,6 +138,10 @@ macx {
 
 win32 {
     TARGET = Hugor
+    RC_DEFINES += \
+        HUGOR_VERSION=\""$$VERSION"\" \
+        W32_RC_FILEVERSION=\""$$VERSION_MAJOR","$$VERSION_MINOR","$$VERSION_PATCH",00\" \
+        W32_RC_PRODUCTVERSION=\""$$VERSION_MAJOR","$$VERSION_MINOR","$$VERSION_PATCH",00\"
     !disable-video {
         gstreamer-0.10 {
             error("GStreamer 0.10 is not supported on Windows. You need GStreamer 1.x.")
@@ -195,7 +204,6 @@ HEADERS += \
     src/kcolorbutton.h \
     src/settings.h \
     src/settingsoverrides.h \
-    src/version.h \
     src/rwopsbundle.h \
     src/videoplayer.h \
     src/enginerunner.h \

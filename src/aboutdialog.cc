@@ -5,7 +5,6 @@ extern "C" {
 #include "heheader.h"
 }
 #include "ui_aboutdialog.h"
-#include "version.h"
 
 AboutDialog::AboutDialog(QWidget* parent)
     : QDialog(parent, Qt::WindowTitleHint | Qt::WindowSystemMenuHint)

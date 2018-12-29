@@ -13,7 +13,6 @@ extern "C" {
 }
 #include "hugodefs.h"
 #include "settings.h"
-#include "version.h"
 
 // On some platforms, SDL redefines main in order to provide a platform-specific main()
 // implementation. However, Qt handles this too, so things can get weird. We need to make sure main

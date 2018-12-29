@@ -3,7 +3,9 @@
 # else
 #  include <winver.h>
 # endif
-#include "src/version.h"
+
+#define STRINGIFY(x) #x
+#define HUGOR_VERSION_STR(x) STRINGIFY(x)
 
 IDI_ICON1 ICON DISCARDABLE "w32_icon.ico"
 
@@ -26,9 +28,9 @@ VS_VERSION_INFO VERSIONINFO
 			BEGIN
 				VALUE "CompanyName", "Nikos Chantziaras"
 				VALUE "FileDescription", "Hugor - A Hugo Interpreter"
-				VALUE "FileVersion", HUGOR_VERSION
-				VALUE "ProductVersion", HUGOR_VERSION
-				VALUE "LegalCopyright", "Copyright 2006, Kent Tessman; 2012, Nikos Chantziaras"
+				VALUE "FileVersion", HUGOR_VERSION_STR(HUGOR_VERSION)
+				VALUE "ProductVersion", HUGOR_VERSION_STR(HUGOR_VERSION)
+				VALUE "LegalCopyright", "Copyright 2006, Kent Tessman; 2011-2018, Nikos Chantziaras"
 				VALUE "OriginalFilename", "Hugor.exe"
 				VALUE "ProductName", "Hugor"
 			END
