@@ -35,9 +35,9 @@ VideoPlayer::VideoPlayer(QWidget* parent)
 {
     d_->media_player = new QMediaPlayer(this, QMediaPlayer::LowLatency);
     d_->setAttribute(Qt::WA_OpaquePaintEvent, true);
-    //d_->setAttribute(Qt::WA_NoSystemBackground, true);
-    //d_->setAttribute(Qt::WA_PaintOnScreen, true);
-    //d_->setAutoFillBackground(false);
+    // d_->setAttribute(Qt::WA_NoSystemBackground, true);
+    // d_->setAttribute(Qt::WA_PaintOnScreen, true);
+    // d_->setAutoFillBackground(false);
     d_->setAspectRatioMode(Qt::KeepAspectRatio);
     d_->media_player->setVideoOutput(d_);
     d_->io_dev = new RwopsQIODevice(this);
@@ -82,8 +82,8 @@ void VideoPlayer::play()
 {
     show();
     d_->show();
-    //raise();
-    //d_->raise();
+    // raise();
+    // d_->raise();
     d_->media_player->play();
 }
 
@@ -112,6 +112,11 @@ void VideoPlayer::resizeEvent(QResizeEvent* e)
 {
     QWidget::resizeEvent(e);
     d_->resize(size());
+}
+
+QPaintEngine* VideoPlayer::paintEngine() const
+{
+    return QWidget::paintEngine();
 }
 
 /* Copyright (C) 2011-2018 Nikos Chantziaras
