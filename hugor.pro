@@ -12,21 +12,14 @@ VERSION_PATCH = 99
 VERSION = "$$VERSION_MAJOR"."$$VERSION_MINOR"."$$VERSION_PATCH"
 DEFINES += HUGOR_VERSION=\\\"$$VERSION\\\"
 
-lessThan(QT_MAJOR_VERSION, 5) {
-    error(Qt 5 is required to build this application.)
+contains(QT_MAJOR_VERSION, 5):lessThan(QT_MINOR_VERSION, 6) {
+    error(Qt 5.6 or higher is required. You are using Qt "$$QT_MAJOR_VERSION"."$$QT_MINOR_VERSION")
 }
 
 #SANITIZER_FLAGS = -fsanitize=undefined,integer -fno-omit-frame-pointer
 #QMAKE_CFLAGS += $$SANITIZER_FLAGS
 #QMAKE_CXXFLAGS += $$SANITIZER_FLAGS
 #QMAKE_LFLAGS += $$SANITIZER_FLAGS
-
-# qmake on Qt 5.3 and lower doesn't recognize c++14
-contains(QT_MAJOR_VERSION, 5):lessThan(QT_MINOR_VERSION, 4) {
-    CONFIG += c++11
-    QMAKE_CXXFLAGS_CXX11 = $$replace(QMAKE_CXXFLAGS_CXX11, "std=c\+\+11", "std=c++1y")
-    QMAKE_CXXFLAGS_CXX11 = $$replace(QMAKE_CXXFLAGS_CXX11, "std=c\+\+0x", "std=c++1y")
-}
 
 static:DEFINES += STATIC_QT
 

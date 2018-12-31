@@ -159,8 +159,14 @@ ConfDialog::ConfDialog(HMainWindow* parent)
     connect(ui_->midiPlayButton, &QPushButton::clicked, this, &ConfDialog::playTestMidi);
     connect(ui_->midiStopButton, &QPushButton::clicked, this, &ConfDialog::stopTestMidi);
     connect(ui_->soundFontPushButton, &QPushButton::clicked, this, &ConfDialog::browseForSoundFont);
+#if QT_VERSION >= QT_VERSION_CHECK(5, 7, 0)
     connect(ui_->gainSpinBox, qOverload<double>(&QDoubleSpinBox::valueChanged), this,
             &ConfDialog::setGain);
+#else
+    connect(ui_->gainSpinBox,
+            static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this,
+            &ConfDialog::setGain);
+#endif
 }
 
 ConfDialog::~ConfDialog()
@@ -202,8 +208,14 @@ void ConfDialog::makeInstantApply()
     connect(ui_->volumeSlider, SIGNAL(valueChanged(int)), SLOT(applySettings()));
     connect(ui_->soundFontGroupBox, &QGroupBox::toggled, this, &ConfDialog::applySettings);
     connect(ui_->soundFontLineEdit, &QLineEdit::textChanged, this, &ConfDialog::applySettings);
+#if QT_VERSION >= QT_VERSION_CHECK(5, 7, 0)
     connect(ui_->gainSpinBox, qOverload<double>(&QDoubleSpinBox::valueChanged), this,
             &ConfDialog::applySettings);
+#else
+    connect(ui_->gainSpinBox,
+            static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this,
+            &ConfDialog::applySettings);
+#endif
     connect(ui_->overlayScrollbackCheckBox, SIGNAL(toggled(bool)), this, SLOT(applySettings()));
     connect(ui_->mainTextColorButton, SIGNAL(changed(QColor)), this, SLOT(applySettings()));
     connect(ui_->mainBgColorButton, SIGNAL(changed(QColor)), this, SLOT(applySettings()));
