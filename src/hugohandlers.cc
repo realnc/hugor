@@ -6,6 +6,7 @@
 #include <QTextCodec>
 #include <QTextLayout>
 #include <QTextStream>
+#include <QWindow>
 #include <algorithm>
 #include <cstdio>
 
@@ -240,6 +241,8 @@ void HugoHandlers::displaypicture(HUGO_FILE infile, long len, int* result) const
     // Qt.
     QImage img;
     img.loadFromData(data);
+    const auto dpr = hMainWin->windowHandle()->devicePixelRatio();
+    img.setDevicePixelRatio(dpr);
 
     // Done with the file.
     file.close();
@@ -254,16 +257,18 @@ void HugoHandlers::displaypicture(HUGO_FILE infile, long len, int* result) const
         imgSize.setHeight(physical_windowheight);
     }
     // Make sure to keep the aspect ratio (don't stretch.)
+    // Only apply a smoothing filter if that setting is enabled in the settings.
+    Qt::TransformationMode mode;
+    if (hApp->settings()->use_smooth_scaling) {
+        mode = Qt::SmoothTransformation;
+    } else {
+        mode = Qt::FastTransformation;
+    }
     if (imgSize != img.size()) {
-        // Only apply a smoothing filter if that setting is enabled in the settings.
-        Qt::TransformationMode mode;
-        if (hApp->settings()->use_smooth_scaling) {
-            mode = Qt::SmoothTransformation;
-        } else {
-            mode = Qt::FastTransformation;
-        }
-        img = img.scaled(imgSize, Qt::KeepAspectRatio, mode);
-        imgSize = img.size();
+        img = img.scaled(imgSize * dpr, Qt::KeepAspectRatio, mode);
+        imgSize = img.size() / dpr;
+    } else if (not qFuzzyCompare(dpr, 1.0)) {
+        img = img.scaled(img.size() * dpr, Qt::KeepAspectRatio, mode);
     }
 
     // The image should be displayed centered.

@@ -9,6 +9,7 @@
 #include <QPainter>
 #include <QTextCodec>
 #include <QTimer>
+#include <QWindow>
 
 #include "happlication.h"
 extern "C" {
@@ -21,6 +22,11 @@ extern "C" {
 #include "settings.h"
 
 HFrame* hFrame = nullptr;
+
+static qreal dpr()
+{
+    return hMainWin->windowHandle()->devicePixelRatio();
+}
 
 HFrame::HFrame(QWidget* parent)
     : QWidget(parent)
@@ -147,7 +153,9 @@ void HFrame::paintEvent(QPaintEvent* e)
     // qDebug(Q_FUNC_INFO);
     QPainter p(this);
     p.setClipRegion(e->region());
-    p.drawPixmap(e->rect(), pixmap_, e->rect());
+    QRectF src_rect(e->rect().topLeft() * dpr(),
+                    QSizeF(e->rect().width(), e->rect().height()) * dpr());
+    p.drawPixmap(e->rect(), pixmap_, src_rect);
 
     // Draw our current input. We need to do this here, after the pixmap has already been painted,
     // so that the input gets painted on top. Otherwise, we could not erase text during editing.
@@ -181,19 +189,17 @@ void HFrame::resizeEvent(QResizeEvent* e)
         return;
     }
 
-    // Save a copy of the current pixmaps.
-    const QPixmap& tmp = pixmap_.copy();
-
     // Adjust the margins so that we get our final size.
     hApp->updateMargins(-1);
 
-    // Create new pixmaps, using the new size and fill it with the default background color.
-    QPixmap newPixmap(size());
+    // Create a new pixmap, using the new size and fill it with the default background color.
+    QPixmap newPixmap(size() * dpr());
+    newPixmap.setDevicePixelRatio(dpr());
     newPixmap.fill(hugoColorToQt(bg_color_));
 
-    // Draw the saved pixmaps into the new ones and use them as our new display.
+    // Draw the current pixmap into the new one and use it as our new display.
     QPainter p(&newPixmap);
-    p.drawPixmap(0, 0, tmp);
+    p.drawPixmap(0, 0, pixmap_);
     pixmap_ = newPixmap;
 
     hHandlers->settextmode();
@@ -480,7 +486,7 @@ bool HFrame::hasKeyInQueue()
     return not key_queue_.isEmpty();
 }
 
-void HFrame::clearRegion(int left, int top, int right, int bottom)
+void HFrame::clearRegion(qreal left, qreal top, qreal right, qreal bottom)
 {
     // qDebug(Q_FUNC_INFO);
     flushText();
@@ -490,7 +496,7 @@ void HFrame::clearRegion(int left, int top, int right, int bottom)
         return;
     }
     QPainter p(&pixmap_);
-    QRect rect(left, top, right - left + 1, bottom - top + 1);
+    QRectF rect(left, top, right - left + 1, bottom - top + 1);
     p.fillRect(rect, hugoColorToQt(bg_color_));
 
     // If this was a fullscreen clear, then also clear the margin color.
@@ -556,12 +562,14 @@ void HFrame::scrollUp(int left, int top, int right, int bottom, int h)
     QRegion exposed;
     ++right;
     ++bottom;
-    pixmap_.scroll(0, -h, left, top, right - left, bottom - top, &exposed);
+    pixmap_.scroll(0, -h * dpr(), left * dpr(), top * dpr(), (right - left) * dpr(),
+                   (bottom - top) * dpr(), &exposed);
     need_screen_update_ = true;
 
     // Fill exposed region.
     const QRect& r = exposed.boundingRect();
-    clearRegion(r.left(), r.top(), r.left() + r.width(), r.top() + r.bottom());
+    clearRegion(r.left() / dpr(), r.top() / dpr(), (r.left() + r.width()) / dpr(),
+                (r.top() + r.bottom()) / dpr());
 
     if (hApp->settings()->soft_text_scrolling) {
         QEventLoop idleLoop;

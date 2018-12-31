@@ -177,7 +177,7 @@ public:
     bool hasKeyInQueue();
 
     // Clear a region of the window using the current background color.
-    void clearRegion(int left, int top, int right, int bottom);
+    void clearRegion(qreal left, qreal top, qreal right, qreal bottom);
 
     // Set the current foreground color.
     void setFgColor(int color);

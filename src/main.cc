@@ -26,7 +26,9 @@ extern "C" {
 
 int main(int argc, char* argv[])
 {
+    QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     HApplication app(argc, argv, "Hugor", HUGOR_VERSION, "Nikos Chantziaras", "");
+    QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 
     initSoundEngine();
 #ifndef DISABLE_VIDEO
