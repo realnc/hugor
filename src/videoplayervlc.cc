@@ -40,6 +40,8 @@ decltype(&libvlc_video_set_mouse_input) libvlc_video_set_mouse_input_ptr = nullp
 decltype(&libvlc_event_attach) libvlc_event_attach_ptr = nullptr;
 decltype(&libvlc_media_player_set_nsobject) libvlc_media_player_set_nsobject_ptr = nullptr;
 decltype(&libvlc_media_player_set_xwindow) libvlc_media_player_set_xwindow_ptr = nullptr;
+decltype(&libvlc_errmsg) libvlc_errmsg_ptr = nullptr;
+decltype(&libvlc_audio_set_volume) libvlc_audio_set_volume_ptr = nullptr;
 #include "dlvlcdef.h"
 #endif
 
@@ -145,6 +147,9 @@ void initVideoEngine(int& /*argc*/, char* /*argv*/[])
         (decltype(libvlc_media_add_option_ptr))lib.resolve("libvlc_media_add_option");
     libvlc_media_player_set_xwindow_ptr = (decltype(
         libvlc_media_player_set_xwindow_ptr))lib.resolve("libvlc_media_player_set_xwindow");
+    libvlc_errmsg_ptr = (decltype(libvlc_errmsg_ptr))lib.resolve("libvlc_errmsg_ptr");
+    libvlc_audio_set_volume_ptr =
+        (decltype(libvlc_audio_set_volume))lib.resolve("libvlc_audio_set_volume");
 #endif
 }
 

@@ -21,6 +21,8 @@
 #define libvlc_event_attach libvlc_event_attach_ptr
 #define libvlc_media_player_set_nsobject libvlc_media_player_set_nsobject_ptr
 #define libvlc_media_player_set_xwindow libvlc_media_player_set_xwindow_ptr
+#define libvlc_errmsg libvlc_errmsg_ptr
+#define libvlc_audio_set_volume libvlc_audio_set_volume_ptr
 #endif
 
 /* Copyright (C) 2011-2018 Nikos Chantziaras
