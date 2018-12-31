@@ -99,7 +99,10 @@ private:
     QPoint cursor_pos_ {0, 0};
 
     // Height of the text cursor in pixels.
-    unsigned height_;
+    int cursor_height_;
+
+    // Text cursor width.
+    float cursor_width_ = 1.5f;
 
     // Last position of the text cursor.
     QPoint last_cursor_pos_ {0, 0};
@@ -208,7 +211,7 @@ public:
     // Set the height of the text cursor in pixels.
     void setCursorHeight(unsigned height)
     {
-        height_ = height;
+        cursor_height_ = height;
     }
 
     // Show/hide the text cursor.

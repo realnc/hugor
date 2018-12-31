@@ -30,7 +30,7 @@ static qreal dpr()
 
 HFrame::HFrame(QWidget* parent)
     : QWidget(parent)
-    , height_(QFontMetrics(hApp->settings()->prop_font).height())
+    , cursor_height_(QFontMetrics(hApp->settings()->prop_font).height())
     , blink_timer_(new QTimer(this))
     , minimize_timer_(new QTimer(this))
 {
@@ -78,8 +78,7 @@ void HFrame::enqueueKey(char key, QMouseEvent* e)
 void HFrame::blinkCursor()
 {
     is_blink_visible_ = not is_blink_visible_;
-    update(cursor_pos_.x(), cursor_pos_.y() + 1, cursor_pos_.x() + 2,
-           cursor_pos_.y() + height_ + 2);
+    update(cursor_pos_.x() - 1, cursor_pos_.y() - 1, cursor_width_ + 2, cursor_height_ + 2);
 }
 
 void HFrame::handleFocusChange(QWidget* old, QWidget* now)
@@ -174,9 +173,10 @@ void HFrame::paintEvent(QPaintEvent* e)
 
     // Likewise, the input caret needs to be painted on top of the input text.
     if (is_cursor_visible_ and is_blink_visible_) {
-        p.setPen(hugoColorToQt(fg_color_));
-        p.drawLine(cursor_pos_.x(), cursor_pos_.y() + 1, cursor_pos_.x(),
-                   cursor_pos_.y() + 1 + height_);
+        p.setPen({hugoColorToQt(fg_color_), cursor_width_, Qt::SolidLine, Qt::FlatCap});
+        p.drawLine(
+            QPointF(cursor_pos_.x() + cursor_width_ / 2.0, cursor_pos_.y()),
+            QPointF(cursor_pos_.x() + cursor_width_ / 2.0, cursor_pos_.y() + cursor_height_));
     }
 }
 
