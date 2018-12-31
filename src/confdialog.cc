@@ -69,9 +69,15 @@ ConfDialog::ConfDialog(HMainWindow* parent)
 
     ui_->allowGraphicsCheckBox->setChecked(sett->enable_graphics);
 #ifdef DISABLE_VIDEO
+    ui_->allowVideoCheckBox->setChecked(false);
     ui_->allowVideoCheckBox->setDisabled(true);
 #else
-    ui_->allowVideoCheckBox->setChecked(sett->enable_video);
+    if (sett->video_sys_error) {
+        ui_->allowVideoCheckBox->setChecked(false);
+        ui_->allowVideoCheckBox->setDisabled(true);
+    } else {
+        ui_->allowVideoCheckBox->setChecked(sett->enable_video);
+    }
 #endif
 #ifdef DISABLE_AUDIO
     ui_->allowSoundEffectsCheckBox->setDisabled(true);
@@ -213,7 +219,11 @@ void ConfDialog::applySettings()
     Settings* sett = hApp->settings();
 
     sett->enable_graphics = ui_->allowGraphicsCheckBox->isChecked();
-    sett->enable_video = ui_->allowVideoCheckBox->isChecked();
+#ifndef DISABLE_VIDEO
+    if (not sett->video_sys_error) {
+        sett->enable_video = ui_->allowVideoCheckBox->isChecked();
+    }
+#endif
     sett->enable_sound_effects = ui_->allowSoundEffectsCheckBox->isChecked();
     sett->enable_music = ui_->allowMusicCheckBox->isChecked();
     sett->use_smooth_scaling = ui_->smoothScalingCheckBox->isChecked();
