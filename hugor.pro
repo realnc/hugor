@@ -88,9 +88,6 @@ static:DEFINES += STATIC_QT
         win32 {
             DEFINES += DL_VLC
         }
-        macos {
-            QMAKE_RPATHDIR += @executable_path/lib
-        }
         HEADERS += \
             src/dlvlcdef.h \
             src/videoplayervlc_p.h
