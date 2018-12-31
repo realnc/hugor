@@ -4,7 +4,6 @@ TEMPLATE = app
 CONFIG += silent warn_on link_pkgconfig strict_c++ c++14
 TARGET = hugor
 ICON = mac_icon.icns
-RC_FILE += hugor.rc
 
 VERSION_MAJOR = 1
 VERSION_MINOR = 0
@@ -128,10 +127,11 @@ macx {
 
 win32 {
     TARGET = Hugor
-    RC_DEFINES += \
-        HUGOR_VERSION=\""$$VERSION"\" \
-        W32_RC_FILEVERSION=\""$$VERSION_MAJOR","$$VERSION_MINOR","$$VERSION_PATCH",00\" \
-        W32_RC_PRODUCTVERSION=\""$$VERSION_MAJOR","$$VERSION_MINOR","$$VERSION_PATCH",00\"
+    RC_ICONS = w32_icon.ico
+    QMAKE_TARGET_COMPANY = "Nikos Chantziaras"
+    QMAKE_TARGET_DESCRIPTION = "Hugor - A Hugo Interpreter"
+    QMAKE_TARGET_COPYRIGHT = "Copyright 2006, Kent Tessman; 2011-2018, Nikos Chantziaras"
+
     !disable-video {
         gstreamer-0.10 {
             error("GStreamer 0.10 is not supported on Windows. You need GStreamer 1.x.")
