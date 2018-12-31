@@ -86,7 +86,7 @@ void HFrame::handleFocusChange(QWidget* old, QWidget* now)
 {
     if (now == nullptr) {
         // Minimize a bit later, in case we only lose focus for a very short time.
-        minimize_timer_->start(40);
+        minimize_timer_->start(200);
     } else if (old == nullptr and now != nullptr) {
         // In case we only lost focus only for a short time, abort any pending minimize operation.
         minimize_timer_->stop();
