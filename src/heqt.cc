@@ -923,6 +923,12 @@ int hugo_playvideo(HUGO_FILE infile, long, char, char, int)
     return true;
 }
 
+void initVideoEngine(int& /*argc*/, char* /*argv*/[])
+{}
+
+void closeVideoEngine()
+{}
+
 #else
 
 int hugo_hasvideo(void)

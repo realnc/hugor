@@ -31,9 +31,7 @@ int main(int argc, char* argv[])
     QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 
     initSoundEngine();
-#ifndef DISABLE_VIDEO
     initVideoEngine(argc, argv);
-#endif
 
     // Filename of the game to run.
     QString gameFileName;
@@ -69,9 +67,7 @@ int main(int argc, char* argv[])
     QTimer::singleShot(0, &app, [&app, gameFileName] { app.entryPoint(gameFileName); });
 #endif
     ret = HApplication::exec();
-#ifndef DISABLE_VIDEO
     closeVideoEngine();
-#endif
     closeSoundEngine();
     return ret;
 }
