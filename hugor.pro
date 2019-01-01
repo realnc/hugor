@@ -1,7 +1,7 @@
 QT += core widgets
 QT_CONFIG -= no-pkg-config
 TEMPLATE = app
-CONFIG += silent warn_on link_pkgconfig strict_c++ c++14
+CONFIG += silent warn_on link_pkgconfig strict_c++ c++14 gc_binaries
 TARGET = hugor
 ICON = mac_icon.icns
 
@@ -122,7 +122,6 @@ static:DEFINES += STATIC_QT
 macx {
     TARGET = Hugor
     QMAKE_INFO_PLIST = Info.plist
-    QMAKE_LFLAGS_RELEASE += -dead_strip
 }
 
 win32 {
@@ -147,15 +146,6 @@ win32 {
     *-g++* {
         QMAKE_CFLAGS += -march=i686 -mtune=generic
         QMAKE_CXXFLAGS += -march=i686 -mtune=generic
-
-        # Dead code stripping (requires patched binutils).
-        QMAKE_CFLAGS_RELEASE += -fdata-sections -ffunction-sections
-        QMAKE_CXXFLAGS_RELEASE += -fdata-sections -ffunction-sections
-        QMAKE_LFLAGS_RELEASE += -Wl,--gc-sections
-
-        # Don't dead-strip the resource section (it contains the icon,
-        # version strings, etc.)  We use a linker script to do that.
-        QMAKE_LFLAGS += $$PWD/w32_linkscript
     }
 }
 
