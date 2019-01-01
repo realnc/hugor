@@ -11,6 +11,7 @@
 #include <QLayout>
 #include <QMenuBar>
 #include <QMessageBox>
+#include <QScreen>
 #include <QStatusBar>
 #include <QStyle>
 #include <QTextCodec>
@@ -241,11 +242,11 @@ void HApplication::updateMarginColor(int color)
 
 void HApplication::updateMargins(int color)
 {
-    int scrWidth = QApplication::desktop()->screenGeometry().width();
     int margin;
 
     // In fullscreen mode, respect the aspect ratio and max width settings.
     if (hMainWin->isFullScreen()) {
+        int scrWidth = QApplication::primaryScreen()->size().width();
         int maxWidth = settings_->fullscreen_width * scrWidth / 100;
 
         // Calculate how big the margin should be to get the specified width.

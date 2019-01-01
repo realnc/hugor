@@ -5,6 +5,7 @@
 #include <QDebug>
 #include <QDesktopWidget>
 #include <QFileInfo>
+#include <QScreen>
 #include <QSettings>
 
 extern "C" {
@@ -161,8 +162,8 @@ void Settings::loadFromDisk(SettingsOverrides* ovr)
     is_fullscreen = sett.value(SETT_FULLSCREEN, true).toBool();
     margin_size = sett.value(SETT_MARGIN_SIZE, 0).toInt();
     // If fullscreen width is not set, use one that results in a 4:3 ratio.
-    int scrHeight = QApplication::desktop()->screenGeometry().height();
-    int scrWidth = QApplication::desktop()->screenGeometry().width();
+    int scrHeight = QApplication::primaryScreen()->size().height();
+    int scrWidth = QApplication::primaryScreen()->size().width();
     fullscreen_width = sett.value(SETT_FULLSCREEN_WIDTH,
                                   (double)scrHeight * ((double)widthRatio / (double)heightRatio)
                                       * 100.0 / (double)scrWidth)
