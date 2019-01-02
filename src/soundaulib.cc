@@ -27,7 +27,6 @@ extern "C" {
 // Current music and sample volumes. Needed to restore the volumes after muting them.
 static int currentMusicVol = 100;
 static int currentSampleVol = 100;
-static bool isMuted = false;
 
 // We only play one music and one sample track at a time, so it's enough to make these static.
 static std::unique_ptr<Aulib::AudioStream>& musicStream()
@@ -90,22 +89,19 @@ void closeSoundEngine()
 
 void muteSound(bool mute)
 {
-    if (mute and not isMuted) {
-        if (musicStream()) {
-            musicStream()->setVolume(0);
+    if (musicStream()) {
+        if (mute) {
+            musicStream()->mute();
+        } else {
+            musicStream()->unmute();
         }
-        if (sampleStream()) {
-            sampleStream()->setVolume(0);
+    }
+    if (sampleStream()) {
+        if (mute) {
+            sampleStream()->mute();
+        } else {
+            sampleStream()->unmute();
         }
-        isMuted = true;
-    } else if (not mute and isMuted) {
-        if (musicStream()) {
-            musicStream()->setVolume(convertHugoVolume(currentMusicVol));
-        }
-        if (sampleStream()) {
-            sampleStream()->setVolume(convertHugoVolume(currentSampleVol));
-        }
-        isMuted = false;
     }
 }
 
@@ -232,7 +228,7 @@ void HugoHandlers::musicvolume(int vol) const
 
     // Convert the Hugo volume range [0..100] to [0..1] and attenuate the result by the global
     // volume, using an exponential (power of 2) scale.
-    if (musicStream() and not isMuted) {
+    if (musicStream()) {
         musicStream()->setVolume(convertHugoVolume(vol));
     }
 }
@@ -257,7 +253,7 @@ void HugoHandlers::samplevolume(int vol) const
         vol = 100;
     }
     currentSampleVol = vol;
-    if (sampleStream() and not isMuted) {
+    if (sampleStream()) {
         sampleStream()->setVolume(convertHugoVolume(vol));
     }
 }
