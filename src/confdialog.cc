@@ -126,6 +126,21 @@ ConfDialog::ConfDialog(HMainWindow* parent)
     } else {
         ui_->scriptWrapSpinBox->setValue(sett->script_wrap);
     }
+    switch (sett->cursor_shape) {
+    case Settings::TextCursorShape::Ibeam:
+        ui_->cursorShapeComboBox->setCurrentIndex(0);
+        break;
+    case Settings::TextCursorShape::Block:
+        ui_->cursorShapeComboBox->setCurrentIndex(1);
+        break;
+    default:
+    case Settings::TextCursorShape::Underline:
+        ui_->cursorShapeComboBox->setCurrentIndex(2);
+        break;
+    }
+    ui_->cursorThicknessComboBox->setCurrentIndex(sett->cursor_thickness);
+    ui_->cursorThicknessComboBox->setDisabled(sett->cursor_shape
+                                              == Settings::TextCursorShape::Block);
     if (sett->start_fullscreen) {
         ui_->fullscreenRadioButton->setChecked(true);
     } else if (sett->start_windowed) {
@@ -167,6 +182,13 @@ ConfDialog::ConfDialog(HMainWindow* parent)
             static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this,
             &ConfDialog::setGain);
 #endif
+    connect(ui_->cursorShapeComboBox,
+#if QT_VERSION >= QT_VERSION_CHECK(5, 7, 0)
+            qOverload<int>(&QComboBox::currentIndexChanged),
+#else
+            static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+#endif
+            this, [this](int index) { ui_->cursorThicknessComboBox->setDisabled(index == 1); });
 }
 
 ConfDialog::~ConfDialog()
@@ -199,6 +221,20 @@ void ConfDialog::makeInstantApply()
     connect(ui_->marginSizeSpinBox, SIGNAL(valueChanged(int)), this, SLOT(applySettings()));
     connect(ui_->fullscreenWidthSpinBox, SIGNAL(valueChanged(int)), this, SLOT(applySettings()));
     connect(ui_->scriptWrapSpinBox, SIGNAL(valueChanged(int)), this, SLOT(applySettings()));
+    connect(ui_->cursorShapeComboBox,
+#if QT_VERSION >= QT_VERSION_CHECK(5, 7, 0)
+            qOverload<int>(&QComboBox::currentIndexChanged),
+#else
+            static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+#endif
+            this, &ConfDialog::applySettings);
+    connect(ui_->cursorThicknessComboBox,
+#if QT_VERSION >= QT_VERSION_CHECK(5, 7, 0)
+            qOverload<int>(&QComboBox::currentIndexChanged),
+#else
+            static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+#endif
+            this, &ConfDialog::applySettings);
     connect(ui_->allowGraphicsCheckBox, SIGNAL(toggled(bool)), this, SLOT(applySettings()));
     connect(ui_->allowVideoCheckBox, SIGNAL(toggled(bool)), this, SLOT(applySettings()));
     connect(ui_->allowSoundEffectsCheckBox, SIGNAL(toggled(bool)), this, SLOT(applySettings()));
@@ -267,6 +303,18 @@ void ConfDialog::applySettings()
     } else {
         sett->script_wrap = ui_->scriptWrapSpinBox->value();
     }
+    switch (ui_->cursorShapeComboBox->currentIndex()) {
+    case 0:
+        sett->cursor_shape = Settings::TextCursorShape::Ibeam;
+        break;
+    case 1:
+        sett->cursor_shape = Settings::TextCursorShape::Block;
+        break;
+    case 2:
+        sett->cursor_shape = Settings::TextCursorShape::Underline;
+        break;
+    }
+    sett->cursor_thickness = ui_->cursorThicknessComboBox->currentIndex();
     sett->start_fullscreen = ui_->fullscreenRadioButton->isChecked();
     sett->start_windowed = ui_->windowRadioButton->isChecked();
 

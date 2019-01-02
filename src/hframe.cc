@@ -75,10 +75,34 @@ void HFrame::enqueueKey(char key, QMouseEvent* e)
     keypressAvailableWaitCond.wakeAll();
 }
 
+void HFrame::updateCursorShape()
+{
+    auto shape = hApp->settings()->cursor_shape;
+    float thickness = hApp->settings()->cursor_thickness + 1;
+
+    if (shape == Settings::TextCursorShape::Ibeam) {
+        cursor_height_ = font_metrics_.height();
+        cursor_width_ = thickness;
+        return;
+    }
+
+    if (shape == Settings::TextCursorShape::Block) {
+        cursor_height_ = font_metrics_.height();
+    } else if (shape == Settings::TextCursorShape::Underline) {
+        cursor_height_ = thickness;
+    }
+    auto cur_char = input_buf_[input_current_char_];
+    if (cur_char.isNull()) {
+        cursor_width_ = font_metrics_.width('_');
+    } else {
+        cursor_width_ = font_metrics_.width(cur_char);
+    }
+}
+
 void HFrame::blinkCursor()
 {
     is_blink_visible_ = not is_blink_visible_;
-    update(cursor_pos_.x() - 1, cursor_pos_.y() - 1, cursor_width_ + 2, cursor_height_ + 2);
+    update(cursor_pos_.x() - 2, cursor_pos_.y() - 2, cursor_width_ + 4, font_metrics_.height() + 4);
 }
 
 void HFrame::handleFocusChange(QWidget* old, QWidget* now)
@@ -146,7 +170,7 @@ void HFrame::endInputMode(bool addToHistory)
     printText(input_buf_.toLatin1().constData(), input_start_x_, input_start_y_);
     inputLineWaitCond.wakeAll();
 }
-
+#include <cmath>
 void HFrame::paintEvent(QPaintEvent* e)
 {
     // qDebug(Q_FUNC_INFO);
@@ -158,25 +182,58 @@ void HFrame::paintEvent(QPaintEvent* e)
 
     // Draw our current input. We need to do this here, after the pixmap has already been painted,
     // so that the input gets painted on top. Otherwise, we could not erase text during editing.
+    QFont f(use_fixed_font_ ? hApp->settings()->fixed_font : hApp->settings()->prop_font);
+    f.setUnderline(use_underline_font_);
+    f.setItalic(use_italic_font_);
+    f.setBold(use_bold_font_);
+    QFontMetrics m(f);
+    p.setFont(f);
     if (input_mode_ == InputMode::Normal and not input_buf_.isEmpty()) {
-        QFont f(use_fixed_font_ ? hApp->settings()->fixed_font : hApp->settings()->prop_font);
-        f.setUnderline(use_underline_font_);
-        f.setItalic(use_italic_font_);
-        f.setBold(use_bold_font_);
-        QFontMetrics m(f);
-        p.setFont(f);
         p.setPen(hugoColorToQt(fg_color_));
         p.setBackgroundMode(Qt::OpaqueMode);
         p.setBackground(QBrush(hugoColorToQt(bg_color_)));
         p.drawText(input_start_x_, input_start_y_ + m.ascent() + 1, input_buf_);
     }
 
-    // Likewise, the input caret needs to be painted on top of the input text.
-    if (is_cursor_visible_ and is_blink_visible_) {
-        p.setPen({hugoColorToQt(fg_color_), cursor_width_, Qt::SolidLine, Qt::FlatCap});
+    if (not is_cursor_visible_ or not is_blink_visible_) {
+        return;
+    }
+
+    // Draw the input caret.
+    QPen pen(hugoColorToQt(fg_color_));
+    pen.setCapStyle(Qt::FlatCap);
+    pen.setCosmetic(false);
+    p.setBrush(hugoColorToQt(fg_color_));
+    switch (hApp->settings()->cursor_shape) {
+    case Settings::TextCursorShape::Ibeam: {
+        pen.setWidthF(cursor_width_);
+        p.setPen(pen);
         p.drawLine(
-            QPointF(cursor_pos_.x() + cursor_width_ / 2.0, cursor_pos_.y()),
-            QPointF(cursor_pos_.x() + cursor_width_ / 2.0, cursor_pos_.y() + cursor_height_));
+            QPointF(cursor_pos_.x() + cursor_width_ / dpr(), cursor_pos_.y()),
+            QPointF(cursor_pos_.x() + cursor_width_ / dpr(), cursor_pos_.y() + cursor_height_));
+        break;
+    }
+    case Settings::TextCursorShape::Block:
+        pen.setColor(Qt::transparent); // workaround for rounded angles (Qt bug?)
+        p.setPen(pen);
+        p.drawRect(
+            QRectF(cursor_pos_.x() - 1.0, cursor_pos_.y(), cursor_width_ + 2.0, cursor_height_));
+        break;
+    case Settings::TextCursorShape::Underline:
+        pen.setWidthF(cursor_height_);
+        p.setPen(pen);
+        p.drawLine(
+            QPointF(cursor_pos_.x(), cursor_pos_.y() + font_metrics_.height() - 1),
+            QPointF(cursor_pos_.x() + cursor_width_, cursor_pos_.y() + font_metrics_.height() - 1));
+        break;
+    }
+
+    // With a block-shaped cursor, draw the covered character in inverse color.
+    if (hApp->settings()->cursor_shape == Settings::TextCursorShape::Block) {
+        p.setPen(hugoColorToQt(bg_color_));
+        p.setBackgroundMode(Qt::TransparentMode);
+        p.drawText(QPointF(cursor_pos_.x(), cursor_pos_.y() + m.ascent() + 1),
+                   input_buf_.mid(input_current_char_, 1));
     }
 }
 
@@ -532,7 +589,7 @@ void HFrame::setFontType(int hugoFont)
     font_metrics_ = QFontMetrics(f, &pixmap_);
 
     // Adjust text caret for new font.
-    setCursorHeight(font_metrics_.height());
+    updateCursorShape();
 }
 
 void HFrame::printText(const QString& str, int x, int y)

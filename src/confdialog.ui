@@ -276,6 +276,253 @@
        </item>
       </layout>
      </widget>
+     <widget class="QWidget" name="miscTab">
+      <attribute name="title">
+       <string>Misc</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_2">
+       <item row="0" column="0">
+        <layout class="QFormLayout" name="formLayout_3">
+         <item row="0" column="0">
+          <widget class="QLabel" name="marginSizeLabel">
+           <property name="text">
+            <string>&amp;Margin Size</string>
+           </property>
+           <property name="buddy">
+            <cstring>marginSizeSpinBox</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QSpinBox" name="marginSizeSpinBox">
+           <property name="suffix">
+            <string>px</string>
+           </property>
+           <property name="maximum">
+            <number>9999</number>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_3">
+           <property name="text">
+            <string>&amp;Fullscreen Width</string>
+           </property>
+           <property name="buddy">
+            <cstring>fullscreenWidthSpinBox</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QSpinBox" name="fullscreenWidthSpinBox">
+           <property name="suffix">
+            <string>%</string>
+           </property>
+           <property name="minimum">
+            <number>10</number>
+           </property>
+           <property name="maximum">
+            <number>100</number>
+           </property>
+           <property name="value">
+            <number>100</number>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="scriptWrapLabel">
+           <property name="text">
+            <string>&amp;Scriptfile Wrap</string>
+           </property>
+           <property name="buddy">
+            <cstring>scriptWrapSpinBox</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QSpinBox" name="scriptWrapSpinBox">
+           <property name="specialValueText">
+            <string>None</string>
+           </property>
+           <property name="suffix">
+            <string>ch</string>
+           </property>
+           <property name="minimum">
+            <number>20</number>
+           </property>
+           <property name="maximum">
+            <number>9999</number>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="label_5">
+           <property name="text">
+            <string>Cursor Sha&amp;pe</string>
+           </property>
+           <property name="buddy">
+            <cstring>cursorShapeComboBox</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QComboBox" name="cursorShapeComboBox">
+           <item>
+            <property name="text">
+             <string>I-Beam</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Block</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Underline</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="label_7">
+           <property name="text">
+            <string>Cursor T&amp;hickness</string>
+           </property>
+           <property name="buddy">
+            <cstring>cursorThicknessComboBox</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="QComboBox" name="cursorThicknessComboBox">
+           <item>
+            <property name="text">
+             <string>Thin</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Normal</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Thick</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="0" column="1">
+        <layout class="QFormLayout" name="formLayout_5">
+         <property name="leftMargin">
+          <number>20</number>
+         </property>
+         <item row="0" column="0">
+          <widget class="QCheckBox" name="softScrollCheckBox">
+           <property name="toolTip">
+            <string>&lt;p&gt;Scrolls-in new text line by line instead of all at once.&lt;/p&gt;</string>
+           </property>
+           <property name="text">
+            <string>Soft &amp;Text Scrolling</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QCheckBox" name="smartFormattingCheckBox">
+           <property name="toolTip">
+            <string>&lt;p&gt;Converts ASCII quotes and dashes to typographical ones.&lt;/p&gt;</string>
+           </property>
+           <property name="text">
+            <string>Sma&amp;rt Formatting</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QCheckBox" name="overlayScrollbackCheckBox">
+           <property name="toolTip">
+            <string>&lt;p&gt;Make the scrollback window the same size as the game window and position it exactly over it.&lt;/p&gt;</string>
+           </property>
+           <property name="text">
+            <string>&amp;Overlay Scrollback</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="1" column="0" colspan="2">
+        <widget class="QGroupBox" name="startInGroupBox">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="toolTip">
+          <string>&lt;p&gt;This lets you choose in which state the interpreter should start games. You can choose to always start in fullscreen or windowed mode, or use the same mode the interpreter was in the last time it was running.&lt;/p&gt;</string>
+         </property>
+         <property name="title">
+          <string>Startup Mode:</string>
+         </property>
+         <property name="flat">
+          <bool>true</bool>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_5">
+          <item>
+           <widget class="QRadioButton" name="lastStateRadioButton">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string>Last State</string>
+            </property>
+            <attribute name="buttonGroup">
+             <string notr="true">startInButtonGroup</string>
+            </attribute>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="windowRadioButton">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string>Window</string>
+            </property>
+            <attribute name="buttonGroup">
+             <string notr="true">startInButtonGroup</string>
+            </attribute>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="fullscreenRadioButton">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string>Fullscreen</string>
+            </property>
+            <attribute name="buttonGroup">
+             <string notr="true">startInButtonGroup</string>
+            </attribute>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
      <widget class="QWidget" name="mediaTab">
       <attribute name="title">
        <string>Media</string>
@@ -507,261 +754,6 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="miscTab">
-      <attribute name="title">
-       <string>Misc</string>
-      </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout">
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_5">
-         <item>
-          <layout class="QFormLayout" name="formLayout_5">
-           <property name="fieldGrowthPolicy">
-            <enum>QFormLayout::ExpandingFieldsGrow</enum>
-           </property>
-           <property name="formAlignment">
-            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-           </property>
-           <item row="0" column="0">
-            <widget class="QLabel" name="marginSizeLabel">
-             <property name="text">
-              <string>&amp;Margin Size</string>
-             </property>
-             <property name="buddy">
-              <cstring>marginSizeSpinBox</cstring>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QSpinBox" name="marginSizeSpinBox">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="suffix">
-              <string>px</string>
-             </property>
-             <property name="maximum">
-              <number>9999</number>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="label_3">
-             <property name="text">
-              <string>&amp;Fullscreen Width</string>
-             </property>
-             <property name="buddy">
-              <cstring>fullscreenWidthSpinBox</cstring>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1">
-            <widget class="QSpinBox" name="fullscreenWidthSpinBox">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="suffix">
-              <string>%</string>
-             </property>
-             <property name="minimum">
-              <number>10</number>
-             </property>
-             <property name="maximum">
-              <number>100</number>
-             </property>
-             <property name="value">
-              <number>100</number>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="0">
-            <widget class="QLabel" name="scriptWrapLabel">
-             <property name="text">
-              <string>&amp;Scriptfile Wrap</string>
-             </property>
-             <property name="buddy">
-              <cstring>scriptWrapSpinBox</cstring>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="1">
-            <widget class="QSpinBox" name="scriptWrapSpinBox">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="specialValueText">
-              <string>None</string>
-             </property>
-             <property name="suffix">
-              <string>ch</string>
-             </property>
-             <property name="minimum">
-              <number>20</number>
-             </property>
-             <property name="maximum">
-              <number>9999</number>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-         <item>
-          <spacer name="horizontalSpacer">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item>
-          <widget class="QGroupBox" name="startInGroupBox">
-           <property name="toolTip">
-            <string>&lt;p&gt;This lets you choose in which state the interpreter should start games. You can choose to always start in fullscreen or windowed mode, or use the same mode the interpreter was in the last time it was running.&lt;/p&gt;</string>
-           </property>
-           <property name="title">
-            <string>Start in</string>
-           </property>
-           <property name="flat">
-            <bool>true</bool>
-           </property>
-           <layout class="QFormLayout" name="formLayout_8">
-            <property name="formAlignment">
-             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-            </property>
-            <item row="0" column="0" colspan="2">
-             <widget class="QRadioButton" name="fullscreenRadioButton">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="text">
-               <string>Fullscreen</string>
-              </property>
-              <attribute name="buttonGroup">
-               <string notr="true">startInButtonGroup</string>
-              </attribute>
-             </widget>
-            </item>
-            <item row="1" column="0" colspan="2">
-             <widget class="QRadioButton" name="windowRadioButton">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="text">
-               <string>Window</string>
-              </property>
-              <attribute name="buttonGroup">
-               <string notr="true">startInButtonGroup</string>
-              </attribute>
-             </widget>
-            </item>
-            <item row="2" column="0" colspan="2">
-             <widget class="QRadioButton" name="lastStateRadioButton">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="text">
-               <string>Last State</string>
-              </property>
-              <attribute name="buttonGroup">
-               <string notr="true">startInButtonGroup</string>
-              </attribute>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-         </item>
-         <item>
-          <spacer name="horizontalSpacer_2">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QFormLayout" name="formLayout_3">
-         <item row="0" column="0" colspan="2">
-          <widget class="QCheckBox" name="softScrollCheckBox">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="toolTip">
-            <string>&lt;p&gt;Scrolls-in new text line by line instead of all at once.&lt;/p&gt;</string>
-           </property>
-           <property name="text">
-            <string>Soft &amp;Text Scrolling</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0" colspan="2">
-          <widget class="QCheckBox" name="smartFormattingCheckBox">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="toolTip">
-            <string>&lt;p&gt;Converts ASCII quotes and dashes to typographical ones.&lt;/p&gt;</string>
-           </property>
-           <property name="text">
-            <string>Sma&amp;rt Formatting</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0" colspan="2">
-          <widget class="QCheckBox" name="overlayScrollbackCheckBox">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="toolTip">
-            <string>&lt;p&gt;Make the scrollback window the same size as the game window and position it exactly over it.&lt;/p&gt;</string>
-           </property>
-           <property name="text">
-            <string>&amp;Overlay Scrollback</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-      </layout>
-     </widget>
     </widget>
    </item>
    <item>
@@ -812,8 +804,8 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>25</x>
-     <y>354</y>
+     <x>35</x>
+     <y>340</y>
     </hint>
     <hint type="destinationlabel">
      <x>157</x>
@@ -828,8 +820,8 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>25</x>
-     <y>354</y>
+     <x>35</x>
+     <y>340</y>
     </hint>
     <hint type="destinationlabel">
      <x>286</x>

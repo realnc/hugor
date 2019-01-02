@@ -99,7 +99,7 @@ private:
     QPoint cursor_pos_ {0, 0};
 
     // Height of the text cursor in pixels.
-    int cursor_height_;
+    float cursor_height_;
 
     // Text cursor width.
     float cursor_width_ = 1.5f;
@@ -125,6 +125,9 @@ private:
 
     // Add a keypress to our input queue.
     void enqueueKey(char key, QMouseEvent* e);
+
+    // Set the height of the text cursor in pixels.
+    void updateCursorShape();
 
 private slots:
     // Called by the timer to blink the text cursor.
@@ -206,14 +209,8 @@ public:
     void moveCursorPos(const QPoint& pos)
     {
         cursor_pos_ = pos;
+        updateCursorShape();
     }
-
-    // Set the height of the text cursor in pixels.
-    void setCursorHeight(unsigned height)
-    {
-        cursor_height_ = height;
-    }
-
     // Show/hide the text cursor.
     void setCursorVisible(bool visible)
     {

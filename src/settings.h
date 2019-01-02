@@ -8,7 +8,16 @@ class SettingsOverrides;
 
 class Settings final
 {
+    Q_GADGET
+
 public:
+    enum class TextCursorShape {
+        Ibeam,
+        Block,
+        Underline,
+    };
+    Q_ENUM(TextCursorShape)
+
     Settings()
         : video_sys_error(false)
     {}
@@ -41,6 +50,8 @@ public:
     bool soft_text_scrolling;
     bool smart_formatting;
     int script_wrap;
+    TextCursorShape cursor_shape;
+    int cursor_thickness;
 
     bool ask_for_gamefile;
     QString last_file_open_dir;

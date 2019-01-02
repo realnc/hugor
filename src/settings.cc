@@ -52,6 +52,8 @@ extern "C" {
 #define SETT_FULLSCREEN QString::fromLatin1("fullscreen")
 #define SETT_MARGIN_SIZE QString::fromLatin1("marginSize")
 #define SETT_FULLSCREEN_WIDTH QString::fromLatin1("fullscreenWidth")
+#define SETT_TEXT_CURSOR_SHAPE QString::fromLatin1("textCursorShape")
+#define SETT_TEXT_CURSOR_THICKNESS QString::fromLatin1("textCursorThickness")
 #define SETT_START_FULLSCREEN QString::fromLatin1("startFullscreen")
 #define SETT_START_WINDOWED QString::fromLatin1("startWindowed")
 
@@ -130,6 +132,9 @@ void Settings::loadFromDisk(SettingsOverrides* ovr)
     ask_for_gamefile = sett.value(SETT_ASK_FILE, true).toBool();
     last_file_open_dir = sett.value(SETT_LAST_OPEN_DIR, QString::fromLatin1("")).toString();
     script_wrap = sett.value(SETT_SCRIPT_WRAP, 0).toInt();
+    cursor_shape = sett.value(SETT_TEXT_CURSOR_SHAPE, QVariant::fromValue(TextCursorShape::Ibeam))
+                       .value<TextCursorShape>();
+    cursor_thickness = sett.value(SETT_TEXT_CURSOR_THICKNESS, 1).toInt();
     sett.endGroup();
 
     sett.beginGroup(SETT_RECENT_GRP);
@@ -265,6 +270,8 @@ void Settings::saveToDisk()
     sett.setValue(SETT_ASK_FILE, ask_for_gamefile);
     sett.setValue(SETT_LAST_OPEN_DIR, last_file_open_dir);
     sett.setValue(SETT_SCRIPT_WRAP, script_wrap);
+    sett.setValue(SETT_TEXT_CURSOR_SHAPE, QVariant::fromValue(cursor_shape).toString());
+    sett.setValue(SETT_TEXT_CURSOR_THICKNESS, cursor_thickness);
     sett.endGroup();
 
     sett.beginGroup(SETT_RECENT_GRP);
