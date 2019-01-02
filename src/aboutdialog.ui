@@ -52,7 +52,7 @@
          </property>
          <property name="text">
           <string>&lt;p&gt;Hugo Copyright © 2006 Kent Tessman&lt;br/&gt;
-Hugor Copyright © 2011–2018 Nikos Chantziaras&lt;/p&gt;</string>
+Hugor Copyright © 2011–2019 Nikos Chantziaras&lt;/p&gt;</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>

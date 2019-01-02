@@ -325,7 +325,7 @@ void HugoHandlers::playvideo(HUGO_FILE infile, long len, char loop, char bg, int
 
 #endif // !DISABLE_VIDEO
 
-/* Copyright (C) 2011-2018 Nikos Chantziaras
+/* Copyright (C) 2011-2019 Nikos Chantziaras
  *
  * This file is part of Hugor.
  *

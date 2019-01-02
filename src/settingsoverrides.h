@@ -24,7 +24,7 @@ public:
     bool mute_when_minimized;
 };
 
-/* Copyright (C) 2011-2018 Nikos Chantziaras
+/* Copyright (C) 2011-2019 Nikos Chantziaras
  *
  * This file is part of Hugor.
  *

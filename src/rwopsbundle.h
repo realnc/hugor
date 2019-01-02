@@ -21,7 +21,7 @@ struct SDL_RWops* RWFromMediaBundle(FILE* mediaBundle, long resLength);
 }
 #endif
 
-/* Copyright (C) 2011-2018 Nikos Chantziaras
+/* Copyright (C) 2011-2019 Nikos Chantziaras
  *
  * This file is part of Hugor.
  *

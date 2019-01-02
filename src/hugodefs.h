@@ -35,7 +35,7 @@ constexpr unsigned HUGO_LIGHT_MAGENTA = 13;
 constexpr unsigned HUGO_YELLOW = 14;
 constexpr unsigned HUGO_BRIGHT_WHITE = 15;
 
-/* Copyright (C) 2011-2018 Nikos Chantziaras
+/* Copyright (C) 2011-2019 Nikos Chantziaras
  *
  * This file is part of Hugor.
  *

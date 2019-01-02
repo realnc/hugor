@@ -5,7 +5,7 @@ class QColor;
 QColor getExtendedColor(int colorId);
 void setExtendedColor(int colorId, int r, int g, int b, int a);
 
-/* Copyright (C) 2011-2018 Nikos Chantziaras
+/* Copyright (C) 2011-2019 Nikos Chantziaras
  *
  * This file is part of Hugor.
  *
