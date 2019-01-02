@@ -43,6 +43,10 @@ static:DEFINES += STATIC_QT
         OUTSIDE_SPEEX \
         FLOATING_POINT
 
+    HEADERS += \
+        "$$PWD"/SDL_audiolib/include/Aulib/*.h \
+        "$$PWD"/SDL_audiolib/src/*.h
+
     SOURCES += \
         src/soundaulib.cc \
         SDL_audiolib/resampler/resample.c \
