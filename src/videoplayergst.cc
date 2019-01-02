@@ -171,12 +171,11 @@ void VideoPlayer::play()
     if (is_looping) {
         // Wait for the pipeline to transition into the playing state.
         gst_element_get_state(d_->pipeline, nullptr, nullptr, GST_CLOCK_TIME_NONE);
-        // Seek to the end the first time so that there's no pause before the first segment message
-        // arrives.
+        // Do an initial seek so that there's no pause before the first segment message arrives.
         if (not gst_element_seek(
                 d_->pipeline, 1.0, GST_FORMAT_TIME,
                 (GstSeekFlags)((int)GST_SEEK_FLAG_FLUSH | (int)GST_SEEK_FLAG_SEGMENT),
-                GST_SEEK_TYPE_END, 0, GST_SEEK_TYPE_NONE, GST_CLOCK_TIME_NONE)) {
+                GST_SEEK_TYPE_NONE, GST_CLOCK_TIME_NONE, GST_SEEK_TYPE_NONE, GST_CLOCK_TIME_NONE)) {
             qWarning() << "Sending initial video seek event failed.";
             stop();
         }
