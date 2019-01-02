@@ -31,7 +31,7 @@
          <item>
           <widget class="QFontComboBox" name="mainFontBox">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+            <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
@@ -41,7 +41,7 @@
          <item>
           <widget class="QSpinBox" name="mainFontSizeSpinBox">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
@@ -74,7 +74,7 @@
          <item>
           <widget class="QFontComboBox" name="fixedFontBox">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+            <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
@@ -87,7 +87,7 @@
          <item>
           <widget class="QSpinBox" name="fixedFontSizeSpinBox">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
@@ -120,7 +120,7 @@
          <item>
           <widget class="QFontComboBox" name="scrollbackFontBox">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+            <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
@@ -130,7 +130,7 @@
          <item>
           <widget class="QSpinBox" name="scrollbackFontSizeSpinBox">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
@@ -169,7 +169,7 @@
             <item row="0" column="1">
              <widget class="KColorButton" name="mainTextColorButton">
               <property name="sizePolicy">
-               <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
@@ -189,7 +189,7 @@
             <item row="1" column="1">
              <widget class="KColorButton" name="mainBgColorButton">
               <property name="sizePolicy">
-               <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
@@ -218,7 +218,7 @@
                <bool>false</bool>
               </property>
               <property name="sizePolicy">
-               <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
@@ -242,7 +242,7 @@
             <item row="0" column="1">
              <widget class="KColorButton" name="bannerTextColorButton">
               <property name="sizePolicy">
-               <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
@@ -262,7 +262,7 @@
             <item row="1" column="1">
              <widget class="KColorButton" name="bannerBgColorButton">
               <property name="sizePolicy">
-               <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
@@ -283,6 +283,12 @@
       <layout class="QGridLayout" name="gridLayout_2">
        <item row="0" column="0">
         <layout class="QFormLayout" name="formLayout_3">
+         <property name="fieldGrowthPolicy">
+          <enum>QFormLayout::ExpandingFieldsGrow</enum>
+         </property>
+         <property name="rightMargin">
+          <number>20</number>
+         </property>
          <item row="0" column="0">
           <widget class="QLabel" name="marginSizeLabel">
            <property name="text">
@@ -295,6 +301,12 @@
          </item>
          <item row="0" column="1">
           <widget class="QSpinBox" name="marginSizeSpinBox">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="suffix">
             <string>px</string>
            </property>
@@ -315,6 +327,12 @@
          </item>
          <item row="1" column="1">
           <widget class="QSpinBox" name="fullscreenWidthSpinBox">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="suffix">
             <string>%</string>
            </property>
@@ -341,6 +359,12 @@
          </item>
          <item row="2" column="1">
           <widget class="QSpinBox" name="scriptWrapSpinBox">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="specialValueText">
             <string>None</string>
            </property>
@@ -367,6 +391,12 @@
          </item>
          <item row="3" column="1">
           <widget class="QComboBox" name="cursorShapeComboBox">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <item>
             <property name="text">
              <string>I-Beam</string>
@@ -396,6 +426,12 @@
          </item>
          <item row="4" column="1">
           <widget class="QComboBox" name="cursorThicknessComboBox">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <item>
             <property name="text">
              <string>Thin</string>
@@ -403,7 +439,7 @@
            </item>
            <item>
             <property name="text">
-             <string>Normal</string>
+             <string>Medium</string>
             </property>
            </item>
            <item>
@@ -417,9 +453,6 @@
        </item>
        <item row="0" column="1">
         <layout class="QFormLayout" name="formLayout_5">
-         <property name="leftMargin">
-          <number>20</number>
-         </property>
          <item row="0" column="0">
           <widget class="QCheckBox" name="softScrollCheckBox">
            <property name="toolTip">
