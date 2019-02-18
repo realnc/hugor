@@ -5,9 +5,8 @@
 
 	for the Hugo Engine
 
-	Copyright (c) 1995-2006 by Kent Tessman
+	Copyright (c) 1995-2009 by Kent Tessman
 */
-
 
 #include "heheader.h"
 
@@ -20,7 +19,6 @@ void hugo_stopsample(void);
 #ifdef NO_STRFTIME
 extern void hugo_gettimeformatted(char *a);
 #endif
-
 
 int passlocal[MAXLOCALS];		/* locals passed to routine        */
 int arguments_passed;                   /* when calling routine            */

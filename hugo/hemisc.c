@@ -20,7 +20,7 @@
 
 	for the Hugo Engine
 
-	Copyright (c) 1995-2006 by Kent Tessman
+	Copyright (c) 1995-2009 by Kent Tessman
 */
 
 
@@ -146,7 +146,9 @@ void AP (char *a)
 	char sticky = false, skipspchar = false, startofline = 0;
 	int i, alen, plen, cwidth;
 	char c = 0;			/* current character */
+#ifdef USE_SMARTFORMATTING
 	char lastc = 0;			/* for smart formatting */
+#endif
 
 	static int lastfcolor = 16, lastbgcolor = 17;
 	static int lastfont = NORMAL_FONT;
@@ -411,13 +413,13 @@ AddFontCode:
 			thisline = 0;
 #ifdef USE_SMARTFORMATTING
 			leftquote = true;
+			lastc = '\n';
 #endif
 			pbuffer[plen++] = COLOR_CHANGE;
 			pbuffer[plen++] = (char)(fcolor+1);
 			pbuffer[plen++] = (char)(bgcolor+1);
 			pbuffer[plen] = '\0';
 
-			lastc = '\n';
 
 			continue;
 		}
@@ -1506,11 +1508,52 @@ void LoadGame(void)
 
 #if !defined (GLK)	/* ParseCommandLine() is omitted for Glk */
 
+signed char def_fcolor    = DEF_FCOLOR;
+signed char def_bgcolor   = DEF_BGCOLOR;
+signed char def_slfcolor  = DEF_SLFCOLOR;
+signed char def_slbgcolor = DEF_SLBGCOLOR;
+
 void ParseCommandLine(int argc, char *argv[])
 {
 	char drive[MAXDRIVE], dir[MAXDIR], fname[MAXFILENAME], ext[MAXEXT];
+	char* game_file_arg = NULL;
 
-	if (argc==1)
+#if defined(GCC_UNIX) && defined(DO_COLOR)
+        int ch;
+	/* Parse comand line options (colour switches) */
+	while ((ch = getopt(argc, argv, "f:b:F:B:?h")) != -1) {
+	  switch (ch) {
+	    case 'f':
+	      def_fcolor = atoi(optarg);
+	      break;
+	    case 'b':
+	      def_bgcolor = atoi(optarg);
+	      break;
+	    case 'F':
+	      def_slfcolor = atoi(optarg);
+	      break;
+	    case 'B':
+	      def_slbgcolor = atoi(optarg);
+	      break;
+	    case 'h':
+	    case '?':
+	    default:
+	      Banner();
+	      if (mem) hugo_blockfree(mem);
+	      mem = NULL;
+	      exit(0);
+	  }
+	}
+	if ( optind < argc ) {
+	  game_file_arg = argv[optind];
+	}
+#else
+	if (argc>1) {
+	  game_file_arg = argv[1];
+	}
+#endif
+
+	if (game_file_arg==NULL)
 	{
 		Banner();
 		if (mem) hugo_blockfree(mem);
@@ -1518,10 +1561,10 @@ void ParseCommandLine(int argc, char *argv[])
 		exit(0);
 	}
 
-	hugo_splitpath(argv[1], drive, dir, fname, ext);
+	hugo_splitpath(game_file_arg, drive, dir, fname, ext);
 
 	if (strcmp(ext, ""))
-		strcpy(gamefile, argv[1]);
+		strcpy(gamefile, game_file_arg);
 	else
 		hugo_makepath(gamefile, drive, dir, fname,
 #if defined (DEBUGGER)

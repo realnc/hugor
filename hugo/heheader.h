@@ -6,16 +6,16 @@
 	contains definitions and prototypes
 	for the Hugo Engine
 
-	Copyright (c) 1995-2006 by Kent Tessman
+	Copyright (c) 1995-2009 by Kent Tessman
 */
 
 
 #define HEVERSION 3
 #define HEREVISION 1
 #if !defined (COMPILE_V25)
-#define HEINTERIM ".03"
+#define HEINTERIM ".04"
 #else
-#define HEINTERIM ".03 (2.5)"
+#define HEINTERIM ".04 (2.5)"
 #endif
 
 #include <string.h>
@@ -679,7 +679,7 @@ extern void srandom(int);
 #endif
 
 #if !defined (PRINTFATALERROR)
-#define PRINTFATALERROR(a)	fprintf(stderr, a)
+#define PRINTFATALERROR(a)	fprintf(stderr, "%s", a)
 #endif
 
 #ifndef OMIT_EXTRA_STRING_FUNCTIONS
@@ -1048,6 +1048,7 @@ extern char pbuffer[];
 extern int currentpos;
 extern int currentline;
 extern int full;
+extern signed char def_fcolor, def_bgcolor, def_slfcolor, def_slbgcolor;
 extern signed char fcolor, bgcolor, icolor, default_bgcolor;
 extern int currentfont;
 extern char capital;

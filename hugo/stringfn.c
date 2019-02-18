@@ -3,7 +3,7 @@
 
 	String manipulation functions
 
-	Copyright (c) 1995-2006 by Kent Tessman
+	Copyright (c) 1995-2009 by Kent Tessman
 	
 	Only if ALLOW_NESTING is #defined may these calls be nested, and then
 	only two at a time (noting that it takes another 1025 bytes of global

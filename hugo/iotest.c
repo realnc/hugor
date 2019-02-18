@@ -4,7 +4,7 @@
 	to test the screen i/o functions of
 	the Hugo Engine
 
-	Copyright (c) 1995-2005 by Kent Tessman
+	Copyright (c) 1995-2009 by Kent Tessman
 
 	Uses AP(), Printout(), Promptmore(), and SetupDisplay(), and
 	SpecialChar() from hemisc.c.
