@@ -12,7 +12,7 @@ AllowShortBlocksOnASingleLine: false
 AllowShortCaseLabelsOnASingleLine: false
 AllowShortFunctionsOnASingleLine: None
 AllowShortIfStatementsOnASingleLine: false
-AllowShortLoopsOnASingleLine: true
+AllowShortLoopsOnASingleLine: false
 AlwaysBreakAfterDefinitionReturnType: None
 AlwaysBreakAfterReturnType: None
 AlwaysBreakBeforeMultilineStrings: true
@@ -22,12 +22,12 @@ BinPackParameters: true
 BraceWrapping: 
   AfterClass: true
   AfterControlStatement: false
-  AfterEnum: false
+  AfterEnum: true
   AfterFunction: true
   AfterNamespace: false
   AfterObjCDeclaration: false
   AfterStruct: true
-  AfterUnion: false
+  AfterUnion: true
   AfterExternBlock: false
   BeforeCatch: true
   BeforeElse: false
@@ -90,7 +90,7 @@ SortUsingDeclarations: true
 SpaceAfterCStyleCast: false
 SpaceAfterTemplateKeyword: true
 SpaceBeforeAssignmentOperators: true
-SpaceBeforeCpp11BracedList: true
+SpaceBeforeCpp11BracedList: false
 SpaceBeforeCtorInitializerColon: true
 SpaceBeforeInheritanceColon: false
 SpaceBeforeParens: ControlStatements

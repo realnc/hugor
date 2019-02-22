@@ -16,8 +16,8 @@ public:
     {}
 
     VideoPlayer* q;
-    std::unique_ptr<libvlc_instance_t, decltype(&libvlc_release)> vlc_instance {nullptr, nullptr};
-    std::unique_ptr<libvlc_media_player_t, decltype(&libvlc_media_player_release)> vlc_player {
+    std::unique_ptr<libvlc_instance_t, decltype(&libvlc_release)> vlc_instance{nullptr, nullptr};
+    std::unique_ptr<libvlc_media_player_t, decltype(&libvlc_media_player_release)> vlc_player{
         nullptr, nullptr};
     int volume = hApp->settings()->sound_volume;
     bool is_muted = false;

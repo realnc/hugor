@@ -18,7 +18,8 @@ public:
     int getNextOutputByte();
     void parse();
 
-    enum class Opcode : std::int16_t {
+    enum class Opcode : std::int16_t
+    {
         IS_OPCODE_AVAILABLE = 1,
         GET_VERSION = 100,
         GET_OS = 200,
@@ -38,7 +39,8 @@ public:
         CHECK_RESOURCE = 1600,
     };
 
-    enum class OpcodeResult : std::int16_t {
+    enum class OpcodeResult : std::int16_t
+    {
         OK = 0,
         WRONG_PARAM_COUNT = 10,
         WRONG_BYTE_COUNT = 20,
@@ -53,7 +55,7 @@ private:
 
     // Output bytes. The initial values are two bytes representing the number 12121 (little-endian
     // order), which is the initial Hugor control file handshake.
-    std::queue<int> output_ {{0x59, 0x2F}};
+    std::queue<int> output_{{0x59, 0x2F}};
 
     Opcode popOpcode();
     int popValue();

@@ -22,7 +22,8 @@ class HFrame final: public QWidget
 
 private:
     // These values specify the exact input-mode we are in.
-    enum class InputMode {
+    enum class InputMode
+    {
         // We aren't in input-mode. We still enqueue key presses though, so they can be retrieved
         // with getNextKey().
         None,
@@ -81,11 +82,11 @@ private:
     bool use_bold_font_ = false;
 
     // Current font metrics.
-    QFontMetrics font_metrics_ {QFont()};
+    QFontMetrics font_metrics_{QFont()};
 
     // We render game output into a pixmap first instead or painting directly on the widget. We then
     // draw the pixmap in our paintEvent().
-    QPixmap pixmap_ {1, 1};
+    QPixmap pixmap_{1, 1};
 
     // We buffer text printed with printText() so that we can draw whole strings rather than single
     // characters at a time.
@@ -96,7 +97,7 @@ private:
     int flush_pos_y_ = 0;
 
     // Position of the text cursor.
-    QPoint cursor_pos_ {0, 0};
+    QPoint cursor_pos_{0, 0};
 
     // Height of the text cursor in pixels.
     float cursor_height_;
@@ -105,7 +106,7 @@ private:
     float cursor_width_ = 1.5f;
 
     // Last position of the text cursor.
-    QPoint last_cursor_pos_ {0, 0};
+    QPoint last_cursor_pos_{0, 0};
 
     // Is the text cursor visible?
     bool is_cursor_visible_ = false;

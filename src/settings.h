@@ -11,7 +11,8 @@ class Settings final
     Q_GADGET
 
 public:
-    enum class TextCursorShape {
+    enum class TextCursorShape
+    {
         Ibeam,
         Block,
         Underline,
