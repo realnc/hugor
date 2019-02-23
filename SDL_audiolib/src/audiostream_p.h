@@ -3,14 +3,16 @@
 
 #include "Buffer.h"
 #include "aulib.h"
+#include <SDL_audio.h>
+#include <chrono>
 #include <memory>
 #include <vector>
-#include <SDL_audio.h>
 
 namespace Aulib {
 
 /// \private
-struct AudioStream_priv final {
+struct AudioStream_priv final
+{
     const class AudioStream* const q;
 
     explicit AudioStream_priv(class AudioStream* pub, std::unique_ptr<class AudioDecoder> decoder,
@@ -36,8 +38,8 @@ struct AudioStream_priv final {
     bool fFadingIn = false;
     bool fFadingOut = false;
     bool fStopAfterFade = false;
-    int fFadeInTickDuration = 0;
-    int fFadeOutTickDuration = 0;
+    std::chrono::milliseconds fFadeInDuration{};
+    std::chrono::milliseconds fFadeOutDuration{};
     bool fIsMuted = false;
 
     static ::SDL_AudioSpec fAudioSpec;
@@ -57,7 +59,6 @@ struct AudioStream_priv final {
 };
 
 } // namespace Aulib
-
 
 /*
 

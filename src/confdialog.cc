@@ -23,6 +23,8 @@
 #include "settings.h"
 #include "ui_confdialog.h"
 
+using namespace std::chrono_literals;
+
 ConfDialog::ConfDialog(HMainWindow* parent)
     : QDialog(parent, Qt::WindowTitleHint | Qt::WindowSystemMenuHint)
     , ui_(new Ui::ConfDialog)
@@ -373,7 +375,7 @@ void ConfDialog::playTestMidi()
     midi_stream_ =
         std::make_unique<Aulib::AudioStream>(rwops, std::move(fsdec), std::move(resampler), true);
     midi_stream_->setVolume(std::pow(ui_->volumeSlider->value() / 100.f, 2.f));
-    midi_stream_->play(1, 1.5f);
+    midi_stream_->play(1, 1500ms);
 #endif
 }
 
@@ -381,7 +383,7 @@ void ConfDialog::stopTestMidi()
 {
 #ifndef DISABLE_AUDIO
     if (midi_stream_) {
-        midi_stream_->stop(0.5f);
+        midi_stream_->stop(500ms);
     }
 #endif
 }

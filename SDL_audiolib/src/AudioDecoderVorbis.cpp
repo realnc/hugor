@@ -5,18 +5,16 @@
 #include <SDL_rwops.h>
 #include <vorbis/vorbisfile.h>
 
+namespace chrono = std::chrono;
 
 extern "C" {
 
-static size_t
-vorbisReadCb(void* ptr, size_t size, size_t nmemb, void* rwops)
+static size_t vorbisReadCb(void* ptr, size_t size, size_t nmemb, void* rwops)
 {
     return SDL_RWread(static_cast<SDL_RWops*>(rwops), ptr, size, nmemb);
 }
 
-
-static int
-vorbisSeekCb(void* rwops, ogg_int64_t offset, int whence)
+static int vorbisSeekCb(void* rwops, ogg_int64_t offset, int whence)
 {
     if (SDL_RWseek(static_cast<SDL_RWops*>(rwops), offset, whence) < 0) {
         return -1;
@@ -24,40 +22,34 @@ vorbisSeekCb(void* rwops, ogg_int64_t offset, int whence)
     return 0;
 }
 
-
-static long
-vorbisTellCb(void* rwops)
+static long vorbisTellCb(void* rwops)
 {
     return SDL_RWtell(static_cast<SDL_RWops*>(rwops));
 }
 
 } // extern "C"
 
-
 namespace Aulib {
 
 /// \private
-struct AudioDecoderVorbis_priv final {
+struct AudioDecoderVorbis_priv final
+{
     std::unique_ptr<OggVorbis_File, decltype(&ov_clear)> fVFHandle{nullptr, ov_clear};
     int fCurrentSection = 0;
     vorbis_info* fCurrentInfo = nullptr;
     bool fEOF = false;
-    float fDuration = -1.f;
+    chrono::microseconds fDuration{};
 };
 
 } // namespace Aulib
 
-
 Aulib::AudioDecoderVorbis::AudioDecoderVorbis()
     : d(std::make_unique<AudioDecoderVorbis_priv>())
-{ }
-
+{}
 
 Aulib::AudioDecoderVorbis::~AudioDecoderVorbis() = default;
 
-
-bool
-Aulib::AudioDecoderVorbis::open(SDL_RWops* rwops)
+bool Aulib::AudioDecoderVorbis::open(SDL_RWops* rwops)
 {
     if (isOpen()) {
         return true;
@@ -73,29 +65,27 @@ Aulib::AudioDecoderVorbis::open(SDL_RWops* rwops)
     }
     d->fCurrentInfo = ov_info(newHandle.get(), -1);
     auto len = ov_time_total(newHandle.get(), -1);
-    d->fDuration = len == OV_EINVAL ? -1 : len;
+    if (len == OV_EINVAL) {
+        d->fDuration = chrono::microseconds::zero();
+    } else {
+        d->fDuration = chrono::duration_cast<chrono::microseconds>(chrono::duration<double>(len));
+    }
     d->fVFHandle.swap(newHandle);
     setIsOpen(true);
     return true;
 }
 
-
-int
-Aulib::AudioDecoderVorbis::getChannels() const
+int Aulib::AudioDecoderVorbis::getChannels() const
 {
     return d->fCurrentInfo != nullptr ? d->fCurrentInfo->channels : 0;
 }
 
-
-int
-Aulib::AudioDecoderVorbis::getRate() const
+int Aulib::AudioDecoderVorbis::getRate() const
 {
     return d->fCurrentInfo != nullptr ? d->fCurrentInfo->rate : 0;
 }
 
-
-int
-Aulib::AudioDecoderVorbis::doDecoding(float buf[], int len, bool& callAgain)
+int Aulib::AudioDecoderVorbis::doDecoding(float buf[], int len, bool& callAgain)
 {
     callAgain = false;
 
@@ -108,7 +98,7 @@ Aulib::AudioDecoderVorbis::doDecoding(float buf[], int len, bool& callAgain)
 
     while (decSamples < len and not callAgain) {
         int lastSection = d->fCurrentSection;
-        //TODO: We only support up to 2 channels for now.
+        // TODO: We only support up to 2 channels for now.
         auto channels = std::min(d->fCurrentInfo->channels, 2);
         auto ret = ov_read_float(d->fVFHandle.get(), &out, (len - decSamples) / channels,
                                  &d->fCurrentSection);
@@ -119,10 +109,17 @@ Aulib::AudioDecoderVorbis::doDecoding(float buf[], int len, bool& callAgain)
         if (ret < 0) {
             AM_debugPrint("libvorbis stream error: ");
             switch (ret) {
-                case OV_HOLE: AM_debugPrintLn("OV_HOLE"); break;
-                case OV_EBADLINK: AM_debugPrintLn("OV_EBADLINK"); break;
-                case OV_EINVAL: AM_debugPrintLn("OV_EINVAL"); break;
-                default: AM_debugPrintLn("unknown error: " << ret);
+            case OV_HOLE:
+                AM_debugPrintLn("OV_HOLE");
+                break;
+            case OV_EBADLINK:
+                AM_debugPrintLn("OV_EBADLINK");
+                break;
+            case OV_EINVAL:
+                AM_debugPrintLn("OV_EINVAL");
+                break;
+            default:
+                AM_debugPrintLn("unknown error: " << ret);
             }
             break;
         }
@@ -141,9 +138,7 @@ Aulib::AudioDecoderVorbis::doDecoding(float buf[], int len, bool& callAgain)
     return decSamples;
 }
 
-
-bool
-Aulib::AudioDecoderVorbis::rewind()
+bool Aulib::AudioDecoderVorbis::rewind()
 {
     int ret;
     if (d->fEOF) {
@@ -155,20 +150,19 @@ Aulib::AudioDecoderVorbis::rewind()
     return ret == 0;
 }
 
-
-float
-Aulib::AudioDecoderVorbis::duration() const
+chrono::microseconds Aulib::AudioDecoderVorbis::duration() const
 {
     return d->fDuration;
 }
 
-
-bool
-Aulib::AudioDecoderVorbis::seekToTime(float seconds)
+bool Aulib::AudioDecoderVorbis::seekToTime(chrono::microseconds pos)
 {
-    return ov_time_seek_lap(d->fVFHandle.get(), seconds) == 0;
+    if (ov_time_seek_lap(d->fVFHandle.get(), chrono::duration<double>(pos).count()) != 0) {
+        return false;
+    }
+    d->fEOF = false;
+    return true;
 }
-
 
 /*
 

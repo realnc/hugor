@@ -8,7 +8,8 @@ namespace Aulib {
 /*!
  * \brief libmpcdec decoder.
  */
-class AULIB_EXPORT AudioDecoderMusepack final: public AudioDecoder {
+class AULIB_EXPORT AudioDecoderMusepack final: public AudioDecoder
+{
 public:
     AudioDecoderMusepack();
     ~AudioDecoderMusepack() override;
@@ -17,8 +18,8 @@ public:
     int getChannels() const override;
     int getRate() const override;
     bool rewind() override;
-    float duration() const override;
-    bool seekToTime(float seconds) override;
+    std::chrono::microseconds duration() const override;
+    bool seekToTime(std::chrono::microseconds pos) override;
 
 protected:
     int doDecoding(float buf[], int len, bool& callAgain) override;
@@ -28,7 +29,6 @@ private:
 };
 
 } // namespace Aulib
-
 
 /*
 

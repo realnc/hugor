@@ -3,6 +3,7 @@
 
 #include "aulib_export.h"
 #include <SDL_stdinc.h>
+#include <chrono>
 #include <memory>
 
 struct SDL_RWops;
@@ -12,13 +13,14 @@ namespace Aulib {
 /*!
  * \brief Abstract base class for audio decoders.
  */
-class AULIB_EXPORT AudioDecoder {
+class AULIB_EXPORT AudioDecoder
+{
 public:
     AudioDecoder();
     virtual ~AudioDecoder();
 
     AudioDecoder(const AudioDecoder&) = delete;
-    AudioDecoder& operator =(const AudioDecoder&) = delete;
+    AudioDecoder& operator=(const AudioDecoder&) = delete;
 
     static std::unique_ptr<AudioDecoder> decoderFor(const std::string& filename);
     static std::unique_ptr<AudioDecoder> decoderFor(SDL_RWops* rwops);
@@ -30,8 +32,8 @@ public:
     virtual int getChannels() const = 0;
     virtual int getRate() const = 0;
     virtual bool rewind() = 0;
-    virtual float duration() const = 0;
-    virtual bool seekToTime(float seconds) = 0;
+    virtual std::chrono::microseconds duration() const = 0;
+    virtual bool seekToTime(std::chrono::microseconds pos) = 0;
 
 protected:
     void setIsOpen(bool f);
@@ -42,7 +44,6 @@ private:
 };
 
 } // namespace Aulib
-
 
 /*
 

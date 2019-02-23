@@ -3,16 +3,16 @@
 
 #include "Buffer.h"
 #include "aulib.h"
-#include <limits>
 #include <SDL_audio.h>
 #include <libmodplug/modplug.h>
+#include <limits>
+
+namespace chrono = std::chrono;
 
 static ModPlug_Settings modplugSettings;
 static bool initialized = false;
 
-
-static void
-initModPlug(const SDL_AudioSpec& spec)
+static void initModPlug(const SDL_AudioSpec& spec)
 {
     ModPlug_GetSettings(&modplugSettings);
     modplugSettings.mFlags = MODPLUG_ENABLE_OVERSAMPLING | MODPLUG_ENABLE_NOISE_REDUCTION;
@@ -27,20 +27,19 @@ initModPlug(const SDL_AudioSpec& spec)
     initialized = true;
 }
 
-
 namespace Aulib {
 
 /// \private
-struct AudioDecoderModPlug_priv final {
+struct AudioDecoderModPlug_priv final
+{
     AudioDecoderModPlug_priv();
 
     std::unique_ptr<ModPlugFile, decltype(&ModPlug_Unload)> mpHandle{nullptr, &ModPlug_Unload};
     bool atEOF = false;
-    float fDuration = -1.f;
+    chrono::microseconds fDuration{};
 };
 
 } // namespace Aulib
-
 
 Aulib::AudioDecoderModPlug_priv::AudioDecoderModPlug_priv()
 {
@@ -49,23 +48,18 @@ Aulib::AudioDecoderModPlug_priv::AudioDecoderModPlug_priv()
     }
 }
 
-
 Aulib::AudioDecoderModPlug::AudioDecoderModPlug()
     : d(std::make_unique<AudioDecoderModPlug_priv>())
-{
-}
-
+{}
 
 Aulib::AudioDecoderModPlug::~AudioDecoderModPlug() = default;
 
-
-bool
-Aulib::AudioDecoderModPlug::open(SDL_RWops* rwops)
+bool Aulib::AudioDecoderModPlug::open(SDL_RWops* rwops)
 {
     if (isOpen()) {
         return true;
     }
-    //FIXME: error reporting
+    // FIXME: error reporting
     Sint64 dataSize = SDL_RWsize(rwops);
     if (dataSize <= 0 or dataSize > std::numeric_limits<int>::max()) {
         return false;
@@ -79,28 +73,22 @@ Aulib::AudioDecoderModPlug::open(SDL_RWops* rwops)
         return false;
     }
     ModPlug_SetMasterVolume(d->mpHandle.get(), 192);
-    d->fDuration = ModPlug_GetLength(d->mpHandle.get()) / 1000.f;
+    d->fDuration = chrono::milliseconds(ModPlug_GetLength(d->mpHandle.get()));
     setIsOpen(true);
     return true;
 }
 
-
-int
-Aulib::AudioDecoderModPlug::getChannels() const
+int Aulib::AudioDecoderModPlug::getChannels() const
 {
     return modplugSettings.mChannels;
 }
 
-
-int
-Aulib::AudioDecoderModPlug::getRate() const
+int Aulib::AudioDecoderModPlug::getRate() const
 {
     return modplugSettings.mFrequency;
 }
 
-
-int
-Aulib::AudioDecoderModPlug::doDecoding(float buf[], int len, bool& callAgain)
+int Aulib::AudioDecoderModPlug::doDecoding(float buf[], int len, bool& callAgain)
 {
     callAgain = false;
     if (d->atEOF) {
@@ -118,30 +106,22 @@ Aulib::AudioDecoderModPlug::doDecoding(float buf[], int len, bool& callAgain)
     return ret / static_cast<int>(sizeof(*buf));
 }
 
-
-bool
-Aulib::AudioDecoderModPlug::rewind()
+bool Aulib::AudioDecoderModPlug::rewind()
 {
-    ModPlug_Seek(d->mpHandle.get(), 0);
-    d->atEOF = false;
-    return true;
+    return seekToTime(chrono::microseconds::zero());
 }
 
-
-float
-Aulib::AudioDecoderModPlug::duration() const
+chrono::microseconds Aulib::AudioDecoderModPlug::duration() const
 {
     return d->fDuration;
 }
 
-
-bool
-Aulib::AudioDecoderModPlug::seekToTime(float seconds)
+bool Aulib::AudioDecoderModPlug::seekToTime(chrono::microseconds pos)
 {
-    ModPlug_Seek(d->mpHandle.get(), seconds * 1000);
+    ModPlug_Seek(d->mpHandle.get(), chrono::duration_cast<chrono::milliseconds>(pos).count());
+    d->atEOF = false;
     return true;
 }
-
 
 /*
 

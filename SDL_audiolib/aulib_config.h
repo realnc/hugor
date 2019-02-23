@@ -15,7 +15,6 @@
 //#define USE_DEC_BASSMIDI 1
 //#define USE_DEC_WILDMIDI 1
 
-
 /*
 
 Copyright (C) 2014, 2015, 2016, 2017, 2018 Nikos Chantziaras.
