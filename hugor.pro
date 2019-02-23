@@ -72,34 +72,10 @@ static:DEFINES += STATIC_QT
     disable-audio {
         PKGCONFIG += sdl2
     }
-    qt5-video {
-        DEFINES += VIDEO_QT5
-
-        QT += multimediawidgets
-
-        HEADERS += \
-            src/videoplayerqt5_p.h \
-            src/rwopsqiodev.h
-
-        SOURCES += \
-            src/videoplayerqt5.cc \
-            src/videoplayerqt5_p.cc \
-            src/rwopsqiodev.cc
-    } else:vlc-video {
-        PKGCONFIG += libvlc
-        DEFINES += VIDEO_VLC
-        win32 {
-            DEFINES += DL_VLC
-        }
-        HEADERS += \
-            src/dlvlcdef.h \
-            src/videoplayervlc_p.h
-        SOURCES += \
-            src/videoplayervlc.cc
-    } else {
+    gstreamer-1 | gstreamer-0 {
         DEFINES += VIDEO_GSTREAMER
 
-        gstreamer-0.10 {
+        gstreamer-0 {
             PKGCONFIG += \
                 gstreamer-interfaces-0.10 \
                 gstreamer-video-0.10 \
@@ -118,6 +94,33 @@ static:DEFINES += STATIC_QT
             src/videoplayergst.cc \
             src/videoplayergst_p.cc
     }
+    else:qt5-video {
+        DEFINES += VIDEO_QT5
+
+        QT += multimediawidgets
+
+        HEADERS += \
+            src/videoplayerqt5_p.h \
+            src/rwopsqiodev.h
+
+        SOURCES += \
+            src/videoplayerqt5.cc \
+            src/videoplayerqt5_p.cc \
+            src/rwopsqiodev.cc
+    }
+    else {
+        PKGCONFIG += libvlc
+        DEFINES += VIDEO_VLC
+        win32 {
+            DEFINES += DL_VLC
+        }
+        HEADERS += \
+            src/dlvlcdef.h \
+            src/videoplayervlc_p.h
+        SOURCES += \
+            src/videoplayervlc.cc
+    }
+    HEADERS += src/videoplayer.h
     SOURCES *= src/rwopsbundle.c
 } else {
     DEFINES += DISABLE_VIDEO
@@ -136,14 +139,14 @@ win32 {
     QMAKE_TARGET_COPYRIGHT = "Copyright 2006, Kent Tessman; 2011-2019, Nikos Chantziaras"
 
     !disable-video {
-        gstreamer-0.10 {
+        gstreamer-0 {
             error("GStreamer 0.10 is not supported on Windows. You need GStreamer 1.x.")
+        }
+        gstreamer-1 {
+            include(gstreamer-static.pri)
         }
         qt5-video {
             QTPLUGIN += dsengine
-        } else:vlc-video {
-        } else {
-            include(gstreamer-static.pri)
         }
     }
 
@@ -189,7 +192,6 @@ HEADERS += \
     src/settings.h \
     src/settingsoverrides.h \
     src/rwopsbundle.h \
-    src/videoplayer.h \
     src/enginerunner.h \
     src/hugohandlers.h \
     src/hugorfile.h \
