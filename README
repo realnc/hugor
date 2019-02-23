@@ -1,83 +1,105 @@
 Hugor - A portable Hugo engine
 Written and maintained by Nikos Chantziaras <realnc@gmail.com>
 
-Hugor is a "Hugo Runner", meaning a program in which you can load and
-play adventure games created with Kent Tessman’s Hugo authoring system:
+"Hugor" stands for "Hugo Runner."  It plays adventure games created with
+Kent Tessman’s Hugo authoring system:
 
-  http://www.generalcoffee.com
+  http://ifwiki.org/index.php/Hugo
 
-Hugor supports all graphics, sound and music formats of the Hugo engine.
-Video is fully supported in the Linux and Windows versions.  In order to
-be able to play videos, you will need the correct GStreamer
-plugins/codecs installed.  The gstreamer-libav (GStreamer 1.x) or
-gstreamer-ffmpeg (GStreamer 0.10) plugin should be a safe bet.
-
-For audio support, SDL and SDL_mixer are needed.  Both SDL1 as well as
-SDL2 are supported.
+All multimedia features of Hugo are supported: video, graphics, audio
+samples and music.
 
 (For runtime library dependencies of the distributed Linux binary, please
 consult the README.linux-bin file.)
 
-Hugor runs on all current major operating systems (Linux, Mac OS X and
-Microsoft Windows).  You can find up to date, ready to run binaries at:
+Hugor runs on all current major operating systems (Linux, MacOS and
+Microsoft Windows).  You can find binaries at:
 
   http://ifwiki.org/index.php/Hugor
 
-The source code is hosted at the following Git repository:
+The source code is hosted at:
 
   https://github.com/realnc/hugor
+
+If you have questions, you can use the intfiction.org forums:
+
+  https://www.intfiction.org/forum
+
+
+Installing on Gentoo Linux
+==========================
+
+If you're on Gentoo Linux, or a Gentoo-based distro that supports layman
+overlays, you can install Hugor by enabling the interactive-fiction
+overlay:
+
+  layman -a interactive-fiction
+
+You can then emerge Hugor like any other package:
+
+  emerge -a hugor
 
 
 Compiling from source
 =====================
 
 If you wish to build from source, you will need the development packages
-for the Qt library (version 4.6 or later, 5.x is also supported) and
-SDL_mixer (1.2 is used by default, but version 2.0 is also supported).
-To get correct support for MOD and MP3 music, SDL_mixer needs to have
-been built with modplug and libmad support.
+for the Qt library (version 5.6 or later.)
 
-For video support, you will also need GStreamer.  Either 0.10.x or 1.x
-will work.  By default, 1.x is assumed.  You can choose 0.10 instead if
-your system doesn't yet provide the newer gstreamer libraries; see below
-on how to do that.
+For audio support, you will need development files for:
 
-Once all dependencies are installed, you can build Hugor with the
-following commands:
+  SDL 2
+  libmpg123
+  libopenmpt
+  libsndfile
+  libfluidsynth (version 2.x; 1.x will not work)
+
+Video is supported through LibVLC or GStreamer.
+
+LibVLC is the recommended backend, and it is usually installed as part of
+the VLC media player on Linux.  It should be detected though pkg-config.
+The LibVLC ffmpeg/libav plugin needs to be installed (which is the case by
+default on pretty much every Linux distro.)  When building on macOS or
+Windows, I wish you good luck...  You need to make sure the LibVLC
+libraries and headers are available through pkg-config.
+
+When using GStreamer instead of LibVLC, you will need the correct
+GStreamer plugins/codecs installed and their development files. Having the
+ffmpeg or libav plugin installed should be enough.
+
+If all dependencies are available, you can build Hugor with the following
+commands:
 
   qmake
   make -jN
 
 Substitute the 'N' in '-jN' with the amount of CPUs or cores in your
 system in order to utilize all of them for a faster compilation process.
-(If you are not using GNU Make, then the -j option might not be supported.
-If that's the case, simply omit that option altogether.)
 
-By default, SDL_mixer 1.2 is used.  To build against SDL 2 instead, use:
+This will build Hugor with audio and video support, with LibVLC as the
+video backend.
 
-  qmake CONFIG+=sdl2
+To disable audio support, use:
 
-To disable audio support completely, use:
+  qmake -config disable-audio
 
-  qmake CONFIG+=disable-audio
+(Note that SDL2 is still needed for video support, even if audio is
+disabled.)
 
-If you want to build against GStreamer 0.10 instead of 1.x, call qmake
-with:
+To disable video support, use:
 
-  qmake CONFIG+=gstreamer-0.10
+  qmake -config disable-video
 
-Note that SDL is still needed for video support, even if audio is
-disabled.  SDL1 is assumed, unless you specify CONFIG+=sdl2.
+To disable both audio and video:
 
-If you want to disable video support:
+  qmake -config "disable-audio disable-video"
 
-  qmake CONFIG+=disable-video
+The recognized config options are:
 
-If you want to specify multiple CONFIG options, don't forget to quote
-them.  For example, to build without audio support but with video support
-and use gstreamer 0.10 and SDL2:
-
-  qmake CONFIG+="disable-audio sdl2 gstreamer-0.10"
+  disable-audio  - Disable audio support
+  disable-video  - Disable video support
+  gstreamer-1    - Use GStreamer 1.x instead of LibVLC
+  gstreamer-0    - Use GStreamer 0.x instead of LibVLC
 
 If all goes well, you will find an executable in the current directory
-which you can copy somewhere else and run it however you want.
+which you can copy somewhere else.
