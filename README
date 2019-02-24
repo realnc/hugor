@@ -50,7 +50,7 @@ For audio support, you will need development files for:
 
   SDL 2
   libmpg123
-  libopenmpt
+  libopenmpt or libxmp or libmodplug
   libsndfile
   libfluidsynth (version 2.x; 1.x will not work)
 
@@ -77,7 +77,7 @@ Substitute the 'N' in '-jN' with the amount of CPUs or cores in your
 system in order to utilize all of them for a faster compilation process.
 
 This will build Hugor with audio and video support, with LibVLC as the
-video backend.
+video backend and libopenmpt as the MOD music backend.
 
 To disable audio support, use:
 
@@ -96,10 +96,12 @@ To disable both audio and video:
 
 The recognized config options are:
 
-  disable-audio  - Disable audio support
-  disable-video  - Disable video support
+  xmp            - Use libxmp instead of libopenmpt
+  modplug        - Use libmodplug instead of libopenmpt
   gstreamer-1    - Use GStreamer 1.x instead of LibVLC
   gstreamer-0    - Use GStreamer 0.x instead of LibVLC
+  disable-audio  - Disable audio support
+  disable-video  - Disable video support
 
 If all goes well, you will find an executable in the current directory
 which you can copy somewhere else.

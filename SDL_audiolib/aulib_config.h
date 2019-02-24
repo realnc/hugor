@@ -1,19 +1,9 @@
 // This is copyrighted software. More information is at the end of this file.
 #pragma once
 
-//#define USE_RESAMP_SRC 1
-//#define USE_RESAMP_SOXR 1
-#define USE_DEC_OPENMPT 1
-//#define USE_DEC_XMP 1
-//#define USE_DEC_MODPLUG 1
 #define USE_DEC_MPG123 1
 #define USE_DEC_SNDFILE 1
-//#define USE_DEC_LIBVORBIS 1
-//#define USE_DEC_LIBOPUSFILE 1
-//#define USE_DEC_MUSEPACK 1
 #define USE_DEC_FLUIDSYNTH 1
-//#define USE_DEC_BASSMIDI 1
-//#define USE_DEC_WILDMIDI 1
 
 /*
 

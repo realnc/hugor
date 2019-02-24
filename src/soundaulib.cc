@@ -12,6 +12,8 @@
 #include "Aulib/AudioDecoderFluidsynth.h"
 #include "Aulib/AudioDecoderMpg123.h"
 #include "Aulib/AudioDecoderOpenmpt.h"
+#include "Aulib/AudioDecoderModplug.h"
+#include "Aulib/AudioDecoderXmp.h"
 #include "Aulib/AudioDecoderSndfile.h"
 #include "Aulib/AudioResamplerSpeex.h"
 #include "Aulib/AudioStream.h"
@@ -177,10 +179,19 @@ static bool playStream(HUGO_FILE infile, long reslength, char loop_flag, bool is
         }
         case XM_R:
         case S3M_R:
-        case MOD_R:
-            decoder = std::make_unique<Aulib::AudioDecoderOpenmpt>();
+        case MOD_R: {
+            using ModDec_type =
+#if USE_DEC_OPENMPT
+                Aulib::AudioDecoderOpenmpt;
+#elif USE_DEC_XMP
+                Aulib::AudioDecoderXmp;
+#elif USE_DEC_MODPLUG
+                Aulib::AudioDecoderModPlug;
+#endif
+            decoder = std::make_unique<ModDec_type>();
             fsynthDec() = nullptr;
             break;
+        }
         case MP3_R:
             decoder = std::make_unique<Aulib::AudioDecoderMpg123>();
             fsynthDec() = nullptr;

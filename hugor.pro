@@ -34,7 +34,23 @@ static:DEFINES += STATIC_QT
         SDL_audiolib/resampler \
         SDL_audiolib/src
 
-    PKGCONFIG += sdl2 sndfile libmpg123 fluidsynth libopenmpt
+    PKGCONFIG += sdl2 sndfile libmpg123 fluidsynth
+
+    xmp {
+        PKGCONFIG += libxmp
+        DEFINES += USE_DEC_XMP=1
+        SOURCES += SDL_audiolib/src/AudioDecoderXmp.cpp
+    }
+    else:modplug {
+        PKGCONFIG += libmodplug
+        DEFINES += USE_DEC_MODPLUG=1
+        SOURCES += SDL_audiolib/src/AudioDecoderModplug.cpp
+    }
+    else {
+        PKGCONFIG += libopenmpt
+        DEFINES += USE_DEC_OPENMPT=1
+        SOURCES += SDL_audiolib/src/AudioDecoderOpenmpt.cpp
+    }
 
     DEFINES += \
         AULIB_STATIC_DEFINE \
@@ -52,7 +68,6 @@ static:DEFINES += STATIC_QT
         SDL_audiolib/resampler/resample.c \
         SDL_audiolib/src/AudioDecoder.cpp \
         SDL_audiolib/src/AudioDecoderFluidsynth.cpp \
-        SDL_audiolib/src/AudioDecoderOpenmpt.cpp \
         SDL_audiolib/src/AudioDecoderMpg123.cpp \
         SDL_audiolib/src/AudioDecoderSndfile.cpp \
         SDL_audiolib/src/AudioResampler.cpp \
