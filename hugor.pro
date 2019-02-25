@@ -56,8 +56,7 @@ static:DEFINES += STATIC_QT
         AULIB_STATIC_DEFINE \
         SPX_RESAMPLE_EXPORT= \
         RANDOM_PREFIX=SDL_audiolib \
-        OUTSIDE_SPEEX \
-        FLOATING_POINT
+        OUTSIDE_SPEEX
 
     HEADERS += \
         "$$PWD"/SDL_audiolib/include/Aulib/*.h \
