@@ -2,7 +2,7 @@
 #pragma once
 #include <QApplication>
 
-template <typename F>
+template<typename F>
 static void runInMainThread(F&& fun)
 {
     QObject tmp;

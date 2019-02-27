@@ -10,11 +10,11 @@
 #include <cmath>
 
 #include "Aulib/AudioDecoderFluidsynth.h"
+#include "Aulib/AudioDecoderModplug.h"
 #include "Aulib/AudioDecoderMpg123.h"
 #include "Aulib/AudioDecoderOpenmpt.h"
-#include "Aulib/AudioDecoderModplug.h"
-#include "Aulib/AudioDecoderXmp.h"
 #include "Aulib/AudioDecoderSndfile.h"
+#include "Aulib/AudioDecoderXmp.h"
 #include "Aulib/AudioResamplerSpeex.h"
 #include "Aulib/AudioStream.h"
 #include "aulib.h"
