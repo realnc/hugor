@@ -282,6 +282,9 @@ void HMainWindow::setFullscreen(bool f)
 void HMainWindow::closeEvent(QCloseEvent* e)
 {
     if (not hApp->gameRunning()) {
+        if (conf_dialog_ != nullptr) {
+            conf_dialog_->close();
+        }
         QMainWindow::closeEvent(e);
         return;
     }
@@ -299,6 +302,9 @@ void HMainWindow::closeEvent(QCloseEvent* e)
 #endif
 
     if (msgBox->exec() == QMessageBox::Yes) {
+        if (conf_dialog_ != nullptr) {
+            conf_dialog_->close();
+        }
         hApp->settings()->saveToDisk();
         closeVideoEngine();
         closeSoundEngine();
