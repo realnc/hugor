@@ -26,7 +26,7 @@
 using namespace std::chrono_literals;
 
 ConfDialog::ConfDialog(HMainWindow* parent)
-    : QDialog(parent, Qt::WindowTitleHint | Qt::WindowSystemMenuHint)
+    : QDialog(parent, Qt::WindowTitleHint | Qt::WindowSystemMenuHint | Qt::WindowCloseButtonHint)
     , ui_(new Ui::ConfDialog)
 {
     ui_->setupUi(this);

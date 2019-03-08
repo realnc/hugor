@@ -7,7 +7,7 @@ extern "C" {
 #include "ui_aboutdialog.h"
 
 AboutDialog::AboutDialog(QWidget* parent)
-    : QDialog(parent, Qt::WindowTitleHint | Qt::WindowSystemMenuHint)
+    : QDialog(parent, Qt::WindowTitleHint | Qt::WindowSystemMenuHint | Qt::WindowCloseButtonHint)
     , ui_(new Ui::AboutDialog)
 {
     ui_->setupUi(this);
