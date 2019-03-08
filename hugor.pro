@@ -59,8 +59,8 @@ static:DEFINES += STATIC_QT
         OUTSIDE_SPEEX
 
     HEADERS += \
-        "$$PWD"/SDL_audiolib/include/Aulib/*.h \
-        "$$PWD"/SDL_audiolib/src/*.h
+        $$files(SDL_audiolib/include/Aulib/*.h) \
+        $$files(SDL_audiolib/src/*.h)
 
     SOURCES += \
         src/soundaulib.cc \
