@@ -52,6 +52,7 @@ ConfDialog::ConfDialog(HMainWindow* parent)
     initial_gain_ = sett->synth_gain;
 
 #ifdef DISABLE_AUDIO
+    ui_->volumeSlider->setEnabled(false);
     ui_->soundFontGroupBox->setEnabled(false);
     ui_->midiTestLabel->setEnabled(false);
     ui_->midiPlayButton->setEnabled(false);
