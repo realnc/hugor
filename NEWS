@@ -1,14 +1,70 @@
-Git - 2015-04-09
+Git - 2019-03-10
 ================
 
-  - Support for game-specific start-up configuration files. See the file:
+  - Improved SDL audio engine, using SDL_audiolib instead of SDL_mixer.
 
-      example.cfg
+    Resampling quality is improved and the engine will now correctly apply
+    resampling (if needed) in all cases. Previously, certain sample rates could
+    cause resampling to be skipped, resulting in audio that plays at the wrong
+    speed.
 
-    for details.
+    MIDI music is now rendered using an internal SoundFont synthesizer
+    (FluidSynth) or an OPL3 emulator (Nuked OPL3 through libADLMIDI) and thus it
+    no longer matters whether or not the operating system supports MIDI. For
+    FluidSynth, you can use your own SoundFont instead of the default one.
+
+    Higher quality and more accurate playback of MOD-based music through
+    libopenmpt. You can optionally use libxmp or libmodplug instead when
+    building the interpreter from source.
+
+  - The FMOD audio engine has been removed. It was there as a better alternative
+    to SDL_mixer, but FMOD is proprietary software and thus could not be shipped
+    with Hugor by default and thus required people to build from source. Since
+    we now use SDL_audiolib, FMOD no longer serves any purpose.
+
+  - The sound volume is now configurable through a slider in the preferences
+    dialog.
+
+  - The behavior of the "mute sound in background" setting has been changed. It
+    now only mutes the sound when the application is minimized, not when it
+    loses focus.
+
+  - Video is now fully supported in the Linux, macOS and Windows versions of
+    Hugor. The default video backend is libVLC, but you can optionally use
+    GStreamer instead when building from source (although this is not
+    recommended, as GStreamer has issues with the video format used in "Future
+    Boy".)
+
+  - The interpreter is now executing games in their own thread. A game that (for
+    whatever reason) freezes and stops responding will no longer freeze the
+    entire application with no possibility to quit. Also, games that carry out
+    time consuming operations between input prompts will no longer cause
+    temporary UI freezes.
+
+  - Improvements for Retina (and high DPI in general) displays. UI, text and
+    graphics should no longer appear blurry.
+
+  - Added two new text caret shapes, underline and block, as alternatives to the
+    default "I-Beam" shape, along with three thickness levels for I-Beam and
+    underline.
 
   - The "Fullscreen Width" configuration option is now a percentage, rather
     than an absolute pixel value.
+
+  - If this version of Hugor is started for the first time, fullscreen mode will
+    default to a 4:3 display ratio, as otherwise text lines can be extremely
+    long on wide screen displays.
+
+  - Fullscreen mode is now restored correctly between sessions.
+
+  - The margin color auto-detection when in fullscreen mode can now be disabled
+    and a custom color can be manually configured.
+
+  - The mode in which the interpreter starts (fullscreen, window, last state) is
+    now configurable.
+
+  - Alt+tabbing out of the interpreter when in fullscreen mode will now minimize
+    it.
 
   - The scrollback now ignores main window word wrapping and does its own word
     wrapping.
@@ -21,54 +77,30 @@ Git - 2015-04-09
   - Scriptfiles are now written using the correct character encoding of the
     operating system's locale.
 
-  - Fullscreen mode is now restored correctly between sessions.
-
-  - Video is now fully supported in the Linux and Windows versions of Hugor.
-
-  - The FMOD sound back-end has been removed.  SDL is now the only supported
-    sound back-end.
-
   - Games that expect mouse input will no longer receive right-clicks (or
-    left-clicks on left-handed mouse devices), since this is reserved for the
+    left-clicks on left-handed mouse setups), since this is reserved for the
     context menu.
-
-  - If this version of Hugor is started for the first time, fullscreen mode will
-    default to a 4:3 display ratio, as otherwise text lines can be extremely
-    long on wide screen displays.
 
   - Context menu entries set by the game are now supported and displayed in the
     context menu.
 
   - Pasting words on double-click now only works with the left mouse button.
 
-  - The margin color auto-detection when in fullscreen mode can now be disabled
-    and a custom color can be manually configured.
+  - Support for game-specific start-up configuration files. See the
+    "example.cfg" file for details.
 
-  - The interpreter is now executing games in their own thread. A game that (for
-    whatever reason) is stuck or froze up, will not result in the rest of the
-    application hanging with no possibility to quit. Previously, the only way to
-    exit the application in such cases was to kill the interpreter process
-    through an operating system facility (like the task manager on Windows.)
-
-  - The sound volume is now configurable through a slider in the preferences
-    dialog.
-
-  - The behavior of the "mute sound in background" setting has been changed. It
-    now only mutes the sound when the application is minimized, not when it
-    loses focus.
-
-  - The mode in which the interpreter starts (fullscreen, window, last state) is
-    now configurable.
-
-  - Alt+tabbing out of the interpreter when in fullscreen mode will now minimize
-    it.
+  - The Hugo base code was updated, fixing rare cases of crashes and failures to
+    restore saved games.
 
   - Hugor is now licensed under the GNU General Public License version 3, along
     with an additional permission to combine and distribute it together with the
     Hugo Engine. (The special permission is needed, since the Hugo Engine uses a
     license that is not compatible with the GPL.)
 
-  - Qt version 5 is now required to build Hugor. Qt 4 is no longer supported.
+  - Qt version 5.6 or higher is now required to build Hugor. Qt 4 is no longer
+    supported.
+
+  - Building the source code now requires at least a C++14 compiler.
 
 
 1.0 - 2012-08-15
