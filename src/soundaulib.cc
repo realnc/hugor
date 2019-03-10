@@ -7,8 +7,10 @@
 #include <QResource>
 #include <SDL.h>
 #include <SDL_audio.h>
+#include <algorithm>
 #include <cmath>
 
+#include "Aulib/AudioDecoderAdlmidi.h"
 #include "Aulib/AudioDecoderFluidsynth.h"
 #include "Aulib/AudioDecoderModplug.h"
 #include "Aulib/AudioDecoderMpg123.h"
@@ -17,12 +19,14 @@
 #include "Aulib/AudioDecoderXmp.h"
 #include "Aulib/AudioResamplerSpeex.h"
 #include "Aulib/AudioStream.h"
+#include "Aulib/Processor.h"
 #include "aulib.h"
 #include "happlication.h"
 extern "C" {
 #include "heheader.h"
 }
 #include "hugorfile.h"
+#include "oplvolumebooster.h"
 #include "rwopsbundle.h"
 #include "settings.h"
 
@@ -43,6 +47,8 @@ static std::unique_ptr<Aulib::AudioStream>& sampleStream()
     return p;
 }
 
+// We hold a pointer to the fluidsynth decoder so we can change the gain while the stream is
+// playing.
 static Aulib::AudioDecoderFluidSynth*& fsynthDec()
 {
     static Aulib::AudioDecoderFluidSynth* p = nullptr;
@@ -134,6 +140,20 @@ bool isSamplePlaying()
     return sampleStream() and sampleStream()->isPlaying();
 }
 
+static std::unique_ptr<Aulib::AudioDecoderFluidSynth> createFsynth()
+{
+    auto fsdec = std::make_unique<Aulib::AudioDecoderFluidSynth>();
+    if (hApp->settings()->soundfont.isEmpty() or not hApp->settings()->use_custom_soundfont) {
+        QResource sf2Res(":/soundfont.sf2");
+        auto* sf2_rwops = SDL_RWFromConstMem(sf2Res.data(), sf2Res.size());
+        fsdec->loadSoundfont(sf2_rwops);
+    } else {
+        fsdec->loadSoundfont(hApp->settings()->soundfont.toStdString());
+    }
+    fsdec->setGain(hApp->settings()->synth_gain);
+    return fsdec;
+}
+
 static bool playStream(HUGO_FILE infile, long reslength, char loop_flag, bool isMusic)
 {
     if ((isMusic and not hApp->settings()->enable_music)
@@ -144,6 +164,7 @@ static bool playStream(HUGO_FILE infile, long reslength, char loop_flag, bool is
 
     auto& stream = isMusic ? musicStream() : sampleStream();
     std::unique_ptr<Aulib::AudioDecoder> decoder;
+    std::shared_ptr<OplVolumeBooster> processor;
 
     if (stream) {
         stream->stop();
@@ -163,18 +184,20 @@ static bool playStream(HUGO_FILE infile, long reslength, char loop_flag, bool is
     } else {
         switch (resource_type) {
         case MIDI_R: {
-            auto fsdec = std::make_unique<Aulib::AudioDecoderFluidSynth>();
-            if (hApp->settings()->soundfont.isEmpty()
-                or not hApp->settings()->use_custom_soundfont) {
-                QResource sf2Res(":/soundfont.sf2");
-                auto* sf2_rwops = SDL_RWFromConstMem(sf2Res.data(), sf2Res.size());
-                fsdec->loadSoundfont(sf2_rwops);
+#if USE_DEC_ADLMIDI
+            if (hApp->settings()->use_adlmidi) {
+                auto dec = std::make_unique<Aulib::AudioDecoderAdlmidi>();
+                fsynthDec() = nullptr;
+                decoder = std::move(dec);
+                processor = std::make_shared<OplVolumeBooster>();
             } else {
-                fsdec->loadSoundfont(hApp->settings()->soundfont.toStdString());
+#endif
+                auto dec = createFsynth();
+                fsynthDec() = dec.get();
+                decoder = std::move(dec);
+#if USE_DEC_ADLMIDI
             }
-            fsdec->setGain(hApp->settings()->synth_gain);
-            fsynthDec() = fsdec.get();
-            decoder = std::move(fsdec);
+#endif
             break;
         }
         case XM_R:
@@ -204,6 +227,7 @@ static bool playStream(HUGO_FILE infile, long reslength, char loop_flag, bool is
 
     stream = std::make_unique<Aulib::AudioStream>(
         rwops, std::move(decoder), std::make_unique<Aulib::AudioResamplerSpeex>(), true);
+    stream->addProcessor(std::move(processor));
     if (stream->open()) {
         // Start playing the stream. Loop forever if 'loop_flag' is true. Otherwise, just play it
         // once.

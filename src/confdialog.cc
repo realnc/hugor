@@ -10,6 +10,8 @@
 #include <QSignalMapper>
 #include <QStyle>
 #ifndef DISABLE_AUDIO
+#include "oplvolumebooster.h"
+#include <Aulib/AudioDecoderAdlmidi.h>
 #include <Aulib/AudioDecoderFluidsynth.h>
 #include <Aulib/AudioResamplerSpeex.h>
 #include <Aulib/AudioStream.h>
@@ -56,6 +58,9 @@ ConfDialog::ConfDialog(HMainWindow* parent)
     ui_->midiStopButton->setEnabled(false);
     ui_->gainLabel->setEnabled(false);
     ui_->gainSpinBox->setEnabled(false);
+    ui_->midiGroupBox->setEnabled(false);
+#elif not USE_DEC_ADLMIDI
+    ui_->midiGroupBox->setEnabled(false);
 #endif
 
 #ifdef Q_OS_MAC
@@ -102,6 +107,20 @@ ConfDialog::ConfDialog(HMainWindow* parent)
     ui_->soundFontGroupBox->setChecked(sett->use_custom_soundfont);
     ui_->soundFontLineEdit->setText(sett->soundfont);
     ui_->gainSpinBox->setValue(sett->synth_gain);
+#if USE_DEC_ADLMIDI
+    connect(ui_->adlibRadioButton, &QRadioButton::toggled, [this](bool checked) {
+        ui_->soundFontGroupBox->setDisabled(checked);
+        ui_->gainLabel->setDisabled(checked);
+        ui_->gainSpinBox->setDisabled(checked);
+    });
+    if (sett->use_adlmidi) {
+        ui_->adlibRadioButton->setChecked(true);
+    } else {
+        ui_->fsynthRadioButton->setChecked(true);
+    }
+#else
+    ui_->fsynthRadioButton->setChecked(true);
+#endif
 
     ui_->mainBgColorButton->setColor(sett->main_bg_color);
     ui_->mainTextColorButton->setColor(sett->main_text_color);
@@ -254,6 +273,7 @@ void ConfDialog::makeInstantApply()
             static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this,
             &ConfDialog::applySettings);
 #endif
+    connect(ui_->adlibRadioButton, SIGNAL(toggled(bool)), this, SLOT(applySettings()));
     connect(ui_->overlayScrollbackCheckBox, SIGNAL(toggled(bool)), this, SLOT(applySettings()));
     connect(ui_->mainTextColorButton, SIGNAL(changed(QColor)), this, SLOT(applySettings()));
     connect(ui_->mainBgColorButton, SIGNAL(changed(QColor)), this, SLOT(applySettings()));
@@ -283,6 +303,7 @@ void ConfDialog::applySettings()
     sett->use_custom_soundfont =
         ui_->soundFontGroupBox->isChecked() and not sett->soundfont.isEmpty();
     sett->synth_gain = ui_->gainSpinBox->value();
+    sett->use_adlmidi = ui_->adlibRadioButton->isChecked();
     sett->main_bg_color = ui_->mainBgColorButton->color();
     sett->main_text_color = ui_->mainTextColorButton->color();
     sett->status_bg_color = ui_->bannerBgColorButton->color();
@@ -361,19 +382,34 @@ void ConfDialog::playTestMidi()
     // Re-create the stream each time because the selected soundfont might have changed.
     midi_stream_ = nullptr;
     QResource midiRes(":/test.mid");
-    auto fsdec = std::make_unique<Aulib::AudioDecoderFluidSynth>();
-    if (not ui_->soundFontGroupBox->isChecked() or ui_->soundFontLineEdit->text().isEmpty()) {
-        QResource sf2Res(":/soundfont.sf2");
-        fsdec->loadSoundfont(SDL_RWFromConstMem(sf2Res.data(), sf2Res.size()));
+    std::unique_ptr<Aulib::AudioDecoder> decoder;
+    std::shared_ptr<OplVolumeBooster> processor;
+#if USE_DEC_ADLMIDI
+    if (ui_->adlibRadioButton->isChecked()) {
+        auto adldec = std::make_unique<Aulib::AudioDecoderAdlmidi>();
+        fsynth_dec_ = nullptr;
+        decoder = std::move(adldec);
+        processor = std::make_shared<OplVolumeBooster>();
     } else {
-        fsdec->loadSoundfont(ui_->soundFontLineEdit->text().toStdString());
+#endif
+        auto fsdec = std::make_unique<Aulib::AudioDecoderFluidSynth>();
+        if (not ui_->soundFontGroupBox->isChecked() or ui_->soundFontLineEdit->text().isEmpty()) {
+            QResource sf2Res(":/soundfont.sf2");
+            fsdec->loadSoundfont(SDL_RWFromConstMem(sf2Res.data(), sf2Res.size()));
+        } else {
+            fsdec->loadSoundfont(ui_->soundFontLineEdit->text().toStdString());
+        }
+        fsdec->setGain(ui_->gainSpinBox->value());
+        fsynth_dec_ = fsdec.get();
+        decoder = std::move(fsdec);
+#if USE_DEC_ADLMIDI
     }
-    fsdec->setGain(ui_->gainSpinBox->value());
-    fsynth_dec_ = fsdec.get();
+#endif
     auto resampler = std::make_unique<Aulib::AudioResamplerSpeex>();
     auto* rwops = SDL_RWFromConstMem(midiRes.data(), midiRes.size());
     midi_stream_ =
-        std::make_unique<Aulib::AudioStream>(rwops, std::move(fsdec), std::move(resampler), true);
+        std::make_unique<Aulib::AudioStream>(rwops, std::move(decoder), std::move(resampler), true);
+    midi_stream_->addProcessor(std::move(processor));
     midi_stream_->setVolume(std::pow(ui_->volumeSlider->value() / 100.f, 2.f));
     midi_stream_->play(1, 1500ms);
 #endif
@@ -391,7 +427,7 @@ void ConfDialog::stopTestMidi()
 void ConfDialog::setGain()
 {
 #ifndef DISABLE_AUDIO
-    if (midi_stream_) {
+    if (midi_stream_ and fsynth_dec_ != nullptr) {
         fsynth_dec_->setGain(ui_->gainSpinBox->value());
     }
     hApp->settings()->synth_gain = ui_->gainSpinBox->value();

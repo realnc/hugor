@@ -28,6 +28,7 @@ extern "C" {
 #define SETT_USE_CUSTOM_SOUNDFONT QString::fromLatin1("usecustomsoundfont")
 #define SETT_SOUNDFONT QString::fromLatin1("soundfont")
 #define SETT_SYNTH_GAIN QString::fromLatin1("synthgain")
+#define SETT_USE_ADLMIDI QString::fromLatin1("useadlmidi")
 #define SETT_SMOOTH_IMAGES QString::fromLatin1("smoothImageScaling")
 #define SETT_MUTE_MINIMIZED QString::fromLatin1("muteWhenMinimized")
 #define SETT_SOUND_VOL QString::fromLatin1("soundVolume")
@@ -77,6 +78,7 @@ void Settings::loadFromDisk(SettingsOverrides* ovr)
     use_custom_soundfont = sett.value(SETT_USE_CUSTOM_SOUNDFONT, false).toBool();
     soundfont = sett.value(SETT_SOUNDFONT, QString()).toString();
     synth_gain = sett.value(SETT_SYNTH_GAIN, 0.6f).toFloat();
+    use_adlmidi = sett.value(SETT_USE_ADLMIDI, false).toBool();
     sett.endGroup();
 
     sett.beginGroup(SETT_COLORS_GRP);
@@ -247,6 +249,7 @@ void Settings::saveToDisk()
     sett.setValue(SETT_USE_CUSTOM_SOUNDFONT, use_custom_soundfont);
     sett.setValue(SETT_SOUNDFONT, soundfont);
     sett.setValue(SETT_SYNTH_GAIN, synth_gain);
+    sett.setValue(SETT_USE_ADLMIDI, use_adlmidi);
     sett.endGroup();
 
     sett.beginGroup(SETT_COLORS_GRP);

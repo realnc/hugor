@@ -37,6 +37,7 @@ public:
     bool use_custom_soundfont;
     QString soundfont;
     float synth_gain;
+    bool use_adlmidi;
 
     QColor main_text_color;
     QColor main_bg_color;

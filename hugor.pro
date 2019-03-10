@@ -52,6 +52,12 @@ static:DEFINES += STATIC_QT
         SOURCES += SDL_audiolib/src/AudioDecoderOpenmpt.cpp
     }
 
+    adlmidi {
+        DEFINES += USE_DEC_ADLMIDI=1
+        SOURCES += SDL_audiolib/src/AudioDecoderAdlmidi.cpp
+        LIBS += -lADLMIDI
+    }
+
     DEFINES += \
         AULIB_STATIC_DEFINE \
         SPX_RESAMPLE_EXPORT= \
@@ -60,10 +66,12 @@ static:DEFINES += STATIC_QT
 
     HEADERS += \
         $$files(SDL_audiolib/include/Aulib/*.h) \
-        $$files(SDL_audiolib/src/*.h)
+        $$files(SDL_audiolib/src/*.h) \
+        src/oplvolumebooster.h
 
     SOURCES += \
         src/soundaulib.cc \
+        src/oplvolumebooster.cc \
         SDL_audiolib/resampler/resample.c \
         SDL_audiolib/src/AudioDecoder.cpp \
         SDL_audiolib/src/AudioDecoderFluidsynth.cpp \
@@ -72,6 +80,7 @@ static:DEFINES += STATIC_QT
         SDL_audiolib/src/AudioResampler.cpp \
         SDL_audiolib/src/AudioResamplerSpeex.cpp \
         SDL_audiolib/src/AudioStream.cpp \
+        SDL_audiolib/src/Processor.cpp \
         SDL_audiolib/src/Stream.cpp \
         SDL_audiolib/src/audiostream_p.cpp \
         SDL_audiolib/src/aulib.cpp \

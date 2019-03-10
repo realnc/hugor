@@ -563,48 +563,6 @@
       <layout class="QGridLayout" name="gridLayout">
        <item row="0" column="0">
         <layout class="QFormLayout" name="formLayout_6">
-         <item row="0" column="0" colspan="2">
-          <widget class="QCheckBox" name="allowMusicCheckBox">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text">
-            <string>Enable &amp;Music</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0" colspan="2">
-          <widget class="QCheckBox" name="allowSoundEffectsCheckBox">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text">
-            <string>Enable Sound &amp;Effects</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0" colspan="2">
-          <widget class="QCheckBox" name="muteWhenMinimizedCheckBox">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="toolTip">
-            <string>&lt;p&gt;Mutes all sound when the application window is minimized.&lt;/p&gt;</string>
-           </property>
-           <property name="text">
-            <string>Mute When Mi&amp;nimized</string>
-           </property>
-          </widget>
-         </item>
          <item row="3" column="0" colspan="2">
           <widget class="QLabel" name="volumeLabel">
            <property name="text">
@@ -637,11 +595,40 @@
            </property>
           </widget>
          </item>
+         <item row="5" column="0" colspan="2">
+          <widget class="QGroupBox" name="midiGroupBox">
+           <property name="title">
+            <string>&amp;Play MIDI using:</string>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout">
+            <item>
+             <widget class="QRadioButton" name="fsynthRadioButton">
+              <property name="toolTip">
+               <string>Play MIDI using FluidSynth, a SoundFont synthesizer.</string>
+              </property>
+              <property name="text">
+               <string>SoundFont S&amp;ynthesizer</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="adlibRadioButton">
+              <property name="toolTip">
+               <string>Play MIDI using libADLMIDI, an OPL3 emulation library. High CPU usage.</string>
+              </property>
+              <property name="text">
+               <string>&amp;AdLib (OPL3) Emulation</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
         </layout>
        </item>
        <item row="0" column="1">
         <layout class="QFormLayout" name="formLayout_7">
-         <item row="0" column="0">
+         <item row="3" column="0">
           <widget class="QCheckBox" name="allowGraphicsCheckBox">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
@@ -654,7 +641,7 @@
            </property>
           </widget>
          </item>
-         <item row="1" column="0">
+         <item row="4" column="0">
           <widget class="QCheckBox" name="allowVideoCheckBox">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
@@ -667,7 +654,7 @@
            </property>
           </widget>
          </item>
-         <item row="2" column="0">
+         <item row="5" column="0">
           <widget class="QCheckBox" name="smoothScalingCheckBox">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
@@ -680,6 +667,48 @@
            </property>
            <property name="text">
             <string>Use Smooth Image &amp;Scaling</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QCheckBox" name="allowMusicCheckBox">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Enable &amp;Music</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QCheckBox" name="allowSoundEffectsCheckBox">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Enable Sound &amp;Effects</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QCheckBox" name="muteWhenMinimizedCheckBox">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="toolTip">
+            <string>&lt;p&gt;Mutes all sound when the application window is minimized.&lt;/p&gt;</string>
+           </property>
+           <property name="text">
+            <string>Mute When Mi&amp;nimized</string>
            </property>
           </widget>
          </item>
@@ -756,7 +785,7 @@
          <item>
           <widget class="QLabel" name="gainLabel">
            <property name="text">
-            <string>MI&amp;DI Synth Gain</string>
+            <string>Flui&amp;dSynth Gain</string>
            </property>
            <property name="buddy">
             <cstring>gainSpinBox</cstring>
@@ -814,9 +843,6 @@
   <tabstop>fsMarginColorButton</tabstop>
   <tabstop>bannerTextColorButton</tabstop>
   <tabstop>bannerBgColorButton</tabstop>
-  <tabstop>allowMusicCheckBox</tabstop>
-  <tabstop>allowSoundEffectsCheckBox</tabstop>
-  <tabstop>muteWhenMinimizedCheckBox</tabstop>
   <tabstop>volumeSlider</tabstop>
   <tabstop>allowGraphicsCheckBox</tabstop>
   <tabstop>allowVideoCheckBox</tabstop>

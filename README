@@ -53,6 +53,7 @@ For audio support, you will need development files for:
   libopenmpt or libxmp or libmodplug
   libsndfile
   libfluidsynth (version 2.x; 1.x will not work)
+  libADLMIDI (optional; it plays MIDI through OPL3 emulation)
 
 Video is supported through LibVLC or GStreamer.
 
@@ -98,6 +99,7 @@ The recognized config options are:
 
   xmp            - Use libxmp instead of libopenmpt
   modplug        - Use libmodplug instead of libopenmpt
+  adlmidi        - Enable OPL3 emulator (requires libADLMIDI)
   gstreamer-1    - Use GStreamer 1.x instead of LibVLC
   gstreamer-0    - Use GStreamer 0.x instead of LibVLC
   disable-audio  - Disable audio support

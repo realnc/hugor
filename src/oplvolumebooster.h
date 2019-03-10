@@ -1,52 +1,17 @@
 // This is copyrighted software. More information is at the end of this file.
 #pragma once
-#include <QDialog>
+#include <Aulib/Processor.h>
 
-#include <memory>
+#include <algorithm>
 
-namespace Ui {
-class ConfDialog;
-}
-
-namespace Aulib {
-class AudioStream;
-class AudioDecoderFluidSynth;
-class AudioDecoderAdlmidi;
-} // namespace Aulib
-
-class HMainWindow;
-
-class ConfDialog final: public QDialog
+/* Used to boost the volume of the OPL emulator's output, since it is rather quiet.
+ */
+class OplVolumeBooster final: public Aulib::Processor
 {
-    Q_OBJECT
-
-public:
-    ConfDialog(HMainWindow* parent = nullptr);
-    ~ConfDialog() override;
-
-protected:
-    void changeEvent(QEvent* e) override;
-
-private:
-    Ui::ConfDialog* ui_;
-    int initial_sound_vol_;
-    float initial_gain_;
-#ifndef DISABLE_AUDIO
-    std::unique_ptr<Aulib::AudioStream> midi_stream_;
-    Aulib::AudioDecoderFluidSynth* fsynth_dec_ = nullptr;
-#endif
-
-    // Makes the dialog's controls apply instantly when they change.
-    void makeInstantApply();
-
-private slots:
-    void applySettings();
-    void cancel();
-    void setSoundVolume(int vol);
-    void playTestMidi();
-    void stopTestMidi();
-    void setGain();
-    void browseForSoundFont();
+    void process(float dest[], const float source[], int len) override
+    {
+        std::transform(source, source + len, dest, [](float sample) { return sample * 2.f; });
+    }
 };
 
 /* Copyright (C) 2011-2019 Nikos Chantziaras
