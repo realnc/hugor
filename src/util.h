@@ -1,6 +1,8 @@
 // This is copyrighted software. More information is at the end of this file.
 #pragma once
 #include <QApplication>
+#include <QtGlobal>
+#include <type_traits>
 
 template<typename F>
 static void runInMainThread(F&& fun)
@@ -9,6 +11,17 @@ static void runInMainThread(F&& fun)
     QObject::connect(&tmp, &QObject::destroyed, qApp, std::forward<F>(fun),
                      Qt::BlockingQueuedConnection);
 }
+
+#if QT_VERSION < QT_VERSION_CHECK(5, 7, 0)
+template<typename T>
+constexpr typename std::add_const<T>::type& qAsConst(T& t) noexcept
+{
+    return t;
+}
+
+template<typename T>
+void qAsConst(const T&&) = delete;
+#endif
 
 /* Copyright (C) 2011-2019 Nikos Chantziaras
  *
