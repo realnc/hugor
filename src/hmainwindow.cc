@@ -49,6 +49,7 @@ HMainWindow::HMainWindow(QWidget* parent)
     act = new QAction(tr("&Preferences..."), this);
     act->setIcon(QIcon::fromTheme(QString::fromLatin1("configure")));
     act->setShortcuts(QKeySequence::Preferences);
+    act->setMenuRole(QAction::PreferencesRole);
     menu->addAction(act);
     addAction(act);
     connect(act, SIGNAL(triggered()), SLOT(showConfDialog()));
@@ -96,6 +97,7 @@ HMainWindow::HMainWindow(QWidget* parent)
     menu = menuBar->addMenu(tr("&Help"));
     act = new QAction(tr("A&bout Hugor"), this);
     act->setIcon(QIcon::fromTheme(QString::fromLatin1("help-about")));
+    act->setMenuRole(QAction::AboutRole);
     menu->addAction(act);
     connect(act, SIGNAL(triggered()), SLOT(showAbout()));
 
