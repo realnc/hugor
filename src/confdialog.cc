@@ -25,7 +25,9 @@
 #include "settings.h"
 #include "ui_confdialog.h"
 
+#ifndef DISABLE_VIDEO
 using namespace std::chrono_literals;
+#endif
 
 ConfDialog::ConfDialog(HMainWindow* parent)
     : QDialog(parent, Qt::WindowTitleHint | Qt::WindowSystemMenuHint | Qt::WindowCloseButtonHint)
