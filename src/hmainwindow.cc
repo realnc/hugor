@@ -24,6 +24,7 @@ extern "C" {
 #include "hscrollback.h"
 #include "hugodefs.h"
 #include "settings.h"
+#include "util.h"
 
 HMainWindow* hMainWin = nullptr;
 
@@ -61,30 +62,30 @@ HMainWindow::HMainWindow(QWidget* parent)
     connect(act, SIGNAL(triggered()), SLOT(showScrollback()));
     scrollback_action_ = act;
 
-#ifdef Q_OS_MAC
     act = new QAction(tr("Enter &Full Screen"), this);
-#else
-    act = new QAction(tr("&Fullscreen Mode"), this);
+#ifndef Q_OS_MACOS
     act->setCheckable(true);
 #endif
-    act->setIcon(fullscreen_enter_icon_);
-    QList<QKeySequence> keySeqList;
-#ifdef Q_OS_MAC
-    keySeqList.append(QKeySequence("Meta+Ctrl+F"));
-#elif defined(Q_OS_WIN)
-    keySeqList.append(QKeySequence("F11"));
-    keySeqList.append(QKeySequence("Alt+Return"));
-    keySeqList.append(QKeySequence("Alt+Enter"));
-#else
-    if (hApp->desktopIsGnome()) {
-        keySeqList.append(QKeySequence("Ctrl+F11"));
-    } else {
-        // Assume KDE.
-        keySeqList.append(QKeySequence("F11"));
-        keySeqList.append(QKeySequence("Shift+Ctrl+F"));
+    auto shortcuts = QKeySequence::keyBindings(QKeySequence::FullScreen);
+    // Also allow alt+enter/alt+return as a fullscreen toggle even if the platform normally doesn't
+    // use that.
+    bool alt_enter_found = false;
+    bool alt_return_found = false;
+    for (const auto& i : qAsConst(shortcuts)) {
+        if (i.matches({"alt+enter"})) {
+            alt_enter_found = true;
+        } else if (i.matches({"alt+return"})) {
+            alt_return_found = true;
+        }
     }
-#endif
-    act->setShortcuts(keySeqList);
+    if (not alt_enter_found) {
+        shortcuts += QKeySequence("alt+enter");
+    }
+    if (not alt_return_found) {
+        shortcuts += QKeySequence("alt+return");
+    }
+    act->setShortcuts(shortcuts);
+    act->setIcon(fullscreen_enter_icon_);
     act->setShortcutContext(Qt::ApplicationShortcut);
     menu->addAction(act);
     addAction(act);
@@ -113,17 +114,15 @@ void HMainWindow::fullscreenAdjust()
 {
     if (isFullScreen()) {
         fullscreen_action_->setIcon(fullscreen_exit_icon_);
-#ifdef Q_OS_MAC
-        fullscreen_action_->setText("Exit Full Screen");
-#else
+        fullscreen_action_->setText("Exit &Full Screen");
+#ifndef Q_OS_MACOS
         fullscreen_action_->setChecked(true);
         menuBar()->hide();
 #endif
     } else {
         fullscreen_action_->setIcon(fullscreen_enter_icon_);
-#ifdef Q_OS_MAC
-        fullscreen_action_->setText("Enter Full Screen");
-#else
+        fullscreen_action_->setText("Enter &Full Screen");
+#ifndef Q_OS_MACOS
         fullscreen_action_->setChecked(false);
         if (is_menubar_visible_) {
             menuBar()->show();
