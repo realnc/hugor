@@ -12,6 +12,7 @@ extern "C" {
 #include "heheader.h"
 }
 #include "hugodefs.h"
+#include "macos.h"
 #include "settings.h"
 
 // On some platforms, SDL redefines main in order to provide a platform-specific main()
@@ -26,6 +27,11 @@ extern "C" {
 
 int main(int argc, char* argv[])
 {
+#ifdef Q_OS_OSX
+    disableAutomaticWindowTabbing();
+    disableSomeMenuEntries();
+#endif
+
     QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     HApplication app(argc, argv, "Hugor", HUGOR_VERSION, "Nikos Chantziaras", "");
     QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);

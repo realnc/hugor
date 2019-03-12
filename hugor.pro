@@ -152,6 +152,9 @@ static:DEFINES += STATIC_QT
 macx {
     TARGET = Hugor
     QMAKE_INFO_PLIST = Info.plist
+    HEADERS += src/macos.h
+    SOURCES += src/macos.mm
+    LIBS += -framework AppKit
 }
 
 win32 {
