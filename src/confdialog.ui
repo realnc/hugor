@@ -628,48 +628,6 @@
        </item>
        <item row="0" column="1">
         <layout class="QFormLayout" name="formLayout_7">
-         <item row="3" column="0">
-          <widget class="QCheckBox" name="allowGraphicsCheckBox">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text">
-            <string>Enable &amp;Graphics</string>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="0">
-          <widget class="QCheckBox" name="allowVideoCheckBox">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text">
-            <string>Enable &amp;Video</string>
-           </property>
-          </widget>
-         </item>
-         <item row="5" column="0">
-          <widget class="QCheckBox" name="smoothScalingCheckBox">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="toolTip">
-            <string>&lt;p&gt;Applies a bilinear filter when scaling images in order to avoid scaling artifacts (pixelization and distortion.)&lt;/p&gt;</string>
-           </property>
-           <property name="text">
-            <string>Use Smooth Image &amp;Scaling</string>
-           </property>
-          </widget>
-         </item>
          <item row="0" column="0">
           <widget class="QCheckBox" name="allowMusicCheckBox">
            <property name="sizePolicy">
@@ -709,6 +667,32 @@
            </property>
            <property name="text">
             <string>Mute When Mi&amp;nimized</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QCheckBox" name="allowGraphicsCheckBox">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Enable &amp;Graphics</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="0">
+          <widget class="QCheckBox" name="allowVideoCheckBox">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Enable &amp;Video</string>
            </property>
           </widget>
          </item>
@@ -846,7 +830,6 @@
   <tabstop>volumeSlider</tabstop>
   <tabstop>allowGraphicsCheckBox</tabstop>
   <tabstop>allowVideoCheckBox</tabstop>
-  <tabstop>smoothScalingCheckBox</tabstop>
   <tabstop>marginSizeSpinBox</tabstop>
   <tabstop>fullscreenWidthSpinBox</tabstop>
   <tabstop>scriptWrapSpinBox</tabstop>

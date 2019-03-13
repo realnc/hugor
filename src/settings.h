@@ -31,7 +31,6 @@ public:
     bool enable_video;
     bool enable_sound_effects;
     bool enable_music;
-    bool use_smooth_scaling;
     bool mute_when_minimized;
     int sound_volume;
     bool use_custom_soundfont;

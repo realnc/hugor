@@ -257,18 +257,11 @@ void HugoHandlers::displaypicture(HUGO_FILE infile, long len, int* result) const
         imgSize.setHeight(physical_windowheight);
     }
     // Make sure to keep the aspect ratio (don't stretch.)
-    // Only apply a smoothing filter if that setting is enabled in the settings.
-    Qt::TransformationMode mode;
-    if (hApp->settings()->use_smooth_scaling) {
-        mode = Qt::SmoothTransformation;
-    } else {
-        mode = Qt::FastTransformation;
-    }
     if (imgSize != img.size()) {
-        img = img.scaled(imgSize * dpr, Qt::KeepAspectRatio, mode);
+        img = img.scaled(imgSize * dpr, Qt::KeepAspectRatio, Qt::SmoothTransformation);
         imgSize = img.size() / dpr;
     } else if (not qFuzzyCompare(dpr, 1.0)) {
-        img = img.scaled(img.size() * dpr, Qt::KeepAspectRatio, mode);
+        img = img.scaled(img.size() * dpr, Qt::KeepAspectRatio, Qt::SmoothTransformation);
     }
 
     // The image should be displayed centered.

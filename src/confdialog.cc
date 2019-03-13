@@ -106,7 +106,6 @@ ConfDialog::ConfDialog(HMainWindow* parent)
     ui_->volumeSlider->setValue(sett->sound_volume);
     connect(ui_->volumeSlider, SIGNAL(valueChanged(int)), SLOT(setSoundVolume(int)));
 #endif
-    ui_->smoothScalingCheckBox->setChecked(sett->use_smooth_scaling);
     ui_->soundFontGroupBox->setChecked(sett->use_custom_soundfont);
     ui_->soundFontLineEdit->setText(sett->soundfont);
     ui_->gainSpinBox->setValue(sett->synth_gain);
@@ -263,7 +262,6 @@ void ConfDialog::makeInstantApply()
     connect(ui_->allowVideoCheckBox, SIGNAL(toggled(bool)), this, SLOT(applySettings()));
     connect(ui_->allowSoundEffectsCheckBox, SIGNAL(toggled(bool)), this, SLOT(applySettings()));
     connect(ui_->allowMusicCheckBox, SIGNAL(toggled(bool)), this, SLOT(applySettings()));
-    connect(ui_->smoothScalingCheckBox, SIGNAL(toggled(bool)), this, SLOT(applySettings()));
     connect(ui_->muteWhenMinimizedCheckBox, SIGNAL(toggled(bool)), this, SLOT(applySettings()));
     connect(ui_->volumeSlider, SIGNAL(valueChanged(int)), SLOT(applySettings()));
     connect(ui_->soundFontGroupBox, &QGroupBox::toggled, this, &ConfDialog::applySettings);
@@ -299,7 +297,6 @@ void ConfDialog::applySettings()
 #endif
     sett->enable_sound_effects = ui_->allowSoundEffectsCheckBox->isChecked();
     sett->enable_music = ui_->allowMusicCheckBox->isChecked();
-    sett->use_smooth_scaling = ui_->smoothScalingCheckBox->isChecked();
     sett->mute_when_minimized = ui_->muteWhenMinimizedCheckBox->isChecked();
     sett->sound_volume = ui_->volumeSlider->value();
     sett->soundfont = ui_->soundFontLineEdit->text();

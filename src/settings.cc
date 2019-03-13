@@ -29,7 +29,6 @@ extern "C" {
 #define SETT_SOUNDFONT QString::fromLatin1("soundfont")
 #define SETT_SYNTH_GAIN QString::fromLatin1("synthgain")
 #define SETT_USE_ADLMIDI QString::fromLatin1("useadlmidi")
-#define SETT_SMOOTH_IMAGES QString::fromLatin1("smoothImageScaling")
 #define SETT_MUTE_MINIMIZED QString::fromLatin1("muteWhenMinimized")
 #define SETT_SOUND_VOL QString::fromLatin1("soundVolume")
 #define SETT_MAIN_BG_COLOR QString::fromLatin1("mainbg")
@@ -72,7 +71,6 @@ void Settings::loadFromDisk(SettingsOverrides* ovr)
     enableSoundEffects = sett.value(SETT_SOUNDS, false).toBool();
     enableMusic = sett.value(SETT_MUSIC, false).toBool();
 #endif
-    use_smooth_scaling = sett.value(SETT_SMOOTH_IMAGES, true).toBool();
     mute_when_minimized = sett.value(SETT_MUTE_MINIMIZED, true).toBool();
     sound_volume = sett.value(SETT_SOUND_VOL, 100).toInt();
     use_custom_soundfont = sett.value(SETT_USE_CUSTOM_SOUNDFONT, false).toBool();
@@ -217,9 +215,6 @@ void Settings::loadFromDisk(SettingsOverrides* ovr)
         sett.endGroup();
 
         sett.beginGroup(SETT_MEDIA_GRP);
-        if (not sett.contains(SETT_SMOOTH_IMAGES)) {
-            use_smooth_scaling = ovr->image_smoothing;
-        }
         if (not sett.contains(SETT_MUTE_MINIMIZED)) {
             mute_when_minimized = ovr->mute_when_minimized;
         }
@@ -243,7 +238,6 @@ void Settings::saveToDisk()
     sett.setValue(SETT_VIDEO, enable_video);
     sett.setValue(SETT_SOUNDS, enable_sound_effects);
     sett.setValue(SETT_MUSIC, enable_music);
-    sett.setValue(SETT_SMOOTH_IMAGES, use_smooth_scaling);
     sett.setValue(SETT_MUTE_MINIMIZED, mute_when_minimized);
     sett.setValue(SETT_SOUND_VOL, sound_volume);
     sett.setValue(SETT_USE_CUSTOM_SOUNDFONT, use_custom_soundfont);

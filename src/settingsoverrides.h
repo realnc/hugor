@@ -20,7 +20,6 @@ public:
     int prop_font_size;
     int fixed_font_size;
     int scrollback_font_size;
-    bool image_smoothing;
     bool mute_when_minimized;
 };
 

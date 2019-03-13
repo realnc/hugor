@@ -29,7 +29,6 @@ SettingsOverrides::SettingsOverrides(const QString& filename)
     prop_font_size = sett.value(QString::fromLatin1("propFontSize"), 0).toInt();
     fixed_font_size = sett.value(QString::fromLatin1("fixedFontSize"), 0).toInt();
     scrollback_font_size = sett.value(QString::fromLatin1("scrollbackFontSize"), 0).toInt();
-    image_smoothing = sett.value(QString::fromLatin1("imageSmoothing"), true).toBool();
     QString namedColor = sett.value(QString::fromLatin1("fsMarginColor"), QString()).toString();
     fs_margin_color.setNamedColor(namedColor);
     sett.endGroup();
