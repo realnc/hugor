@@ -822,6 +822,7 @@
   </customwidget>
  </customwidgets>
  <tabstops>
+  <tabstop>tabWidget</tabstop>
   <tabstop>mainFontBox</tabstop>
   <tabstop>mainFontSizeSpinBox</tabstop>
   <tabstop>fixedFontBox</tabstop>
@@ -834,15 +835,32 @@
   <tabstop>fsMarginColorButton</tabstop>
   <tabstop>bannerTextColorButton</tabstop>
   <tabstop>bannerBgColorButton</tabstop>
-  <tabstop>volumeSlider</tabstop>
-  <tabstop>allowGraphicsCheckBox</tabstop>
-  <tabstop>allowVideoCheckBox</tabstop>
   <tabstop>marginSizeSpinBox</tabstop>
   <tabstop>fullscreenWidthSpinBox</tabstop>
   <tabstop>scriptWrapSpinBox</tabstop>
+  <tabstop>cursorShapeComboBox</tabstop>
+  <tabstop>cursorThicknessComboBox</tabstop>
   <tabstop>softScrollCheckBox</tabstop>
   <tabstop>smartFormattingCheckBox</tabstop>
   <tabstop>overlayScrollbackCheckBox</tabstop>
+  <tabstop>scrollWheelCheckBox</tabstop>
+  <tabstop>lastStateRadioButton</tabstop>
+  <tabstop>windowRadioButton</tabstop>
+  <tabstop>fullscreenRadioButton</tabstop>
+  <tabstop>volumeSlider</tabstop>
+  <tabstop>fsynthRadioButton</tabstop>
+  <tabstop>adlibRadioButton</tabstop>
+  <tabstop>allowMusicCheckBox</tabstop>
+  <tabstop>allowSoundEffectsCheckBox</tabstop>
+  <tabstop>muteWhenMinimizedCheckBox</tabstop>
+  <tabstop>allowGraphicsCheckBox</tabstop>
+  <tabstop>allowVideoCheckBox</tabstop>
+  <tabstop>soundFontGroupBox</tabstop>
+  <tabstop>soundFontLineEdit</tabstop>
+  <tabstop>soundFontPushButton</tabstop>
+  <tabstop>midiPlayButton</tabstop>
+  <tabstop>midiStopButton</tabstop>
+  <tabstop>gainSpinBox</tabstop>
  </tabstops>
  <resources/>
  <connections>
