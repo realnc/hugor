@@ -9,6 +9,7 @@
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QScrollBar>
+#include <QShortcut>
 #include <QTextCodec>
 #include <QTextEdit>
 #include <QWindowStateChangeEvent>
@@ -102,6 +103,10 @@ HMainWindow::HMainWindow(QWidget* parent)
     act->setMenuRole(QAction::AboutRole);
     menu->addAction(act);
     connect(act, SIGNAL(triggered()), SLOT(showAbout()));
+
+    // Handle "close window" shortcut.
+    connect(new QShortcut(QKeySequence::Close, this), &QShortcut::activated, this,
+            &HMainWindow::close);
 
     scrollback_window_ = new HScrollbackWindow(nullptr);
 
