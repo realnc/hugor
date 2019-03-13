@@ -14,7 +14,6 @@ void disableSomeMenuEntries()
 {
     [[NSUserDefaults standardUserDefaults] setBool:YES
                                             forKey:@"NSDisabledCharacterPaletteMenuItem"];
-    [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"NSFullScreenMenuItemEverywhere"];
 }
 
 /* Copyright (C) 2011-2019 Nikos Chantziaras

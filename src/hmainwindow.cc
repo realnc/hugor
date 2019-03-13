@@ -88,7 +88,9 @@ HMainWindow::HMainWindow(QWidget* parent)
     act->setShortcuts(shortcuts);
     act->setIcon(fullscreen_enter_icon_);
     act->setShortcutContext(Qt::ApplicationShortcut);
+#ifndef Q_OS_MACOS
     menu->addAction(act);
+#endif
     addAction(act);
     connect(act, SIGNAL(triggered()), SLOT(toggleFullscreen()));
     fullscreen_action_ = act;
