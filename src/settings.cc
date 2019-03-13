@@ -48,6 +48,7 @@ extern "C" {
 #define SETT_GAMES_LIST QString::fromLatin1("games")
 #define SETT_APP_SIZE QString::fromLatin1("size")
 #define SETT_OVERLAY_SCROLL QString::fromLatin1("overlayScrollback")
+#define SETT_SCROLLBACK_ON_WHEEL QString::fromLatin1("scrollbackOnWheel")
 #define SETT_MAXIMIZED QString::fromLatin1("maximized")
 #define SETT_FULLSCREEN QString::fromLatin1("fullscreen")
 #define SETT_MARGIN_SIZE QString::fromLatin1("marginSize")
@@ -163,6 +164,7 @@ void Settings::loadFromDisk(SettingsOverrides* ovr)
     sett.beginGroup(SETT_GEOMETRY_GRP);
     app_size = sett.value(SETT_APP_SIZE, QSize(800, 600)).toSize();
     overlay_scrollback = sett.value(SETT_OVERLAY_SCROLL, true).toBool();
+    scrollback_on_wheel = sett.value(SETT_SCROLLBACK_ON_WHEEL, true).toBool();
     is_maximized = sett.value(SETT_MAXIMIZED, false).toBool();
     is_fullscreen = sett.value(SETT_FULLSCREEN, true).toBool();
     margin_size = sett.value(SETT_MARGIN_SIZE, 0).toInt();
@@ -284,6 +286,7 @@ void Settings::saveToDisk()
         sett.setValue(SETT_APP_SIZE, hMainWin->size());
     }
     sett.setValue(SETT_OVERLAY_SCROLL, overlay_scrollback);
+    sett.setValue(SETT_SCROLLBACK_ON_WHEEL, scrollback_on_wheel);
     sett.setValue(SETT_MAXIMIZED, hMainWin->isMaximized());
     sett.setValue(SETT_FULLSCREEN, hMainWin->isFullScreen());
     sett.setValue(SETT_MARGIN_SIZE, margin_size);

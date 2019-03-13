@@ -6,8 +6,10 @@
 #include <QWheelEvent>
 #include <utility>
 
+#include "happlication.h"
 #include "hmainwindow.h"
 #include "hugodefs.h"
+#include "settings.h"
 
 HMarginWidget::HMarginWidget(QWidget* parent)
     : QWidget(parent)
@@ -22,7 +24,7 @@ HMarginWidget::HMarginWidget(QWidget* parent)
 
 void HMarginWidget::wheelEvent(QWheelEvent* e)
 {
-    if (e->delta() > 0) {
+    if (hApp->settings()->scrollback_on_wheel and e->delta() > 0) {
         hMainWin->showScrollback();
     }
     e->accept();

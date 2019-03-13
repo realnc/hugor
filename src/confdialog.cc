@@ -143,6 +143,7 @@ ConfDialog::ConfDialog(HMainWindow* parent)
     ui_->smartFormattingCheckBox->setChecked(sett->smart_formatting);
     ui_->marginSizeSpinBox->setValue(sett->margin_size);
     ui_->overlayScrollbackCheckBox->setChecked(sett->overlay_scrollback);
+    ui_->scrollWheelCheckBox->setChecked(sett->scrollback_on_wheel);
     ui_->fullscreenWidthSpinBox->setValue(sett->fullscreen_width);
     if (sett->script_wrap < ui_->scriptWrapSpinBox->minimum()) {
         ui_->scriptWrapSpinBox->setValue(ui_->scriptWrapSpinBox->minimum());
@@ -276,6 +277,7 @@ void ConfDialog::makeInstantApply()
 #endif
     connect(ui_->adlibRadioButton, SIGNAL(toggled(bool)), this, SLOT(applySettings()));
     connect(ui_->overlayScrollbackCheckBox, SIGNAL(toggled(bool)), this, SLOT(applySettings()));
+    connect(ui_->scrollWheelCheckBox, SIGNAL(toggled(bool)), this, SLOT(applySettings()));
     connect(ui_->mainTextColorButton, SIGNAL(changed(QColor)), this, SLOT(applySettings()));
     connect(ui_->mainBgColorButton, SIGNAL(changed(QColor)), this, SLOT(applySettings()));
     connect(ui_->bannerTextColorButton, SIGNAL(changed(QColor)), this, SLOT(applySettings()));
@@ -319,6 +321,7 @@ void ConfDialog::applySettings()
     sett->soft_text_scrolling = ui_->softScrollCheckBox->isChecked();
     sett->smart_formatting = ui_->smartFormattingCheckBox->isChecked();
     sett->overlay_scrollback = ui_->overlayScrollbackCheckBox->isChecked();
+    sett->scrollback_on_wheel = ui_->scrollWheelCheckBox->isChecked();
     sett->margin_size = ui_->marginSizeSpinBox->value();
     sett->fullscreen_width = ui_->fullscreenWidthSpinBox->value();
     if (ui_->scriptWrapSpinBox->value() <= ui_->scriptWrapSpinBox->minimum()) {

@@ -64,6 +64,7 @@ public:
     bool is_maximized;
     bool is_fullscreen;
     bool overlay_scrollback;
+    bool scrollback_on_wheel;
     int margin_size;
     int fullscreen_width;
     bool start_fullscreen;
