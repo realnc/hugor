@@ -155,6 +155,11 @@ macx {
     HEADERS += src/macos.h
     SOURCES += src/macos.mm
     LIBS += -framework AppKit
+    contains(QT_MAJOR_VERSION, 5):lessThan(QT_MINOR_VERSION, 10) {
+        message("*** You are using Qt < 5.10. You need to manually specify")
+        message("*** LSMinimumSystemVersion in the generated Info.plist in")
+        message("*** the app bundle after building.")
+    }
 }
 
 win32 {
