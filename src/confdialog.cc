@@ -33,6 +33,7 @@ ConfDialog::ConfDialog(HMainWindow* parent)
     : QDialog(parent, Qt::WindowTitleHint | Qt::WindowSystemMenuHint | Qt::WindowCloseButtonHint)
     , ui_(new Ui::ConfDialog)
 {
+    setWindowModality(Qt::ApplicationModal);
     ui_->setupUi(this);
     Settings* sett = hApp->settings();
     sett->loadFromDisk();
