@@ -25,7 +25,7 @@
 #include "settings.h"
 #include "ui_confdialog.h"
 
-#ifndef DISABLE_VIDEO
+#ifndef DISABLE_AUDIO
 using namespace std::chrono_literals;
 #endif
 
