@@ -32,7 +32,8 @@ static:DEFINES += STATIC_QT
         SDL_audiolib \
         SDL_audiolib/include \
         SDL_audiolib/resampler \
-        SDL_audiolib/src
+        SDL_audiolib/src \
+        SDL_audiolib/src/missing
 
     PKGCONFIG += sdl2 sndfile libmpg123 fluidsynth
 
@@ -67,12 +68,14 @@ static:DEFINES += STATIC_QT
     HEADERS += \
         $$files(SDL_audiolib/include/Aulib/*.h) \
         $$files(SDL_audiolib/src/*.h) \
+        $$files(SDL_audiolib/src/missing/*.h) \
         src/oplvolumebooster.h
 
     SOURCES += \
         src/soundaulib.cc \
         src/oplvolumebooster.cc \
         SDL_audiolib/resampler/resample.c \
+        SDL_audiolib/src/missing/sdl_load_file_rw.c \
         SDL_audiolib/src/AudioDecoder.cpp \
         SDL_audiolib/src/AudioDecoderFluidsynth.cpp \
         SDL_audiolib/src/AudioDecoderMpg123.cpp \

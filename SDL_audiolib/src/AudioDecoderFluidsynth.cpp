@@ -143,12 +143,20 @@ Aulib::AudioDecoderFluidSynth::~AudioDecoderFluidSynth() = default;
 
 int Aulib::AudioDecoderFluidSynth::loadSoundfont(const std::string& filename)
 {
-    fluid_synth_sfload(d->fSynth.get(), filename.c_str(), 1);
+    if (fluid_synth_sfload(d->fSynth.get(), filename.c_str(), 1) == FLUID_FAILED) {
+        SDL_SetError("FluidSynth failed to load soundfont.");
+        return -1;
+    }
     return 0;
 }
 
 int Aulib::AudioDecoderFluidSynth::loadSoundfont(SDL_RWops* rwops)
 {
+    if (rwops == nullptr) {
+        SDL_SetError("rwops is null.");
+        return -1;
+    }
+
     auto closeRwops = [rwops] {
         if (SDL_RWclose(rwops) != 0) {
             AM_warnLn("failed to close rwops: " << SDL_GetError());
