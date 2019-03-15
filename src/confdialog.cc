@@ -11,6 +11,7 @@
 #include <QStyle>
 #ifndef DISABLE_AUDIO
 #include "oplvolumebooster.h"
+#include "synthfactory.h"
 #include <Aulib/AudioDecoderAdlmidi.h>
 #include <Aulib/AudioDecoderFluidsynth.h>
 #include <Aulib/AudioResamplerSpeex.h>
@@ -390,20 +391,16 @@ void ConfDialog::playTestMidi()
     std::shared_ptr<OplVolumeBooster> processor;
 #if USE_DEC_ADLMIDI
     if (ui_->adlibRadioButton->isChecked()) {
-        auto adldec = std::make_unique<Aulib::AudioDecoderAdlmidi>();
         fsynth_dec_ = nullptr;
-        decoder = std::move(adldec);
+        decoder = makeAdlmidiDec();
         processor = std::make_shared<OplVolumeBooster>();
     } else {
 #endif
-        auto fsdec = std::make_unique<Aulib::AudioDecoderFluidSynth>();
-        if (not ui_->soundFontGroupBox->isChecked() or ui_->soundFontLineEdit->text().isEmpty()) {
-            QResource sf2Res(":/soundfont.sf2");
-            fsdec->loadSoundfont(SDL_RWFromConstMem(sf2Res.data(), sf2Res.size()));
-        } else {
-            fsdec->loadSoundfont(ui_->soundFontLineEdit->text().toStdString());
+        QString soundfont;
+        if (ui_->soundFontGroupBox->isChecked() and not ui_->soundFontLineEdit->text().isEmpty()) {
+            soundfont = ui_->soundFontLineEdit->text();
         }
-        fsdec->setGain(ui_->gainSpinBox->value());
+        auto fsdec = makeFluidsynthDec(soundfont, ui_->gainSpinBox->value());
         fsynth_dec_ = fsdec.get();
         decoder = std::move(fsdec);
 #if USE_DEC_ADLMIDI

@@ -69,11 +69,13 @@ static:DEFINES += STATIC_QT
         $$files(SDL_audiolib/include/Aulib/*.h) \
         $$files(SDL_audiolib/src/*.h) \
         $$files(SDL_audiolib/src/missing/*.h) \
-        src/oplvolumebooster.h
+        src/oplvolumebooster.h \
+        src/synthfactory.h
 
     SOURCES += \
         src/soundaulib.cc \
         src/oplvolumebooster.cc \
+        src/synthfactory.cc \
         SDL_audiolib/resampler/resample.c \
         SDL_audiolib/src/missing/sdl_load_file_rw.c \
         SDL_audiolib/src/AudioDecoder.cpp \

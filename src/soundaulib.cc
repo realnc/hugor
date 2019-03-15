@@ -29,6 +29,7 @@ extern "C" {
 #include "oplvolumebooster.h"
 #include "rwopsbundle.h"
 #include "settings.h"
+#include "synthfactory.h"
 
 // Current music and sample volumes. Needed to restore the volumes after muting them.
 static int currentMusicVol = 100;
@@ -140,20 +141,6 @@ bool isSamplePlaying()
     return sampleStream() and sampleStream()->isPlaying();
 }
 
-static std::unique_ptr<Aulib::AudioDecoderFluidSynth> createFsynth()
-{
-    auto fsdec = std::make_unique<Aulib::AudioDecoderFluidSynth>();
-    if (hApp->settings()->soundfont.isEmpty() or not hApp->settings()->use_custom_soundfont) {
-        QResource sf2Res(":/soundfont.sf2");
-        auto* sf2_rwops = SDL_RWFromConstMem(sf2Res.data(), sf2Res.size());
-        fsdec->loadSoundfont(sf2_rwops);
-    } else {
-        fsdec->loadSoundfont(hApp->settings()->soundfont.toStdString());
-    }
-    fsdec->setGain(hApp->settings()->synth_gain);
-    return fsdec;
-}
-
 static bool playStream(HUGO_FILE infile, long reslength, char loop_flag, bool isMusic)
 {
     if ((isMusic and not hApp->settings()->enable_music)
@@ -186,13 +173,15 @@ static bool playStream(HUGO_FILE infile, long reslength, char loop_flag, bool is
         case MIDI_R: {
 #if USE_DEC_ADLMIDI
             if (hApp->settings()->use_adlmidi) {
-                auto dec = std::make_unique<Aulib::AudioDecoderAdlmidi>();
+                decoder = makeAdlmidiDec();
                 fsynthDec() = nullptr;
-                decoder = std::move(dec);
                 processor = std::make_shared<OplVolumeBooster>();
             } else {
 #endif
-                auto dec = createFsynth();
+                const auto& soundfont = hApp->settings()->use_custom_soundfont
+                                            ? hApp->settings()->soundfont
+                                            : QString();
+                auto dec = makeFluidsynthDec(soundfont, hApp->settings()->synth_gain);
                 fsynthDec() = dec.get();
                 decoder = std::move(dec);
 #if USE_DEC_ADLMIDI
