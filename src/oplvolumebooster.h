@@ -10,7 +10,7 @@ class OplVolumeBooster final: public Aulib::Processor
 {
     void process(float dest[], const float source[], int len) override
     {
-        std::transform(source, source + len, dest, [](float sample) { return sample * 2.f; });
+        std::transform(source, source + len, dest, [](float sample) { return sample * 2.5f; });
     }
 };
 
