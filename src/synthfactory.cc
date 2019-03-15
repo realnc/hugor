@@ -3,6 +3,7 @@
 
 #include "Aulib/AudioDecoderAdlmidi.h"
 #include "Aulib/AudioDecoderFluidsynth.h"
+#include <QByteArray>
 #include <QResource>
 #include <SDL_rwops.h>
 
@@ -25,7 +26,16 @@ std::unique_ptr<Aulib::AudioDecoderFluidSynth> makeFluidsynthDec(const QString& 
 #if USE_DEC_ADLMIDI
 std::unique_ptr<Aulib::AudioDecoderAdlmidi> makeAdlmidiDec()
 {
-    return std::make_unique<Aulib::AudioDecoderAdlmidi>();
+    auto decoder = std::make_unique<Aulib::AudioDecoderAdlmidi>();
+    QResource res(":/genmidi_gs.wopl");
+    const QByteArray data = res.isCompressed()
+                                ? qUncompress(res.data(), res.size())
+                                : QByteArray::fromRawData((const char*)res.data(), res.size());
+
+    decoder->setEmulator(Aulib::AudioDecoderAdlmidi::Emulator::Dosbox);
+    decoder->setChipAmount(6);
+    decoder->loadBank(SDL_RWFromConstMem(data.constData(), data.size()));
+    return decoder;
 }
 #endif
 
