@@ -66,6 +66,7 @@ static:DEFINES += STATIC_QT
         OUTSIDE_SPEEX
 
     HEADERS += \
+        $$files(SDL_audiolib/include/*.h) \
         $$files(SDL_audiolib/include/Aulib/*.h) \
         $$files(SDL_audiolib/src/*.h) \
         $$files(SDL_audiolib/src/missing/*.h) \
