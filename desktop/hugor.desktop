@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Hugor
+Type=Application
+Comment=Multimedia interpreter for Hugo text adventures
+Exec=hugor
+TryExec=hugor
+Icon=hugor
+Categories=Game;
+GenericName=Hugo Interpreter
+MimeType=application/x-hugo-image;

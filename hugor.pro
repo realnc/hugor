@@ -268,7 +268,38 @@ SOURCES += \
     hugo/heset.c \
     hugo/stringfn.c
 
-OTHER_FILES += \
-    README \
+docs.files = NEWS README
+desktopfile.files = desktop/hugor.desktop
+desktopicon.files = desktop/hugor.png
+fileicons.files = desktop/hicolor
+mimefile.files = desktop/hugor.xml
+
+OTHER_FILES *= \
+    $$desktopfile.files \
+    $$desktopicon.files \
+    $$docs.files \
+    $$fileicons.files \
+    $$mimefile.files \
+    LICENSE \
     README.linux-bin \
-    w32_linkscript
+    example.cfg
+
+unix : !macos {
+    isEmpty(PREFIX) {
+        PREFIX = /usr/local
+    }
+    isEmpty(BINDIR) {
+        BINDIR = "$$PREFIX/bin"
+    }
+    isEmpty(DATADIR) {
+        DATADIR = "$$PREFIX/share"
+    }
+
+    target.path = "$$BINDIR"
+    desktopfile.path = "$$DATADIR/applications"
+    desktopicon.path = "$$DATADIR/pixmaps"
+    fileicons.path = "$$DATADIR/icons"
+    mimefile.path = "$$DATADIR/mime/packages"
+    docs.path = "$$DATADIR/doc/$$TARGET-$$VERSION"
+    INSTALLS += desktopfile desktopicon mimefile fileicons docs target
+}
