@@ -294,12 +294,15 @@ unix : !macos {
     isEmpty(DATADIR) {
         DATADIR = "$$PREFIX/share"
     }
+    isEmpty(DOCDIR) {
+        DOCDIR = "$$DATADIR/doc/$$TARGET-$$VERSION"
+    }
 
     target.path = "$$BINDIR"
     desktopfile.path = "$$DATADIR/applications"
     desktopicon.path = "$$DATADIR/pixmaps"
     fileicons.path = "$$DATADIR/icons"
     mimefile.path = "$$DATADIR/mime/packages"
-    docs.path = "$$DATADIR/doc/$$TARGET-$$VERSION"
+    docs.path = "$$DOCDIR"
     INSTALLS += desktopfile desktopicon mimefile fileicons docs target
 }
