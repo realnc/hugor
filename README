@@ -21,9 +21,13 @@ The source code is hosted at:
 
   https://github.com/realnc/hugor
 
-If you have questions, you can use the intfiction.org forums:
+If you have questions, you can use the intfiction.org forum:
 
-  https://www.intfiction.org/forum
+  https://www.intfiction.org
+
+or the Jolt Country forum:
+
+  https://www.joltcountry.com/phpBB3
 
 
 Installing on Gentoo Linux
@@ -42,6 +46,10 @@ You can then emerge Hugor like any other package:
 
 Compiling from source
 =====================
+
+(NOTE: These instructions are for Unix systems (Linux, macOS, *BSD, etc.)
+On Windows, you're on your own. The official Windows binary for Hugor is
+built in Linux, using an MXE [https://mxe.cc] toolchain.)
 
 If you wish to build from source, you will need the development packages
 for the Qt library (version 5.6 or later.)
@@ -68,8 +76,8 @@ When using GStreamer instead of LibVLC, you will need the correct
 GStreamer plugins/codecs installed and their development files. Having the
 ffmpeg or libav plugin installed should be enough.
 
-If all dependencies are available, you can build Hugor with the following
-commands:
+If all dependencies are available, you can build and install Hugor with
+the following commands:
 
   qmake
   make -jN
@@ -79,6 +87,20 @@ system in order to utilize all of them for a faster compilation process.
 
 This will build Hugor with audio and video support, with LibVLC as the
 video backend and libopenmpt as the MOD music backend.
+
+On macOS, this will create an application bundle (Hugor.app) that you can
+run. You can also move it into /Applications. You might want to run the
+"macdeployqt" command-line tool (comes with Qt) on the app bundle in order
+to copy needed libraries into it.
+
+On other Unix systems, you can install into /usr/local with:
+
+  make install
+
+To specify a different path, you should pass PREFIX to qmake prior to
+installing:
+
+  qmake PREFIX=/some/other/directory
 
 To disable audio support, use:
 
@@ -105,5 +127,9 @@ The recognized config options are:
   disable-audio  - Disable audio support
   disable-video  - Disable video support
 
-If all goes well, you will find an executable in the current directory
-which you can copy somewhere else.
+The recognized installation directory options are:
+
+  PREFIX   - Install prefix. Default is /usr/local.
+  BINDIR   - Default is PREFIX/bin.
+  DATADIR  - Default is PREFIX/share.
+  DOCDIR   - Default is DATADIR/doc/hugor-version

@@ -1,4 +1,4 @@
-Git - 2019-03-10
+Git - 2019-03-17
 ================
 
   - Improved SDL audio engine, using SDL_audiolib instead of SDL_mixer.
@@ -9,8 +9,8 @@ Git - 2019-03-10
     speed.
 
     MIDI music is now rendered using an internal SoundFont synthesizer
-    (FluidSynth) or an OPL3 emulator (Nuked OPL3 through libADLMIDI) and thus it
-    no longer matters whether or not the operating system supports MIDI. For
+    (FluidSynth) or an OPL3 emulator (DOSBOX OPL through libADLMIDI) and thus
+    it no longer matters whether or not the operating system supports MIDI. For
     FluidSynth, you can use your own SoundFont instead of the default one.
 
     Higher quality and more accurate playback of MOD-based music through
@@ -57,6 +57,9 @@ Git - 2019-03-10
 
   - Fullscreen mode is now restored correctly between sessions.
 
+  - Alt+Enter and Alt+Return can now be used on all platforms to toggle
+    fullscreen mode, in addition to the platform-specific shortcuts.
+
   - The margin color auto-detection when in fullscreen mode can now be disabled
     and a custom color can be manually configured.
 
@@ -70,6 +73,10 @@ Git - 2019-03-10
     wrapping.
 
   - The scrollback font is now configurable.
+
+  - A new "show scrollback when using scrollwheel" configuration option
+    controls whether or not the scrollback is shown when trying to scroll with
+    the mouse wheel.
 
   - Scriptfile output can now be word-wrapped. The text width to use when
     wrapping is configurable through a new configuration option.
@@ -86,21 +93,27 @@ Git - 2019-03-10
 
   - Pasting words on double-click now only works with the left mouse button.
 
+  - Images are now always scaled using bilinear filtering and the "smooth image
+    scaling" option has been removed from the preferences dialog.
+
   - Support for game-specific start-up configuration files. See the
     "example.cfg" file for details.
 
   - The Hugo base code was updated, fixing rare cases of crashes and failures to
     restore saved games.
 
+  - When building from source, you can now do "make install", which installs to
+    /usr/local by default. See README on how to change the default path.
+
+  - At least Qt 5.6 and SDL 2 are now required to build Hugor. Qt 4 and SDL 1
+    are no longer supported.
+
+  - Building the source code now requires at least a C++14 compiler.
+
   - Hugor is now licensed under the GNU General Public License version 3, along
     with an additional permission to combine and distribute it together with the
     Hugo Engine. (The special permission is needed, since the Hugo Engine uses a
     license that is not compatible with the GPL.)
-
-  - Qt version 5.6 or higher is now required to build Hugor. Qt 4 is no longer
-    supported.
-
-  - Building the source code now requires at least a C++14 compiler.
 
 
 1.0 - 2012-08-15
