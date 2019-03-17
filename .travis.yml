@@ -120,5 +120,5 @@ script:
       fi
     - make -j2
     - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-        sudo make install
+        sudo make install;
       fi
