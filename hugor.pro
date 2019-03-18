@@ -54,9 +54,9 @@ static:DEFINES += STATIC_QT
     }
 
     adlmidi {
+        PKGCONFIG += libADLMIDI
         DEFINES += USE_DEC_ADLMIDI=1
         SOURCES += SDL_audiolib/src/AudioDecoderAdlmidi.cpp
-        LIBS += -lADLMIDI
     }
 
     DEFINES += \
