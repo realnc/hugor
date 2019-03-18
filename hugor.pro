@@ -120,7 +120,6 @@ contains(QT_MAJOR_VERSION, 5):lessThan(QT_MINOR_VERSION, 6) {
             src/videoplayergst_p.h
 
         SOURCES += \
-            src/gstinit.cc \
             src/videoplayergst.cc \
             src/videoplayergst_p.cc
     }
@@ -177,12 +176,6 @@ win32 {
     QMAKE_TARGET_COPYRIGHT = "Copyright 2006, Kent Tessman; 2011-2019, Nikos Chantziaras"
 
     !disable-video {
-        gstreamer-0 {
-            error("GStreamer 0.10 is not supported on Windows. You need GStreamer 1.x.")
-        }
-        gstreamer-1 {
-            include(gstreamer-static.pri)
-        }
         qt5-video {
             QTPLUGIN += dsengine
         }

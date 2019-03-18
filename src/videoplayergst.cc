@@ -4,6 +4,7 @@
 
 #include <QDebug>
 #include <QErrorMessage>
+#include <QMessageBox>
 #include <QResizeEvent>
 #include <SDL_rwops.h>
 #include <cmath>
@@ -27,6 +28,27 @@
 
 static bool isMuted = false;
 static VideoPlayer* currentVideo = nullptr;
+
+void initVideoEngine(int& argc, char* argv[])
+{
+    GError* gstError = nullptr;
+
+    if (not gst_init_check(&argc, &argv, &gstError)) {
+        QString errMsg(
+            QObject::tr("Unable to use GStreamer. Video support will be "
+                        "disabled."));
+        if (gstError->message != nullptr && qstrlen(gstError->message) > 0) {
+            errMsg += QObject::tr("The GStreamer error was: ")
+                      + QString::fromLocal8Bit(gstError->message);
+        }
+        g_error_free(gstError);
+        QMessageBox::critical(nullptr, HApplication::applicationName(), errMsg);
+        hApp->settings()->video_sys_error = true;
+    }
+}
+
+void closeVideoEngine()
+{}
 
 void muteVideo(bool mute)
 {
