@@ -11,6 +11,9 @@ VERSION_PATCH = 99
 VERSION = "$$VERSION_MAJOR"."$$VERSION_MINOR"."$$VERSION_PATCH"
 DEFINES += HUGOR_VERSION=\\\"$$VERSION\\\"
 
+lessThan(QT_MAJOR_VERSION, 5) {
+    error(Qt 4 is not supported. You need at least Qt 5.6.)
+}
 contains(QT_MAJOR_VERSION, 5):lessThan(QT_MINOR_VERSION, 6) {
     error(Qt 5.6 or higher is required. You are using Qt "$$QT_MAJOR_VERSION"."$$QT_MINOR_VERSION")
 }
@@ -19,8 +22,6 @@ contains(QT_MAJOR_VERSION, 5):lessThan(QT_MINOR_VERSION, 6) {
 #QMAKE_CFLAGS += $$SANITIZER_FLAGS
 #QMAKE_CXXFLAGS += $$SANITIZER_FLAGS
 #QMAKE_LFLAGS += $$SANITIZER_FLAGS
-
-static:DEFINES += STATIC_QT
 
 !disable-audio {
     CONFIG(debug, release|debug) {
