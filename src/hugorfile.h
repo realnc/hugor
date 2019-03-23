@@ -5,23 +5,31 @@
 struct HugorFile final
 {
 public:
-    HugorFile(FILE* handle)
+    explicit HugorFile(FILE* const handle) noexcept
         : handle_(handle)
     {}
 
-    ~HugorFile()
+    ~HugorFile() noexcept
     {
         close();
     }
 
     HugorFile(const HugorFile&) = delete;
+    HugorFile& operator=(const HugorFile&) = delete;
 
-    FILE* get() const
+    FILE* get() const noexcept
     {
         return handle_;
     }
 
-    int close()
+    FILE* release() noexcept
+    {
+        auto* tmp = handle_;
+        handle_ = nullptr;
+        return tmp;
+    }
+
+    int close() noexcept
     {
         if (handle_ == nullptr) {
             return 0;

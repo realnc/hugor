@@ -250,6 +250,7 @@ SOURCES += \
     src/hugohandlers.cc \
     src/opcodeparser.cc \
     src/extcolors.cc \
+    src/hugorfile.cc \
     \
     hugo/he.c \
     hugo/hebuffer.c \
