@@ -221,7 +221,10 @@ VideoPlayer::~VideoPlayer()
 
 bool VideoPlayer::loadVideo(FILE* src, long len, bool loop)
 {
-    if (d_->vlc_player != nullptr and libvlc_media_player_is_playing(d_->vlc_player.get())) {
+    if (d_->vlc_instance == nullptr or d_->vlc_player == nullptr) {
+        return false;
+    }
+    if (libvlc_media_player_is_playing(d_->vlc_player.get())) {
         stop();
     }
 
