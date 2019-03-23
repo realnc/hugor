@@ -3,8 +3,9 @@
 #ifndef DISABLE_VIDEO
 #include <QWidget>
 
-struct SDL_RWops;
 class VideoPlayer_priv;
+struct HugorFile;
+struct SDL_RWops;
 
 class VideoPlayer final: public QWidget
 {
@@ -14,7 +15,7 @@ public:
     VideoPlayer(QWidget* parent = nullptr);
     ~VideoPlayer() override;
 
-    bool loadVideo(FILE* src, long len, bool loop);
+    bool loadVideo(HugorFile* src, long len, bool loop);
 
 public slots:
     void play();

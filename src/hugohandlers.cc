@@ -244,10 +244,6 @@ void HugoHandlers::displaypicture(HUGO_FILE infile, long len, int* result) const
     const auto dpr = hMainWin->windowHandle()->devicePixelRatio();
     img.setDevicePixelRatio(dpr);
 
-    // Done with the file.
-    file.close();
-    delete infile;
-
     // Scale the image, if needed.
     QSize imgSize(img.size());
     if (img.width() > physical_windowwidth) {
@@ -294,7 +290,7 @@ void HugoHandlers::playvideo(HUGO_FILE infile, long len, char loop, char bg, int
             return;
         }
     }
-    if (not vid_player_->loadVideo(infile->get(), len, loop)) {
+    if (not vid_player_->loadVideo(infile, len, loop)) {
         *result = false;
         return;
     }

@@ -22,6 +22,7 @@
 #include "happlication.h"
 #include "hframe.h"
 #include "hmainwindow.h"
+#include "hugorfile.h"
 #include "rwopsbundle.h"
 #include "settings.h"
 #include "videoplayergst_p.h"
@@ -127,7 +128,7 @@ static void cbOnSourceSetup(GstPipeline* /*pipeline*/, GstAppSrc* source, gpoint
 
 } // extern "C"
 
-bool VideoPlayer::loadVideo(FILE* src, long len, bool loop)
+bool VideoPlayer::loadVideo(HugorFile* src, long len, bool loop)
 {
     if (d_->pipeline == nullptr) {
         const char* playbinName =
@@ -165,12 +166,13 @@ bool VideoPlayer::loadVideo(FILE* src, long len, bool loop)
     if (rwops_ != nullptr) {
         SDL_RWclose(rwops_);
     }
-    rwops_ = RWFromMediaBundle(src, len);
+    rwops_ = RWFromMediaBundle(src->get(), len);
     if (rwops_ == nullptr) {
         hMainWin->errorMsgObj()->showMessage(tr("Unable to read video data from disk: ")
                                              + SDL_GetError());
         return false;
     }
+    src->release();
     data_len = len;
     is_looping = loop;
     g_object_set(G_OBJECT(d_->pipeline), "uri", "appsrc://", NULL);

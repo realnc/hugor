@@ -297,8 +297,7 @@ int hugo_overwrite(char* /*f*/)
 
 static bool ctrlFileInWriteMode = false;
 
-HUGO_FILE
-hugo_fopen(const char* path, const char* mode)
+HUGO_FILE hugo_fopen(const char* path, const char* mode)
 {
     if (QString(path).endsWith(CHECK_FNAME)) {
         if (mode[0] == 'r') {
@@ -860,6 +859,7 @@ int hugo_displaypicture(HUGO_FILE infile, long len)
 {
     int result;
     runInMainThread([infile, len, &result] { hHandlers->displaypicture(infile, len, &result); });
+    delete infile;
     return result;
 }
 
@@ -869,6 +869,7 @@ int hugo_playmusic(HUGO_FILE infile, long len, char loop_flag)
     runInMainThread([infile, len, loop_flag, &result] {
         hHandlers->playmusic(infile, len, loop_flag, &result);
     });
+    delete infile;
     return result;
 }
 
@@ -888,6 +889,7 @@ int hugo_playsample(HUGO_FILE infile, long len, char loop_flag)
     runInMainThread([infile, len, loop_flag, &result] {
         hHandlers->playsample(infile, len, loop_flag, &result);
     });
+    delete infile;
     return result;
 }
 
@@ -919,7 +921,7 @@ void hugo_stopvideo(void)
 
 int hugo_playvideo(HUGO_FILE infile, long, char, char, int)
 {
-    hugo_fclose(infile);
+    delete infile;
     return true;
 }
 
@@ -950,6 +952,7 @@ int hugo_playvideo(HUGO_FILE infile, long len, char loop, char bg, int vol)
     runInMainThread([infile, len, loop, bg, vol, &result] {
         hHandlers->playvideo(infile, len, loop, bg, vol, &result);
     });
+    delete infile;
     return result;
 }
 

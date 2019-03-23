@@ -14,6 +14,7 @@
 
 #include "happlication.h"
 #include "hmainwindow.h"
+#include "hugorfile.h"
 #include "rwopsbundle.h"
 #include "settings.h"
 #include "util.h"
@@ -219,7 +220,7 @@ VideoPlayer::~VideoPlayer()
     video_player = nullptr;
 }
 
-bool VideoPlayer::loadVideo(FILE* src, long len, bool loop)
+bool VideoPlayer::loadVideo(HugorFile* src, long len, bool loop)
 {
     if (d_->vlc_instance == nullptr or d_->vlc_player == nullptr) {
         return false;
@@ -229,7 +230,7 @@ bool VideoPlayer::loadVideo(FILE* src, long len, bool loop)
     }
 
     SDL_ClearError();
-    auto* rwops = RWFromMediaBundle(src, len);
+    auto* rwops = RWFromMediaBundle(src->get(), len);
     if (rwops == nullptr) {
         QString msg(QLatin1String("Failed to open video data"));
         if (strlen(SDL_GetError()) == 0) {
@@ -240,6 +241,7 @@ bool VideoPlayer::loadVideo(FILE* src, long len, bool loop)
         hMainWin->errorMsgObj()->showMessage(msg);
         return false;
     }
+    src->release();
 
     auto* media = libvlc_media_new_callbacks(d_->vlc_instance.get(), vlcOpenCb, vlcReadCb,
                                              vlcSeekCb, vlcCloseCb, rwops);

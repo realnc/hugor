@@ -34,10 +34,9 @@ bool isSamplePlaying()
     return false;
 }
 
-void HugoHandlers::playmusic(HUGO_FILE infile, long /*reslength*/, char /*loop_flag*/,
+void HugoHandlers::playmusic(HUGO_FILE /*infile*/, long /*reslength*/, char /*loop_flag*/,
                              int* result) const
 {
-    delete infile;
     *result = false;
 }
 
@@ -47,10 +46,9 @@ void HugoHandlers::musicvolume(int /*vol*/) const
 void HugoHandlers::stopmusic() const
 {}
 
-void HugoHandlers::playsample(HUGO_FILE infile, long /*reslength*/, char /*loop_flag*/,
+void HugoHandlers::playsample(HUGO_FILE /*infile*/, long /*reslength*/, char /*loop_flag*/,
                               int* result) const
 {
-    delete infile;
     *result = false;
 }
 

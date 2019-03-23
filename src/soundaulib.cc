@@ -145,7 +145,6 @@ static bool playStream(HUGO_FILE infile, long reslength, char loop_flag, bool is
 {
     if ((isMusic and not hApp->settings()->enable_music)
         or (not isMusic and not hApp->settings()->enable_sound_effects)) {
-        delete infile;
         return false;
     }
 
@@ -162,9 +161,9 @@ static bool playStream(HUGO_FILE infile, long reslength, char loop_flag, bool is
     SDL_RWops* rwops = RWFromMediaBundle(infile->get(), reslength);
     if (rwops == nullptr) {
         qWarning() << "ERROR:" << SDL_GetError();
-        delete infile;
         return false;
     }
+    infile->release();
 
     if (not isMusic) {
         decoder = std::make_unique<Aulib::AudioDecoderSndfile>();
