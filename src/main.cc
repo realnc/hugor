@@ -35,6 +35,9 @@ int main(int argc, char* argv[])
     QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     HApplication app(argc, argv, "Hugor", HUGOR_VERSION, "Nikos Chantziaras", "");
     QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
+#if QT_VERSION >= QT_VERSION_CHECK(5, 7, 0)
+    QApplication::setDesktopFileName("nikos.chantziaras.hugor");
+#endif
 
     initSoundEngine();
     initVideoEngine(argc, argv);
