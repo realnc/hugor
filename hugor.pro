@@ -264,7 +264,7 @@ SOURCES += \
     hugo/stringfn.c
 
 docs.files = NEWS README
-desktopfile.files = desktop/hugor.desktop
+desktopfile.files = desktop/nikos.chantziaras.hugor.desktop
 desktopicon.files = desktop/hugor.png
 fileicons.files = desktop/hicolor
 mimefile.files = desktop/hugor.xml
@@ -295,7 +295,7 @@ unix : !macos {
 
     target.path = "$$BINDIR"
     desktopfile.path = "$$DATADIR/applications"
-    desktopicon.path = "$$DATADIR/pixmaps"
+    desktopicon.path = "$$DATADIR/icons/hicolor/256x256/apps"
     fileicons.path = "$$DATADIR/icons"
     mimefile.path = "$$DATADIR/mime/packages"
     docs.path = "$$DOCDIR"

@@ -1,10 +1,11 @@
 [Desktop Entry]
-Name=Hugor
+Version=1.1
 Type=Application
+Name=Hugor
+GenericName=Hugo Interpreter
 Comment=Multimedia interpreter for Hugo text adventures
-Exec=hugor
+Exec=hugor %f
 TryExec=hugor
 Icon=hugor
 Categories=Game;
-GenericName=Hugo Interpreter
 MimeType=application/x-hugo-image;
