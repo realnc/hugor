@@ -118,10 +118,8 @@ Git - 2019-03-24
 
   - Building the source code now requires at least a C++14 compiler.
 
-  - Hugor is now licensed under the GNU General Public License version 3, along
-    with an additional permission to combine and distribute it together with the
-    Hugo Engine. (The special permission is needed, since the Hugo Engine uses a
-    license that is not compatible with the GPL.)
+  - Hugor is now licensed under the GNU General Public License version 3, and
+    the Hugo base code under the BSD 2-Clause "Simplified" License.
 
 
 1.0 - 2012-08-15
