@@ -276,6 +276,7 @@ OTHER_FILES *= \
     $$fileicons.files \
     $$mimefile.files \
     LICENSE \
+    hugo/LICENSE.TXT \
     example.cfg
 
 unix : !macos {
