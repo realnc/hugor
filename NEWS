@@ -1,4 +1,4 @@
-Git - 2019-03-17
+Git - 2019-03-24
 ================
 
   - Improved SDL audio engine, using SDL_audiolib instead of SDL_mixer.
@@ -28,6 +28,14 @@ Git - 2019-03-17
   - The behavior of the "mute sound in background" setting has been changed. It
     now only mutes the sound when the application is minimized, not when it
     loses focus.
+
+  - The line spacing of the chosen fonts is now respected. Text should be more
+    readable as a result.
+
+  - Text kerning is now disabled. The Hugo engine can't deal with kerning
+    correctly, which would previously result in text lines that are often too
+    short and with excessive amounts of space between words when text style or
+    color changes are involved.
 
   - Video is now fully supported in the Linux, macOS and Windows versions of
     Hugor. The default video backend is libVLC, but you can optionally use
