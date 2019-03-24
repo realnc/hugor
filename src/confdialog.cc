@@ -315,6 +315,7 @@ void ConfDialog::applySettings()
     sett->custom_fs_margin_color = ui_->customFsMarginColorCheckBox->isChecked();
     sett->fs_margin_color = ui_->fsMarginColorButton->color();
     sett->prop_font = ui_->mainFontBox->currentFont();
+    sett->prop_font.setKerning(false);
     sett->fixed_font = ui_->fixedFontBox->currentFont();
     sett->scrollback_font = ui_->scrollbackFontBox->currentFont();
     sett->prop_font.setPointSize(ui_->mainFontSizeSpinBox->value());

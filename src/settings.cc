@@ -117,6 +117,7 @@ void Settings::loadFromDisk(SettingsOverrides* ovr)
     tmp.fromString(sett.value(SETT_MAIN_FONT, DEFAULT_PROP).toString());
     prop_font.setFamily(tmp.family());
     prop_font.setPointSize(tmp.pointSize());
+    prop_font.setKerning(false);
     fixed_font.setStyleStrategy(strat);
     tmp.fromString(sett.value(SETT_FIXED_FONT, DEFAULT_MONO).toString());
     fixed_font.setFamily(tmp.family());
