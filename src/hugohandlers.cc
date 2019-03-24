@@ -24,10 +24,10 @@ void HugoHandlers::calcFontDimensions() const
     const QFontMetrics fixedMetr(hApp->settings()->fixed_font);
 
     FIXEDCHARWIDTH = fixedMetr.averageCharWidth();
-    FIXEDLINEHEIGHT = fixedMetr.height();
+    FIXEDLINEHEIGHT = fixedMetr.lineSpacing();
 
     ::charwidth = curMetr.averageCharWidth();
-    lineheight = curMetr.height();
+    lineheight = curMetr.lineSpacing();
 }
 
 void HugoHandlers::getfilename(char* a, char* b) const
@@ -211,7 +211,7 @@ void HugoHandlers::font(int f) const
 {
     hFrame->setFontType(f);
     ::charwidth = hFrame->currentFontMetrics().averageCharWidth();
-    lineheight = hFrame->currentFontMetrics().height();
+    lineheight = hFrame->currentFontMetrics().lineSpacing();
 }
 
 void HugoHandlers::settextcolor(int c) const
