@@ -276,7 +276,6 @@ OTHER_FILES *= \
     $$fileicons.files \
     $$mimefile.files \
     LICENSE \
-    README.linux-bin \
     example.cfg
 
 unix : !macos {

@@ -9,9 +9,6 @@ Kent Tessman’s Hugo authoring system:
 All multimedia features of Hugo are supported: video, graphics, audio
 samples and music.
 
-(For runtime library dependencies of the distributed Linux binary, please
-consult the README.linux-bin file.)
-
 Hugor runs on all current major operating systems (Linux, MacOS and
 Microsoft Windows).  You can find binaries at:
 
