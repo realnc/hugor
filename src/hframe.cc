@@ -651,11 +651,23 @@ void HFrame::flushText()
     f.setItalic(use_italic_font_);
     f.setBold(use_bold_font_);
     QPainter p(&pixmap_);
+
+    // Manually fill the text background before drawing the text. We need this because
+    // QPainter::drawText() will not fill the whole height of the line.
+    p.save();
+    QPen pen;
+    pen.setColor(Qt::transparent); // workaround for rounded angles (Qt bug?)
+    pen.setCapStyle(Qt::FlatCap);
+    pen.setCosmetic(false);
+    p.setPen(pen);
+    p.setBrush(hugoColorToQt(bg_color_));
+    p.drawRect(flush_pos_x_, flush_pos_y_ + 1, currentFontMetrics().width(print_buf_),
+               currentFontMetrics().lineSpacing());
+    p.restore();
+
     p.setFont(f);
     p.setPen(hugoColorToQt(fg_color_));
-    p.setBackgroundMode(Qt::OpaqueMode);
-    p.setBackground(QBrush(hugoColorToQt(bg_color_)));
-    p.drawText(flush_pos_x_, flush_pos_y_ + currentFontMetrics().ascent() + 1, print_buf_);
+    p.drawText(flush_pos_x_, flush_pos_y_ + currentFontMetrics().ascent(), print_buf_);
     print_buf_.clear();
     need_screen_update_ = true;
 }
