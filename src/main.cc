@@ -32,7 +32,9 @@ int main(int argc, char* argv[])
     disableSomeMenuEntries();
 #endif
 
+#if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
     QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+#endif
     HApplication app(argc, argv, "Hugor", HUGOR_VERSION, "Nikos Chantziaras", "");
     QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 #if QT_VERSION >= QT_VERSION_CHECK(5, 7, 0)

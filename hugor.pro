@@ -12,10 +12,10 @@ VERSION = "$$VERSION_MAJOR"."$$VERSION_MINOR"."$$VERSION_PATCH"
 DEFINES += HUGOR_VERSION=\\\"$$VERSION\\\"
 
 lessThan(QT_MAJOR_VERSION, 5) {
-    error(Qt 4 is not supported. You need at least Qt 5.6.)
+    error(Qt 4 is not supported. You need at least Qt 5.5.)
 }
-contains(QT_MAJOR_VERSION, 5):lessThan(QT_MINOR_VERSION, 6) {
-    error(Qt 5.6 or higher is required. You are using Qt "$$QT_MAJOR_VERSION"."$$QT_MINOR_VERSION")
+contains(QT_MAJOR_VERSION, 5):lessThan(QT_MINOR_VERSION, 5) {
+    error(Qt 5.5 or higher is required. You are using Qt "$$QT_MAJOR_VERSION"."$$QT_MINOR_VERSION")
 }
 
 #SANITIZER_FLAGS = -fsanitize=undefined,integer -fno-omit-frame-pointer
