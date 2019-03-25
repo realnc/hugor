@@ -192,7 +192,7 @@ void HFrame::paintEvent(QPaintEvent* e)
         p.setPen(hugoColorToQt(fg_color_));
         p.setBackgroundMode(Qt::OpaqueMode);
         p.setBackground(QBrush(hugoColorToQt(bg_color_)));
-        p.drawText(input_start_x_, input_start_y_ + m.ascent() + 1, input_buf_);
+        p.drawText(input_start_x_, input_start_y_ + m.ascent(), input_buf_);
     }
 
     if (not is_cursor_visible_ or not is_blink_visible_) {
