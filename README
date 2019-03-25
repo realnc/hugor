@@ -49,7 +49,8 @@ On Windows, you're on your own. The official Windows binary for Hugor is
 built in Linux, using an MXE [https://mxe.cc] toolchain.)
 
 If you wish to build from source, you will need the development packages
-for the Qt library (version 5.6 or later.)
+for the Qt library. At least Qt 5.5 is required. 5.6 or newer is *highly*
+recommended, preferably 5.9 or newer.
 
 For audio support, you will need development files for:
 

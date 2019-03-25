@@ -113,8 +113,9 @@ Git - 2019-03-24
   - When building from source, you can now do "make install", which installs to
     /usr/local by default. See README on how to change the default path.
 
-  - At least Qt 5.6 and SDL 2 are now required to build Hugor. Qt 4 and SDL 1
-    are no longer supported.
+  - At least Qt 5.5 and SDL 2 are now required to build Hugor. Qt 4 and SDL 1
+    are no longer supported. It's recommended to use Qt 5.6 or newer though,
+    preferably 5.9 or newer.
 
   - Building the source code now requires at least a C++14 compiler.
 
