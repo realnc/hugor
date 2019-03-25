@@ -170,7 +170,7 @@ void HFrame::endInputMode(bool addToHistory)
     printText(input_buf_.toLatin1().constData(), input_start_x_, input_start_y_);
     inputLineWaitCond.wakeAll();
 }
-#include <cmath>
+
 void HFrame::paintEvent(QPaintEvent* e)
 {
     // qDebug(Q_FUNC_INFO);
