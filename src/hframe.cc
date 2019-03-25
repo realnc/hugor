@@ -586,7 +586,7 @@ void HFrame::setFontType(int hugoFont)
     f.setUnderline(use_underline_font_);
     f.setItalic(use_italic_font_);
     f.setBold(use_bold_font_);
-    font_metrics_ = QFontMetrics(f, &pixmap_);
+    font_metrics_ = QFontMetrics(f);
 
     // Adjust text caret for new font.
     updateCursorShape();
