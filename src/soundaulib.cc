@@ -203,10 +203,19 @@ static bool playStream(HUGO_FILE infile, long reslength, char loop_flag, bool is
             fsynthDec() = nullptr;
             break;
         }
-        case MP3_R:
-            decoder = std::make_unique<Aulib::AudioDecoderMpg123>();
+        case MP3_R: {
+            // A bug in the Hugo base code allows WAV files to be played in the music channel. The
+            // engine passes them as MP3_R. "Future Boy" is a known game that depends on this bug.
+            std::array<char, 5> head{};
+            if (SDL_RWread(rwops, head.data(), 1, 4) == 4 and head == decltype(head){"RIFF"}) {
+                decoder = std::make_unique<Aulib::AudioDecoderSndfile>();
+            } else {
+                decoder = std::make_unique<Aulib::AudioDecoderMpg123>();
+            }
+            SDL_RWseek(rwops, 0, RW_SEEK_SET);
             fsynthDec() = nullptr;
             break;
+        }
         default:
             qWarning() << "ERROR: Unknown music resource type";
             return false;
