@@ -37,20 +37,19 @@ HFrame::HFrame(QWidget* parent)
     // We handle player input, so we need to accept focus.
     setFocusPolicy(Qt::WheelFocus);
 
-    connect(blink_timer_, SIGNAL(timeout()), this, SLOT(blinkCursor()));
+    connect(blink_timer_, &QTimer::timeout, this, &HFrame::blinkCursor);
     resetCursorBlinking();
     // setCursorVisible(true);
 
     // We need to check whether the application lost focus.
-    connect(qApp, SIGNAL(focusChanged(QWidget*, QWidget*)),
-            SLOT(handleFocusChange(QWidget*, QWidget*)));
+    connect(qApp, &QApplication::focusChanged, this, &HFrame::handleFocusChange);
 
     minimize_timer_->setSingleShot(true);
-    connect(minimize_timer_, SIGNAL(timeout()), SLOT(handleFocusLost()));
+    connect(minimize_timer_, &QTimer::timeout, this, &HFrame::handleFocusLost);
 
     // Requesting scrollback simply triggers the scrollback window. Since focus is lost, subsequent
     // scrolling/paging events will work as expected.
-    connect(this, SIGNAL(requestScrollback()), hMainWin, SLOT(showScrollback()));
+    connect(this, &HFrame::requestScrollback, hMainWin, &HMainWindow::showScrollback);
 
     setAttribute(Qt::WA_InputMethodEnabled);
     setAttribute(Qt::WA_OpaquePaintEvent);
@@ -632,8 +631,8 @@ void HFrame::scrollUp(int left, int top, int right, int bottom, int h)
         QEventLoop idleLoop;
         QTimer timer;
         timer.setSingleShot(true);
-        QObject::connect(&timer, SIGNAL(timeout()), &idleLoop, SLOT(quit()));
-        QObject::connect(hApp, SIGNAL(gameQuitting()), &idleLoop, SLOT(quit()));
+        connect(&timer, &QTimer::timeout, &idleLoop, &QEventLoop::quit);
+        connect(hApp, &HApplication::gameQuitting, &idleLoop, &QEventLoop::quit);
         timer.start(12);
         idleLoop.exec();
     }

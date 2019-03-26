@@ -107,7 +107,7 @@ ConfDialog::ConfDialog(HMainWindow* parent)
     ui_->volumeSlider->setDisabled(true);
 #else
     ui_->volumeSlider->setValue(sett->sound_volume);
-    connect(ui_->volumeSlider, SIGNAL(valueChanged(int)), SLOT(setSoundVolume(int)));
+    connect(ui_->volumeSlider, &QSlider::valueChanged, this, &ConfDialog::setSoundVolume);
 #endif
     ui_->soundFontGroupBox->setChecked(sett->use_custom_soundfont);
     ui_->soundFontLineEdit->setText(sett->soundfont);
@@ -132,8 +132,8 @@ ConfDialog::ConfDialog(HMainWindow* parent)
     ui_->bannerBgColorButton->setColor(sett->status_bg_color);
     ui_->bannerTextColorButton->setColor(sett->status_text_color);
     ui_->fsMarginColorButton->setColor(sett->fs_margin_color);
-    connect(ui_->customFsMarginColorCheckBox, SIGNAL(toggled(bool)), ui_->fsMarginColorButton,
-            SLOT(setEnabled(bool)));
+    connect(ui_->customFsMarginColorCheckBox, &QCheckBox::toggled, ui_->fsMarginColorButton,
+            &KColorButton::setEnabled);
     ui_->customFsMarginColorCheckBox->setChecked(sett->custom_fs_margin_color);
 
     ui_->mainFontSizeSpinBox->setValue(sett->prop_font.pointSize());
@@ -191,10 +191,10 @@ ConfDialog::ConfDialog(HMainWindow* parent)
         // Assume KDE/MS Windows standards. No instant apply, and use OK/Apply/Cancel buttons.
         ui_->buttonBox->setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Apply
                                            | QDialogButtonBox::Cancel);
-        connect(ui_->buttonBox->button(QDialogButtonBox::Apply), SIGNAL(clicked()), this,
-                SLOT(applySettings()));
-        connect(this, SIGNAL(accepted()), this, SLOT(applySettings()));
-        connect(this, SIGNAL(rejected()), SLOT(cancel()));
+        connect(ui_->buttonBox->button(QDialogButtonBox::Apply), &QPushButton::clicked, this,
+                &ConfDialog::applySettings);
+        connect(this, &ConfDialog::accepted, this, &ConfDialog::applySettings);
+        connect(this, &ConfDialog::rejected, this, &ConfDialog::cancel);
     }
 #endif
 
@@ -226,41 +226,51 @@ void ConfDialog::changeEvent(QEvent* e)
 
 void ConfDialog::makeInstantApply()
 {
-    connect(ui_->mainFontBox, SIGNAL(currentFontChanged(QFont)), this, SLOT(applySettings()));
-    connect(ui_->fixedFontBox, SIGNAL(currentFontChanged(QFont)), this, SLOT(applySettings()));
-    connect(ui_->scrollbackFontBox, SIGNAL(currentFontChanged(QFont)), this, SLOT(applySettings()));
-    connect(ui_->mainFontSizeSpinBox, SIGNAL(valueChanged(int)), this, SLOT(applySettings()));
-    connect(ui_->fixedFontSizeSpinBox, SIGNAL(valueChanged(int)), this, SLOT(applySettings()));
-    connect(ui_->scrollbackFontSizeSpinBox, SIGNAL(valueChanged(int)), this, SLOT(applySettings()));
-    connect(ui_->softScrollCheckBox, SIGNAL(toggled(bool)), this, SLOT(applySettings()));
-    connect(ui_->smartFormattingCheckBox, SIGNAL(toggled(bool)), this, SLOT(applySettings()));
-    connect(ui_->marginSizeSpinBox, SIGNAL(valueChanged(int)), this, SLOT(applySettings()));
-    connect(ui_->fullscreenWidthSpinBox, SIGNAL(valueChanged(int)), this, SLOT(applySettings()));
-    connect(ui_->scriptWrapSpinBox, SIGNAL(valueChanged(int)), this, SLOT(applySettings()));
+    connect(ui_->mainFontBox, &QFontComboBox::currentFontChanged, this, &ConfDialog::applySettings);
+    connect(ui_->fixedFontBox, &QFontComboBox::currentFontChanged, this,
+            &ConfDialog::applySettings);
+    connect(ui_->scrollbackFontBox, &QFontComboBox::currentFontChanged, this,
+            &ConfDialog::applySettings);
+    connect(ui_->mainFontSizeSpinBox, qOverload<int>(&QSpinBox::valueChanged), this,
+            &ConfDialog::applySettings);
+    connect(ui_->fixedFontSizeSpinBox, qOverload<int>(&QSpinBox::valueChanged), this,
+            &ConfDialog::applySettings);
+    connect(ui_->scrollbackFontSizeSpinBox, qOverload<int>(&QSpinBox::valueChanged), this,
+            &ConfDialog::applySettings);
+    connect(ui_->softScrollCheckBox, &QCheckBox::toggled, this, &ConfDialog::applySettings);
+    connect(ui_->smartFormattingCheckBox, &QCheckBox::toggled, this, &ConfDialog::applySettings);
+    connect(ui_->marginSizeSpinBox, qOverload<int>(&QSpinBox::valueChanged), this,
+            &ConfDialog::applySettings);
+    connect(ui_->fullscreenWidthSpinBox, qOverload<int>(&QSpinBox::valueChanged), this,
+            &ConfDialog::applySettings);
+    connect(ui_->scriptWrapSpinBox, qOverload<int>(&QSpinBox::valueChanged), this,
+            &ConfDialog::applySettings);
     connect(ui_->cursorShapeComboBox, qOverload<int>(&QComboBox::currentIndexChanged), this,
             &ConfDialog::applySettings);
     connect(ui_->cursorThicknessComboBox, qOverload<int>(&QComboBox::currentIndexChanged), this,
             &ConfDialog::applySettings);
-    connect(ui_->allowGraphicsCheckBox, SIGNAL(toggled(bool)), this, SLOT(applySettings()));
-    connect(ui_->allowVideoCheckBox, SIGNAL(toggled(bool)), this, SLOT(applySettings()));
-    connect(ui_->allowSoundEffectsCheckBox, SIGNAL(toggled(bool)), this, SLOT(applySettings()));
-    connect(ui_->allowMusicCheckBox, SIGNAL(toggled(bool)), this, SLOT(applySettings()));
-    connect(ui_->muteWhenMinimizedCheckBox, SIGNAL(toggled(bool)), this, SLOT(applySettings()));
-    connect(ui_->volumeSlider, SIGNAL(valueChanged(int)), SLOT(applySettings()));
+    connect(ui_->allowGraphicsCheckBox, &QCheckBox::toggled, this, &ConfDialog::applySettings);
+    connect(ui_->allowVideoCheckBox, &QCheckBox::toggled, this, &ConfDialog::applySettings);
+    connect(ui_->allowSoundEffectsCheckBox, &QCheckBox::toggled, this, &ConfDialog::applySettings);
+    connect(ui_->allowMusicCheckBox, &QCheckBox::toggled, this, &ConfDialog::applySettings);
+    connect(ui_->muteWhenMinimizedCheckBox, &QCheckBox::toggled, this, &ConfDialog::applySettings);
+    connect(ui_->volumeSlider, &QSlider::valueChanged, this, &ConfDialog::applySettings);
     connect(ui_->soundFontGroupBox, &QGroupBox::toggled, this, &ConfDialog::applySettings);
     connect(ui_->soundFontLineEdit, &QLineEdit::textChanged, this, &ConfDialog::applySettings);
     connect(ui_->gainSpinBox, qOverload<double>(&QDoubleSpinBox::valueChanged), this,
             &ConfDialog::applySettings);
-    connect(ui_->adlibRadioButton, SIGNAL(toggled(bool)), this, SLOT(applySettings()));
-    connect(ui_->overlayScrollbackCheckBox, SIGNAL(toggled(bool)), this, SLOT(applySettings()));
-    connect(ui_->scrollWheelCheckBox, SIGNAL(toggled(bool)), this, SLOT(applySettings()));
-    connect(ui_->mainTextColorButton, SIGNAL(changed(QColor)), this, SLOT(applySettings()));
-    connect(ui_->mainBgColorButton, SIGNAL(changed(QColor)), this, SLOT(applySettings()));
-    connect(ui_->bannerTextColorButton, SIGNAL(changed(QColor)), this, SLOT(applySettings()));
-    connect(ui_->bannerBgColorButton, SIGNAL(changed(QColor)), this, SLOT(applySettings()));
-    connect(ui_->customFsMarginColorCheckBox, SIGNAL(toggled(bool)), this, SLOT(applySettings()));
-    connect(ui_->fsMarginColorButton, SIGNAL(changed(QColor)), this, SLOT(applySettings()));
-    connect(ui_->startInButtonGroup, SIGNAL(buttonClicked(int)), SLOT(applySettings()));
+    connect(ui_->adlibRadioButton, &QRadioButton::toggled, this, &ConfDialog::applySettings);
+    connect(ui_->overlayScrollbackCheckBox, &QCheckBox::toggled, this, &ConfDialog::applySettings);
+    connect(ui_->scrollWheelCheckBox, &QCheckBox::toggled, this, &ConfDialog::applySettings);
+    connect(ui_->mainTextColorButton, &KColorButton::changed, this, &ConfDialog::applySettings);
+    connect(ui_->mainBgColorButton, &KColorButton::changed, this, &ConfDialog::applySettings);
+    connect(ui_->bannerTextColorButton, &KColorButton::changed, this, &ConfDialog::applySettings);
+    connect(ui_->bannerBgColorButton, &KColorButton::changed, this, &ConfDialog::applySettings);
+    connect(ui_->customFsMarginColorCheckBox, &QCheckBox::toggled, this,
+            &ConfDialog::applySettings);
+    connect(ui_->fsMarginColorButton, &KColorButton::changed, this, &ConfDialog::applySettings);
+    connect(ui_->startInButtonGroup, qOverload<int>(&QButtonGroup::buttonClicked), this,
+            &ConfDialog::applySettings);
 }
 
 void ConfDialog::applySettings()

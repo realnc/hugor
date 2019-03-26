@@ -218,11 +218,11 @@ void HApplication::runGame()
         hugo_thread_->setObjectName("engine");
         engine_runner_ = new EngineRunner(gamefile_, hugo_thread_);
         engine_runner_->moveToThread(hugo_thread_);
-        connect(engine_runner_, SIGNAL(finished()), hugo_thread_, SLOT(quit()));
-        connect(hugo_thread_, SIGNAL(started()), engine_runner_, SLOT(runEngine()));
-        connect(hugo_thread_, SIGNAL(finished()), engine_runner_, SLOT(deleteLater()));
-        connect(hugo_thread_, SIGNAL(finished()), hugo_thread_, SLOT(deleteLater()));
-        connect(hugo_thread_, SIGNAL(finished()), SLOT(handleEngineFinished()));
+        connect(engine_runner_, &EngineRunner::finished, hugo_thread_, &EngineThread::quit);
+        connect(hugo_thread_, &QThread::started, engine_runner_, &EngineRunner::runEngine);
+        connect(hugo_thread_, &QThread::finished, engine_runner_, &EngineRunner::deleteLater);
+        connect(hugo_thread_, &QThread::finished, hugo_thread_, &EngineThread::deleteLater);
+        connect(hugo_thread_, &QThread::finished, this, &HApplication::handleEngineFinished);
         hugo_thread_->start();
     }
 }
@@ -316,7 +316,7 @@ void HApplication::entryPoint(QString gameFileName)
     }
 
     // Automatically quit the application when the last window has closed.
-    connect(this, SIGNAL(lastWindowClosed()), this, SLOT(quit()));
+    connect(this, &HApplication::lastWindowClosed, this, &HApplication::quit);
 
     // If we have a filename, load it.
     if (not next_game_.isEmpty()) {

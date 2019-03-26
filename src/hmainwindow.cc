@@ -53,7 +53,7 @@ HMainWindow::HMainWindow(QWidget* parent)
     act->setMenuRole(QAction::PreferencesRole);
     menu->addAction(act);
     addAction(act);
-    connect(act, SIGNAL(triggered()), SLOT(showConfDialog()));
+    connect(act, &QAction::triggered, this, &HMainWindow::showConfDialog);
     preferences_action_ = act;
 
     // "View" menu.
@@ -61,7 +61,7 @@ HMainWindow::HMainWindow(QWidget* parent)
     act = new QAction(tr("Show &Scrollback"), this);
     menu->addAction(act);
     addAction(act);
-    connect(act, SIGNAL(triggered()), SLOT(showScrollback()));
+    connect(act, &QAction::triggered, this, &HMainWindow::showScrollback);
     scrollback_action_ = act;
 
     act = new QAction(tr("Enter &Full Screen"), this);
@@ -93,7 +93,7 @@ HMainWindow::HMainWindow(QWidget* parent)
     menu->addAction(act);
 #endif
     addAction(act);
-    connect(act, SIGNAL(triggered()), SLOT(toggleFullscreen()));
+    connect(act, &QAction::triggered, this, &HMainWindow::toggleFullscreen);
     fullscreen_action_ = act;
 
     // "Help" menu.
@@ -102,7 +102,7 @@ HMainWindow::HMainWindow(QWidget* parent)
     act->setIcon(QIcon::fromTheme(QString::fromLatin1("help-about")));
     act->setMenuRole(QAction::AboutRole);
     menu->addAction(act);
-    connect(act, SIGNAL(triggered()), SLOT(showAbout()));
+    connect(act, &QAction::triggered, this, &HMainWindow::showAbout);
 
     // Handle "close window" shortcut.
     connect(new QShortcut(QKeySequence::Close, this), &QShortcut::activated, this,
@@ -152,7 +152,7 @@ void HMainWindow::showConfDialog()
     }
     conf_dialog_ = new ConfDialog(this);
     conf_dialog_->setWindowTitle(HApplication::applicationName() + ' ' + tr("Preferences"));
-    connect(conf_dialog_, SIGNAL(finished(int)), this, SLOT(hideConfDialog()));
+    connect(conf_dialog_, &ConfDialog::finished, this, &HMainWindow::hideConfDialog);
     conf_dialog_->show();
 }
 
@@ -174,7 +174,7 @@ void HMainWindow::showAbout()
     }
 
     about_dialog_ = new AboutDialog(this);
-    connect(about_dialog_, SIGNAL(finished(int)), SLOT(hideAbout()));
+    connect(about_dialog_, &AboutDialog::finished, this, &HMainWindow::hideAbout);
     about_dialog_->show();
 }
 
@@ -236,7 +236,7 @@ void HMainWindow::showScrollback()
                   + QKeySequence(QKeySequence::Close).toString(QKeySequence::NativeText)
                   + " or click here to exit</a>)</body></html>";
     banner->setText(bannerText);
-    connect(banner, SIGNAL(linkActivated(QString)), SLOT(hideScrollback()));
+    connect(banner, &QLabel::linkActivated, this, &HMainWindow::hideScrollback);
 
     hApp->marginWidget()->setBannerWidget(banner);
     hFrame->hide();

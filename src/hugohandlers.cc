@@ -300,10 +300,10 @@ void HugoHandlers::playvideo(HUGO_FILE infile, long len, char loop, char bg, int
                              physical_windowheight);
     if (not bg) {
         QEventLoop idleLoop;
-        QObject::connect(vid_player_, SIGNAL(videoFinished()), &idleLoop, SLOT(quit()));
-        QObject::connect(vid_player_, SIGNAL(errorOccurred()), &idleLoop, SLOT(quit()));
-        QObject::connect(hApp, SIGNAL(gameQuitting()), &idleLoop, SLOT(quit()));
-        QObject::connect(hFrame, SIGNAL(escKeyPressed()), &idleLoop, SLOT(quit()));
+        connect(vid_player_, &VideoPlayer::videoFinished, &idleLoop, &QEventLoop::quit);
+        connect(vid_player_, &VideoPlayer::errorOccurred, &idleLoop, &QEventLoop::quit);
+        connect(hApp, &HApplication::gameQuitting, &idleLoop, &QEventLoop::quit);
+        connect(hFrame, &HFrame::escKeyPressed, &idleLoop, &QEventLoop::quit);
         vid_player_->play();
         idleLoop.exec();
     } else {

@@ -12,6 +12,7 @@
 #include "hugorfile.h"
 #include "rwopsbundle.h"
 #include "rwopsqiodev.h"
+#include "util.h"
 #include "videoplayerqt5_p.h"
 
 void initVideoEngine(int& /*argc*/, char* /*argv*/[])
@@ -46,10 +47,10 @@ VideoPlayer::VideoPlayer(QWidget* parent)
     setMouseTracking(true);
     d_->setMouseTracking(true);
 
-    connect(d_->media_player, SIGNAL(mediaStatusChanged(QMediaPlayer::MediaStatus)), d_,
-            SLOT(onStatusChange(QMediaPlayer::MediaStatus)));
-    connect(d_->media_player, SIGNAL(error(QMediaPlayer::Error)), d_,
-            SLOT(onError(QMediaPlayer::Error)));
+    connect(d_->media_player, &QMediaPlayer::mediaStatusChanged, d_,
+            &VideoPlayer_priv::onStatusChange);
+    connect(d_->media_player, qOverload<QMediaPlayer::Error>(&QMediaPlayer::error), d_,
+            &VideoPlayer_priv::onError);
 }
 
 VideoPlayer::~VideoPlayer()
