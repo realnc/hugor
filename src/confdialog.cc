@@ -25,6 +25,7 @@
 #include "hugodefs.h"
 #include "settings.h"
 #include "ui_confdialog.h"
+#include "util.h"
 
 #ifndef DISABLE_AUDIO
 using namespace std::chrono_literals;
@@ -200,21 +201,10 @@ ConfDialog::ConfDialog(HMainWindow* parent)
     connect(ui_->midiPlayButton, &QPushButton::clicked, this, &ConfDialog::playTestMidi);
     connect(ui_->midiStopButton, &QPushButton::clicked, this, &ConfDialog::stopTestMidi);
     connect(ui_->soundFontPushButton, &QPushButton::clicked, this, &ConfDialog::browseForSoundFont);
-#if QT_VERSION >= QT_VERSION_CHECK(5, 7, 0)
     connect(ui_->gainSpinBox, qOverload<double>(&QDoubleSpinBox::valueChanged), this,
             &ConfDialog::setGain);
-#else
-    connect(ui_->gainSpinBox,
-            static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this,
-            &ConfDialog::setGain);
-#endif
-    connect(ui_->cursorShapeComboBox,
-#if QT_VERSION >= QT_VERSION_CHECK(5, 7, 0)
-            qOverload<int>(&QComboBox::currentIndexChanged),
-#else
-            static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-#endif
-            this, [this](int index) { ui_->cursorThicknessComboBox->setDisabled(index == 1); });
+    connect(ui_->cursorShapeComboBox, qOverload<int>(&QComboBox::currentIndexChanged), this,
+            [this](int index) { ui_->cursorThicknessComboBox->setDisabled(index == 1); });
 }
 
 ConfDialog::~ConfDialog()
@@ -247,20 +237,10 @@ void ConfDialog::makeInstantApply()
     connect(ui_->marginSizeSpinBox, SIGNAL(valueChanged(int)), this, SLOT(applySettings()));
     connect(ui_->fullscreenWidthSpinBox, SIGNAL(valueChanged(int)), this, SLOT(applySettings()));
     connect(ui_->scriptWrapSpinBox, SIGNAL(valueChanged(int)), this, SLOT(applySettings()));
-    connect(ui_->cursorShapeComboBox,
-#if QT_VERSION >= QT_VERSION_CHECK(5, 7, 0)
-            qOverload<int>(&QComboBox::currentIndexChanged),
-#else
-            static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-#endif
-            this, &ConfDialog::applySettings);
-    connect(ui_->cursorThicknessComboBox,
-#if QT_VERSION >= QT_VERSION_CHECK(5, 7, 0)
-            qOverload<int>(&QComboBox::currentIndexChanged),
-#else
-            static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-#endif
-            this, &ConfDialog::applySettings);
+    connect(ui_->cursorShapeComboBox, qOverload<int>(&QComboBox::currentIndexChanged), this,
+            &ConfDialog::applySettings);
+    connect(ui_->cursorThicknessComboBox, qOverload<int>(&QComboBox::currentIndexChanged), this,
+            &ConfDialog::applySettings);
     connect(ui_->allowGraphicsCheckBox, SIGNAL(toggled(bool)), this, SLOT(applySettings()));
     connect(ui_->allowVideoCheckBox, SIGNAL(toggled(bool)), this, SLOT(applySettings()));
     connect(ui_->allowSoundEffectsCheckBox, SIGNAL(toggled(bool)), this, SLOT(applySettings()));
@@ -269,14 +249,8 @@ void ConfDialog::makeInstantApply()
     connect(ui_->volumeSlider, SIGNAL(valueChanged(int)), SLOT(applySettings()));
     connect(ui_->soundFontGroupBox, &QGroupBox::toggled, this, &ConfDialog::applySettings);
     connect(ui_->soundFontLineEdit, &QLineEdit::textChanged, this, &ConfDialog::applySettings);
-#if QT_VERSION >= QT_VERSION_CHECK(5, 7, 0)
     connect(ui_->gainSpinBox, qOverload<double>(&QDoubleSpinBox::valueChanged), this,
             &ConfDialog::applySettings);
-#else
-    connect(ui_->gainSpinBox,
-            static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this,
-            &ConfDialog::applySettings);
-#endif
     connect(ui_->adlibRadioButton, SIGNAL(toggled(bool)), this, SLOT(applySettings()));
     connect(ui_->overlayScrollbackCheckBox, SIGNAL(toggled(bool)), this, SLOT(applySettings()));
     connect(ui_->scrollWheelCheckBox, SIGNAL(toggled(bool)), this, SLOT(applySettings()));
