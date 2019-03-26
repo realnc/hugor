@@ -8,6 +8,7 @@
 #include <SDL.h>
 #include <SDL_audio.h>
 #include <algorithm>
+#include <array>
 #include <cmath>
 
 #include "Aulib/AudioDecoderAdlmidi.h"
