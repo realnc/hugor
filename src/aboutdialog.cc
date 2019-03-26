@@ -19,8 +19,10 @@ AboutDialog::AboutDialog(QWidget* parent)
     str += QString::number(HEVERSION) + "." + QString::number(HEREVISION) + HEINTERIM + "</p>";
 
     str +=
-        "<p>For bug reports or any other form of feedback, you can send email"
-        " to <a href=\"mailto:realnc@gmail.com\">realnc@gmail.com</a></p>";
+        "<p>For bug reports or any other form of feedback, you can use the "
+        "<a href=\"https://intfiction.org\">intfiction.org forum</a>, the "
+        "<a href=\"https://www.joltcountry.com/phpBB3\">Jolt Country forum</a>, or send email to "
+        "<a href=\"mailto:realnc@gmail.com\">realnc@gmail.com</a></p>";
 
     ui_->aboutLabel->setText(ui_->aboutLabel->text() + str);
 }

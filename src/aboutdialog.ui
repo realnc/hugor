@@ -15,8 +15,8 @@
       </sizepolicy>
      </property>
      <property name="text">
-      <string>&lt;h3&gt;&lt;a href=&quot;http://www.generalcoffee.com&quot;&gt;&lt;img src=&quot;:/hugologo.png&quot; /&gt;&lt;/a&gt;
-&lt;br&gt;Hugor - A Portable Hugo Engine&lt;/h3&gt;</string>
+      <string>&lt;h3&gt;&lt;a href=&quot;http://ifwiki.org/index.php/Hugo&quot;&gt;&lt;img src=&quot;:/hugologo.png&quot; /&gt;&lt;/a&gt;
+&lt;br&gt;Hugor - A Portable Hugo Interpreter&lt;/h3&gt;</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
@@ -72,7 +72,7 @@ Hugor Copyright © 2011–2019 Nikos Chantziaras&lt;/p&gt;</string>
      </widget>
      <widget class="QWidget" name="tab_2">
       <attribute name="title">
-       <string>Thanks To</string>
+       <string>Acknowledgements</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
@@ -114,18 +114,31 @@ Robb Sherwin
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_6">
        <item>
-        <widget class="QTextBrowser" name="textBrowser_2">
-         <property name="html">
-          <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Segoe UI'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif';&quot;&gt;Hugor is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif';&quot;&gt;Hugor is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif';&quot;&gt;You should have received a copy of the GNU General Public License along with Hugor. If not, see &lt;/span&gt;&lt;a href=&quot;http://www.gnu.org/licenses/&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; text-decoration: underline; color:#0000ff;&quot;&gt;http://www.gnu.org/licenses/&lt;/span&gt;&lt;/a&gt;&lt;span style=&quot; font-family:'Sans Serif';&quot;&gt;.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <widget class="QLabel" name="licenseLabel">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>&lt;p&gt;Hugor is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.&lt;/p&gt;
+
+&lt;p&gt;Hugor is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.&lt;/p&gt;
+
+&lt;p&gt;You should have received a copy of the GNU General Public License along with Hugor. If not, see &lt;a href=&quot;http://www.gnu.org/licenses/&quot;&gt;http://www.gnu.org/licenses/&lt;/a&gt;.&lt;/p&gt;</string>
+         </property>
+         <property name="textFormat">
+          <enum>Qt::RichText</enum>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
          </property>
          <property name="openExternalLinks">
           <bool>true</bool>
+         </property>
+         <property name="textInteractionFlags">
+          <set>Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse</set>
          </property>
         </widget>
        </item>
