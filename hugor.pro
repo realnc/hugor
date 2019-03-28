@@ -5,9 +5,9 @@ CONFIG += silent warn_on link_pkgconfig strict_c++ c++14 gc_binaries
 TARGET = hugor
 ICON = mac_icon.icns
 
-VERSION_MAJOR = 1
+VERSION_MAJOR = 2
 VERSION_MINOR = 0
-VERSION_PATCH = 99
+VERSION_PATCH = 0
 VERSION = "$$VERSION_MAJOR"."$$VERSION_MINOR"."$$VERSION_PATCH"
 DEFINES += HUGOR_VERSION=\\\"$$VERSION\\\"
 
