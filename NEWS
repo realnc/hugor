@@ -1,4 +1,4 @@
-Git - 2019-03-24
+2.0 - 2019-03-28
 ================
 
   - Improved SDL audio engine, using SDL_audiolib instead of SDL_mixer.
@@ -24,6 +24,12 @@ Git - 2019-03-24
 
   - The sound volume is now configurable through a slider in the preferences
     dialog.
+
+  - Implemented a bug that exists in the official Windows interpreter that
+    allows WAV files to be played in the music channel. Even though that's not
+    actually allowed, at least one game (Future Boy) depends on this bug in
+    order to play some of its audio. This now works "correctly" in Hugor as
+    well.
 
   - The behavior of the "mute sound in background" setting has been changed. It
     now only mutes the sound when the application is minimized, not when it
@@ -114,8 +120,7 @@ Git - 2019-03-24
     /usr/local by default. See README on how to change the default path.
 
   - At least Qt 5.5 and SDL 2 are now required to build Hugor. Qt 4 and SDL 1
-    are no longer supported. It's recommended to use Qt 5.6 or newer though,
-    preferably 5.9 or newer.
+    are no longer supported. It's *highly* recommended to use Qt 5.9 or newer.
 
   - Building the source code now requires at least a C++14 compiler.
 
