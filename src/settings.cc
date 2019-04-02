@@ -169,17 +169,16 @@ void Settings::loadFromDisk(SettingsOverrides* ovr)
     is_maximized = sett.value(SETT_MAXIMIZED, false).toBool();
     is_fullscreen = sett.value(SETT_FULLSCREEN, true).toBool();
     margin_size = sett.value(SETT_MARGIN_SIZE, 0).toInt();
-    // If fullscreen width is not set, use one that results in a 4:3 ratio.
-    int scrHeight = QApplication::primaryScreen()->size().height();
-    int scrWidth = QApplication::primaryScreen()->size().width();
-    fullscreen_width = sett.value(SETT_FULLSCREEN_WIDTH,
-                                  (double)scrHeight * ((double)widthRatio / (double)heightRatio)
-                                      * 100.0 / (double)scrWidth)
-                           .toInt();
-    if (fullscreen_width > 100) {
-        fullscreen_width = 100;
-    } else if (fullscreen_width < 10) {
-        fullscreen_width = 10;
+    // If fullscreen width is not set or is invalid, use one that results in a 4:3 ratio.
+    {
+        int scrHeight = QApplication::primaryScreen()->size().height();
+        int scrWidth = QApplication::primaryScreen()->size().width();
+        int wantedWidth = (double)scrHeight * ((double)widthRatio / (double)heightRatio) * 100.0
+                          / (double)scrWidth;
+        fullscreen_width = sett.value(SETT_FULLSCREEN_WIDTH, wantedWidth).toInt();
+        if (fullscreen_width < 10 or fullscreen_width > 100) {
+            fullscreen_width = wantedWidth;
+        }
     }
     start_fullscreen = sett.value(SETT_START_FULLSCREEN, false).toBool();
     if (start_fullscreen) {
