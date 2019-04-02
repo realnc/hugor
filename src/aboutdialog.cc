@@ -21,8 +21,9 @@ AboutDialog::AboutDialog(QWidget* parent)
     str +=
         "<p>For bug reports or any other form of feedback, you can use the "
         "<a href=\"https://intfiction.org\">intfiction.org forum</a>, the "
-        "<a href=\"https://www.joltcountry.com/phpBB3\">Jolt Country forum</a>, or send email to "
-        "<a href=\"mailto:realnc@gmail.com\">realnc@gmail.com</a></p>";
+        "<a href=\"https://www.joltcountry.com/phpBB3\">Jolt Country forum</a>, the "
+        "<a href=\"https://github.com/realnc/hugor\">GitHub project page</a> issue tracker, "
+        "or send email to <a href=\"mailto:realnc@gmail.com\">realnc@gmail.com</a></p>";
 
     ui_->aboutLabel->setText(ui_->aboutLabel->text() + str);
 }
