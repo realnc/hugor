@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2019 Nikos Chantziaras <realnc@gmail.com> -->
+<component type="desktop-application">
+    <id>nikos.chantziaras.hugor</id>
+    <metadata_license>FSFAP</metadata_license>
+    <project_license>GPL-3.0+</project_license>
+    <developer_name>Nikos Chantziaras</developer_name>
+    <update_contact>realnc@gmail.com</update_contact>
+    <launchable type="desktop-id">nikos.chantziaras.hugor.desktop</launchable>
+
+    <description>
+        <p>Hugor is an interpreter that will play text adventure games made with Hugo, an
+        Interactive Fiction authoring system. All features of the Hugo engine are supported,
+        including graphics, music and sound, as well as video.</p>
+
+        <p>Most Hugo games are free and can be downloaded from places like the Interactive Fiction
+        Database (https://ifdb.tads.org) or the Interactive Fiction Archive
+        (https://ifarchive.org).</p>
+    </description>
+
+    <screenshots>
+        <screenshot type="default">
+            <caption>Hugor running the game "Future Boy"</caption>
+            <image type="source" width="1280" height="720">https://raw.githubusercontent.com/realnc/hugor/master/screenshots/Future_Boy_Main_Menu.jpg</image>
+        </screenshot>
+        <screenshot>
+            <caption>Hugor running the game "Future Boy"</caption>
+            <image type="source" width="1280" height="720">https://raw.githubusercontent.com/realnc/hugor/master/screenshots/Future_Boy_In_Game.jpg</image>
+        </screenshot>
+        <screenshot>
+            <caption>Hugor running the game "Necrotic Drift"</caption>
+            <image type="source" width="1280" height="720">https://raw.githubusercontent.com/realnc/hugor/master/screenshots/Necrotic_Drift_Title.jpg</image>
+        </screenshot>
+        <screenshot>
+            <caption>Hugor fonts and colors configuration settings</caption>
+            <image type="source" width="680" height="523">https://raw.githubusercontent.com/realnc/hugor/master/screenshots/Settings_1.png</image>
+        </screenshot>
+        <screenshot>
+            <caption>Hugor miscellaneous configuration settings</caption>
+            <image type="source" width="680" height="523">https://raw.githubusercontent.com/realnc/hugor/master/screenshots/Settings_2.png</image>
+        </screenshot>
+        <screenshot>
+            <caption>Hugor audio and video configuration settings</caption>
+            <image type="source" width="680" height="523">https://raw.githubusercontent.com/realnc/hugor/master/screenshots/Settings_3.png</image>
+        </screenshot>
+    </screenshots>
+
+    <url type="homepage">https://github.com/realnc/hugor</url>
+    <url type="bugtracker">https://github.com/realnc/hugor/issues</url>
+    <url type="contact">mailto:realnc@gmail.com</url>
+
+    <releases>
+    <release version="2.1" date="2019-04-02">
+        <description>
+            <p>Minor bug fix release, correcting an issue where the game's width in fullscreen mode
+            is too narrow.</p>
+        </description>
+    </release>
+    <release version="2.0" date="2019-03-28">
+        <description>
+            <p>Seven years worth of updates, way too numerous to list here individually. The most
+            prominent features include full support for video (used by the game "Future Boy"), a new
+            audio engine with higher sound quality, MIDI support with custom SoundFont support,
+            optional AdLib (OPL3) emulation for MIDI, and improved text rendering.</p>
+        </description>
+    </release>
+    <release version="1.0" date="2012-08-15">
+        <description>
+            <p>First stable release.</p>
+        </description>
+    </release>
+    </releases>
+</component>

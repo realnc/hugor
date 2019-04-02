@@ -263,41 +263,37 @@ SOURCES += \
     hugo/heset.c \
     hugo/stringfn.c
 
-docs.files = NEWS README
+appdataxml.files = desktop/nikos.chantziaras.hugor.appdata.xml
 desktopfile.files = desktop/nikos.chantziaras.hugor.desktop
 desktopicon.files = desktop/hugor.png
+docs.files = NEWS README
 fileicons.files = desktop/hicolor
 mimefile.files = desktop/hugor.xml
 
 OTHER_FILES *= \
-    $$desktopfile.files \
-    $$desktopicon.files \
-    $$docs.files \
-    $$fileicons.files \
-    $$mimefile.files \
     LICENSE \
     hugo/LICENSE.TXT \
     example.cfg
 
-unix : !macos {
-    isEmpty(PREFIX) {
-        PREFIX = /usr/local
-    }
-    isEmpty(BINDIR) {
-        BINDIR = "$$PREFIX/bin"
-    }
-    isEmpty(DATADIR) {
-        DATADIR = "$$PREFIX/share"
-    }
-    isEmpty(DOCDIR) {
-        DOCDIR = "$$DATADIR/doc/$$TARGET-$$VERSION"
-    }
-
-    target.path = "$$BINDIR"
-    desktopfile.path = "$$DATADIR/applications"
-    desktopicon.path = "$$DATADIR/icons/hicolor/256x256/apps"
-    fileicons.path = "$$DATADIR/icons"
-    mimefile.path = "$$DATADIR/mime/packages"
-    docs.path = "$$DOCDIR"
-    INSTALLS += desktopfile desktopicon mimefile fileicons docs target
+isEmpty(PREFIX) {
+    PREFIX = /usr/local
 }
+isEmpty(BINDIR) {
+    BINDIR = "$$PREFIX/bin"
+}
+isEmpty(DATADIR) {
+    DATADIR = "$$PREFIX/share"
+}
+isEmpty(DOCDIR) {
+    DOCDIR = "$$DATADIR/doc/$$TARGET-$$VERSION"
+}
+
+appdataxml.path = "$$DATADIR/metainfo"
+desktopfile.path = "$$DATADIR/applications"
+desktopicon.path = "$$DATADIR/icons/hicolor/256x256/apps"
+docs.path = "$$DOCDIR"
+fileicons.path = "$$DATADIR/icons"
+mimefile.path = "$$DATADIR/mime/packages"
+target.path = "$$BINDIR"
+
+INSTALLS += appdataxml desktopfile desktopicon docs fileicons mimefile target

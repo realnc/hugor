@@ -1,9 +1,9 @@
 [Desktop Entry]
-Version=1.1
+Version=1.0
 Type=Application
 Name=Hugor
 GenericName=Hugo Interpreter
-Comment=Multimedia interpreter for Hugo text adventures
+Comment=Multimedia interpreter for Hugo adventure games
 Exec=hugor %f
 TryExec=hugor
 Icon=hugor
