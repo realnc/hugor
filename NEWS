@@ -1,3 +1,14 @@
+2.1 - 2019-04-02
+================
+
+  - Fixes an issue where the fullscreen width is too narrow when loading
+    settings stored by Hugor version 1.0.
+
+  - The Linux AppImage now integrates better with the Gnome desktop (native
+    Gnome file dialogs are used when possible, and some missing icons should
+    now show correctly.)
+
+
 2.0 - 2019-03-28
 ================
 
