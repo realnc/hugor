@@ -272,8 +272,10 @@ mimefile.files = desktop/hugor.xml
 
 OTHER_FILES *= \
     LICENSE \
+    example.cfg \
     hugo/LICENSE.TXT \
-    example.cfg
+    scripts/build_appimage.sh \
+    scripts/build_macos.sh
 
 isEmpty(PREFIX) {
     PREFIX = /usr/local
