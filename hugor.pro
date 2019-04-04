@@ -251,6 +251,7 @@ SOURCES += \
     src/opcodeparser.cc \
     src/extcolors.cc \
     src/hugorfile.cc \
+    src/util.cc \
     \
     hugo/he.c \
     hugo/hebuffer.c \
