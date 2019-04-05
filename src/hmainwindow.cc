@@ -191,11 +191,10 @@ void HMainWindow::showScrollback()
     // Make sure the mouse cursor is visible.
     hApp->marginWidget()->unsetCursor();
 
-    // If no overlay was requested and the scrollback is currently in its overlay mode, make it a
-    // regular window again.
-    if (not hApp->settings()->overlay_scrollback) {
+    // Only obey the overlay preference if we're not in fullscreen.
+    if (not hApp->settings()->overlay_scrollback and not isFullScreen()) {
         hideScrollback();
-        // If a widget has no parent, it will be displayed in a new window,
+        // Make it parentless, so it will be displayed in a new window.
         scrollback_window_->setParent(nullptr);
         scrollback_window_->show();
         scrollback_window_->activateWindow();
@@ -262,6 +261,8 @@ void HMainWindow::hideScrollback()
 
 void HMainWindow::toggleFullscreen()
 {
+    bool reopen_scrollback = false;
+
     if (isFullScreen()) {
         showNormal();
         if (hApp->settings()->is_maximized) {
@@ -274,9 +275,19 @@ void HMainWindow::toggleFullscreen()
         hApp->settings()->is_fullscreen = true;
         hApp->settings()->is_maximized = isMaximized();
         showFullScreen();
+
+        // If the scrollback is open in its own window, close it and reopen it so it becomes an
+        // overlay.
+        if (scrollback_window_->isWindow() and scrollback_window_->isVisible()) {
+            reopen_scrollback = true;
+        }
     }
     hApp->settings()->saveToDisk();
     fullscreenAdjust();
+    if (reopen_scrollback) {
+        hideScrollback();
+        showScrollback();
+    }
 }
 
 void HMainWindow::setFullscreen(bool f)

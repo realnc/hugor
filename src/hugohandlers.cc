@@ -61,11 +61,13 @@ void HugoHandlers::getfilename(char* a, char* b) const
         caption = "Save transcript to a file";
     }
 
+    hFrame->setPreventAutoMinimize(true);
     if (saveMode) {
         fname = QFileDialog::getSaveFileName(hMainWin, caption, b, filter);
     } else {
         fname = QFileDialog::getOpenFileName(hMainWin, caption, b, filter);
     }
+    hFrame->setPreventAutoMinimize(false);
     qstrcpy(line, fname.toLocal8Bit().constData());
 }
 

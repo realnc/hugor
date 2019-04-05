@@ -130,6 +130,9 @@ private:
     // Set the height of the text cursor in pixels.
     void updateCursorShape();
 
+    // Prevent auto minimize when fullscreen.
+    bool prevent_auto_minimize_ = false;
+
 private slots:
     // Called by the timer to blink the text cursor.
     void blinkCursor();
@@ -236,6 +239,11 @@ public:
     // Returns a list of current context menu entries set by the game and inserts them into the
     // `dst` menu.
     QList<const QAction*> getGameContextMenuEntries(QMenu& dst);
+
+    void setPreventAutoMinimize(bool f)
+    {
+        prevent_auto_minimize_ = f;
+    }
 
 public slots:
     // Flush any pending text drawing.

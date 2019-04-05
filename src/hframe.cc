@@ -137,7 +137,7 @@ void HFrame::handleFocusLost()
     }
 #endif
     // Minimize the application if we're fullscreen (except on OSX.)
-    if (hMainWin->isFullScreen()) {
+    if (hMainWin->isFullScreen() and not prevent_auto_minimize_) {
 #ifndef Q_OS_MAC
         hMainWin->showMinimized();
 #endif

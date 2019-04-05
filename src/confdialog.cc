@@ -21,6 +21,7 @@
 #include <cmath>
 
 #include "happlication.h"
+#include "hframe.h"
 #include "hmainwindow.h"
 #include "hugodefs.h"
 #include "settings.h"
@@ -423,9 +424,11 @@ void ConfDialog::setGain()
 
 void ConfDialog::browseForSoundFont()
 {
+    hFrame->setPreventAutoMinimize(true);
     auto file = QFileDialog::getOpenFileName(this, tr("Set SoundFont"),
                                              QFileInfo(ui_->soundFontLineEdit->text()).path(),
                                              "SoundFonts (*.sf2 *.sf3);;All Files (*)");
+    hFrame->setPreventAutoMinimize(false);
     if (not file.isEmpty()) {
         ui_->soundFontLineEdit->setText(file);
     }
