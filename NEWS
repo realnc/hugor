@@ -1,3 +1,10 @@
+2.2 - 2019-04-05
+================
+
+  - The interpreter should no longer get minimized when it shouldn't in
+    fullscreen mode.
+
+
 2.1 - 2019-04-02
 ================
 
