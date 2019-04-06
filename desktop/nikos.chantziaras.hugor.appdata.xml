@@ -50,6 +50,12 @@
     <url type="contact">mailto:realnc@gmail.com</url>
 
     <releases>
+    <release version="2.2" date="2019-04-05">
+        <description>
+            <p>Minor bug fix release: the interpreter should no longer get minimized when it
+            shouldn't in fullscreen mode.</p>
+        </description>
+    </release>
     <release version="2.1" date="2019-04-02">
         <description>
             <p>Minor bug fix release, correcting an issue where the game's width in fullscreen mode
