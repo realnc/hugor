@@ -6,12 +6,13 @@
 #include <QErrorMessage>
 #include <QLibrary>
 #include <QResizeEvent>
-#include <QThread>
 #include <SDL_rwops.h>
 #include <algorithm>
+#include <cmath>
 #include <memory>
 #include <vlc/vlc.h>
 
+#include "Aulib/AudioStream.h"
 #include "happlication.h"
 #include "hmainwindow.h"
 #include "hugorfile.h"
@@ -19,34 +20,62 @@
 #include "settings.h"
 #include "util.h"
 #include "videoplayervlc_p.h"
+#include "vlcaudiodecoder.h"
 
 #ifdef DL_VLC
-decltype(&libvlc_media_add_option) libvlc_media_add_option_ptr = nullptr;
-decltype(&libvlc_media_event_manager) libvlc_media_event_manager_ptr = nullptr;
-decltype(&libvlc_media_new_callbacks) libvlc_media_new_callbacks_ptr = nullptr;
-decltype(&libvlc_media_player_event_manager) libvlc_media_player_event_manager_ptr = nullptr;
-decltype(&libvlc_media_player_is_playing) libvlc_media_player_is_playing_ptr = nullptr;
-decltype(&libvlc_media_player_new) libvlc_media_player_new_ptr = nullptr;
-decltype(&libvlc_media_player_play) libvlc_media_player_play_ptr = nullptr;
-decltype(&libvlc_media_player_release) libvlc_media_player_release_ptr = nullptr;
-decltype(&libvlc_media_player_set_hwnd) libvlc_media_player_set_hwnd_ptr = nullptr;
-decltype(&libvlc_media_player_set_media) libvlc_media_player_set_media_ptr = nullptr;
-decltype(&libvlc_media_player_stop) libvlc_media_player_stop_ptr = nullptr;
-decltype(&libvlc_media_release) libvlc_media_release_ptr = nullptr;
-decltype(&libvlc_new) libvlc_new_ptr = nullptr;
-decltype(&libvlc_release) libvlc_release_ptr = nullptr;
-decltype(&libvlc_video_get_size) libvlc_video_get_size_ptr = nullptr;
-decltype(&libvlc_video_set_key_input) libvlc_video_set_key_input_ptr = nullptr;
-decltype(&libvlc_video_set_mouse_input) libvlc_video_set_mouse_input_ptr = nullptr;
-decltype(&libvlc_event_attach) libvlc_event_attach_ptr = nullptr;
-decltype(&libvlc_media_player_set_nsobject) libvlc_media_player_set_nsobject_ptr = nullptr;
-decltype(&libvlc_media_player_set_xwindow) libvlc_media_player_set_xwindow_ptr = nullptr;
-decltype(&libvlc_errmsg) libvlc_errmsg_ptr = nullptr;
-decltype(&libvlc_audio_set_volume) libvlc_audio_set_volume_ptr = nullptr;
-#include "dlvlcdef.h"
+extern "C" {
+static decltype(&libvlc_audio_set_callbacks) libvlc_audio_set_callbacks_ptr;
+#define libvlc_audio_set_callbacks libvlc_audio_set_callbacks_ptr
+static decltype(&libvlc_audio_set_delay) libvlc_audio_set_delay_ptr;
+#define libvlc_audio_set_delay libvlc_audio_set_delay_ptr
+static decltype(&libvlc_audio_set_format) libvlc_audio_set_format_ptr;
+#define libvlc_audio_set_format libvlc_audio_set_format_ptr
+static decltype(&libvlc_errmsg) libvlc_errmsg_ptr;
+#define libvlc_errmsg libvlc_errmsg_ptr
+static decltype(&libvlc_event_attach) libvlc_event_attach_ptr;
+#define libvlc_event_attach libvlc_event_attach_ptr
+static decltype(&libvlc_media_add_option) libvlc_media_add_option_ptr;
+#define libvlc_media_add_option libvlc_media_add_option_ptr
+static decltype(&libvlc_media_event_manager) libvlc_media_event_manager_ptr;
+#define libvlc_media_event_manager libvlc_media_event_manager_ptr
+static decltype(&libvlc_media_new_callbacks) libvlc_media_new_callbacks_ptr;
+#define libvlc_media_new_callbacks libvlc_media_new_callbacks_ptr
+static decltype(&libvlc_media_player_event_manager) libvlc_media_player_event_manager_ptr;
+#define libvlc_media_player_event_manager libvlc_media_player_event_manager_ptr
+static decltype(&libvlc_media_player_is_playing) libvlc_media_player_is_playing_ptr;
+#define libvlc_media_player_is_playing libvlc_media_player_is_playing_ptr
+static decltype(&libvlc_media_player_new) libvlc_media_player_new_ptr;
+#define libvlc_media_player_new libvlc_media_player_new_ptr
+static decltype(&libvlc_media_player_play) libvlc_media_player_play_ptr;
+#define libvlc_media_player_play libvlc_media_player_play_ptr
+static decltype(&libvlc_media_player_release) libvlc_media_player_release_ptr;
+#define libvlc_media_player_release libvlc_media_player_release_ptr
+static decltype(&libvlc_media_player_set_hwnd) libvlc_media_player_set_hwnd_ptr;
+#define libvlc_media_player_set_hwnd libvlc_media_player_set_hwnd_ptr
+static decltype(&libvlc_media_player_set_media) libvlc_media_player_set_media_ptr;
+#define libvlc_media_player_set_media libvlc_media_player_set_media_ptr
+static decltype(&libvlc_media_player_set_nsobject) libvlc_media_player_set_nsobject_ptr;
+#define libvlc_media_player_set_nsobject libvlc_media_player_set_nsobject_ptr
+static decltype(&libvlc_media_player_set_xwindow) libvlc_media_player_set_xwindow_ptr;
+#define libvlc_media_player_set_xwindow libvlc_media_player_set_xwindow_ptr
+static decltype(&libvlc_media_player_stop) libvlc_media_player_stop_ptr;
+#define libvlc_media_player_stop libvlc_media_player_stop_ptr
+static decltype(&libvlc_media_release) libvlc_media_release_ptr;
+#define libvlc_media_release libvlc_media_release_ptr
+static decltype(&libvlc_new) libvlc_new_ptr;
+#define libvlc_new libvlc_new_ptr
+static decltype(&libvlc_release) libvlc_release_ptr;
+#define libvlc_release libvlc_release_ptr
+static decltype(&libvlc_video_get_size) libvlc_video_get_size_ptr;
+#define libvlc_video_get_size libvlc_video_get_size_ptr
+static decltype(&libvlc_video_set_key_input) libvlc_video_set_key_input_ptr;
+#define libvlc_video_set_key_input libvlc_video_set_key_input_ptr
+static decltype(&libvlc_video_set_mouse_input) libvlc_video_set_mouse_input_ptr;
+#define libvlc_video_set_mouse_input libvlc_video_set_mouse_input_ptr
+}
 #endif
 
-static VideoPlayer* video_player = nullptr;
+static VideoPlayer* video_player;
 
 extern "C" {
 static int vlcOpenCb(void* rwops, void** datap, uint64_t* sizep)
@@ -101,7 +130,20 @@ static void vlcMediaParsedCb(const libvlc_event_t* /*event*/, void* videoplayer_
                        q->y() + (q->maximumHeight() - vidSize.height()) / 2, vidSize.width(),
                        vidSize.height());
         q->show();
+
+        libvlc_audio_set_delay(d->vlc_player.get(),
+                               ((float)Aulib::spec().samples / Aulib::spec().freq) * -1000000);
     });
+}
+
+static void vlcAudioPlayCb(void* data, const void* samples, unsigned count, int64_t /*pts*/)
+{
+    static_cast<VideoPlayer_priv*>(data)->audio_decoder->pushSamples(samples, count);
+}
+
+static void vlcAudioFlushCb(void* data, int64_t /*pts*/)
+{
+    static_cast<VideoPlayer_priv*>(data)->audio_decoder->discardPendingSamples();
 }
 }
 
@@ -113,44 +155,50 @@ void initVideoEngine(int& /*argc*/, char* /*argv*/[])
         hApp->settings()->video_sys_error = true;
         return;
     }
+    libvlc_audio_set_callbacks_ptr =
+        (decltype(libvlc_audio_set_callbacks_ptr))lib.resolve("libvlc_audio_set_callbacks");
+    libvlc_audio_set_delay_ptr =
+        (decltype(libvlc_audio_set_delay_ptr))lib.resolve("libvlc_audio_set_delay");
+    libvlc_audio_set_format_ptr =
+        (decltype(libvlc_audio_set_format_ptr))lib.resolve("libvlc_audio_set_format");
+    libvlc_errmsg_ptr = (decltype(libvlc_errmsg_ptr))lib.resolve("libvlc_errmsg_ptr");
     libvlc_event_attach_ptr = (decltype(libvlc_event_attach_ptr))lib.resolve("libvlc_event_attach");
-    libvlc_video_get_size_ptr =
-        (decltype(libvlc_video_get_size_ptr))lib.resolve("libvlc_video_get_size");
-    libvlc_new_ptr = (decltype(libvlc_new_ptr))lib.resolve("libvlc_new");
-    libvlc_release_ptr = (decltype(libvlc_release_ptr))lib.resolve("libvlc_release");
+    libvlc_media_add_option_ptr =
+        (decltype(libvlc_media_add_option_ptr))lib.resolve("libvlc_media_add_option");
+    libvlc_media_event_manager_ptr =
+        (decltype(libvlc_media_event_manager_ptr))lib.resolve("libvlc_media_event_manager");
+    libvlc_media_new_callbacks_ptr =
+        (decltype(libvlc_media_new_callbacks_ptr))lib.resolve("libvlc_media_new_callbacks");
+    libvlc_media_player_event_manager_ptr = (decltype(
+        libvlc_media_player_event_manager_ptr))lib.resolve("libvlc_media_player_event_manager");
+    libvlc_media_player_is_playing_ptr =
+        (decltype(libvlc_media_player_is_playing_ptr))lib.resolve("libvlc_media_player_is_playing");
     libvlc_media_player_new_ptr =
         (decltype(libvlc_media_player_new_ptr))lib.resolve("libvlc_media_player_new");
+    libvlc_media_player_play_ptr =
+        (decltype(libvlc_media_player_play_ptr))lib.resolve("libvlc_media_player_play");
     libvlc_media_player_release_ptr =
         (decltype(libvlc_media_player_release_ptr))lib.resolve("libvlc_media_player_release");
+    libvlc_media_player_set_hwnd_ptr =
+        (decltype(libvlc_media_player_set_hwnd_ptr))lib.resolve("libvlc_media_player_set_hwnd");
+    libvlc_media_player_set_media_ptr =
+        (decltype(libvlc_media_player_set_media_ptr))lib.resolve("libvlc_media_player_set_media");
+    libvlc_media_player_set_nsobject_ptr = (decltype(
+        libvlc_media_player_set_nsobject_ptr))lib.resolve("libvlc_media_player_set_nsobject");
+    libvlc_media_player_set_xwindow_ptr = (decltype(
+        libvlc_media_player_set_xwindow_ptr))lib.resolve("libvlc_media_player_set_xwindow");
+    libvlc_media_player_stop_ptr =
+        (decltype(libvlc_media_player_stop_ptr))lib.resolve("libvlc_media_player_stop");
+    libvlc_media_release_ptr =
+        (decltype(libvlc_media_release_ptr))lib.resolve("libvlc_media_release");
+    libvlc_new_ptr = (decltype(libvlc_new_ptr))lib.resolve("libvlc_new");
+    libvlc_release_ptr = (decltype(libvlc_release_ptr))lib.resolve("libvlc_release");
+    libvlc_video_get_size_ptr =
+        (decltype(libvlc_video_get_size_ptr))lib.resolve("libvlc_video_get_size");
     libvlc_video_set_key_input_ptr =
         (decltype(libvlc_video_set_key_input_ptr))lib.resolve("libvlc_video_set_key_input");
     libvlc_video_set_mouse_input_ptr =
         (decltype(libvlc_video_set_mouse_input_ptr))lib.resolve("libvlc_video_set_mouse_input");
-    libvlc_media_player_event_manager_ptr = (decltype(
-        libvlc_media_player_event_manager_ptr))lib.resolve("libvlc_media_player_event_manager");
-    libvlc_media_player_play_ptr =
-        (decltype(libvlc_media_player_play_ptr))lib.resolve("libvlc_media_player_play");
-    libvlc_media_player_stop_ptr =
-        (decltype(libvlc_media_player_stop_ptr))lib.resolve("libvlc_media_player_stop");
-    libvlc_media_player_is_playing_ptr =
-        (decltype(libvlc_media_player_is_playing_ptr))lib.resolve("libvlc_media_player_is_playing");
-    libvlc_media_new_callbacks_ptr =
-        (decltype(libvlc_media_new_callbacks_ptr))lib.resolve("libvlc_media_new_callbacks");
-    libvlc_media_player_set_media_ptr =
-        (decltype(libvlc_media_player_set_media_ptr))lib.resolve("libvlc_media_player_set_media");
-    libvlc_media_player_set_hwnd_ptr =
-        (decltype(libvlc_media_player_set_hwnd_ptr))lib.resolve("libvlc_media_player_set_hwnd");
-    libvlc_media_event_manager_ptr =
-        (decltype(libvlc_media_event_manager_ptr))lib.resolve("libvlc_media_event_manager");
-    libvlc_media_release_ptr =
-        (decltype(libvlc_media_release_ptr))lib.resolve("libvlc_media_release");
-    libvlc_media_add_option_ptr =
-        (decltype(libvlc_media_add_option_ptr))lib.resolve("libvlc_media_add_option");
-    libvlc_media_player_set_xwindow_ptr = (decltype(
-        libvlc_media_player_set_xwindow_ptr))lib.resolve("libvlc_media_player_set_xwindow");
-    libvlc_errmsg_ptr = (decltype(libvlc_errmsg_ptr))lib.resolve("libvlc_errmsg_ptr");
-    libvlc_audio_set_volume_ptr =
-        (decltype(libvlc_audio_set_volume))lib.resolve("libvlc_audio_set_volume");
 #endif
 }
 
@@ -180,7 +228,9 @@ VideoPlayer::VideoPlayer(QWidget* parent)
     , d_(new VideoPlayer_priv(this))
 {
     setAttribute(Qt::WA_NativeWindow);
+
     d_->vlc_instance = {libvlc_new(0, nullptr), libvlc_release};
+
     if (not d_->vlc_instance) {
         QString msg(QLatin1String("Failed to initialize LibVLC"));
         if (libvlc_errmsg() == nullptr) {
@@ -192,6 +242,7 @@ VideoPlayer::VideoPlayer(QWidget* parent)
         hMainWin->errorMsgObj()->showMessage(msg);
         return;
     }
+
     d_->vlc_player = {libvlc_media_player_new(d_->vlc_instance.get()), libvlc_media_player_release};
     if (not d_->vlc_player) {
         QString msg(QLatin1String("Failed to create LibVLC player"));
@@ -204,10 +255,25 @@ VideoPlayer::VideoPlayer(QWidget* parent)
         hMainWin->errorMsgObj()->showMessage(msg);
         return;
     }
+
+    auto decoder = std::make_unique<VlcAudioDecoder>();
+    d_->audio_decoder = decoder.get();
+    d_->audio_stream = std::make_unique<Aulib::AudioStream>(nullptr, std::move(decoder), false);
+    d_->audio_stream->play();
+
+    // We request 16-bit int instead of float samples because current libVLC (3.0.6) is bugged; it
+    // ignores the sample format request and always feeds us 16-bit int samples.
+    libvlc_audio_set_format(d_->vlc_player.get(), "S16N", Aulib::spec().freq,
+                            Aulib::spec().channels);
+    libvlc_audio_set_callbacks(d_->vlc_player.get(), vlcAudioPlayCb, nullptr, nullptr,
+                               vlcAudioFlushCb, nullptr, d_);
+
     libvlc_video_set_key_input(d_->vlc_player.get(), false);
     libvlc_video_set_mouse_input(d_->vlc_player.get(), false);
-    auto* event_mgr = libvlc_media_player_event_manager(d_->vlc_player.get());
-    libvlc_event_attach(event_mgr, libvlc_MediaPlayerEndReached, vlcMediaEndCb, this);
+
+    libvlc_event_attach(libvlc_media_player_event_manager(d_->vlc_player.get()),
+                        libvlc_MediaPlayerEndReached, vlcMediaEndCb, this);
+
     setAttribute(Qt::WA_PaintOnScreen, true);
     setMouseTracking(true);
     Q_ASSERT(video_player == nullptr);
@@ -279,7 +345,7 @@ void VideoPlayer::play()
 {
     parentWidget()->update();
     update();
-    setVolume(hApp->settings()->sound_volume);
+    d_->audio_decoder->discardPendingSamples();
     libvlc_media_player_play(d_->vlc_player.get());
 }
 
@@ -295,28 +361,26 @@ void VideoPlayer::stop()
 
 void VideoPlayer::updateVolume()
 {
-    setVolume(hApp->settings()->sound_volume);
+    if (d_->vlc_player == nullptr) {
+        return;
+    }
+    d_->audio_stream->setVolume(
+        std::pow((d_->hugo_volume / 100.f) * (hApp->settings()->sound_volume / 100.f), 2.f));
 }
 
 void VideoPlayer::setVolume(const int vol)
 {
-    d_->volume = std::min(std::max(0, vol), 100);
-    if (d_->vlc_player == nullptr or d_->is_muted) {
-        return;
-    }
-    libvlc_audio_set_volume(d_->vlc_player.get(), d_->volume);
+    d_->hugo_volume = std::min(std::max(0, vol), 100);
+    updateVolume();
 }
 
 void VideoPlayer::setMute(const bool mute)
 {
-    if (mute == d_->is_muted) {
-        return;
+    if (mute) {
+        d_->audio_stream->mute();
+    } else {
+        d_->audio_stream->unmute();
     }
-    d_->is_muted = mute;
-    if (d_->vlc_player == nullptr) {
-        return;
-    }
-    libvlc_audio_set_volume(d_->vlc_player.get(), mute ? 0 : d_->volume);
 }
 
 void VideoPlayer::resizeEvent(QResizeEvent* e)

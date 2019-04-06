@@ -1,29 +1,30 @@
 // This is copyrighted software. More information is at the end of this file.
 #pragma once
-#include <memory>
-#include <vlc/vlc.h>
+#include "Aulib/AudioDecoder.h"
 
-namespace Aulib {
-class AudioStream;
-}
-class VideoPlayer;
-class VlcAudioDecoder;
+#include <QMutex>
+#include <boost/circular_buffer.hpp>
+#include <cstdint>
 
-class VideoPlayer_priv final
+class VlcAudioDecoder final: public Aulib::AudioDecoder
 {
 public:
-    VideoPlayer_priv(VideoPlayer* q_ptr)
-        : q(q_ptr)
-    {}
+    void pushSamples(const void* samples, unsigned count) noexcept;
+    void discardPendingSamples() noexcept;
 
-    VideoPlayer* q;
-    std::unique_ptr<libvlc_instance_t, decltype(&libvlc_release)> vlc_instance{nullptr, nullptr};
-    std::unique_ptr<libvlc_media_player_t, decltype(&libvlc_media_player_release)> vlc_player{
-        nullptr, nullptr};
-    std::unique_ptr<Aulib::AudioStream> audio_stream;
-    VlcAudioDecoder* audio_decoder = nullptr;
-    int hugo_volume = 100;
-    bool is_looping = false;
+    bool open(SDL_RWops* rwops) override;
+    int getChannels() const override;
+    int getRate() const override;
+    bool rewind() override;
+    std::chrono::microseconds duration() const override;
+    bool seekToTime(std::chrono::microseconds pos) override;
+
+protected:
+    int doDecoding(float buf[], int len, bool& callAgain) override;
+
+private:
+    boost::circular_buffer<int16_t> sample_buf_{131072};
+    QMutex sample_buf_mutex_;
 };
 
 /* Copyright (C) 2011-2019 Nikos Chantziaras

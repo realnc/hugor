@@ -138,16 +138,20 @@ contains(QT_MAJOR_VERSION, 5):lessThan(QT_MINOR_VERSION, 5) {
             src/rwopsqiodev.cc
     }
     else {
+        disable-audio {
+            error("The libVLC video backend can't be built without audio support.")
+        }
         PKGCONFIG += libvlc
         DEFINES += VIDEO_VLC
         win32 {
             DEFINES += DL_VLC
         }
         HEADERS += \
-            src/dlvlcdef.h \
-            src/videoplayervlc_p.h
+            src/videoplayervlc_p.h \
+            src/vlcaudiodecoder.h
         SOURCES += \
-            src/videoplayervlc.cc
+            src/videoplayervlc.cc \
+            src/vlcaudiodecoder.cc
     }
     HEADERS += src/videoplayer.h
     SOURCES *= src/rwopsbundle.c
@@ -202,6 +206,9 @@ MOC_DIR = tmp
 UI_DIR = tmp
 
 DEFINES += HUGOR QT_DEPRECATED_WARNINGS QT_DISABLE_DEPRECATED_BEFORE=0x050600
+CONFIG(debug, debug|release) {
+    DEFINES += BOOST_CB_ENABLE_DEBUG=1
+}
 
 RESOURCES += resources.qrc
 
