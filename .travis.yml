@@ -9,6 +9,7 @@ addons:
             - sourceline: 'ppa:jonathonf/vlc-3'
 
         packages:
+            - libboost-dev
             - libmpg123-dev
             - libsdl2-dev
             - libsndfile1-dev
