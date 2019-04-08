@@ -279,6 +279,10 @@ fileicons.files = desktop/hicolor
 mimefile.files = desktop/hugor.xml
 
 OTHER_FILES *= \
+    .clang-format \
+    .gitattributes \
+    .gitignore \
+    .travis.yml \
     LICENSE \
     example.cfg \
     hugo/LICENSE.TXT \
