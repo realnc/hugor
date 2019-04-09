@@ -35,12 +35,12 @@ bool VlcAudioDecoder::open(SDL_RWops* rwops)
 
 int VlcAudioDecoder::getChannels() const
 {
-    return Aulib::spec().channels;
+    return Aulib::channelCount();
 }
 
 int VlcAudioDecoder::getRate() const
 {
-    return Aulib::spec().freq;
+    return Aulib::sampleRate();
 }
 
 bool VlcAudioDecoder::rewind()

@@ -1,12 +1,12 @@
 // This is copyrighted software. More information is at the end of this file.
 #pragma once
-#include "Aulib/AudioDecoder.h"
+#include "Aulib/Decoder.h"
 
 #include <QMutex>
 #include <boost/circular_buffer.hpp>
 #include <cstdint>
 
-class VlcAudioDecoder final: public Aulib::AudioDecoder
+class VlcAudioDecoder final: public Aulib::Decoder
 {
 public:
     void pushSamples(const void* samples, unsigned count) noexcept;

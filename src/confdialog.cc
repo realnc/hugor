@@ -12,10 +12,10 @@
 #ifndef DISABLE_AUDIO
 #include "oplvolumebooster.h"
 #include "synthfactory.h"
-#include <Aulib/AudioDecoderAdlmidi.h>
-#include <Aulib/AudioDecoderFluidsynth.h>
-#include <Aulib/AudioResamplerSpeex.h>
-#include <Aulib/AudioStream.h>
+#include <Aulib/DecoderAdlmidi.h>
+#include <Aulib/DecoderFluidsynth.h>
+#include <Aulib/ResamplerSpeex.h>
+#include <Aulib/Stream.h>
 #include <SDL_rwops.h>
 #endif
 #include <cmath>
@@ -373,7 +373,7 @@ void ConfDialog::playTestMidi()
     // Re-create the stream each time because the selected soundfont might have changed.
     midi_stream_ = nullptr;
     QResource midiRes(":/test.mid");
-    std::unique_ptr<Aulib::AudioDecoder> decoder;
+    std::unique_ptr<Aulib::Decoder> decoder;
     std::shared_ptr<OplVolumeBooster> processor;
 #if USE_DEC_ADLMIDI
     if (ui_->adlibRadioButton->isChecked()) {
@@ -392,10 +392,10 @@ void ConfDialog::playTestMidi()
 #if USE_DEC_ADLMIDI
     }
 #endif
-    auto resampler = std::make_unique<Aulib::AudioResamplerSpeex>();
+    auto resampler = std::make_unique<Aulib::ResamplerSpeex>();
     auto* rwops = SDL_RWFromConstMem(midiRes.data(), midiRes.size());
     midi_stream_ =
-        std::make_unique<Aulib::AudioStream>(rwops, std::move(decoder), std::move(resampler), true);
+        std::make_unique<Aulib::Stream>(rwops, std::move(decoder), std::move(resampler), true);
     midi_stream_->addProcessor(std::move(processor));
     midi_stream_->setVolume(std::pow(ui_->volumeSlider->value() / 100.f, 2.f));
     midi_stream_->play(1, 1500ms);

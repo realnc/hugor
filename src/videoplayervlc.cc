@@ -12,7 +12,7 @@
 #include <memory>
 #include <vlc/vlc.h>
 
-#include "Aulib/AudioStream.h"
+#include "Aulib/Stream.h"
 #include "happlication.h"
 #include "hmainwindow.h"
 #include "hugorfile.h"
@@ -132,7 +132,7 @@ static void vlcMediaParsedCb(const libvlc_event_t* /*event*/, void* videoplayer_
         q->show();
 
         libvlc_audio_set_delay(d->vlc_player.get(),
-                               ((float)Aulib::spec().samples / Aulib::spec().freq) * -1000000);
+                               ((float)Aulib::frameSize() / Aulib::sampleRate()) * -1000000);
     });
 }
 
@@ -258,13 +258,13 @@ VideoPlayer::VideoPlayer(QWidget* parent)
 
     auto decoder = std::make_unique<VlcAudioDecoder>();
     d_->audio_decoder = decoder.get();
-    d_->audio_stream = std::make_unique<Aulib::AudioStream>(nullptr, std::move(decoder), false);
+    d_->audio_stream = std::make_unique<Aulib::Stream>(nullptr, std::move(decoder), false);
     d_->audio_stream->play();
 
     // We request 16-bit int instead of float samples because current libVLC (3.0.6) is bugged; it
     // ignores the sample format request and always feeds us 16-bit int samples.
-    libvlc_audio_set_format(d_->vlc_player.get(), "S16N", Aulib::spec().freq,
-                            Aulib::spec().channels);
+    libvlc_audio_set_format(d_->vlc_player.get(), "S16N", Aulib::sampleRate(),
+                            Aulib::channelCount());
     libvlc_audio_set_callbacks(d_->vlc_player.get(), vlcAudioPlayCb, nullptr, nullptr,
                                vlcAudioFlushCb, nullptr, d_);
 

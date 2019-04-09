@@ -9,9 +9,9 @@ class ConfDialog;
 }
 
 namespace Aulib {
-class AudioStream;
-class AudioDecoderFluidSynth;
-class AudioDecoderAdlmidi;
+class Stream;
+class DecoderFluidsynth;
+class DecoderAdlmidi;
 } // namespace Aulib
 
 class HMainWindow;
@@ -32,8 +32,8 @@ private:
     int initial_sound_vol_;
     float initial_gain_;
 #ifndef DISABLE_AUDIO
-    std::unique_ptr<Aulib::AudioStream> midi_stream_;
-    Aulib::AudioDecoderFluidSynth* fsynth_dec_ = nullptr;
+    std::unique_ptr<Aulib::Stream> midi_stream_;
+    Aulib::DecoderFluidsynth* fsynth_dec_ = nullptr;
 #endif
 
     // Makes the dialog's controls apply instantly when they change.

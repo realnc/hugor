@@ -41,23 +41,23 @@ contains(QT_MAJOR_VERSION, 5):lessThan(QT_MINOR_VERSION, 5) {
     xmp {
         PKGCONFIG += libxmp
         DEFINES += USE_DEC_XMP=1
-        SOURCES += SDL_audiolib/src/AudioDecoderXmp.cpp
+        SOURCES += SDL_audiolib/src/DecoderXmp.cpp
     }
     else:modplug {
         PKGCONFIG += libmodplug
         DEFINES += USE_DEC_MODPLUG=1
-        SOURCES += SDL_audiolib/src/AudioDecoderModplug.cpp
+        SOURCES += SDL_audiolib/src/DecoderModplug.cpp
     }
     else {
         PKGCONFIG += libopenmpt
         DEFINES += USE_DEC_OPENMPT=1
-        SOURCES += SDL_audiolib/src/AudioDecoderOpenmpt.cpp
+        SOURCES += SDL_audiolib/src/DecoderOpenmpt.cpp
     }
 
     adlmidi {
         PKGCONFIG += libADLMIDI
         DEFINES += USE_DEC_ADLMIDI=1
-        SOURCES += SDL_audiolib/src/AudioDecoderAdlmidi.cpp
+        SOURCES += SDL_audiolib/src/DecoderAdlmidi.cpp
     }
 
     DEFINES += \
@@ -80,16 +80,15 @@ contains(QT_MAJOR_VERSION, 5):lessThan(QT_MINOR_VERSION, 5) {
         src/synthfactory.cc \
         SDL_audiolib/resampler/resample.c \
         SDL_audiolib/src/missing/sdl_load_file_rw.c \
-        SDL_audiolib/src/AudioDecoder.cpp \
-        SDL_audiolib/src/AudioDecoderFluidsynth.cpp \
-        SDL_audiolib/src/AudioDecoderMpg123.cpp \
-        SDL_audiolib/src/AudioDecoderSndfile.cpp \
-        SDL_audiolib/src/AudioResampler.cpp \
-        SDL_audiolib/src/AudioResamplerSpeex.cpp \
-        SDL_audiolib/src/AudioStream.cpp \
+        SDL_audiolib/src/Decoder.cpp \
+        SDL_audiolib/src/DecoderFluidsynth.cpp \
+        SDL_audiolib/src/DecoderMpg123.cpp \
+        SDL_audiolib/src/DecoderSndfile.cpp \
         SDL_audiolib/src/Processor.cpp \
+        SDL_audiolib/src/Resampler.cpp \
+        SDL_audiolib/src/ResamplerSpeex.cpp \
         SDL_audiolib/src/Stream.cpp \
-        SDL_audiolib/src/audiostream_p.cpp \
+        SDL_audiolib/src/stream_p.cpp \
         SDL_audiolib/src/aulib.cpp \
         SDL_audiolib/src/sampleconv.cpp
 } else {

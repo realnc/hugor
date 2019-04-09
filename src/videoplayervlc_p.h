@@ -4,7 +4,7 @@
 #include <vlc/vlc.h>
 
 namespace Aulib {
-class AudioStream;
+class Stream;
 }
 class VideoPlayer;
 class VlcAudioDecoder;
@@ -20,7 +20,7 @@ public:
     std::unique_ptr<libvlc_instance_t, decltype(&libvlc_release)> vlc_instance{nullptr, nullptr};
     std::unique_ptr<libvlc_media_player_t, decltype(&libvlc_media_player_release)> vlc_player{
         nullptr, nullptr};
-    std::unique_ptr<Aulib::AudioStream> audio_stream;
+    std::unique_ptr<Aulib::Stream> audio_stream;
     VlcAudioDecoder* audio_decoder = nullptr;
     int hugo_volume = 100;
     bool is_looping = false;

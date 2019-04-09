@@ -1,16 +1,16 @@
 // This is copyrighted software. More information is at the end of this file.
 #include "synthfactory.h"
 
-#include "Aulib/AudioDecoderAdlmidi.h"
-#include "Aulib/AudioDecoderFluidsynth.h"
+#include "Aulib/DecoderAdlmidi.h"
+#include "Aulib/DecoderFluidsynth.h"
 #include <QByteArray>
 #include <QResource>
 #include <SDL_rwops.h>
 
-std::unique_ptr<Aulib::AudioDecoderFluidSynth> makeFluidsynthDec(const QString& soundfont,
-                                                                 const float gain)
+std::unique_ptr<Aulib::DecoderFluidsynth> makeFluidsynthDec(const QString& soundfont,
+                                                            const float gain)
 {
-    auto decoder = std::make_unique<Aulib::AudioDecoderFluidSynth>();
+    auto decoder = std::make_unique<Aulib::DecoderFluidsynth>();
 
     if (soundfont.isNull()) {
         QResource res(QLatin1String(":/soundfont.sf2"));
@@ -24,15 +24,15 @@ std::unique_ptr<Aulib::AudioDecoderFluidSynth> makeFluidsynthDec(const QString& 
 }
 
 #if USE_DEC_ADLMIDI
-std::unique_ptr<Aulib::AudioDecoderAdlmidi> makeAdlmidiDec()
+std::unique_ptr<Aulib::DecoderAdlmidi> makeAdlmidiDec()
 {
-    auto decoder = std::make_unique<Aulib::AudioDecoderAdlmidi>();
+    auto decoder = std::make_unique<Aulib::DecoderAdlmidi>();
     QResource res(":/genmidi_gs.wopl");
     const QByteArray data = res.isCompressed()
                                 ? qUncompress(res.data(), res.size())
                                 : QByteArray::fromRawData((const char*)res.data(), res.size());
 
-    decoder->setEmulator(Aulib::AudioDecoderAdlmidi::Emulator::Dosbox);
+    decoder->setEmulator(Aulib::DecoderAdlmidi::Emulator::Dosbox);
     decoder->setChipAmount(6);
     decoder->loadBank(SDL_RWFromConstMem(data.constData(), data.size()));
     return decoder;

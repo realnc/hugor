@@ -4,15 +4,14 @@
 
 class QString;
 namespace Aulib {
-class AudioDecoderFluidSynth;
-class AudioDecoderAdlmidi;
+class DecoderFluidsynth;
+class DecoderAdlmidi;
 } // namespace Aulib
 
 // If 'soundfont' is null, the embedded soundfont will be used.
-std::unique_ptr<Aulib::AudioDecoderFluidSynth> makeFluidsynthDec(const QString& soundfont,
-                                                                 float gain);
+std::unique_ptr<Aulib::DecoderFluidsynth> makeFluidsynthDec(const QString& soundfont, float gain);
 
-std::unique_ptr<Aulib::AudioDecoderAdlmidi> makeAdlmidiDec();
+std::unique_ptr<Aulib::DecoderAdlmidi> makeAdlmidiDec();
 
 /* Copyright (C) 2011-2019 Nikos Chantziaras
  *

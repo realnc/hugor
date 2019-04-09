@@ -11,15 +11,15 @@
 #include <array>
 #include <cmath>
 
-#include "Aulib/AudioDecoderAdlmidi.h"
-#include "Aulib/AudioDecoderFluidsynth.h"
-#include "Aulib/AudioDecoderModplug.h"
-#include "Aulib/AudioDecoderMpg123.h"
-#include "Aulib/AudioDecoderOpenmpt.h"
-#include "Aulib/AudioDecoderSndfile.h"
-#include "Aulib/AudioDecoderXmp.h"
-#include "Aulib/AudioResamplerSpeex.h"
-#include "Aulib/AudioStream.h"
+#include "Aulib/DecoderAdlmidi.h"
+#include "Aulib/DecoderFluidsynth.h"
+#include "Aulib/DecoderModplug.h"
+#include "Aulib/DecoderMpg123.h"
+#include "Aulib/DecoderOpenmpt.h"
+#include "Aulib/DecoderSndfile.h"
+#include "Aulib/DecoderXmp.h"
+#include "Aulib/ResamplerSpeex.h"
+#include "Aulib/Stream.h"
 #include "Aulib/Processor.h"
 #include "aulib.h"
 #include "happlication.h"
@@ -37,23 +37,23 @@ static int currentMusicVol = 100;
 static int currentSampleVol = 100;
 
 // We only play one music and one sample track at a time, so it's enough to make these static.
-static std::unique_ptr<Aulib::AudioStream>& musicStream()
+static std::unique_ptr<Aulib::Stream>& musicStream()
 {
-    static auto p = std::unique_ptr<Aulib::AudioStream>();
+    static auto p = std::unique_ptr<Aulib::Stream>();
     return p;
 }
 
-static std::unique_ptr<Aulib::AudioStream>& sampleStream()
+static std::unique_ptr<Aulib::Stream>& sampleStream()
 {
-    static auto p = std::unique_ptr<Aulib::AudioStream>();
+    static auto p = std::unique_ptr<Aulib::Stream>();
     return p;
 }
 
 // We hold a pointer to the fluidsynth decoder so we can change the gain while the stream is
 // playing.
-static Aulib::AudioDecoderFluidSynth*& fsynthDec()
+static Aulib::DecoderFluidsynth*& fsynthDec()
 {
-    static Aulib::AudioDecoderFluidSynth* p = nullptr;
+    static Aulib::DecoderFluidsynth* p = nullptr;
     return p;
 }
 
@@ -77,7 +77,7 @@ void initSoundEngine()
 
     // Initialize audio with 44.1kHz, 16 bit, 2 channels (stereo) and a 4k chunk size.
     // TODO: Make this configurable?
-    if (Aulib::init(44100, AUDIO_S16SYS, 2, 4096) != 0) {
+    if (not Aulib::init(44100, AUDIO_S16SYS, 2, 4096)) {
         qWarning("Unable to initialize audio: %s", SDL_GetError());
         exit(1);
     }
@@ -150,7 +150,7 @@ static bool playStream(HUGO_FILE infile, long reslength, char loop_flag, bool is
     }
 
     auto& stream = isMusic ? musicStream() : sampleStream();
-    std::unique_ptr<Aulib::AudioDecoder> decoder;
+    std::unique_ptr<Aulib::Decoder> decoder;
     std::shared_ptr<OplVolumeBooster> processor;
 
     if (stream) {
@@ -167,7 +167,7 @@ static bool playStream(HUGO_FILE infile, long reslength, char loop_flag, bool is
     infile->release();
 
     if (not isMusic) {
-        decoder = std::make_unique<Aulib::AudioDecoderSndfile>();
+        decoder = std::make_unique<Aulib::DecoderSndfile>();
     } else {
         switch (resource_type) {
         case MIDI_R: {
@@ -194,11 +194,11 @@ static bool playStream(HUGO_FILE infile, long reslength, char loop_flag, bool is
         case MOD_R: {
             using ModDec_type =
 #if USE_DEC_OPENMPT
-                Aulib::AudioDecoderOpenmpt;
+                Aulib::DecoderOpenmpt;
 #elif USE_DEC_XMP
-                Aulib::AudioDecoderXmp;
+                Aulib::DecoderXmp;
 #elif USE_DEC_MODPLUG
-                Aulib::AudioDecoderModPlug;
+                Aulib::DecoderModPlug;
 #endif
             decoder = std::make_unique<ModDec_type>();
             fsynthDec() = nullptr;
@@ -209,9 +209,9 @@ static bool playStream(HUGO_FILE infile, long reslength, char loop_flag, bool is
             // engine passes them as MP3_R. "Future Boy" is a known game that depends on this bug.
             std::array<char, 5> head{};
             if (SDL_RWread(rwops, head.data(), 1, 4) == 4 and head == decltype(head){"RIFF"}) {
-                decoder = std::make_unique<Aulib::AudioDecoderSndfile>();
+                decoder = std::make_unique<Aulib::DecoderSndfile>();
             } else {
-                decoder = std::make_unique<Aulib::AudioDecoderMpg123>();
+                decoder = std::make_unique<Aulib::DecoderMpg123>();
             }
             SDL_RWseek(rwops, 0, RW_SEEK_SET);
             fsynthDec() = nullptr;
@@ -223,8 +223,8 @@ static bool playStream(HUGO_FILE infile, long reslength, char loop_flag, bool is
         }
     }
 
-    stream = std::make_unique<Aulib::AudioStream>(
-        rwops, std::move(decoder), std::make_unique<Aulib::AudioResamplerSpeex>(), true);
+    stream = std::make_unique<Aulib::Stream>(rwops, std::move(decoder),
+                                             std::make_unique<Aulib::ResamplerSpeex>(), true);
     stream->addProcessor(std::move(processor));
     if (stream->open()) {
         // Start playing the stream. Loop forever if 'loop_flag' is true. Otherwise, just play it
