@@ -69,12 +69,6 @@ static float convertHugoVolume(int hugoVol)
 
 void initSoundEngine()
 {
-    // Initialize only the audio part of SDL.
-    if (SDL_Init(SDL_INIT_AUDIO) != 0) {
-        qWarning("Unable to initialize sound system: %s", SDL_GetError());
-        exit(1);
-    }
-
     // Initialize audio with 44.1kHz, 16 bit, 2 channels (stereo) and a 4k chunk size.
     // TODO: Make this configurable?
     if (not Aulib::init(44100, AUDIO_S16SYS, 2, 4096)) {
