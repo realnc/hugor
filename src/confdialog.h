@@ -28,7 +28,7 @@ protected:
     void changeEvent(QEvent* e) override;
 
 private:
-    Ui::ConfDialog* ui_;
+    std::unique_ptr<Ui::ConfDialog> ui_;
     int initial_sound_vol_;
     float initial_gain_;
 #ifndef DISABLE_AUDIO

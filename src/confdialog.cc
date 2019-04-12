@@ -34,12 +34,12 @@ using namespace std::chrono_literals;
 
 ConfDialog::ConfDialog(HMainWindow* parent)
     : QDialog(parent, Qt::WindowTitleHint | Qt::WindowSystemMenuHint | Qt::WindowCloseButtonHint)
-    , ui_(new Ui::ConfDialog)
+    , ui_(std::make_unique<Ui::ConfDialog>())
 {
     setWindowModality(Qt::ApplicationModal);
     ui_->setupUi(this);
-    Settings* sett = hApp->settings();
-    sett->loadFromDisk();
+    hApp->settings().loadFromDisk();
+    const Settings& sett = hApp->settings();
 
     const auto& playIcon = style()->standardIcon(QStyle::SP_MediaPlay);
     const auto& stopIcon = style()->standardIcon(QStyle::SP_MediaStop);
@@ -54,8 +54,8 @@ ConfDialog::ConfDialog(HMainWindow* parent)
     }
 
     ui_->gainLabel->setToolTip(ui_->gainSpinBox->toolTip());
-    initial_sound_vol_ = sett->sound_volume;
-    initial_gain_ = sett->synth_gain;
+    initial_sound_vol_ = sett.sound_volume;
+    initial_gain_ = sett.synth_gain;
 
 #ifdef DISABLE_AUDIO
     ui_->volumeSlider->setEnabled(false);
@@ -81,16 +81,16 @@ ConfDialog::ConfDialog(HMainWindow* parent)
     ui_->fsMarginColorButton->setFixedSize(macSize);
 #endif
 
-    ui_->allowGraphicsCheckBox->setChecked(sett->enable_graphics);
+    ui_->allowGraphicsCheckBox->setChecked(sett.enable_graphics);
 #ifdef DISABLE_VIDEO
     ui_->allowVideoCheckBox->setChecked(false);
     ui_->allowVideoCheckBox->setDisabled(true);
 #else
-    if (sett->video_sys_error) {
+    if (sett.video_sys_error) {
         ui_->allowVideoCheckBox->setChecked(false);
         ui_->allowVideoCheckBox->setDisabled(true);
     } else {
-        ui_->allowVideoCheckBox->setChecked(sett->enable_video);
+        ui_->allowVideoCheckBox->setChecked(sett.enable_video);
     }
 #endif
 #ifdef DISABLE_AUDIO
@@ -98,28 +98,28 @@ ConfDialog::ConfDialog(HMainWindow* parent)
     ui_->allowMusicCheckBox->setDisabled(true);
     ui_->muteWhenMinimizedCheckBox->setDisabled(true);
 #else
-    ui_->allowSoundEffectsCheckBox->setChecked(sett->enable_sound_effects);
-    ui_->allowMusicCheckBox->setChecked(sett->enable_music);
-    ui_->muteWhenMinimizedCheckBox->setChecked(sett->mute_when_minimized);
+    ui_->allowSoundEffectsCheckBox->setChecked(sett.enable_sound_effects);
+    ui_->allowMusicCheckBox->setChecked(sett.enable_music);
+    ui_->muteWhenMinimizedCheckBox->setChecked(sett.mute_when_minimized);
 #endif
 #if defined(DISABLE_VIDEO) and defined(DISABLE_AUDIO)
     ui_->volumeLabel->setDisabled(true);
     ui_->volumeSlider->setValue(0);
     ui_->volumeSlider->setDisabled(true);
 #else
-    ui_->volumeSlider->setValue(sett->sound_volume);
+    ui_->volumeSlider->setValue(sett.sound_volume);
     connect(ui_->volumeSlider, &QSlider::valueChanged, this, &ConfDialog::setSoundVolume);
 #endif
-    ui_->soundFontGroupBox->setChecked(sett->use_custom_soundfont);
-    ui_->soundFontLineEdit->setText(sett->soundfont);
-    ui_->gainSpinBox->setValue(sett->synth_gain);
+    ui_->soundFontGroupBox->setChecked(sett.use_custom_soundfont);
+    ui_->soundFontLineEdit->setText(sett.soundfont);
+    ui_->gainSpinBox->setValue(sett.synth_gain);
 #if USE_DEC_ADLMIDI
     connect(ui_->adlibRadioButton, &QRadioButton::toggled, [this](bool checked) {
         ui_->soundFontGroupBox->setDisabled(checked);
         ui_->gainLabel->setDisabled(checked);
         ui_->gainSpinBox->setDisabled(checked);
     });
-    if (sett->use_adlmidi) {
+    if (sett.use_adlmidi) {
         ui_->adlibRadioButton->setChecked(true);
     } else {
         ui_->fsynthRadioButton->setChecked(true);
@@ -128,33 +128,33 @@ ConfDialog::ConfDialog(HMainWindow* parent)
     ui_->fsynthRadioButton->setChecked(true);
 #endif
 
-    ui_->mainBgColorButton->setColor(sett->main_bg_color);
-    ui_->mainTextColorButton->setColor(sett->main_text_color);
-    ui_->bannerBgColorButton->setColor(sett->status_bg_color);
-    ui_->bannerTextColorButton->setColor(sett->status_text_color);
-    ui_->fsMarginColorButton->setColor(sett->fs_margin_color);
+    ui_->mainBgColorButton->setColor(sett.main_bg_color);
+    ui_->mainTextColorButton->setColor(sett.main_text_color);
+    ui_->bannerBgColorButton->setColor(sett.status_bg_color);
+    ui_->bannerTextColorButton->setColor(sett.status_text_color);
+    ui_->fsMarginColorButton->setColor(sett.fs_margin_color);
     connect(ui_->customFsMarginColorCheckBox, &QCheckBox::toggled, ui_->fsMarginColorButton,
             &KColorButton::setEnabled);
-    ui_->customFsMarginColorCheckBox->setChecked(sett->custom_fs_margin_color);
+    ui_->customFsMarginColorCheckBox->setChecked(sett.custom_fs_margin_color);
 
-    ui_->mainFontSizeSpinBox->setValue(sett->prop_font.pointSize());
-    ui_->fixedFontSizeSpinBox->setValue(sett->fixed_font.pointSize());
-    ui_->scrollbackFontSizeSpinBox->setValue(sett->scrollback_font.pointSize());
-    ui_->mainFontBox->setCurrentFont(sett->prop_font);
-    ui_->fixedFontBox->setCurrentFont(sett->fixed_font);
-    ui_->scrollbackFontBox->setCurrentFont(sett->scrollback_font);
-    ui_->softScrollCheckBox->setChecked(sett->soft_text_scrolling);
-    ui_->smartFormattingCheckBox->setChecked(sett->smart_formatting);
-    ui_->marginSizeSpinBox->setValue(sett->margin_size);
-    ui_->overlayScrollbackCheckBox->setChecked(sett->overlay_scrollback);
-    ui_->scrollWheelCheckBox->setChecked(sett->scrollback_on_wheel);
-    ui_->fullscreenWidthSpinBox->setValue(sett->fullscreen_width);
-    if (sett->script_wrap < ui_->scriptWrapSpinBox->minimum()) {
+    ui_->mainFontSizeSpinBox->setValue(sett.prop_font.pointSize());
+    ui_->fixedFontSizeSpinBox->setValue(sett.fixed_font.pointSize());
+    ui_->scrollbackFontSizeSpinBox->setValue(sett.scrollback_font.pointSize());
+    ui_->mainFontBox->setCurrentFont(sett.prop_font);
+    ui_->fixedFontBox->setCurrentFont(sett.fixed_font);
+    ui_->scrollbackFontBox->setCurrentFont(sett.scrollback_font);
+    ui_->softScrollCheckBox->setChecked(sett.soft_text_scrolling);
+    ui_->smartFormattingCheckBox->setChecked(sett.smart_formatting);
+    ui_->marginSizeSpinBox->setValue(sett.margin_size);
+    ui_->overlayScrollbackCheckBox->setChecked(sett.overlay_scrollback);
+    ui_->scrollWheelCheckBox->setChecked(sett.scrollback_on_wheel);
+    ui_->fullscreenWidthSpinBox->setValue(sett.fullscreen_width);
+    if (sett.script_wrap < ui_->scriptWrapSpinBox->minimum()) {
         ui_->scriptWrapSpinBox->setValue(ui_->scriptWrapSpinBox->minimum());
     } else {
-        ui_->scriptWrapSpinBox->setValue(sett->script_wrap);
+        ui_->scriptWrapSpinBox->setValue(sett.script_wrap);
     }
-    switch (sett->cursor_shape) {
+    switch (sett.cursor_shape) {
     case Settings::TextCursorShape::Ibeam:
         ui_->cursorShapeComboBox->setCurrentIndex(0);
         break;
@@ -166,12 +166,12 @@ ConfDialog::ConfDialog(HMainWindow* parent)
         ui_->cursorShapeComboBox->setCurrentIndex(2);
         break;
     }
-    ui_->cursorThicknessComboBox->setCurrentIndex(sett->cursor_thickness);
-    ui_->cursorThicknessComboBox->setDisabled(sett->cursor_shape
+    ui_->cursorThicknessComboBox->setCurrentIndex(sett.cursor_thickness);
+    ui_->cursorThicknessComboBox->setDisabled(sett.cursor_shape
                                               == Settings::TextCursorShape::Block);
-    if (sett->start_fullscreen) {
+    if (sett.start_fullscreen) {
         ui_->fullscreenRadioButton->setChecked(true);
-    } else if (sett->start_windowed) {
+    } else if (sett.start_windowed) {
         ui_->windowRadioButton->setChecked(true);
     } else {
         ui_->lastStateRadioButton->setChecked(true);
@@ -208,10 +208,7 @@ ConfDialog::ConfDialog(HMainWindow* parent)
             [this](int index) { ui_->cursorThicknessComboBox->setDisabled(index == 1); });
 }
 
-ConfDialog::~ConfDialog()
-{
-    delete ui_;
-}
+ConfDialog::~ConfDialog() = default;
 
 void ConfDialog::changeEvent(QEvent* e)
 {
@@ -276,75 +273,75 @@ void ConfDialog::makeInstantApply()
 
 void ConfDialog::applySettings()
 {
-    Settings* sett = hApp->settings();
+    Settings& sett = hApp->settings();
 
-    sett->enable_graphics = ui_->allowGraphicsCheckBox->isChecked();
+    sett.enable_graphics = ui_->allowGraphicsCheckBox->isChecked();
 #ifndef DISABLE_VIDEO
-    if (not sett->video_sys_error) {
-        sett->enable_video = ui_->allowVideoCheckBox->isChecked();
+    if (not sett.video_sys_error) {
+        sett.enable_video = ui_->allowVideoCheckBox->isChecked();
     }
 #endif
-    sett->enable_sound_effects = ui_->allowSoundEffectsCheckBox->isChecked();
-    sett->enable_music = ui_->allowMusicCheckBox->isChecked();
-    sett->mute_when_minimized = ui_->muteWhenMinimizedCheckBox->isChecked();
-    sett->sound_volume = ui_->volumeSlider->value();
-    sett->soundfont = ui_->soundFontLineEdit->text();
-    sett->use_custom_soundfont =
-        ui_->soundFontGroupBox->isChecked() and not sett->soundfont.isEmpty();
-    sett->synth_gain = ui_->gainSpinBox->value();
-    sett->use_adlmidi = ui_->adlibRadioButton->isChecked();
-    sett->main_bg_color = ui_->mainBgColorButton->color();
-    sett->main_text_color = ui_->mainTextColorButton->color();
-    sett->status_bg_color = ui_->bannerBgColorButton->color();
-    sett->status_text_color = ui_->bannerTextColorButton->color();
-    sett->custom_fs_margin_color = ui_->customFsMarginColorCheckBox->isChecked();
-    sett->fs_margin_color = ui_->fsMarginColorButton->color();
-    sett->prop_font = ui_->mainFontBox->currentFont();
-    sett->prop_font.setKerning(false);
-    sett->fixed_font = ui_->fixedFontBox->currentFont();
-    sett->scrollback_font = ui_->scrollbackFontBox->currentFont();
-    sett->prop_font.setPointSize(ui_->mainFontSizeSpinBox->value());
-    sett->fixed_font.setPointSize(ui_->fixedFontSizeSpinBox->value());
-    sett->scrollback_font.setPointSize(ui_->scrollbackFontSizeSpinBox->value());
-    sett->soft_text_scrolling = ui_->softScrollCheckBox->isChecked();
-    sett->smart_formatting = ui_->smartFormattingCheckBox->isChecked();
-    sett->overlay_scrollback = ui_->overlayScrollbackCheckBox->isChecked();
-    sett->scrollback_on_wheel = ui_->scrollWheelCheckBox->isChecked();
-    sett->margin_size = ui_->marginSizeSpinBox->value();
-    sett->fullscreen_width = ui_->fullscreenWidthSpinBox->value();
+    sett.enable_sound_effects = ui_->allowSoundEffectsCheckBox->isChecked();
+    sett.enable_music = ui_->allowMusicCheckBox->isChecked();
+    sett.mute_when_minimized = ui_->muteWhenMinimizedCheckBox->isChecked();
+    sett.sound_volume = ui_->volumeSlider->value();
+    sett.soundfont = ui_->soundFontLineEdit->text();
+    sett.use_custom_soundfont =
+        ui_->soundFontGroupBox->isChecked() and not sett.soundfont.isEmpty();
+    sett.synth_gain = ui_->gainSpinBox->value();
+    sett.use_adlmidi = ui_->adlibRadioButton->isChecked();
+    sett.main_bg_color = ui_->mainBgColorButton->color();
+    sett.main_text_color = ui_->mainTextColorButton->color();
+    sett.status_bg_color = ui_->bannerBgColorButton->color();
+    sett.status_text_color = ui_->bannerTextColorButton->color();
+    sett.custom_fs_margin_color = ui_->customFsMarginColorCheckBox->isChecked();
+    sett.fs_margin_color = ui_->fsMarginColorButton->color();
+    sett.prop_font = ui_->mainFontBox->currentFont();
+    sett.prop_font.setKerning(false);
+    sett.fixed_font = ui_->fixedFontBox->currentFont();
+    sett.scrollback_font = ui_->scrollbackFontBox->currentFont();
+    sett.prop_font.setPointSize(ui_->mainFontSizeSpinBox->value());
+    sett.fixed_font.setPointSize(ui_->fixedFontSizeSpinBox->value());
+    sett.scrollback_font.setPointSize(ui_->scrollbackFontSizeSpinBox->value());
+    sett.soft_text_scrolling = ui_->softScrollCheckBox->isChecked();
+    sett.smart_formatting = ui_->smartFormattingCheckBox->isChecked();
+    sett.overlay_scrollback = ui_->overlayScrollbackCheckBox->isChecked();
+    sett.scrollback_on_wheel = ui_->scrollWheelCheckBox->isChecked();
+    sett.margin_size = ui_->marginSizeSpinBox->value();
+    sett.fullscreen_width = ui_->fullscreenWidthSpinBox->value();
     if (ui_->scriptWrapSpinBox->value() <= ui_->scriptWrapSpinBox->minimum()) {
-        sett->script_wrap = 0;
+        sett.script_wrap = 0;
     } else {
-        sett->script_wrap = ui_->scriptWrapSpinBox->value();
+        sett.script_wrap = ui_->scriptWrapSpinBox->value();
     }
     switch (ui_->cursorShapeComboBox->currentIndex()) {
     case 0:
-        sett->cursor_shape = Settings::TextCursorShape::Ibeam;
+        sett.cursor_shape = Settings::TextCursorShape::Ibeam;
         break;
     case 1:
-        sett->cursor_shape = Settings::TextCursorShape::Block;
+        sett.cursor_shape = Settings::TextCursorShape::Block;
         break;
     case 2:
-        sett->cursor_shape = Settings::TextCursorShape::Underline;
+        sett.cursor_shape = Settings::TextCursorShape::Underline;
         break;
     }
-    sett->cursor_thickness = ui_->cursorThicknessComboBox->currentIndex();
-    sett->start_fullscreen = ui_->fullscreenRadioButton->isChecked();
-    sett->start_windowed = ui_->windowRadioButton->isChecked();
+    sett.cursor_thickness = ui_->cursorThicknessComboBox->currentIndex();
+    sett.start_fullscreen = ui_->fullscreenRadioButton->isChecked();
+    sett.start_windowed = ui_->windowRadioButton->isChecked();
 
     // Notify the application that preferences have changed.
     hApp->notifyPreferencesChange(sett);
 
-    sett->saveToDisk();
+    sett.saveToDisk();
 
-    initial_sound_vol_ = sett->sound_volume;
-    initial_gain_ = sett->synth_gain;
+    initial_sound_vol_ = sett.sound_volume;
+    initial_gain_ = sett.synth_gain;
 }
 
 void ConfDialog::cancel()
 {
-    hApp->settings()->sound_volume = initial_sound_vol_;
-    hApp->settings()->synth_gain = initial_gain_;
+    hApp->settings().sound_volume = initial_sound_vol_;
+    hApp->settings().synth_gain = initial_gain_;
     updateMusicVolume();
     updateSoundVolume();
     updateVideoVolume();
@@ -353,7 +350,7 @@ void ConfDialog::cancel()
 
 void ConfDialog::setSoundVolume(int vol)
 {
-    hApp->settings()->sound_volume = vol;
+    hApp->settings().sound_volume = vol;
     updateMusicVolume();
     updateSoundVolume();
     updateVideoVolume();
@@ -417,7 +414,7 @@ void ConfDialog::setGain()
     if (midi_stream_ and fsynth_dec_ != nullptr) {
         fsynth_dec_->setGain(ui_->gainSpinBox->value());
     }
-    hApp->settings()->synth_gain = ui_->gainSpinBox->value();
+    hApp->settings().synth_gain = ui_->gainSpinBox->value();
     ::updateSynthGain();
 #endif
 }

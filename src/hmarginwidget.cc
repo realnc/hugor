@@ -24,7 +24,7 @@ HMarginWidget::HMarginWidget(QWidget* parent)
 
 void HMarginWidget::wheelEvent(QWheelEvent* e)
 {
-    if (hApp->settings()->scrollback_on_wheel and e->delta() > 0) {
+    if (hApp->settings().scrollback_on_wheel and e->delta() > 0) {
         hMainWin->showScrollback();
     }
     e->accept();

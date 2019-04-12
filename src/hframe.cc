@@ -30,7 +30,7 @@ static qreal dpr()
 
 HFrame::HFrame(QWidget* parent)
     : QWidget(parent)
-    , cursor_height_(QFontMetrics(hApp->settings()->prop_font).height())
+    , cursor_height_(QFontMetrics(hApp->settings().prop_font).height())
     , blink_timer_(new QTimer(this))
     , minimize_timer_(new QTimer(this))
 {
@@ -76,8 +76,8 @@ void HFrame::enqueueKey(char key, QMouseEvent* e)
 
 void HFrame::updateCursorShape()
 {
-    auto shape = hApp->settings()->cursor_shape;
-    float thickness = hApp->settings()->cursor_thickness + 1;
+    auto shape = hApp->settings().cursor_shape;
+    float thickness = hApp->settings().cursor_thickness + 1;
 
     if (shape == Settings::TextCursorShape::Ibeam) {
         cursor_height_ = font_metrics_.height();
@@ -141,7 +141,7 @@ void HFrame::handleFocusLost()
 #ifndef Q_OS_MAC
         hMainWin->showMinimized();
 #endif
-        if (hApp->settings()->mute_when_minimized) {
+        if (hApp->settings().mute_when_minimized) {
             muteSound(true);
             muteVideo(true);
         }
@@ -181,7 +181,7 @@ void HFrame::paintEvent(QPaintEvent* e)
 
     // Draw our current input. We need to do this here, after the pixmap has already been painted,
     // so that the input gets painted on top. Otherwise, we could not erase text during editing.
-    QFont f(use_fixed_font_ ? hApp->settings()->fixed_font : hApp->settings()->prop_font);
+    QFont f(use_fixed_font_ ? hApp->settings().fixed_font : hApp->settings().prop_font);
     f.setUnderline(use_underline_font_);
     f.setItalic(use_italic_font_);
     f.setBold(use_bold_font_);
@@ -203,7 +203,7 @@ void HFrame::paintEvent(QPaintEvent* e)
     pen.setCapStyle(Qt::FlatCap);
     pen.setCosmetic(false);
     p.setBrush(hugoColorToQt(fg_color_));
-    switch (hApp->settings()->cursor_shape) {
+    switch (hApp->settings().cursor_shape) {
     case Settings::TextCursorShape::Ibeam: {
         pen.setWidthF(cursor_width_);
         p.setPen(pen);
@@ -228,7 +228,7 @@ void HFrame::paintEvent(QPaintEvent* e)
     }
 
     // With a block-shaped cursor, draw the covered character in inverse color.
-    if (hApp->settings()->cursor_shape == Settings::TextCursorShape::Block) {
+    if (hApp->settings().cursor_shape == Settings::TextCursorShape::Block) {
         p.setPen(hugoColorToQt(bg_color_));
         p.setBackgroundMode(Qt::TransparentMode);
         p.drawText(QPointF(cursor_pos_.x(), cursor_pos_.y() + m.ascent() + 1),
@@ -581,7 +581,7 @@ void HFrame::setFontType(int hugoFont)
     use_italic_font_ = hugoFont & ITALIC_FONT;
     use_bold_font_ = hugoFont & BOLD_FONT;
 
-    QFont f(use_fixed_font_ ? hApp->settings()->fixed_font : hApp->settings()->prop_font);
+    QFont f(use_fixed_font_ ? hApp->settings().fixed_font : hApp->settings().prop_font);
     f.setUnderline(use_underline_font_);
     f.setItalic(use_italic_font_);
     f.setBold(use_bold_font_);
@@ -627,7 +627,7 @@ void HFrame::scrollUp(int left, int top, int right, int bottom, int h)
     clearRegion(r.left() / dpr(), r.top() / dpr(), (r.left() + r.width()) / dpr(),
                 (r.top() + r.bottom()) / dpr());
 
-    if (hApp->settings()->soft_text_scrolling) {
+    if (hApp->settings().soft_text_scrolling) {
         QEventLoop idleLoop;
         QTimer timer;
         timer.setSingleShot(true);
@@ -645,7 +645,7 @@ void HFrame::flushText()
         return;
     }
 
-    QFont f(use_fixed_font_ ? hApp->settings()->fixed_font : hApp->settings()->prop_font);
+    QFont f(use_fixed_font_ ? hApp->settings().fixed_font : hApp->settings().prop_font);
     f.setUnderline(use_underline_font_);
     f.setItalic(use_italic_font_);
     f.setBold(use_bold_font_);

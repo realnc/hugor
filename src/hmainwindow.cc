@@ -192,7 +192,7 @@ void HMainWindow::showScrollback()
     hApp->marginWidget()->unsetCursor();
 
     // Only obey the overlay preference if we're not in fullscreen.
-    if (not hApp->settings()->overlay_scrollback and not isFullScreen()) {
+    if (not hApp->settings().overlay_scrollback and not isFullScreen()) {
         hideScrollback();
         // Make it parentless, so it will be displayed in a new window.
         scrollback_window_->setParent(nullptr);
@@ -265,15 +265,15 @@ void HMainWindow::toggleFullscreen()
 
     if (isFullScreen()) {
         showNormal();
-        if (hApp->settings()->is_maximized) {
+        if (hApp->settings().is_maximized) {
             showMaximized();
         }
-        hApp->settings()->is_fullscreen = false;
+        hApp->settings().is_fullscreen = false;
     } else {
         // Remember our windowed size in case we quit while in fullscreen.
-        hApp->settings()->app_size = size();
-        hApp->settings()->is_fullscreen = true;
-        hApp->settings()->is_maximized = isMaximized();
+        hApp->settings().app_size = size();
+        hApp->settings().is_fullscreen = true;
+        hApp->settings().is_maximized = isMaximized();
         showFullScreen();
 
         // If the scrollback is open in its own window, close it and reopen it so it becomes an
@@ -282,7 +282,7 @@ void HMainWindow::toggleFullscreen()
             reopen_scrollback = true;
         }
     }
-    hApp->settings()->saveToDisk();
+    hApp->settings().saveToDisk();
     fullscreenAdjust();
     if (reopen_scrollback) {
         hideScrollback();
@@ -324,7 +324,7 @@ void HMainWindow::closeEvent(QCloseEvent* e)
         if (conf_dialog_ != nullptr) {
             conf_dialog_->close();
         }
-        hApp->settings()->saveToDisk();
+        hApp->settings().saveToDisk();
         closeVideoEngine();
         closeSoundEngine();
         hApp->terminateEngineThread();
@@ -350,7 +350,7 @@ void HMainWindow::changeEvent(QEvent* e)
     } else if (chEv->oldState().testFlag(Qt::WindowMinimized) and not isMinimized()) {
         muteSound(false);
         muteVideo(false);
-    } else if (hApp->settings()->mute_when_minimized
+    } else if (hApp->settings().mute_when_minimized
                and not chEv->oldState().testFlag(Qt::WindowMinimized) and isMinimized()) {
         muteSound(true);
         muteVideo(true);

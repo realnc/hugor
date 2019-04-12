@@ -8,7 +8,7 @@ extern "C" {
 
 AboutDialog::AboutDialog(QWidget* parent)
     : QDialog(parent, Qt::WindowTitleHint | Qt::WindowSystemMenuHint | Qt::WindowCloseButtonHint)
-    , ui_(new Ui::AboutDialog)
+    , ui_(std::make_unique<Ui::AboutDialog>())
 {
     ui_->setupUi(this);
 
@@ -28,10 +28,7 @@ AboutDialog::AboutDialog(QWidget* parent)
     ui_->aboutLabel->setText(ui_->aboutLabel->text() + str);
 }
 
-AboutDialog::~AboutDialog()
-{
-    delete ui_;
-}
+AboutDialog::~AboutDialog() = default;
 
 /* Copyright (C) 2011-2019 Nikos Chantziaras
  *

@@ -19,7 +19,7 @@
 void HugoHandlers::calcFontDimensions()
 {
     const QFontMetrics& curMetr = hFrame->currentFontMetrics();
-    const QFontMetrics fixedMetr(hApp->settings()->fixed_font);
+    const QFontMetrics fixedMetr(hApp->settings().fixed_font);
 
     FIXEDCHARWIDTH = fixedMetr.averageCharWidth();
     FIXEDLINEHEIGHT = fixedMetr.lineSpacing();
@@ -280,7 +280,7 @@ void HugoHandlers::stopvideo()
 
 void HugoHandlers::playvideo(HUGO_FILE infile, long len, char loop, char bg, int vol, int* result)
 {
-    if (not hApp->settings()->enable_video or hApp->settings()->video_sys_error) {
+    if (not hApp->settings().enable_video or hApp->settings().video_sys_error) {
         *result = false;
         return;
     }

@@ -2,6 +2,8 @@
 #pragma once
 #include <QDialog>
 
+#include <memory>
+
 namespace Ui {
 class AboutDialog;
 }
@@ -15,7 +17,7 @@ public:
     ~AboutDialog() override;
 
 private:
-    Ui::AboutDialog* ui_;
+    std::unique_ptr<Ui::AboutDialog> ui_;
 };
 
 /* Copyright (C) 2011-2019 Nikos Chantziaras

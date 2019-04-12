@@ -93,17 +93,16 @@ HApplication::HApplication(int& argc, char* argv[], const char* appName, const c
 #endif
 
     // Load our persistent settings.
-    settings_ = new Settings;
-    settings_->loadFromDisk(settOvr);
+    settings_.loadFromDisk(settOvr);
 
     // Apply the smart formatting setting.
-    smartformatting = settings_->smart_formatting;
+    smartformatting = settings_.smart_formatting;
 
     // Set our global pointer.
     hApp = this;
 
     // Create our main application window.
-    main_win_ = new HMainWindow(nullptr);
+    main_win_ = std::make_unique<HMainWindow>(nullptr);
     main_win_->setWindowTitle(HApplication::applicationName());
 
     // Disable screen updates until we're actually ready to run a game. This prevents screen flicker
@@ -111,7 +110,7 @@ HApplication::HApplication(int& argc, char* argv[], const char* appName, const c
     main_win_->setUpdatesEnabled(false);
 
     // This widget provides margins for fFrameWin.
-    margin_widget_ = new HMarginWidget(main_win_);
+    margin_widget_ = new HMarginWidget(main_win_.get());
 
     frame_win_ = new HFrame(margin_widget_);
     margin_widget_->addWidget(frame_win_);
@@ -123,7 +122,7 @@ HApplication::HApplication(int& argc, char* argv[], const char* appName, const c
     }
 
     // Restore the application's size.
-    main_win_->resize(settings_->app_size);
+    main_win_->resize(settings_.app_size);
 
     // Set application window icon, unless we're on OS X where the bundle icon is used.
 #ifndef Q_OS_MAC
@@ -136,9 +135,7 @@ HApplication::~HApplication()
 {
     // qDebug() << Q_FUNC_INFO;
     Q_ASSERT(hApp != nullptr);
-    settings_->saveToDisk();
-    delete settings_;
-    delete main_win_;
+    settings_.saveToDisk();
     // We're being destroyed, so our global pointer is no longer valid.
     hApp = nullptr;
 }
@@ -155,7 +152,7 @@ void HApplication::runGame()
         next_game_.clear();
 
         // Remember the directory of the game.
-        settings_->last_file_open_dir = finfo.absolutePath();
+        settings_.last_file_open_dir = finfo.absolutePath();
 
         // Change to the game file's directory.
         QDir::setCurrent(finfo.absolutePath());
@@ -172,7 +169,7 @@ void HApplication::runGame()
 #endif
 
         // Add the game file to our "recent games" list.
-        QStringList& gamesList = settings_->recent_games_list;
+        QStringList& gamesList = settings_.recent_games_list;
         int recentIdx = gamesList.indexOf(finfo.absoluteFilePath());
         if (recentIdx > 0) {
             // It's already in the list and it's not the first item. Make it the first item so that
@@ -201,7 +198,7 @@ void HApplication::runGame()
                 gamesList.prepend(finfo.absoluteFilePath());
             }
         }
-        settings_->saveToDisk();
+        settings_.saveToDisk();
 
         // Run the Hugo engine.
         is_game_running_ = true;
@@ -228,9 +225,9 @@ void HApplication::updateMarginColor(int color)
         return;
     }
 
-    const Settings* sett = hApp->settings();
-    const QColor& qColor = (hMainWin->isFullScreen() and sett->custom_fs_margin_color)
-                               ? sett->fs_margin_color
+    const Settings& sett = hApp->settings();
+    const QColor& qColor = (hMainWin->isFullScreen() and sett.custom_fs_margin_color)
+                               ? sett.fs_margin_color
                                : hugoColorToQt(color);
     margin_widget_->setColor(qColor);
 }
@@ -242,7 +239,7 @@ void HApplication::updateMargins(int color)
     // In fullscreen mode, respect the aspect ratio and max width settings.
     if (hMainWin->isFullScreen()) {
         int scrWidth = QApplication::primaryScreen()->size().width();
-        int maxWidth = settings_->fullscreen_width * scrWidth / 100;
+        int maxWidth = settings_.fullscreen_width * scrWidth / 100;
 
         // Calculate how big the margin should be to get the specified width.
         int targetWidth = qMin(maxWidth, margin_widget_->width());
@@ -253,7 +250,7 @@ void HApplication::updateMargins(int color)
         if (margin_widget_->layout()->indexOf(frame_win_) < 0) {
             return;
         }
-        margin = settings_->margin_size;
+        margin = settings_.margin_size;
     }
     margin_widget_->setContentsMargins(margin, 0, margin, bottom_margin_size_);
     updateMarginColor(color);
@@ -292,15 +289,15 @@ void HApplication::entryPoint(QString gameFileName)
     }
 
     // If we still don't have a filename, prompt for one.
-    if (next_game_.isEmpty() and settings_->ask_for_gamefile) {
+    if (next_game_.isEmpty() and settings_.ask_for_gamefile) {
         next_game_ = QFileDialog::getOpenFileName(
             nullptr, QObject::tr("Choose the story file you wish to play"),
-            settings_->last_file_open_dir,
+            settings_.last_file_open_dir,
             QObject::tr("Hugo Games") + QString::fromLatin1("(*.hex)"));
     }
 
     // Switch to fullscreen, if needed.
-    if (settings_->is_fullscreen) {
+    if (settings_.is_fullscreen) {
         main_win_->toggleFullscreen();
         // If we don't let the event loop run for a while, for some reason the screen will be
         // flashing when the window first becomes visible. The reason is unknown, but this seems to
@@ -315,7 +312,7 @@ void HApplication::entryPoint(QString gameFileName)
 
     // If we have a filename, load it.
     if (not next_game_.isEmpty()) {
-        if (settings_->is_maximized) {
+        if (settings_.is_maximized) {
             main_win_->showMaximized();
         } else {
             main_win_->show();
@@ -335,9 +332,9 @@ void HApplication::handleEngineFinished()
     main_win_->close();
 }
 
-void HApplication::notifyPreferencesChange(const Settings* sett)
+void HApplication::notifyPreferencesChange(const Settings& sett)
 {
-    smartformatting = sett->smart_formatting;
+    smartformatting = sett.smart_formatting;
 
     // 'bgcolor' is a Hugo engine global.
     updateMargins(::bgcolor);
@@ -347,14 +344,14 @@ void HApplication::notifyPreferencesChange(const Settings* sett)
 
     // The fonts might have changed.
     hFrame->setFontType(currentfont);
-    hMainWin->setScrollbackFont(sett->scrollback_font);
+    hMainWin->setScrollbackFont(sett.scrollback_font);
 
     display_needs_repaint = true;
 #ifndef DISABLE_AUDIO
-    if (not sett->enable_music) {
+    if (not sett.enable_music) {
         HugoHandlers::stopmusic();
     }
-    if (not sett->enable_sound_effects) {
+    if (not sett.enable_sound_effects) {
         HugoHandlers::stopsample();
     }
     updateMusicVolume();
@@ -362,7 +359,7 @@ void HApplication::notifyPreferencesChange(const Settings* sett)
     updateVideoVolume();
 #endif
 #ifndef DISABLE_VIDEO
-    if (not sett->enable_video) {
+    if (not sett.enable_video) {
         HugoHandlers::stopvideo();
     }
 #endif

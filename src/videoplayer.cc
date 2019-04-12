@@ -149,7 +149,7 @@ void initVideoEngine(int& /*argc*/, char* /*argv*/[])
 #ifdef DL_VLC
     QLibrary lib("libvlc");
     if (not lib.load()) {
-        hApp->settings()->video_sys_error = true;
+        hApp->settings().video_sys_error = true;
         return;
     }
     libvlc_audio_set_callbacks_ptr =
@@ -234,7 +234,7 @@ VideoPlayer::VideoPlayer(QWidget* parent)
         } else {
             msg += QLatin1String(": ") + libvlc_errmsg();
         }
-        hApp->settings()->video_sys_error = true;
+        hApp->settings().video_sys_error = true;
         hMainWin->errorMsgObj()->showMessage(msg);
         return;
     }
@@ -247,7 +247,7 @@ VideoPlayer::VideoPlayer(QWidget* parent)
         } else {
             msg += QLatin1String(": ") + libvlc_errmsg();
         }
-        hApp->settings()->video_sys_error = true;
+        hApp->settings().video_sys_error = true;
         hMainWin->errorMsgObj()->showMessage(msg);
         return;
     }
@@ -369,7 +369,7 @@ void VideoPlayer::updateVolume()
         return;
     }
     audio_stream_->setVolume(
-        std::pow((hugo_volume_ / 100.f) * (hApp->settings()->sound_volume / 100.f), 2.f));
+        std::pow((hugo_volume_ / 100.f) * (hApp->settings().sound_volume / 100.f), 2.f));
 }
 
 void VideoPlayer::setVolume(const int vol)

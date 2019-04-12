@@ -2,13 +2,15 @@
 #pragma once
 #include <QApplication>
 
+#include "settings.h"
+#include <memory>
+
 class EngineRunner;
 class EngineThread;
 class HApplication;
 class HFrame;
 class HMainWindow;
 class HMarginWidget;
-class Settings;
 
 extern HApplication* hApp;
 
@@ -18,10 +20,10 @@ class HApplication final: public QApplication
 
 private:
     // Preferences (fonts, colors, etc.)
-    Settings* settings_;
+    Settings settings_;
 
     // Main application window.
-    HMainWindow* main_win_;
+    std::unique_ptr<HMainWindow> main_win_;
 
     // Frame widget containing all subwindows.
     HFrame* frame_win_;
@@ -86,7 +88,7 @@ public:
      */
     void updateMargins(int color);
 
-    Settings* settings() const
+    Settings& settings()
     {
         return settings_;
     }
@@ -120,7 +122,7 @@ public:
     }
 
     // Notify the application that preferences have changed.
-    void notifyPreferencesChange(const Settings* sett);
+    void notifyPreferencesChange(const Settings& sett);
 
     // Advance the event loop.
     void advanceEventLoop();

@@ -64,7 +64,7 @@ static float convertHugoVolume(int hugoVol)
     } else if (hugoVol > 100) {
         hugoVol = 100;
     }
-    return (hugoVol / 100.f) * std::pow((float)hApp->settings()->sound_volume / 100.f, 2.f);
+    return (hugoVol / 100.f) * std::pow((float)hApp->settings().sound_volume / 100.f, 2.f);
 }
 
 void initSoundEngine()
@@ -122,7 +122,7 @@ void updateSoundVolume()
 void updateSynthGain()
 {
     if (fsynthDec() != nullptr) {
-        fsynthDec()->setGain(hApp->settings()->synth_gain);
+        fsynthDec()->setGain(hApp->settings().synth_gain);
     }
 }
 
@@ -138,8 +138,8 @@ bool isSamplePlaying()
 
 static bool playStream(HUGO_FILE infile, long reslength, char loop_flag, bool isMusic)
 {
-    if ((isMusic and not hApp->settings()->enable_music)
-        or (not isMusic and not hApp->settings()->enable_sound_effects)) {
+    if ((isMusic and not hApp->settings().enable_music)
+        or (not isMusic and not hApp->settings().enable_sound_effects)) {
         return false;
     }
 
@@ -166,16 +166,15 @@ static bool playStream(HUGO_FILE infile, long reslength, char loop_flag, bool is
         switch (resource_type) {
         case MIDI_R: {
 #if USE_DEC_ADLMIDI
-            if (hApp->settings()->use_adlmidi) {
+            if (hApp->settings().use_adlmidi) {
                 decoder = makeAdlmidiDec();
                 fsynthDec() = nullptr;
                 processor = std::make_shared<OplVolumeBooster>();
             } else {
 #endif
-                const auto& soundfont = hApp->settings()->use_custom_soundfont
-                                            ? hApp->settings()->soundfont
-                                            : QString();
-                auto dec = makeFluidsynthDec(soundfont, hApp->settings()->synth_gain);
+                const auto& soundfont =
+                    hApp->settings().use_custom_soundfont ? hApp->settings().soundfont : QString();
+                auto dec = makeFluidsynthDec(soundfont, hApp->settings().synth_gain);
                 fsynthDec() = dec.get();
                 decoder = std::move(dec);
 #if USE_DEC_ADLMIDI
