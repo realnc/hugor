@@ -19,7 +19,6 @@
 #include "rwopsbundle.h"
 #include "settings.h"
 #include "util.h"
-#include "videoplayervlc_p.h"
 #include "vlcaudiodecoder.h"
 
 #ifdef DL_VLC
@@ -107,43 +106,41 @@ static void vlcCloseCb(void* rwops)
 static void vlcMediaEndCb(const libvlc_event_t* /*event*/, void* videoplayer)
 {
     runInMainThread([videoplayer] {
-        auto* q = static_cast<VideoPlayer*>(videoplayer);
-        q->hide();
-        emit q->videoFinished();
+        auto* vp = static_cast<VideoPlayer*>(videoplayer);
+        vp->hide();
+        emit vp->videoFinished();
     });
 }
 
-static void vlcMediaParsedCb(const libvlc_event_t* /*event*/, void* videoplayer_priv)
+static void vlcMediaParsedCb(const libvlc_event_t* /*event*/, void* videoplayer)
 {
-    runInMainThread([videoplayer_priv] {
-        auto* d = static_cast<VideoPlayer_priv*>(videoplayer_priv);
-        auto* q = d->q;
+    runInMainThread([videoplayer] {
+        auto* vp = static_cast<VideoPlayer*>(videoplayer);
         unsigned width, height;
-        if (libvlc_video_get_size(d->vlc_player.get(), 0, &width, &height) != 0) {
+        if (not vp->getVideoSize(width, height)) {
             return;
         }
         QSize vidSize(width, height);
-        if (vidSize.width() > q->maximumWidth() or vidSize.height() > q->maximumHeight()) {
-            vidSize.scale(q->maximumSize(), Qt::KeepAspectRatio);
+        if (vidSize.width() > vp->maximumWidth() or vidSize.height() > vp->maximumHeight()) {
+            vidSize.scale(vp->maximumSize(), Qt::KeepAspectRatio);
         }
-        q->setGeometry(q->x() + (q->maximumWidth() - vidSize.width()) / 2,
-                       q->y() + (q->maximumHeight() - vidSize.height()) / 2, vidSize.width(),
-                       vidSize.height());
-        q->show();
+        vp->setGeometry(vp->x() + (vp->maximumWidth() - vidSize.width()) / 2,
+                        vp->y() + (vp->maximumHeight() - vidSize.height()) / 2, vidSize.width(),
+                        vidSize.height());
+        vp->show();
 
-        libvlc_audio_set_delay(d->vlc_player.get(),
-                               ((float)Aulib::frameSize() / Aulib::sampleRate()) * -1000000);
+        vp->setAudioDelay(((float)Aulib::frameSize() / Aulib::sampleRate()) * -1000000);
     });
 }
 
 static void vlcAudioPlayCb(void* data, const void* samples, unsigned count, int64_t /*pts*/)
 {
-    static_cast<VideoPlayer_priv*>(data)->audio_decoder->pushSamples(samples, count);
+    static_cast<VlcAudioDecoder*>(data)->pushSamples(samples, count);
 }
 
 static void vlcAudioFlushCb(void* data, int64_t /*pts*/)
 {
-    static_cast<VideoPlayer_priv*>(data)->audio_decoder->discardPendingSamples();
+    static_cast<VlcAudioDecoder*>(data)->discardPendingSamples();
 }
 }
 
@@ -225,13 +222,12 @@ void updateVideoVolume()
 
 VideoPlayer::VideoPlayer(QWidget* parent)
     : QWidget(parent)
-    , d_(new VideoPlayer_priv(this))
 {
     setAttribute(Qt::WA_NativeWindow);
 
-    d_->vlc_instance = {libvlc_new(0, nullptr), libvlc_release};
+    vlc_instance_ = {libvlc_new(0, nullptr), libvlc_release};
 
-    if (not d_->vlc_instance) {
+    if (not vlc_instance_) {
         QString msg(QLatin1String("Failed to initialize LibVLC"));
         if (libvlc_errmsg() == nullptr) {
             msg += '.';
@@ -243,8 +239,8 @@ VideoPlayer::VideoPlayer(QWidget* parent)
         return;
     }
 
-    d_->vlc_player = {libvlc_media_player_new(d_->vlc_instance.get()), libvlc_media_player_release};
-    if (not d_->vlc_player) {
+    vlc_player_ = {libvlc_media_player_new(vlc_instance_.get()), libvlc_media_player_release};
+    if (not vlc_player_) {
         QString msg(QLatin1String("Failed to create LibVLC player"));
         if (libvlc_errmsg() == nullptr) {
             msg += '.';
@@ -257,21 +253,20 @@ VideoPlayer::VideoPlayer(QWidget* parent)
     }
 
     auto decoder = std::make_unique<VlcAudioDecoder>();
-    d_->audio_decoder = decoder.get();
-    d_->audio_stream = std::make_unique<Aulib::Stream>(nullptr, std::move(decoder), false);
-    d_->audio_stream->play();
+    audio_decoder_ = decoder.get();
+    audio_stream_ = std::make_unique<Aulib::Stream>(nullptr, std::move(decoder), false);
+    audio_stream_->play();
 
     // We request 16-bit int instead of float samples because current libVLC (3.0.6) is bugged; it
     // ignores the sample format request and always feeds us 16-bit int samples.
-    libvlc_audio_set_format(d_->vlc_player.get(), "S16N", Aulib::sampleRate(),
-                            Aulib::channelCount());
-    libvlc_audio_set_callbacks(d_->vlc_player.get(), vlcAudioPlayCb, nullptr, nullptr,
-                               vlcAudioFlushCb, nullptr, d_);
+    libvlc_audio_set_format(vlc_player_.get(), "S16N", Aulib::sampleRate(), Aulib::channelCount());
+    libvlc_audio_set_callbacks(vlc_player_.get(), vlcAudioPlayCb, nullptr, nullptr, vlcAudioFlushCb,
+                               nullptr, audio_decoder_);
 
-    libvlc_video_set_key_input(d_->vlc_player.get(), false);
-    libvlc_video_set_mouse_input(d_->vlc_player.get(), false);
+    libvlc_video_set_key_input(vlc_player_.get(), false);
+    libvlc_video_set_mouse_input(vlc_player_.get(), false);
 
-    libvlc_event_attach(libvlc_media_player_event_manager(d_->vlc_player.get()),
+    libvlc_event_attach(libvlc_media_player_event_manager(vlc_player_.get()),
                         libvlc_MediaPlayerEndReached, vlcMediaEndCb, this);
 
     setAttribute(Qt::WA_PaintOnScreen, true);
@@ -282,16 +277,15 @@ VideoPlayer::VideoPlayer(QWidget* parent)
 
 VideoPlayer::~VideoPlayer()
 {
-    delete d_;
     video_player = nullptr;
 }
 
 bool VideoPlayer::loadVideo(HugorFile* src, long len, bool loop)
 {
-    if (d_->vlc_instance == nullptr or d_->vlc_player == nullptr) {
+    if (vlc_instance_ == nullptr or vlc_player_ == nullptr) {
         return false;
     }
-    if (libvlc_media_player_is_playing(d_->vlc_player.get())) {
+    if (libvlc_media_player_is_playing(vlc_player_.get())) {
         stop();
     }
 
@@ -309,8 +303,8 @@ bool VideoPlayer::loadVideo(HugorFile* src, long len, bool loop)
     }
     src->release();
 
-    auto* media = libvlc_media_new_callbacks(d_->vlc_instance.get(), vlcOpenCb, vlcReadCb,
-                                             vlcSeekCb, vlcCloseCb, rwops);
+    auto* media = libvlc_media_new_callbacks(vlc_instance_.get(), vlcOpenCb, vlcReadCb, vlcSeekCb,
+                                             vlcCloseCb, rwops);
     if (media == nullptr) {
         QString msg(QLatin1String("Failed to create LibVLC media"));
         if (libvlc_errmsg() == nullptr) {
@@ -326,60 +320,70 @@ bool VideoPlayer::loadVideo(HugorFile* src, long len, bool loop)
     if (loop) {
         libvlc_media_add_option(media, "input-repeat=65535");
     }
-    libvlc_media_player_set_media(d_->vlc_player.get(), media);
+    libvlc_media_player_set_media(vlc_player_.get(), media);
     libvlc_media_release(media);
 #if defined(Q_OS_MAC)
-    libvlc_media_player_set_nsobject(d_->vlc_player.get(), (void*)winId());
+    libvlc_media_player_set_nsobject(vlc_player_.get(), (void*)winId());
 #elif defined(Q_OS_UNIX)
-    libvlc_media_player_set_xwindow(d_->vlc_player.get(), winId());
+    libvlc_media_player_set_xwindow(vlc_player_.get(), winId());
 #elif defined(Q_OS_WIN)
-    libvlc_media_player_set_hwnd(d_->vlc_player.get(), (void*)winId());
+    libvlc_media_player_set_hwnd(vlc_player_.get(), (void*)winId());
 #endif
     libvlc_event_attach(libvlc_media_event_manager(media), libvlc_MediaParsedChanged,
-                        vlcMediaParsedCb, d_);
-    d_->is_looping = loop;
+                        vlcMediaParsedCb, this);
+    is_looping_ = loop;
     return true;
+}
+
+bool VideoPlayer::getVideoSize(unsigned& width, unsigned& height)
+{
+    return libvlc_video_get_size(vlc_player_.get(), 0, &width, &height) == 0;
+}
+
+bool VideoPlayer::setAudioDelay(int64_t delay)
+{
+    return libvlc_audio_set_delay(vlc_player_.get(), delay) == 0;
 }
 
 void VideoPlayer::play()
 {
     parentWidget()->update();
     update();
-    d_->audio_decoder->discardPendingSamples();
-    libvlc_media_player_play(d_->vlc_player.get());
+    audio_decoder_->discardPendingSamples();
+    libvlc_media_player_play(vlc_player_.get());
 }
 
 void VideoPlayer::stop()
 {
-    if (d_->vlc_instance == nullptr or d_->vlc_player == nullptr) {
+    if (vlc_instance_ == nullptr or vlc_player_ == nullptr) {
         return;
     }
-    libvlc_media_player_stop(d_->vlc_player.get());
+    libvlc_media_player_stop(vlc_player_.get());
     hide();
     emit videoFinished();
 }
 
 void VideoPlayer::updateVolume()
 {
-    if (d_->vlc_player == nullptr) {
+    if (vlc_player_ == nullptr) {
         return;
     }
-    d_->audio_stream->setVolume(
-        std::pow((d_->hugo_volume / 100.f) * (hApp->settings()->sound_volume / 100.f), 2.f));
+    audio_stream_->setVolume(
+        std::pow((hugo_volume_ / 100.f) * (hApp->settings()->sound_volume / 100.f), 2.f));
 }
 
 void VideoPlayer::setVolume(const int vol)
 {
-    d_->hugo_volume = std::min(std::max(0, vol), 100);
+    hugo_volume_ = std::min(std::max(0, vol), 100);
     updateVolume();
 }
 
 void VideoPlayer::setMute(const bool mute)
 {
     if (mute) {
-        d_->audio_stream->mute();
+        audio_stream_->mute();
     } else {
-        d_->audio_stream->unmute();
+        audio_stream_->unmute();
     }
 }
 

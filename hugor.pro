@@ -28,7 +28,6 @@ contains(QT_MAJOR_VERSION, 5):lessThan(QT_MINOR_VERSION, 5) {
         DEFINES += AULIB_DEBUG
     }
 
-    SOURCES *= src/rwopsbundle.c
     INCLUDEPATH += \
         SDL_audiolib \
         SDL_audiolib/include \
@@ -72,11 +71,13 @@ contains(QT_MAJOR_VERSION, 5):lessThan(QT_MINOR_VERSION, 5) {
         $$files(SDL_audiolib/src/*.h) \
         $$files(SDL_audiolib/src/missing/*.h) \
         src/oplvolumebooster.h \
+        src/rwopsbundle.h \
         src/synthfactory.h
 
     SOURCES += \
-        src/soundaulib.cc \
         src/oplvolumebooster.cc \
+        src/rwopsbundle.c \
+        src/soundaulib.cc \
         src/synthfactory.cc \
         SDL_audiolib/resampler/resample.c \
         SDL_audiolib/src/missing/sdl_load_file_rw.c \
@@ -96,66 +97,26 @@ contains(QT_MAJOR_VERSION, 5):lessThan(QT_MINOR_VERSION, 5) {
     SOURCES += src/soundnone.cc
 }
 
-!disable-video {
-    # We still need SDL for SDL_RWops, even without audio.
-    disable-audio {
-        PKGCONFIG += sdl2
-    }
-    gstreamer-1 | gstreamer-0 {
-        DEFINES += VIDEO_GSTREAMER
-
-        gstreamer-0 {
-            PKGCONFIG += \
-                gstreamer-interfaces-0.10 \
-                gstreamer-video-0.10 \
-                gstreamer-app-0.10
-        } else {
-            PKGCONFIG += \
-                gstreamer-video-1.0 \
-                gstreamer-app-1.0
-        }
-
-        HEADERS += \
-            src/videoplayergst_p.h
-
-        SOURCES += \
-            src/videoplayergst.cc \
-            src/videoplayergst_p.cc
-    }
-    else:qt5-video {
-        DEFINES += VIDEO_QT5
-
-        QT += multimediawidgets
-
-        HEADERS += \
-            src/videoplayerqt5_p.h \
-            src/rwopsqiodev.h
-
-        SOURCES += \
-            src/videoplayerqt5.cc \
-            src/videoplayerqt5_p.cc \
-            src/rwopsqiodev.cc
-    }
-    else {
-        disable-audio {
-            error("The libVLC video backend can't be built without audio support.")
-        }
-        PKGCONFIG += libvlc
-        DEFINES += VIDEO_VLC
-        win32 {
-            DEFINES += DL_VLC
-        }
-        HEADERS += \
-            src/videoplayervlc_p.h \
-            src/vlcaudiodecoder.h
-        SOURCES += \
-            src/videoplayervlc.cc \
-            src/vlcaudiodecoder.cc
-    }
-    HEADERS += src/videoplayer.h
-    SOURCES *= src/rwopsbundle.c
-} else {
+disable-video {
     DEFINES += DISABLE_VIDEO
+} else {
+    disable-audio {
+        error("Video support needs audio support to be enabled.")
+    }
+
+    PKGCONFIG += libvlc
+
+    win32 {
+        DEFINES += DL_VLC
+    }
+
+    HEADERS += \
+        src/videoplayer.h \
+        src/vlcaudiodecoder.h
+
+    SOURCES += \
+        src/videoplayer.cc \
+        src/vlcaudiodecoder.cc
 }
 
 macx {
@@ -228,7 +189,6 @@ HEADERS += \
     src/kcolorbutton.h \
     src/settings.h \
     src/settingsoverrides.h \
-    src/rwopsbundle.h \
     src/enginerunner.h \
     src/hugohandlers.h \
     src/hugorfile.h \

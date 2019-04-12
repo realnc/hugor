@@ -61,18 +61,12 @@ For audio support, you will need development files for:
   libfluidsynth (version 2.x; 1.x will not work)
   libADLMIDI (optional; it plays MIDI through OPL3 emulation)
 
-Video is supported through LibVLC or GStreamer.
-
-LibVLC is the recommended backend, and it is usually installed as part of
-the VLC media player on Linux.  It should be detected though pkg-config.
-The LibVLC ffmpeg/libav plugin needs to be installed (which is the case by
+Video is supported through LibVLC. It is usually installed as part of the
+VLC media player on Linux. It should be detected though pkg-config. The
+LibVLC ffmpeg/libav plugin needs to be installed (which is the case by
 default on pretty much every Linux distro.)  When building on macOS or
-Windows, I wish you good luck...  You need to make sure the LibVLC
+Windows, I wish you good luck... You need to make sure the LibVLC
 libraries and headers are available through pkg-config.
-
-When using GStreamer instead of LibVLC, you will need the correct
-GStreamer plugins/codecs installed and their development files. Having the
-ffmpeg or libav plugin installed should be enough.
 
 If all dependencies are available, you can build and install Hugor with
 the following commands:
@@ -83,8 +77,8 @@ the following commands:
 Substitute the 'N' in '-jN' with the amount of CPUs or cores in your
 system in order to utilize all of them for a faster compilation process.
 
-This will build Hugor with audio and video support, with LibVLC as the
-video backend and libopenmpt as the MOD music backend.
+This will build Hugor with audio and video support, with libopenmpt as the
+MOD music backend.
 
 On macOS, this will create an application bundle (Hugor.app) that you can
 run. You can also move it into /Applications. You might want to run the
@@ -100,28 +94,21 @@ installing:
 
   qmake PREFIX=/some/other/directory
 
-To disable audio support, use:
-
-  qmake -config disable-audio
-
-(Note that SDL2 is still needed for video support, even if audio is
-disabled.)
-
 To disable video support, use:
 
   qmake -config disable-video
 
-To disable both audio and video:
+To disable audio support, use:
 
   qmake -config "disable-audio disable-video"
+
+(Note that you can't have video support without audio support.)
 
 The recognized config options are:
 
   xmp            - Use libxmp instead of libopenmpt
   modplug        - Use libmodplug instead of libopenmpt
   adlmidi        - Enable OPL3 emulator (requires libADLMIDI)
-  gstreamer-1    - Use GStreamer 1.x instead of LibVLC
-  gstreamer-0    - Use GStreamer 0.x instead of LibVLC
   disable-audio  - Disable audio support
   disable-video  - Disable video support
 

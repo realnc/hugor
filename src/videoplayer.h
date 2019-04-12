@@ -3,7 +3,13 @@
 #ifndef DISABLE_VIDEO
 #include <QWidget>
 
-class VideoPlayer_priv;
+#include <memory>
+#include <vlc/vlc.h>
+
+namespace Aulib {
+class Stream;
+}
+class VlcAudioDecoder;
 struct HugorFile;
 struct SDL_RWops;
 
@@ -16,6 +22,8 @@ public:
     ~VideoPlayer() override;
 
     bool loadVideo(HugorFile* src, long len, bool loop);
+    bool getVideoSize(unsigned& width, unsigned& height);
+    bool setAudioDelay(int64_t delay);
 
 public slots:
     void play();
@@ -35,9 +43,13 @@ protected:
 private:
     SDL_RWops* rwops_ = nullptr;
     long data_len = 0;
-    bool is_looping = false;
-    friend class VideoPlayer_priv;
-    VideoPlayer_priv* d_ = nullptr;
+    bool is_looping_ = false;
+    std::unique_ptr<libvlc_instance_t, decltype(&libvlc_release)> vlc_instance_{nullptr, nullptr};
+    std::unique_ptr<libvlc_media_player_t, decltype(&libvlc_media_player_release)> vlc_player_{
+        nullptr, nullptr};
+    std::unique_ptr<Aulib::Stream> audio_stream_;
+    VlcAudioDecoder* audio_decoder_ = nullptr;
+    int hugo_volume_ = 100;
 };
 
 #endif
