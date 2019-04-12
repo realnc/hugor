@@ -28,13 +28,6 @@ extern "C" {
 static const QLatin1String CONTROL_FNAME("HrCtlAPI");
 static const QLatin1String CHECK_FNAME("HrCheck");
 
-// Exposes QThread::msleep(), which is protected.
-class SleepFuncs final: public QThread
-{
-public:
-    using QThread::msleep;
-};
-
 // Used to wait on the GUI thread for a condition.
 static QMutex* waiterMutex = nullptr;
 
@@ -551,7 +544,7 @@ int hugo_timewait(int n)
 {
     // qDebug() << Q_FUNC_INFO;
     if (hApp->gameRunning() and n > 0) {
-        SleepFuncs::msleep(1000 / n);
+        QThread::msleep(1000 / n);
         runInMainThread([] { hFrame->updateGameScreen(false); });
     }
     return true;
