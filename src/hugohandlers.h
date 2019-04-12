@@ -1,60 +1,43 @@
 // This is copyrighted software. More information is at the end of this file.
 #pragma once
-#include <QObject>
 
 extern "C" {
 #include "heheader.h"
 }
 
-class VideoPlayer;
-class HugoHandlers;
-
-extern HugoHandlers* hHandlers;
-
 /*
- * Handles hugo callbacks from heqt.cc that we want executed in the main thread. The hugo engine
- * runs in a separate thread, so the heqt.cc callbacks will delegate some work to us in order to
- * ensure it runs in the main thrad (like GUI operations.)
+ * Handlers for Hugo callbacks from heqt.cc that we want executed in the main thread. The hugo
+ * engine runs in a separate thread, so the heqt.cc callbacks will delegate some work here in order
+ * to ensure it runs in the main thrad (like GUI operations.)
  */
-class HugoHandlers final: public QObject
-{
-    Q_OBJECT
+namespace HugoHandlers {
 
-public:
-    HugoHandlers(QObject* parent = nullptr)
-        : QObject(parent)
-    {}
-
-    void calcFontDimensions() const;
-
-public slots:
-    void getfilename(char* a, char* b) const;
-    void startGetline(char* p) const;
-    void endGetline() const;
-    void clearfullscreen() const;
-    void clearwindow() const;
-    void settextmode() const;
-    void settextwindow(int left, int top, int right, int bottom) const;
-    void printFatalError(char* a) const;
-    void print(char* a) const;
-    void font(int f) const;
-    void settextcolor(int c) const;
-    void setbackcolor(int c) const;
-    void displaypicture(HUGO_FILE infile, long len, int* result) const;
-    void playmusic(HUGO_FILE infile, long reslength, char loop_flag, int* result) const;
-    void musicvolume(int vol) const;
-    void stopmusic() const;
-    void playsample(HUGO_FILE infile, long reslength, char loop_flag, int* result) const;
-    void samplevolume(int vol) const;
-    void stopsample() const;
+void calcFontDimensions();
+void getfilename(char* a, char* b);
+void startGetline(char* p);
+void endGetline();
+void clearfullscreen();
+void clearwindow();
+void settextmode();
+void settextwindow(int left, int top, int right, int bottom);
+void printFatalError(char* a);
+void print(char* a);
+void font(int f);
+void settextcolor(int c);
+void setbackcolor(int c);
+void displaypicture(HUGO_FILE infile, long len, int* result);
+void playmusic(HUGO_FILE infile, long reslength, char loop_flag, int* result);
+void musicvolume(int vol);
+void stopmusic();
+void playsample(HUGO_FILE infile, long reslength, char loop_flag, int* result);
+void samplevolume(int vol);
+void stopsample();
 #ifndef DISABLE_VIDEO
-    void stopvideo() const;
-    void playvideo(HUGO_FILE infile, long len, char loop, char bg, int vol, int* result);
+void stopvideo();
+void playvideo(HUGO_FILE infile, long len, char loop, char bg, int vol, int* result);
 #endif
 
-private:
-    VideoPlayer* vid_player_ = nullptr;
-};
+}; // namespace HugoHandlers
 
 /* Copyright (C) 2011-2019 Nikos Chantziaras
  *

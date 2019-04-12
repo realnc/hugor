@@ -130,16 +130,11 @@ HApplication::HApplication(int& argc, char* argv[], const char* appName, const c
     HApplication::setWindowIcon(QIcon(":/he_32-bit_48x48.png"));
 #endif
     delete settOvr;
-
-    hHandlers = new HugoHandlers(this);
 }
 
 HApplication::~HApplication()
 {
     // qDebug() << Q_FUNC_INFO;
-    Q_ASSERT(hHandlers != nullptr);
-    delete hHandlers;
-    hHandlers = nullptr;
     Q_ASSERT(hApp != nullptr);
     settings_->saveToDisk();
     delete settings_;
@@ -348,7 +343,7 @@ void HApplication::notifyPreferencesChange(const Settings* sett)
     updateMargins(::bgcolor);
 
     // Recalculate font dimensions, in case font settings have changed.
-    hHandlers->calcFontDimensions();
+    HugoHandlers::calcFontDimensions();
 
     // The fonts might have changed.
     hFrame->setFontType(currentfont);
@@ -357,10 +352,10 @@ void HApplication::notifyPreferencesChange(const Settings* sett)
     display_needs_repaint = true;
 #ifndef DISABLE_AUDIO
     if (not sett->enable_music) {
-        hHandlers->stopmusic();
+        HugoHandlers::stopmusic();
     }
     if (not sett->enable_sound_effects) {
-        hHandlers->stopsample();
+        HugoHandlers::stopsample();
     }
     updateMusicVolume();
     updateSoundVolume();
@@ -368,7 +363,7 @@ void HApplication::notifyPreferencesChange(const Settings* sett)
 #endif
 #ifndef DISABLE_VIDEO
     if (not sett->enable_video) {
-        hHandlers->stopvideo();
+        HugoHandlers::stopvideo();
     }
 #endif
     frame_win_->updateGameScreen(true);

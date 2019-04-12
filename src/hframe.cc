@@ -258,7 +258,7 @@ void HFrame::resizeEvent(QResizeEvent* e)
     p.drawPixmap(0, 0, pixmap_);
     pixmap_ = newPixmap;
 
-    hHandlers->settextmode();
+    HugoHandlers::settextmode();
     display_needs_repaint = true;
 }
 

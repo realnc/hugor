@@ -16,9 +16,7 @@
 #include "settings.h"
 #include "videoplayer.h"
 
-HugoHandlers* hHandlers = nullptr;
-
-void HugoHandlers::calcFontDimensions() const
+void HugoHandlers::calcFontDimensions()
 {
     const QFontMetrics& curMetr = hFrame->currentFontMetrics();
     const QFontMetrics fixedMetr(hApp->settings()->fixed_font);
@@ -30,7 +28,7 @@ void HugoHandlers::calcFontDimensions() const
     lineheight = curMetr.lineSpacing();
 }
 
-void HugoHandlers::getfilename(char* a, char* b) const
+void HugoHandlers::getfilename(char* a, char* b)
 {
     Q_ASSERT(a != nullptr and b != nullptr);
 
@@ -71,7 +69,7 @@ void HugoHandlers::getfilename(char* a, char* b) const
     qstrcpy(line, fname.toLocal8Bit().constData());
 }
 
-void HugoHandlers::startGetline(char* p) const
+void HugoHandlers::startGetline(char* p)
 {
     // Print the prompt in normal text colors.
     settextcolor(fcolor);
@@ -86,7 +84,7 @@ void HugoHandlers::startGetline(char* p) const
     hFrame->startInput(current_text_x, current_text_y);
 }
 
-void HugoHandlers::endGetline() const
+void HugoHandlers::endGetline()
 {
     hFrame->setCursorVisible(false);
     char newline[] = "\r\n";
@@ -94,19 +92,19 @@ void HugoHandlers::endGetline() const
     hFrame->updateGameScreen(false);
 }
 
-void HugoHandlers::clearfullscreen() const
+void HugoHandlers::clearfullscreen()
 {
     hFrame->clearRegion(0, 0, 0, 0);
 }
 
-void HugoHandlers::clearwindow() const
+void HugoHandlers::clearwindow()
 {
     hFrame->setBgColor(bgcolor);
     hFrame->clearRegion(physical_windowleft, physical_windowtop, physical_windowright,
                         physical_windowbottom);
 }
 
-void HugoHandlers::settextmode() const
+void HugoHandlers::settextmode()
 {
     calcFontDimensions();
     SCREENWIDTH = hFrame->width();
@@ -116,7 +114,7 @@ void HugoHandlers::settextmode() const
     settextwindow(1, 1, SCREENWIDTH / FIXEDCHARWIDTH, SCREENHEIGHT / FIXEDLINEHEIGHT);
 }
 
-void HugoHandlers::settextwindow(int left, int top, int right, int bottom) const
+void HugoHandlers::settextwindow(int left, int top, int right, int bottom)
 {
     // qDebug() << "settextwindow" << left << top << right << bottom;
     /* Must be set: */
@@ -142,12 +140,12 @@ void HugoHandlers::settextwindow(int left, int top, int right, int bottom) const
     hFrame->setFontType(currentfont);
 }
 
-void HugoHandlers::printFatalError(char* a) const
+void HugoHandlers::printFatalError(char* a)
 {
     print(a);
 }
 
-void HugoHandlers::print(char* a) const
+void HugoHandlers::print(char* a)
 {
     uint len = qstrlen(a);
     QString ac;
@@ -209,25 +207,25 @@ void HugoHandlers::print(char* a) const
     }
 }
 
-void HugoHandlers::font(int f) const
+void HugoHandlers::font(int f)
 {
     hFrame->setFontType(f);
     ::charwidth = hFrame->currentFontMetrics().averageCharWidth();
     lineheight = hFrame->currentFontMetrics().lineSpacing();
 }
 
-void HugoHandlers::settextcolor(int c) const
+void HugoHandlers::settextcolor(int c)
 {
     hFrame->setFgColor(c);
 }
 
-void HugoHandlers::setbackcolor(int c) const
+void HugoHandlers::setbackcolor(int c)
 {
     hFrame->setBgColor(c);
 }
 
 // FIXME: Check for errors when loading images.
-void HugoHandlers::displaypicture(HUGO_FILE infile, long len, int* result) const
+void HugoHandlers::displaypicture(HUGO_FILE infile, long len, int* result)
 {
     // Open it as a QFile.
     long pos = ftell(infile->get());
@@ -271,10 +269,12 @@ void HugoHandlers::displaypicture(HUGO_FILE infile, long len, int* result) const
 
 #ifndef DISABLE_VIDEO
 
-void HugoHandlers::stopvideo() const
+static VideoPlayer* vid_player = nullptr;
+
+void HugoHandlers::stopvideo()
 {
-    if (vid_player_ != nullptr) {
-        vid_player_->stop();
+    if (vid_player != nullptr) {
+        vid_player->stop();
     }
 }
 
@@ -285,31 +285,31 @@ void HugoHandlers::playvideo(HUGO_FILE infile, long len, char loop, char bg, int
         return;
     }
     stopvideo();
-    if (vid_player_ == nullptr) {
-        vid_player_ = new VideoPlayer(hFrame);
-        if (vid_player_ == nullptr) {
+    if (vid_player == nullptr) {
+        vid_player = new VideoPlayer(hFrame);
+        if (vid_player == nullptr) {
             *result = false;
             return;
         }
     }
-    if (not vid_player_->loadVideo(infile, len, loop)) {
+    if (not vid_player->loadVideo(infile, len, loop)) {
         *result = false;
         return;
     }
-    vid_player_->setVolume(vol);
-    vid_player_->setMaximumSize(QSize(physical_windowwidth, physical_windowheight));
-    vid_player_->setGeometry(physical_windowleft, physical_windowtop, physical_windowwidth,
+    vid_player->setVolume(vol);
+    vid_player->setMaximumSize(QSize(physical_windowwidth, physical_windowheight));
+    vid_player->setGeometry(physical_windowleft, physical_windowtop, physical_windowwidth,
                              physical_windowheight);
     if (not bg) {
         QEventLoop idleLoop;
-        connect(vid_player_, &VideoPlayer::videoFinished, &idleLoop, &QEventLoop::quit);
-        connect(vid_player_, &VideoPlayer::errorOccurred, &idleLoop, &QEventLoop::quit);
-        connect(hApp, &HApplication::gameQuitting, &idleLoop, &QEventLoop::quit);
-        connect(hFrame, &HFrame::escKeyPressed, &idleLoop, &QEventLoop::quit);
-        vid_player_->play();
+        QObject::connect(vid_player, &VideoPlayer::videoFinished, &idleLoop, &QEventLoop::quit);
+        QObject::connect(vid_player, &VideoPlayer::errorOccurred, &idleLoop, &QEventLoop::quit);
+        QObject::connect(hApp, &HApplication::gameQuitting, &idleLoop, &QEventLoop::quit);
+        QObject::connect(hFrame, &HFrame::escKeyPressed, &idleLoop, &QEventLoop::quit);
+        vid_player->play();
         idleLoop.exec();
     } else {
-        vid_player_->play();
+        vid_player->play();
     }
     *result = true;
 }

@@ -35,27 +35,27 @@ bool isSamplePlaying()
 }
 
 void HugoHandlers::playmusic(HUGO_FILE /*infile*/, long /*reslength*/, char /*loop_flag*/,
-                             int* result) const
+                             int* result)
 {
     *result = false;
 }
 
-void HugoHandlers::musicvolume(int /*vol*/) const
+void HugoHandlers::musicvolume(int /*vol*/)
 {}
 
-void HugoHandlers::stopmusic() const
+void HugoHandlers::stopmusic()
 {}
 
 void HugoHandlers::playsample(HUGO_FILE /*infile*/, long /*reslength*/, char /*loop_flag*/,
-                              int* result) const
+                              int* result)
 {
     *result = false;
 }
 
-void HugoHandlers::samplevolume(int /*vol*/) const
+void HugoHandlers::samplevolume(int /*vol*/)
 {}
 
-void HugoHandlers::stopsample() const
+void HugoHandlers::stopsample()
 {}
 
 /* Copyright (C) 2011-2019 Nikos Chantziaras

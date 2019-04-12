@@ -111,12 +111,12 @@ void muteSound(bool mute)
 
 void updateMusicVolume()
 {
-    hHandlers->musicvolume(currentMusicVol);
+    HugoHandlers::musicvolume(currentMusicVol);
 }
 
 void updateSoundVolume()
 {
-    hHandlers->samplevolume(currentSampleVol);
+    HugoHandlers::samplevolume(currentSampleVol);
 }
 
 void updateSynthGain()
@@ -239,12 +239,12 @@ static bool playStream(HUGO_FILE infile, long reslength, char loop_flag, bool is
     return false;
 }
 
-void HugoHandlers::playmusic(HUGO_FILE infile, long reslength, char loop_flag, int* result) const
+void HugoHandlers::playmusic(HUGO_FILE infile, long reslength, char loop_flag, int* result)
 {
     *result = playStream(infile, reslength, loop_flag, true);
 }
 
-void HugoHandlers::musicvolume(int vol) const
+void HugoHandlers::musicvolume(int vol)
 {
     if (vol < 0) {
         vol = 0;
@@ -260,19 +260,19 @@ void HugoHandlers::musicvolume(int vol) const
     }
 }
 
-void HugoHandlers::stopmusic() const
+void HugoHandlers::stopmusic()
 {
     if (musicStream()) {
         musicStream()->stop();
     }
 }
 
-void HugoHandlers::playsample(HUGO_FILE infile, long reslength, char loop_flag, int* result) const
+void HugoHandlers::playsample(HUGO_FILE infile, long reslength, char loop_flag, int* result)
 {
     *result = playStream(infile, reslength, loop_flag, false);
 }
 
-void HugoHandlers::samplevolume(int vol) const
+void HugoHandlers::samplevolume(int vol)
 {
     if (vol < 0) {
         vol = 0;
@@ -285,7 +285,7 @@ void HugoHandlers::samplevolume(int vol) const
     }
 }
 
-void HugoHandlers::stopsample() const
+void HugoHandlers::stopsample()
 {
     if (sampleStream()) {
         sampleStream()->stop();

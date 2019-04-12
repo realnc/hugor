@@ -279,7 +279,7 @@ void hugo_makepath(char* path, char* drive, char* dir, char* fname, char* ext)
 */
 void hugo_getfilename(char* a, char* b)
 {
-    runInMainThread([a, b] { hHandlers->getfilename(a, b); });
+    runInMainThread([a, b] { HugoHandlers::getfilename(a, b); });
 }
 
 /* hugo_overwrite
@@ -502,10 +502,10 @@ void hugo_getline(char* p)
     flushScrollbackBuffer();
 
     QMutexLocker mLocker(waiterMutex);
-    runInMainThread([p] { hHandlers->startGetline(p); });
+    runInMainThread([p] { HugoHandlers::startGetline(p); });
     hFrame->inputLineWaitCond.wait(waiterMutex);
     hFrame->getInput(::buffer, MAXBUFFER);
-    runInMainThread([] { hHandlers->endGetline(); });
+    runInMainThread([] { HugoHandlers::endGetline(); });
 
     // Also copy the input to the script file (if there is one) and the scrollback.
     if (script != nullptr) {
@@ -628,7 +628,7 @@ void hugo_cleanup_screen(void)
  */
 void hugo_clearfullscreen(void)
 {
-    runInMainThread([] { hHandlers->clearfullscreen(); });
+    runInMainThread([] { HugoHandlers::clearfullscreen(); });
     currentpos = 0;
     currentline = 1;
     TB_Clear(0, 0, screenwidth, screenheight);
@@ -639,7 +639,7 @@ void hugo_clearfullscreen(void)
  */
 void hugo_clearwindow(void)
 {
-    runInMainThread([] { hHandlers->clearwindow(); });
+    runInMainThread([] { HugoHandlers::clearwindow(); });
     currentpos = 0;
     currentline = 1;
     TB_Clear(physical_windowleft, physical_windowtop, physical_windowright, physical_windowbottom);
@@ -678,7 +678,7 @@ void hugo_clearwindow(void)
 */
 void hugo_settextmode(void)
 {
-    runInMainThread([] { hHandlers->settextmode(); });
+    runInMainThread([] { HugoHandlers::settextmode(); });
 }
 
 /* Once again, the arguments for the window are passed using character
@@ -699,7 +699,7 @@ void hugo_settextmode(void)
 void hugo_settextwindow(int left, int top, int right, int bottom)
 {
     runInMainThread(
-        [left, top, right, bottom] { hHandlers->settextwindow(left, top, right, bottom); });
+        [left, top, right, bottom] { HugoHandlers::settextwindow(left, top, right, bottom); });
 }
 
 /* The top-left corner of the current active window is (1, 1).
@@ -736,7 +736,7 @@ void hugo_settextpos(int x, int y)
  */
 void printFatalError(char* a)
 {
-    runInMainThread([a] { hHandlers->printFatalError(a); });
+    runInMainThread([a] { HugoHandlers::printFatalError(a); });
 }
 
 /* Essentially the same as printf() without formatting, since printf()
@@ -753,7 +753,7 @@ void printFatalError(char* a)
 */
 void hugo_print(char* a)
 {
-    runInMainThread([a] { hHandlers->print(a); });
+    runInMainThread([a] { HugoHandlers::print(a); });
 }
 
 /* Scroll the current text window up one line.
@@ -775,17 +775,17 @@ void hugo_scrollwindowup()
 */
 void hugo_font(int f)
 {
-    runInMainThread([f] { hHandlers->font(f); });
+    runInMainThread([f] { HugoHandlers::font(f); });
 }
 
 void hugo_settextcolor(int c)
 {
-    runInMainThread([c] { hHandlers->settextcolor(c); });
+    runInMainThread([c] { HugoHandlers::settextcolor(c); });
 }
 
 void hugo_setbackcolor(int c)
 {
-    runInMainThread([c] { hHandlers->setbackcolor(c); });
+    runInMainThread([c] { HugoHandlers::setbackcolor(c); });
 }
 
 /* CHARACTER AND TEXT MEASUREMENT
@@ -858,7 +858,7 @@ int hugo_strlen(char* a)
 int hugo_displaypicture(HUGO_FILE infile, long len)
 {
     int result;
-    runInMainThread([infile, len, &result] { hHandlers->displaypicture(infile, len, &result); });
+    runInMainThread([infile, len, &result] { HugoHandlers::displaypicture(infile, len, &result); });
     delete infile;
     return result;
 }
@@ -867,7 +867,7 @@ int hugo_playmusic(HUGO_FILE infile, long len, char loop_flag)
 {
     int result;
     runInMainThread([infile, len, loop_flag, &result] {
-        hHandlers->playmusic(infile, len, loop_flag, &result);
+        HugoHandlers::playmusic(infile, len, loop_flag, &result);
     });
     delete infile;
     return result;
@@ -875,19 +875,19 @@ int hugo_playmusic(HUGO_FILE infile, long len, char loop_flag)
 
 void hugo_musicvolume(int vol)
 {
-    runInMainThread([vol] { hHandlers->musicvolume(vol); });
+    runInMainThread([vol] { HugoHandlers::musicvolume(vol); });
 }
 
 void hugo_stopmusic(void)
 {
-    runInMainThread([] { hHandlers->stopmusic(); });
+    runInMainThread([] { HugoHandlers::stopmusic(); });
 }
 
 int hugo_playsample(HUGO_FILE infile, long len, char loop_flag)
 {
     int result;
     runInMainThread([infile, len, loop_flag, &result] {
-        hHandlers->playsample(infile, len, loop_flag, &result);
+        HugoHandlers::playsample(infile, len, loop_flag, &result);
     });
     delete infile;
     return result;
@@ -895,12 +895,12 @@ int hugo_playsample(HUGO_FILE infile, long len, char loop_flag)
 
 void hugo_samplevolume(int vol)
 {
-    runInMainThread([vol] { hHandlers->samplevolume(vol); });
+    runInMainThread([vol] { HugoHandlers::samplevolume(vol); });
 }
 
 void hugo_stopsample(void)
 {
-    runInMainThread([] { hHandlers->stopsample(); });
+    runInMainThread([] { HugoHandlers::stopsample(); });
 }
 
 #ifdef DISABLE_VIDEO
@@ -943,14 +943,14 @@ int hugo_hasvideo(void)
 
 void hugo_stopvideo(void)
 {
-    runInMainThread([] { hHandlers->stopvideo(); });
+    runInMainThread([] { HugoHandlers::stopvideo(); });
 }
 
 int hugo_playvideo(HUGO_FILE infile, long len, char loop, char bg, int vol)
 {
     int result;
     runInMainThread([infile, len, loop, bg, vol, &result] {
-        hHandlers->playvideo(infile, len, loop, bg, vol, &result);
+        HugoHandlers::playvideo(infile, len, loop, bg, vol, &result);
     });
     delete infile;
     return result;
