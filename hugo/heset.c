@@ -415,7 +415,7 @@ GetNextPropVal:
 				{
 					if (set_value==title_caption)
 					{
-						strncpy(game_title, GetWord(newp), MAX_GAME_TITLE);
+						strncpy(game_title, GetWord(newp), MAX_GAME_TITLE - 1);
 						hugo_setgametitle(game_title);
 					}
 					else if (set_value==needs_repaint)
