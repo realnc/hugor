@@ -191,7 +191,7 @@ static bool playStream(HUGO_FILE infile, long reslength, char loop_flag, bool is
 #elif USE_DEC_XMP
                 Aulib::DecoderXmp;
 #elif USE_DEC_MODPLUG
-                Aulib::DecoderModPlug;
+                Aulib::DecoderModplug;
 #endif
             decoder = std::make_unique<ModDec_type>();
             fsynthDec() = nullptr;
