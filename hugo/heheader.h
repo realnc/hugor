@@ -1196,9 +1196,6 @@ char *Mid(char *a, int pos, int n);
 char *Right(char *a, int l);
 char *Rtrim(char *a);
 #if defined (EXTRA_STRING_FUNCTIONS)
-#ifndef UNDER_CE
-int atoi(const char * str);
-#endif
 char *itoa(int a, char *buf, int base);
 char *strlwr(char *s);
 char *strnset(char *s, int c, size_t l);

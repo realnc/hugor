@@ -34,6 +34,7 @@
 
 
 #include "heheader.h"
+#include <stdlib.h>
 
 
 /* Function prototypes: */

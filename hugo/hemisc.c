@@ -25,6 +25,7 @@
 
 
 #include "heheader.h"
+#include <stdlib.h>
 
 
 void Banner(void);                      	/* from he.c */
