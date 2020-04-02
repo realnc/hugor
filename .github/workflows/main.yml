@@ -1,0 +1,125 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-16.04, macos-10.15]
+
+    runs-on: ${{ matrix.os }}
+
+    env:
+      CMAKE_GENERATOR: Ninja
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - if: runner.os == 'Linux'
+      name: Add PPAs
+      run: |
+        sudo add-apt-repository ppa:beineri/opt-qt-5.12.1-xenial
+        sudo add-apt-repository ppa:jonathonf/vlc-3
+        sudo apt-get update
+
+    - if: runner.os == 'Linux'
+      name: Install deps
+      run: sudo apt-get -y install
+        libboost-dev
+        libmpg123-dev
+        libsdl2-dev
+        libsndfile1-dev
+        libvlc-dev
+        ninja-build
+        qt512base
+
+    - if: runner.os == 'Linux'
+      run: sudo ln -s /usr/local/lib /usr/local/lib64
+
+    - if: runner.os == 'macOS'
+      name: Install deps
+      run: brew install
+        fluidsynth
+        glib
+        libopenmpt
+        libsndfile
+        mpg123
+        ninja
+        pkg-config
+        qt5
+        sdl2
+
+    - if: runner.os == 'macOS'
+      run: brew link qt5 --force
+
+    - name: Build libADLMIDI
+      working-directory: ../
+      run: |
+        wget -q 'https://github.com/Wohlstand/libADLMIDI/archive/c19bf11f4b12004051fc76651733e17f3e98143a.tar.gz' \
+          -O- | tar xz
+        cd libADLMIDI-c19bf11f4b12004051fc76651733e17f3e98143a
+        mkdir build
+        cd build
+        cmake \
+          -DlibADLMIDI_SHARED=on \
+          -DlibADLMIDI_STATIC=off \
+          -DEXAMPLE_SDL2_AUDIO=off \
+          ..
+        sudo cmake --build . --target install
+
+    - if: runner.os == 'Linux'
+      name: Build FluidSynth
+      working-directory: ../
+      run: |
+        wget -q 'https://github.com/FluidSynth/fluidsynth/archive/v2.1.1.tar.gz' -O- | tar xz
+        mkdir fluidsynth-2.1.1/build
+        cd fluidsynth-2.1.1/build
+        cmake -Denable-framework=off ..
+        sudo cmake --build . --target install
+
+    - if: runner.os == 'Linux'
+      name: Build libopenmpt
+      working-directory: ../
+      run: |
+        wget -q 'https://lib.openmpt.org/files/libopenmpt/src/libopenmpt-0.4.11+release.autotools.tar.gz' \
+          -O- | tar xz
+        mkdir openmpt-build
+        cd openmpt-build
+        ../libopenmpt-0.4.11+release.autotools/configure \
+          --enable-silent-rules \
+          --disable-dependency-tracking \
+          --enable-shared \
+          --disable-static \
+          --disable-openmpt123 \
+          --disable-examples \
+          --disable-tests \
+          --disable-doxygen-doc \
+          --without-zlib \
+          --without-mpg123 \
+          --without-ogg \
+          --without-vorbis \
+          --without-vorbisfile \
+          --without-pulseaudio \
+          --without-portaudio \
+          --without-portaudiocpp \
+          --without-sdl2 \
+          --without-sdl \
+          --without-sndfile \
+          --without-flac
+        make -j`nproc`
+        sudo make install
+
+    - if: runner.os == 'Linux'
+      name: Build
+      run: |
+        source /opt/qt512/bin/qt512-env.sh \
+        && qmake -config adlmidi \
+        && make -j`nproc` \
+        && sudo make install
+
+    - if: runner.os == 'macOS'
+      name: Build
+      run: |
+        qmake -config disable-video -config adlmidi
+        make -j`sysctl -n hw.ncpu`
