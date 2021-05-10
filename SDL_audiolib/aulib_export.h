@@ -39,4 +39,4 @@
 #  endif
 #endif
 
-#endif
+#endif /* AULIB_EXPORT_H */

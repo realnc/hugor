@@ -4,12 +4,20 @@
 #include "Buffer.h"
 #include "aulib.h"
 #include "aulib_debug.h"
-
+#include "missing.h"
 #include <SDL_audio.h>
 #include <SDL_rwops.h>
 #include <array>
 #include <cstdio>
 #include <fluidsynth.h>
+
+#if FLUIDSYNTH_VERSION_MAJOR == 2 && FLUIDSYNTH_VERSION_MINOR >= 2
+using read_cb_count_type = fluid_long_long_t;
+using seek_cb_offset_type = fluid_long_long_t;
+#else
+using read_cb_count_type = int;
+using seek_cb_offset_type = long;
+#endif
 
 namespace chrono = std::chrono;
 
@@ -18,9 +26,9 @@ static fluid_settings_t* settings = nullptr;
 /* Huge kludge. Fluidsynth doesn't have a nice API for custom soundfont loading, so we hijack the
  * filename string to store a pointer to the rwops. We prefix such filenames with a "&".
  */
-static void* sfontOpenCb(const char* filename)
+static auto sfontOpenCb(const char* filename) -> void*
 {
-    if (filename == nullptr) {
+    if (not filename) {
         return nullptr;
     }
     if (filename[0] != '&') {
@@ -36,7 +44,7 @@ static void* sfontOpenCb(const char* filename)
     return rwops;
 }
 
-static int sfontReadCb(void* dst, int count, void* rwops)
+static auto sfontReadCb(void* dst, read_cb_count_type count, void* rwops) -> int
 {
     Buffer<char> buf(count);
     if (SDL_RWread(static_cast<SDL_RWops*>(rwops), buf.get(), 1, count) <= 0) {
@@ -46,7 +54,7 @@ static int sfontReadCb(void* dst, int count, void* rwops)
     return FLUID_OK;
 }
 
-static int sfontSeekCb(void* rwops, long offset, int whence)
+static auto sfontSeekCb(void* rwops, seek_cb_offset_type offset, int whence) -> int
 {
     switch (whence) {
     case SEEK_SET:
@@ -64,7 +72,7 @@ static int sfontSeekCb(void* rwops, long offset, int whence)
     return FLUID_OK;
 }
 
-static int sfontCloseCb(void* rwops)
+static auto sfontCloseCb(void* rwops) -> int
 {
     if (SDL_RWclose(static_cast<SDL_RWops*>(rwops)) != 0) {
         return FLUID_FAILED;
@@ -72,7 +80,7 @@ static int sfontCloseCb(void* rwops)
     return FLUID_OK;
 }
 
-static long sfontTellCb(void* rwops)
+static auto sfontTellCb(void* rwops) -> seek_cb_offset_type
 {
     auto pos = SDL_RWtell(static_cast<SDL_RWops*>(rwops));
     if (pos == -1) {
@@ -81,12 +89,12 @@ static long sfontTellCb(void* rwops)
     return pos;
 }
 
-static int initFluidSynth()
+static auto initFluidSynth() -> int
 {
-    if (settings != nullptr) {
+    if (settings) {
         return 0;
     }
-    if ((settings = new_fluid_settings()) == nullptr) {
+    if (not(settings = new_fluid_settings())) {
         return -1;
     }
     fluid_settings_setnum(settings, "synth.sample-rate", Aulib::sampleRate());
@@ -115,7 +123,7 @@ struct DecoderFluidsynth_priv final
 
 Aulib::DecoderFluidsynth_priv::DecoderFluidsynth_priv()
 {
-    if (settings == nullptr) {
+    if (not settings) {
         initFluidSynth();
     }
     fSynth.reset(new_fluid_synth(settings));
@@ -140,9 +148,12 @@ Aulib::DecoderFluidsynth::DecoderFluidsynth()
 
 Aulib::DecoderFluidsynth::~DecoderFluidsynth() = default;
 
-bool Aulib::DecoderFluidsynth::loadSoundfont(SDL_RWops* rwops)
+auto Aulib::DecoderFluidsynth::loadSoundfont(SDL_RWops* rwops) -> bool
 {
-    if (rwops == nullptr) {
+    if (not isOpen()) {
+        return false;
+    }
+    if (not rwops) {
         SDL_SetError("rwops is null.");
         return false;
     }
@@ -168,8 +179,11 @@ bool Aulib::DecoderFluidsynth::loadSoundfont(SDL_RWops* rwops)
     return true;
 }
 
-bool Aulib::DecoderFluidsynth::loadSoundfont(const std::string& filename)
+auto Aulib::DecoderFluidsynth::loadSoundfont(const std::string& filename) -> bool
 {
+    if (not isOpen()) {
+        return false;
+    }
     if (fluid_synth_sfload(d->fSynth.get(), filename.c_str(), 1) == FLUID_FAILED) {
         SDL_SetError("FluidSynth failed to load soundfont.");
         return false;
@@ -177,17 +191,22 @@ bool Aulib::DecoderFluidsynth::loadSoundfont(const std::string& filename)
     return true;
 }
 
-float Aulib::DecoderFluidsynth::gain() const
+auto Aulib::DecoderFluidsynth::gain() const -> float
 {
+    if (not isOpen()) {
+        return 0.f;
+    }
     return fluid_synth_get_gain(d->fSynth.get());
 }
 
 void Aulib::DecoderFluidsynth::setGain(float gain)
 {
-    fluid_synth_set_gain(d->fSynth.get(), gain);
+    if (isOpen()) {
+        fluid_synth_set_gain(d->fSynth.get(), gain);
+    }
 }
 
-bool Aulib::DecoderFluidsynth::open(SDL_RWops* rwops)
+auto Aulib::DecoderFluidsynth::open(SDL_RWops* rwops) -> bool
 {
     if (isOpen()) {
         return true;
@@ -196,7 +215,7 @@ bool Aulib::DecoderFluidsynth::open(SDL_RWops* rwops)
         SDL_SetError("FluidSynth failed to initialize.");
         return false;
     }
-    if (rwops == nullptr) {
+    if (not rwops) {
         SDL_SetError("rwops is null.");
         return false;
     }
@@ -212,7 +231,7 @@ bool Aulib::DecoderFluidsynth::open(SDL_RWops* rwops)
         return false;
     }
     d->fPlayer.reset(new_fluid_player(d->fSynth.get()));
-    if (d->fPlayer == nullptr) {
+    if (not d->fPlayer) {
         SDL_SetError("Failed to create FluidSynth player.");
         return false;
     }
@@ -230,10 +249,9 @@ bool Aulib::DecoderFluidsynth::open(SDL_RWops* rwops)
     return true;
 }
 
-int Aulib::DecoderFluidsynth::getChannels() const
+auto Aulib::DecoderFluidsynth::getChannels() const -> int
 {
-    if (d->fSynth == nullptr) {
-        SDL_SetError("FluidSynth failed to initialize.");
+    if (not settings) {
         return 0;
     }
 
@@ -243,10 +261,9 @@ int Aulib::DecoderFluidsynth::getChannels() const
     return channels * 2;
 }
 
-int Aulib::DecoderFluidsynth::getRate() const
+auto Aulib::DecoderFluidsynth::getRate() const -> int
 {
-    if (d->fSynth == nullptr) {
-        SDL_SetError("FluidSynth failed to initialize.");
+    if (not settings) {
         return 0;
     }
 
@@ -255,10 +272,9 @@ int Aulib::DecoderFluidsynth::getRate() const
     return rate;
 }
 
-int Aulib::DecoderFluidsynth::doDecoding(float buf[], int len, bool& callAgain)
+auto Aulib::DecoderFluidsynth::doDecoding(float buf[], int len, bool& /*callAgain*/) -> int
 {
-    callAgain = false;
-    if (not d->fPlayer or d->fEOF) {
+    if (d->fEOF or not isOpen()) {
         return 0;
     }
 
@@ -273,10 +289,9 @@ int Aulib::DecoderFluidsynth::doDecoding(float buf[], int len, bool& callAgain)
     return 0;
 }
 
-bool Aulib::DecoderFluidsynth::rewind()
+auto Aulib::DecoderFluidsynth::rewind() -> bool
 {
-    if (d->fSynth == nullptr) {
-        SDL_SetError("FluidSynth failed to initialize.");
+    if (not isOpen()) {
         return false;
     }
 
@@ -292,13 +307,13 @@ bool Aulib::DecoderFluidsynth::rewind()
     return true;
 }
 
-chrono::microseconds Aulib::DecoderFluidsynth::duration() const
+auto Aulib::DecoderFluidsynth::duration() const -> chrono::microseconds
 {
     SDL_SetError("Duration cannot be determined with this decoder.");
     return {};
 }
 
-bool Aulib::DecoderFluidsynth::seekToTime(chrono::microseconds /*pos*/)
+auto Aulib::DecoderFluidsynth::seekToTime(chrono::microseconds /*pos*/) -> bool
 {
     SDL_SetError("Seeking is not supported with this decoder.");
     return false;

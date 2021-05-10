@@ -3,6 +3,7 @@
 
 #include "Buffer.h"
 #include "aulib.h"
+#include "missing.h"
 #include <SDL_rwops.h>
 #include <libopenmpt/libopenmpt.hpp>
 #include <limits>
@@ -14,7 +15,7 @@ namespace Aulib {
 
 struct DecoderOpenmpt_priv final
 {
-    std::unique_ptr<openmpt::module> fModule = nullptr;
+    std::unique_ptr<openmpt::module> fModule;
     bool atEOF = false;
     chrono::microseconds fDuration{};
 };
@@ -27,7 +28,7 @@ Aulib::DecoderOpenmpt::DecoderOpenmpt()
 
 Aulib::DecoderOpenmpt::~DecoderOpenmpt() = default;
 
-bool Aulib::DecoderOpenmpt::open(SDL_RWops* rwops)
+auto Aulib::DecoderOpenmpt::open(SDL_RWops* rwops) -> bool
 {
     if (isOpen()) {
         return true;
@@ -42,7 +43,7 @@ bool Aulib::DecoderOpenmpt::open(SDL_RWops* rwops)
         return false;
     }
 
-    std::unique_ptr<openmpt::module> module(nullptr);
+    std::unique_ptr<openmpt::module> module;
     try {
         module = std::make_unique<openmpt::module>(data.get(), data.size());
     }
@@ -58,37 +59,40 @@ bool Aulib::DecoderOpenmpt::open(SDL_RWops* rwops)
     return true;
 }
 
-int Aulib::DecoderOpenmpt::getChannels() const
+auto Aulib::DecoderOpenmpt::getChannels() const -> int
 {
     return Aulib::channelCount();
 }
 
-int Aulib::DecoderOpenmpt::getRate() const
+auto Aulib::DecoderOpenmpt::getRate() const -> int
 {
     return Aulib::sampleRate();
 }
 
-bool Aulib::DecoderOpenmpt::rewind()
+auto Aulib::DecoderOpenmpt::rewind() -> bool
 {
     return seekToTime(chrono::microseconds::zero());
 }
 
-chrono::microseconds Aulib::DecoderOpenmpt::duration() const
+auto Aulib::DecoderOpenmpt::duration() const -> chrono::microseconds
 {
     return d->fDuration;
 }
 
-bool Aulib::DecoderOpenmpt::seekToTime(chrono::microseconds pos)
+auto Aulib::DecoderOpenmpt::seekToTime(chrono::microseconds pos) -> bool
 {
+    if (not isOpen()) {
+        return false;
+    }
+
     d->fModule->set_position_seconds(chrono::duration<double>(pos).count());
     d->atEOF = false;
     return true;
 }
 
-int Aulib::DecoderOpenmpt::doDecoding(float buf[], int len, bool& callAgain)
+auto Aulib::DecoderOpenmpt::doDecoding(float buf[], int len, bool& /*callAgain*/) -> int
 {
-    callAgain = false;
-    if (d->atEOF) {
+    if (d->atEOF or not isOpen()) {
         return 0;
     }
     int ret;

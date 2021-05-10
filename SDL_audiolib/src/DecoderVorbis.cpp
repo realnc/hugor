@@ -9,12 +9,12 @@ namespace chrono = std::chrono;
 
 extern "C" {
 
-static size_t vorbisReadCb(void* ptr, size_t size, size_t nmemb, void* rwops)
+static auto vorbisReadCb(void* ptr, size_t size, size_t nmemb, void* rwops) -> size_t
 {
     return SDL_RWread(static_cast<SDL_RWops*>(rwops), ptr, size, nmemb);
 }
 
-static int vorbisSeekCb(void* rwops, ogg_int64_t offset, int whence)
+static auto vorbisSeekCb(void* rwops, ogg_int64_t offset, int whence) -> int
 {
     if (SDL_RWseek(static_cast<SDL_RWops*>(rwops), offset, whence) < 0) {
         return -1;
@@ -22,7 +22,7 @@ static int vorbisSeekCb(void* rwops, ogg_int64_t offset, int whence)
     return 0;
 }
 
-static long vorbisTellCb(void* rwops)
+static auto vorbisTellCb(void* rwops) -> long
 {
     return SDL_RWtell(static_cast<SDL_RWops*>(rwops));
 }
@@ -48,7 +48,7 @@ Aulib::DecoderVorbis::DecoderVorbis()
 
 Aulib::DecoderVorbis::~DecoderVorbis() = default;
 
-bool Aulib::DecoderVorbis::open(SDL_RWops* rwops)
+auto Aulib::DecoderVorbis::open(SDL_RWops* rwops) -> bool
 {
     if (isOpen()) {
         return true;
@@ -74,21 +74,19 @@ bool Aulib::DecoderVorbis::open(SDL_RWops* rwops)
     return true;
 }
 
-int Aulib::DecoderVorbis::getChannels() const
+auto Aulib::DecoderVorbis::getChannels() const -> int
 {
-    return d->fCurrentInfo != nullptr ? d->fCurrentInfo->channels : 0;
+    return d->fCurrentInfo ? d->fCurrentInfo->channels : 0;
 }
 
-int Aulib::DecoderVorbis::getRate() const
+auto Aulib::DecoderVorbis::getRate() const -> int
 {
-    return d->fCurrentInfo != nullptr ? d->fCurrentInfo->rate : 0;
+    return d->fCurrentInfo ? d->fCurrentInfo->rate : 0;
 }
 
-int Aulib::DecoderVorbis::doDecoding(float buf[], int len, bool& callAgain)
+auto Aulib::DecoderVorbis::doDecoding(float buf[], int len, bool& callAgain) -> int
 {
-    callAgain = false;
-
-    if (d->fEOF) {
+    if (d->fEOF or not isOpen()) {
         return 0;
     }
 
@@ -137,8 +135,12 @@ int Aulib::DecoderVorbis::doDecoding(float buf[], int len, bool& callAgain)
     return decSamples;
 }
 
-bool Aulib::DecoderVorbis::rewind()
+auto Aulib::DecoderVorbis::rewind() -> bool
 {
+    if (not isOpen()) {
+        return false;
+    }
+
     int ret;
     if (d->fEOF) {
         ret = ov_raw_seek(d->fVFHandle.get(), 0);
@@ -149,14 +151,15 @@ bool Aulib::DecoderVorbis::rewind()
     return ret == 0;
 }
 
-chrono::microseconds Aulib::DecoderVorbis::duration() const
+auto Aulib::DecoderVorbis::duration() const -> chrono::microseconds
 {
     return d->fDuration;
 }
 
-bool Aulib::DecoderVorbis::seekToTime(chrono::microseconds pos)
+auto Aulib::DecoderVorbis::seekToTime(chrono::microseconds pos) -> bool
 {
-    if (ov_time_seek_lap(d->fVFHandle.get(), chrono::duration<double>(pos).count()) != 0) {
+    if (not isOpen()
+        or ov_time_seek_lap(d->fVFHandle.get(), chrono::duration<double>(pos).count()) != 0) {
         return false;
     }
     d->fEOF = false;

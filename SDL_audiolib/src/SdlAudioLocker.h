@@ -12,7 +12,11 @@ class SdlAudioLocker final
 public:
     SdlAudioLocker()
     {
+#if SDL_VERSION_ATLEAST(2, 0, 0)
         SDL_LockAudioDevice(Aulib::Stream_priv::fDeviceId);
+#else
+        SDL_LockAudio();
+#endif
         fIsLocked = true;
     }
 
@@ -22,12 +26,16 @@ public:
     }
 
     SdlAudioLocker(const SdlAudioLocker&) = delete;
-    SdlAudioLocker& operator=(const SdlAudioLocker&) = delete;
+    auto operator=(const SdlAudioLocker&) -> SdlAudioLocker& = delete;
 
     void unlock()
     {
         if (fIsLocked) {
+#if SDL_VERSION_ATLEAST(2, 0, 0)
             SDL_UnlockAudioDevice(Aulib::Stream_priv::fDeviceId);
+#else
+            SDL_UnlockAudio();
+#endif
             fIsLocked = false;
         }
     }

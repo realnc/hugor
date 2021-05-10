@@ -21,12 +21,12 @@ static void (*gMusicFinishHook)() = nullptr;
 
 static void musicFinishHookWrapper(Aulib::Stream& /*unused*/)
 {
-    if (gMusicFinishHook != nullptr) {
+    if (gMusicFinishHook) {
         gMusicFinishHook();
     }
 }
 
-Mix_Music* Mix_LoadMUS(const char* file)
+auto Mix_LoadMUS(const char* file) -> Mix_Music*
 {
     AM_debugPrintLn(__func__);
 
@@ -36,7 +36,7 @@ Mix_Music* Mix_LoadMUS(const char* file)
     return (Mix_Music*)strm;
 }
 
-Mix_Music* Mix_LoadMUS_RW(SDL_RWops* rw)
+auto Mix_LoadMUS_RW(SDL_RWops* rw) -> Mix_Music*
 {
     AM_debugPrintLn(__func__);
 
@@ -46,7 +46,7 @@ Mix_Music* Mix_LoadMUS_RW(SDL_RWops* rw)
     return (Mix_Music*)strm;
 }
 
-Mix_Music* Mix_LoadMUSType_RW(SDL_RWops* rw, Mix_MusicType type, int freesrc)
+auto Mix_LoadMUSType_RW(SDL_RWops* rw, Mix_MusicType type, int freesrc) -> Mix_Music*
 {
     AM_debugPrintLn(__func__ << " type: " << type);
 
@@ -97,21 +97,21 @@ void Mix_FreeMusic(Mix_Music* music)
     delete strm;
 }
 
-int Mix_GetNumMusicDecoders()
+auto Mix_GetNumMusicDecoders() -> int
 {
     AM_debugPrintLn(__func__);
 
     return 0;
 }
 
-const char* Mix_GetMusicDecoder(int /*index*/)
+auto Mix_GetMusicDecoder(int /*index*/) -> const char*
 {
     AM_debugPrintLn(__func__);
 
     return nullptr;
 }
 
-Mix_MusicType Mix_GetMusicType(const Mix_Music* /*music*/)
+auto Mix_GetMusicType(const Mix_Music* /*music*/) -> Mix_MusicType
 {
     AM_debugPrintLn(__func__);
 
@@ -127,31 +127,31 @@ void Mix_HookMusicFinished(void (*music_finished)())
 {
     AM_debugPrintLn(__func__);
 
-    if (music_finished == nullptr) {
-        if (gMusic != nullptr) {
+    if (not music_finished) {
+        if (gMusic) {
             gMusic->unsetFinishCallback();
         }
         gMusicFinishHook = nullptr;
     } else {
         gMusicFinishHook = music_finished;
-        if (gMusic != nullptr) {
+        if (gMusic) {
             gMusic->setFinishCallback(musicFinishHookWrapper);
         }
     }
 }
 
-void* Mix_GetMusicHookData()
+auto Mix_GetMusicHookData() -> void*
 {
     AM_debugPrintLn(__func__);
 
     return nullptr;
 }
 
-int Mix_PlayMusic(Mix_Music* music, int loops)
+auto Mix_PlayMusic(Mix_Music* music, int loops) -> int
 {
     AM_debugPrintLn(__func__);
 
-    if (gMusic != nullptr) {
+    if (gMusic) {
         gMusic->stop();
         gMusic = nullptr;
     }
@@ -163,21 +163,21 @@ int Mix_PlayMusic(Mix_Music* music, int loops)
     return static_cast<int>(gMusic->play(loops == -1 ? 0 : loops));
 }
 
-int Mix_FadeInMusic(Mix_Music* music, int loops, int /*ms*/)
+auto Mix_FadeInMusic(Mix_Music* music, int loops, int /*ms*/) -> int
 {
     AM_debugPrintLn(__func__);
 
     return Mix_PlayMusic(music, loops);
 }
 
-int Mix_FadeInMusicPos(Mix_Music* /*music*/, int /*loops*/, int /*ms*/, double /*position*/)
+auto Mix_FadeInMusicPos(Mix_Music* /*music*/, int /*loops*/, int /*ms*/, double /*position*/) -> int
 {
     AM_debugPrintLn(__func__);
 
     return 0;
 }
 
-int Mix_VolumeMusic(int volume)
+auto Mix_VolumeMusic(int volume) -> int
 {
     AM_debugPrintLn(__func__);
 
@@ -186,32 +186,32 @@ int Mix_VolumeMusic(int volume)
 
     if (volume >= 0) {
         gMusicVolume = (float)volume / (float)MIX_MAX_VOLUME;
-        if (gMusic != nullptr) {
+        if (gMusic) {
             gMusic->setVolume(gMusicVolume);
         }
     }
     return prevVol;
 }
 
-int Mix_HaltMusic()
+auto Mix_HaltMusic() -> int
 {
     AM_debugPrintLn(__func__);
 
-    if (gMusic != nullptr) {
+    if (gMusic) {
         gMusic->stop();
         gMusic = nullptr;
     }
     return 0;
 }
 
-int Mix_FadeOutMusic(int /*ms*/)
+auto Mix_FadeOutMusic(int /*ms*/) -> int
 {
     AM_debugPrintLn(__func__);
 
     return 0;
 }
 
-Mix_Fading Mix_FadingMusic()
+auto Mix_FadingMusic() -> Mix_Fading
 {
     AM_debugPrintLn(__func__);
 
@@ -222,7 +222,7 @@ void Mix_PauseMusic()
 {
     AM_debugPrintLn(__func__);
 
-    if (gMusic != nullptr) {
+    if (gMusic) {
         gMusic->pause();
     }
 }
@@ -231,7 +231,7 @@ void Mix_ResumeMusic()
 {
     AM_debugPrintLn(__func__);
 
-    if (gMusic != nullptr and gMusic->isPaused()) {
+    if (gMusic and gMusic->isPaused()) {
         gMusic->resume();
     }
 }
@@ -240,74 +240,74 @@ void Mix_RewindMusic()
 {
     AM_debugPrintLn(__func__);
 
-    if (gMusic != nullptr) {
+    if (gMusic) {
         gMusic->rewind();
     }
 }
 
-int Mix_PausedMusic()
+auto Mix_PausedMusic() -> int
 {
     AM_debugPrintLn(__func__);
 
-    if (gMusic != nullptr) {
+    if (gMusic) {
         return static_cast<int>(gMusic->isPaused());
     }
     return 0;
 }
 
-int Mix_SetMusicPosition(double /*position*/)
+auto Mix_SetMusicPosition(double /*position*/) -> int
 {
     AM_debugPrintLn(__func__);
 
     return -1;
 }
 
-int Mix_PlayingMusic()
+auto Mix_PlayingMusic() -> int
 {
     AM_debugPrintLn(__func__);
 
-    if (gMusic != nullptr) {
+    if (gMusic) {
         return static_cast<int>(gMusic->isPlaying());
     }
     return 0;
 }
 
-int Mix_SetMusicCMD(const char* /*command*/)
+auto Mix_SetMusicCMD(const char* /*command*/) -> int
 {
     AM_debugPrintLn(__func__);
 
     return -1;
 }
 
-int Mix_SetSynchroValue(int /*value*/)
+auto Mix_SetSynchroValue(int /*value*/) -> int
 {
     AM_debugPrintLn(__func__);
 
     return -1;
 }
 
-int Mix_GetSynchroValue()
+auto Mix_GetSynchroValue() -> int
 {
     AM_debugPrintLn(__func__);
 
     return -1;
 }
 
-int Mix_SetSoundFonts(const char* /*paths*/)
+auto Mix_SetSoundFonts(const char* /*paths*/) -> int
 {
     AM_debugPrintLn(__func__);
 
     return 0;
 }
 
-const char* Mix_GetSoundFonts()
+auto Mix_GetSoundFonts() -> const char*
 {
     AM_debugPrintLn(__func__);
 
     return nullptr;
 }
 
-int Mix_EachSoundFont(int (*/*function*/)(const char*, void*), void* /*data*/)
+auto Mix_EachSoundFont(int (*/*function*/)(const char*, void*), void* /*data*/) -> int
 {
     AM_debugPrintLn(__func__);
 

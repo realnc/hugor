@@ -3,6 +3,7 @@
 
 #include "Buffer.h"
 #include "aulib.h"
+#include "missing.h"
 #include <SDL_rwops.h>
 #include <limits>
 #include <type_traits>
@@ -28,7 +29,7 @@ Aulib::DecoderXmp::DecoderXmp()
 
 Aulib::DecoderXmp::~DecoderXmp() = default;
 
-bool Aulib::DecoderXmp::open(SDL_RWops* rwops)
+auto Aulib::DecoderXmp::open(SDL_RWops* rwops) -> bool
 {
     if (isOpen()) {
         return true;
@@ -60,42 +61,45 @@ bool Aulib::DecoderXmp::open(SDL_RWops* rwops)
     return true;
 }
 
-int Aulib::DecoderXmp::getChannels() const
+auto Aulib::DecoderXmp::getChannels() const -> int
 {
     return 2;
 }
 
-int Aulib::DecoderXmp::getRate() const
+auto Aulib::DecoderXmp::getRate() const -> int
 {
     return d->fRate;
 }
 
-bool Aulib::DecoderXmp::rewind()
+auto Aulib::DecoderXmp::rewind() -> bool
 {
+    if (not isOpen()) {
+        return false;
+    }
+
     xmp_restart_module(d->fContext.get());
     d->fEof = false;
     return true;
 }
 
-chrono::microseconds Aulib::DecoderXmp::duration() const
+auto Aulib::DecoderXmp::duration() const -> chrono::microseconds
 {
     return {}; // TODO
 }
 
-bool Aulib::DecoderXmp::seekToTime(chrono::microseconds pos)
+auto Aulib::DecoderXmp::seekToTime(chrono::microseconds pos) -> bool
 {
     auto pos_ms = chrono::duration_cast<chrono::milliseconds>(pos).count();
-    if (xmp_seek_time(d->fContext.get(), pos_ms) < 0) {
+    if (not isOpen() or xmp_seek_time(d->fContext.get(), pos_ms) < 0) {
         return false;
     }
     d->fEof = false;
     return true;
 }
 
-int Aulib::DecoderXmp::doDecoding(float buf[], int len, bool& callAgain)
+auto Aulib::DecoderXmp::doDecoding(float buf[], int len, bool& /*callAgain*/) -> int
 {
-    callAgain = false;
-    if (d->fEof) {
+    if (d->fEof or not isOpen()) {
         return 0;
     }
     Buffer<Sint16> tmpBuf(len);

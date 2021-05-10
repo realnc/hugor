@@ -5,15 +5,20 @@
 #include "Aulib/Resampler.h"
 #include "Aulib/Stream.h"
 #include "aulib_debug.h"
+#include "missing.h"
 #include <SDL_timer.h>
 #include <algorithm>
 #include <cmath>
+#include <mutex>
 #include <type_traits>
 
 void (*Aulib::Stream_priv::fSampleConverter)(Uint8[], const Buffer<float>& src) = nullptr;
 SDL_AudioSpec Aulib::Stream_priv::fAudioSpec;
+#if SDL_VERSION_ATLEAST(2, 0, 0)
 SDL_AudioDeviceID Aulib::Stream_priv::fDeviceId;
+#endif
 std::vector<Aulib::Stream*> Aulib::Stream_priv::fStreamList;
+SdlMutex Aulib::Stream_priv::fStreamListMutex;
 Buffer<float> Aulib::Stream_priv::fFinalMixBuf{0};
 Buffer<float> Aulib::Stream_priv::fStrmBuf{0};
 Buffer<float> Aulib::Stream_priv::fProcessorBuf{0};
@@ -34,7 +39,7 @@ Aulib::Stream_priv::Stream_priv(Stream* pub, std::unique_ptr<Decoder> decoder,
 
 Aulib::Stream_priv::~Stream_priv()
 {
-    if (fCloseRw and fRWops != nullptr) {
+    if (fCloseRw and fRWops) {
         SDL_RWclose(fRWops);
     }
 }
@@ -75,15 +80,18 @@ void Aulib::Stream_priv::fProcessFade()
 
 void Aulib::Stream_priv::fStop()
 {
-    fStreamList.erase(std::remove(fStreamList.begin(), fStreamList.end(), this->q),
-                      fStreamList.end());
+    {
+        std::lock_guard<SdlMutex> lock(fStreamListMutex);
+        fStreamList.erase(std::remove(fStreamList.begin(), fStreamList.end(), this->q),
+                          fStreamList.end());
+    }
     fDecoder->rewind();
     fIsPlaying = false;
 }
 
 void Aulib::Stream_priv::fSdlCallbackImpl(void* /*unused*/, Uint8 out[], int outLen)
 {
-    AM_debugAssert(Stream_priv::fSampleConverter != nullptr);
+    AM_debugAssert(Stream_priv::fSampleConverter);
 
     int wantedSamples = outLen / (SDL_AUDIO_BITSIZE(fAudioSpec.format) / 8);
 
@@ -98,7 +106,10 @@ void Aulib::Stream_priv::fSdlCallbackImpl(void* /*unused*/, Uint8 out[], int out
 
     // Iterate over a copy of the original stream list, since we might want to
     // modify the original as we go, removing streams that have stopped.
-    std::vector<Stream*> streamList(fStreamList);
+    const std::vector<Stream*> streamList = [] {
+        std::lock_guard<SdlMutex> lock(fStreamListMutex);
+        return fStreamList;
+    }();
 
     for (const auto stream : streamList) {
         if (stream->d->fWantedIterations != 0
@@ -133,9 +144,12 @@ void Aulib::Stream_priv::fSdlCallbackImpl(void* /*unused*/, Uint8 out[], int out
                     ++stream->d->fCurrentIteration;
                     if (stream->d->fCurrentIteration >= stream->d->fWantedIterations) {
                         stream->d->fIsPlaying = false;
-                        fStreamList.erase(
-                            std::remove(fStreamList.begin(), fStreamList.end(), stream),
-                            fStreamList.end());
+                        {
+                            std::lock_guard<SdlMutex> lock(fStreamListMutex);
+                            fStreamList.erase(
+                                std::remove(fStreamList.begin(), fStreamList.end(), stream),
+                                fStreamList.end());
+                        }
                         has_finished = true;
                         break;
                     }
@@ -145,14 +159,22 @@ void Aulib::Stream_priv::fSdlCallbackImpl(void* /*unused*/, Uint8 out[], int out
         }
 
         stream->d->fProcessFade();
-        float volume = stream->d->fVolume * stream->d->fInternalVolume;
+        float volumeLeft = stream->d->fVolume * stream->d->fInternalVolume;
+        float volumeRight = stream->d->fVolume * stream->d->fInternalVolume;
+
+        if (stream->d->fStereoPos < 0.f) {
+            volumeRight *= 1.f + stream->d->fStereoPos;
+        } else if (stream->d->fStereoPos > 0.f) {
+            volumeLeft *= 1.f - stream->d->fStereoPos;
+        }
 
         // Avoid mixing on zero volume.
-        if (not stream->d->fIsMuted and volume > 0.f) {
+        if (not stream->d->fIsMuted and (volumeLeft > 0.f or volumeRight > 0.f)) {
             // Avoid scaling operation when volume is 1.
-            if (volume != 1.f) {
-                for (int i = 0; i < len; ++i) {
-                    fFinalMixBuf[i] += fStrmBuf[i] * volume;
+            if (volumeLeft != 1.f or volumeRight != 1.f) {
+                for (int i = 0; i < len; i += 2) {
+                    fFinalMixBuf[i] += fStrmBuf[i] * volumeLeft;
+                    fFinalMixBuf[i + 1] += fStrmBuf[i + 1] * volumeRight;
                 }
             } else {
                 for (int i = 0; i < len; ++i) {

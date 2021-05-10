@@ -3,10 +3,22 @@
 
 #include "aulib_global.h"
 #include <SDL_audio.h>
+#include <SDL_version.h>
+#include <string>
+
+#if !SDL_VERSION_ATLEAST(2, 0, 0)
+#    include <SDL_stdinc.h>
+#endif
 
 struct SDL_AudioSpec;
 
 namespace Aulib {
+
+#if SDL_VERSION_ATLEAST(2, 0, 0)
+using AudioFormat = SDL_AudioFormat;
+#else
+using AudioFormat = Uint16;
+#endif
 
 /*!
  * \brief Initializes the audio system.
@@ -36,11 +48,16 @@ namespace Aulib {
  *  depends on the audio device and output driver used by SDL. Use \ref frameSize() to find out the
  *  actual frame size.
  *
+ * \param device
+ *  A UTF-8 string reported by SDL_GetAudioDeviceName() or a driver-specific name as appropriate.
+ *  An empty string requests the most reasonable default device.
+ *
  * \return
  *  \retval true The audio system was initialized successfully.
  *  \retval false The audio system could not be initialized.
  */
-AULIB_EXPORT bool init(int freq, SDL_AudioFormat format, int channels, int frameSize);
+AULIB_EXPORT auto init(int freq, AudioFormat format, int channels, int frameSize,
+                       const std::string& device = {}) -> bool;
 
 /*!
  *  \brief Shuts down the SDL_audiolib library.
@@ -55,28 +72,28 @@ AULIB_EXPORT void quit();
  *
  * This can be different than the format that was requested.
  */
-AULIB_EXPORT SDL_AudioFormat sampleFormat() noexcept;
+AULIB_EXPORT auto sampleFormat() noexcept -> AudioFormat;
 
 /*!
  * \brief Sample rate the audio device is actually using.
  *
  * This can be different than the sample rate that was requested.
  */
-AULIB_EXPORT int sampleRate() noexcept;
+AULIB_EXPORT auto sampleRate() noexcept -> int;
 
 /*!
  * \brief Number of output channels.
  *
  * This always matches the amount of channels that was requested.
  */
-AULIB_EXPORT int channelCount() noexcept;
+AULIB_EXPORT auto channelCount() noexcept -> int;
 
 /*!
  * \brief Number of frames (samples per channel) the audio device is actually using.
  *
  * This can be different than the frame size that was requested.
  */
-AULIB_EXPORT int frameSize() noexcept;
+AULIB_EXPORT auto frameSize() noexcept -> int;
 
 } // namespace Aulib
 

@@ -2,7 +2,6 @@
 #include "Aulib/ResamplerSpeex.h"
 
 #include "Aulib/Decoder.h"
-#include "SdlAudioLocker.h"
 #include "aulib_global.h"
 #include "speex_resampler.h"
 
@@ -29,7 +28,7 @@ Aulib::ResamplerSpeex::ResamplerSpeex(int quality)
 
 Aulib::ResamplerSpeex::~ResamplerSpeex() = default;
 
-int Aulib::ResamplerSpeex::quality() const noexcept
+auto Aulib::ResamplerSpeex::quality() const noexcept -> int
 {
     return d->fQuality;
 }
@@ -38,10 +37,9 @@ void Aulib::ResamplerSpeex::setQuality(int quality)
 {
     auto newQ = std::min(std::max(0, quality), 10);
     d->fQuality = newQ;
-    if (d->fResampler == nullptr) {
+    if (not d->fResampler) {
         return;
     }
-    SdlAudioLocker lock;
     speex_resampler_set_quality(d->fResampler.get(), newQ);
 }
 
@@ -64,7 +62,7 @@ void Aulib::ResamplerSpeex::doResampling(float dst[], const float src[], int& ds
     srcLen = static_cast<int>(spxInLen) * channels;
 }
 
-int Aulib::ResamplerSpeex::adjustForOutputSpec(int dstRate, int srcRate, int channels)
+auto Aulib::ResamplerSpeex::adjustForOutputSpec(int dstRate, int srcRate, int channels) -> int
 {
     int err;
     d->fResampler.reset(speex_resampler_init(

@@ -1,7 +1,7 @@
 QT += core widgets
 QT_CONFIG -= no-pkg-config
 TEMPLATE = app
-CONFIG += silent warn_on link_pkgconfig strict_c++ c++14 gc_binaries
+CONFIG += silent warn_on link_pkgconfig strict_c++ c++17 gc_binaries
 TARGET = hugor
 ICON = mac_icon.icns
 
@@ -30,10 +30,9 @@ contains(QT_MAJOR_VERSION, 5):lessThan(QT_MINOR_VERSION, 5) {
 
     INCLUDEPATH += \
         SDL_audiolib \
+        SDL_audiolib/3rdparty/speex_resampler \
         SDL_audiolib/include \
-        SDL_audiolib/resampler \
-        SDL_audiolib/src \
-        SDL_audiolib/src/missing
+        SDL_audiolib/src
 
     PKGCONFIG += sdl2 sndfile libmpg123 fluidsynth
 
@@ -66,6 +65,7 @@ contains(QT_MAJOR_VERSION, 5):lessThan(QT_MINOR_VERSION, 5) {
         OUTSIDE_SPEEX
 
     HEADERS += \
+        $$files(SDL_audiolib/*.h) \
         $$files(SDL_audiolib/include/*.h) \
         $$files(SDL_audiolib/include/Aulib/*.h) \
         $$files(SDL_audiolib/src/*.h) \
@@ -79,7 +79,7 @@ contains(QT_MAJOR_VERSION, 5):lessThan(QT_MINOR_VERSION, 5) {
         src/rwopsbundle.c \
         src/soundaulib.cc \
         src/synthfactory.cc \
-        SDL_audiolib/resampler/resample.c \
+        SDL_audiolib/3rdparty/speex_resampler/resample.c \
         SDL_audiolib/src/missing/sdl_load_file_rw.c \
         SDL_audiolib/src/Decoder.cpp \
         SDL_audiolib/src/DecoderFluidsynth.cpp \

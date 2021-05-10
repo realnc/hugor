@@ -31,6 +31,7 @@
  */
 #define AULIB_VERSION_CHECK(major, minor, patch) ((major<<16)|(minor<<8)|(patch))
 
+
 /*
 
 Copyright (C) 2014, 2015, 2016, 2017, 2018, 2019 Nikos Chantziaras.

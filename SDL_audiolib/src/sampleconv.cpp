@@ -2,6 +2,7 @@
 #include "sampleconv.h"
 
 #include "Buffer.h"
+#include "missing.h"
 #include <SDL_endian.h>
 #include <SDL_version.h>
 #include <limits>
@@ -11,7 +12,7 @@
  * unsigned.)
  */
 template <typename T>
-static constexpr T floatSampleToInt(const float src) noexcept
+static constexpr auto floatSampleToInt(const float src) noexcept -> T
 {
     if (src >= 1.f) {
         return std::numeric_limits<T>::max();

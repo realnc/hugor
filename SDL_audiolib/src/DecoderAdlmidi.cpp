@@ -12,7 +12,7 @@ using BankData = std::unique_ptr<void, decltype(&SDL_free)>;
 
 static constexpr int SAMPLE_RATE = 49716;
 
-static const std::vector<std::string>& embeddedBanks()
+static auto embeddedBanks() -> const std::vector<std::string>&
 {
     static std::vector<std::string> banks;
     static int bank_count = -1;
@@ -43,7 +43,7 @@ struct DecoderAdlmidi_priv final
     size_t bank_data_size = 0;
     int embedded_bank = -1;
 
-    bool setEmulator()
+    auto setEmulator() -> bool
     {
         using Emulator = DecoderAdlmidi::Emulator;
         ADL_Emulator adl_emu;
@@ -73,7 +73,7 @@ struct DecoderAdlmidi_priv final
         return true;
     }
 
-    bool setChipAmount()
+    auto setChipAmount() -> bool
     {
         if (adl_setNumChips(adl_player.get(), chip_amount) < 0) {
             SDL_SetError("libADLMIDI failed to change chip amount. %s",
@@ -83,7 +83,7 @@ struct DecoderAdlmidi_priv final
         return true;
     }
 
-    bool setAndFreeBank()
+    auto setAndFreeBank() -> bool
     {
         if (adl_openBankData(adl_player.get(), bank_data.get(), bank_data_size) < 0) {
             SDL_SetError("libADLMIDI failed to load bank data. %s",
@@ -94,7 +94,7 @@ struct DecoderAdlmidi_priv final
         return true;
     }
 
-    bool setEmbeddedBank()
+    auto setEmbeddedBank() -> bool
     {
         if (adl_setBank(adl_player.get(), embedded_bank) < 0) {
             SDL_SetError("libADLMIDI failed to set embedded bank. %s",
@@ -113,11 +113,11 @@ Aulib::DecoderAdlmidi::DecoderAdlmidi()
 
 Aulib::DecoderAdlmidi::~DecoderAdlmidi() = default;
 
-bool Aulib::DecoderAdlmidi::setEmulator(Emulator emulator)
+auto Aulib::DecoderAdlmidi::setEmulator(Emulator emulator) -> bool
 {
     d->emulator = emulator;
     d->change_emulator = true;
-    if (d->adl_player == nullptr) {
+    if (not isOpen()) {
         return true;
     }
     if (not d->setEmulator()) {
@@ -127,10 +127,10 @@ bool Aulib::DecoderAdlmidi::setEmulator(Emulator emulator)
     return true;
 }
 
-bool Aulib::DecoderAdlmidi::setChipAmount(int chip_amount)
+auto Aulib::DecoderAdlmidi::setChipAmount(int chip_amount) -> bool
 {
     d->chip_amount = chip_amount;
-    if (d->adl_player == nullptr) {
+    if (not isOpen()) {
         return true;
     }
     if (not d->setChipAmount()) {
@@ -140,19 +140,19 @@ bool Aulib::DecoderAdlmidi::setChipAmount(int chip_amount)
     return true;
 }
 
-bool Aulib::DecoderAdlmidi::loadBank(SDL_RWops* rwops)
+auto Aulib::DecoderAdlmidi::loadBank(SDL_RWops* rwops) -> bool
 {
-    if (rwops == nullptr) {
+    if (not rwops) {
         SDL_SetError("rwops is null.");
         return false;
     }
     BankData tmp_data{SDL_LoadFile_RW(rwops, &d->bank_data_size, true), SDL_free};
-    if (tmp_data == nullptr) {
+    if (not tmp_data) {
         SDL_SetError("SDL failed to read bank data. %s", SDL_GetError());
         return false;
     }
     d->embedded_bank = -1;
-    if (d->adl_player == nullptr) {
+    if (not isOpen()) {
         d->bank_data = std::move(tmp_data);
         return true;
     }
@@ -163,17 +163,17 @@ bool Aulib::DecoderAdlmidi::loadBank(SDL_RWops* rwops)
     return true;
 }
 
-bool Aulib::DecoderAdlmidi::loadBank(const std::string& filename)
+auto Aulib::DecoderAdlmidi::loadBank(const std::string& filename) -> bool
 {
     auto* rwops = SDL_RWFromFile(filename.c_str(), "rb");
-    if (rwops == nullptr) {
+    if (not rwops) {
         SDL_SetError("SDL failed to create rwops from filename: %s", SDL_GetError());
         return false;
     }
     return loadBank(rwops);
 }
 
-bool Aulib::DecoderAdlmidi::loadEmbeddedBank(int bank_number)
+auto Aulib::DecoderAdlmidi::loadEmbeddedBank(int bank_number) -> bool
 {
     if (bank_number < 0 or bank_number >= adl_getBanksCount()) {
         SDL_SetError("Invalid bank number.");
@@ -181,7 +181,7 @@ bool Aulib::DecoderAdlmidi::loadEmbeddedBank(int bank_number)
     }
     d->bank_data.reset();
     d->embedded_bank = bank_number;
-    if (d->adl_player == nullptr) {
+    if (not isOpen()) {
         return true;
     }
     if (not d->setEmbeddedBank()) {
@@ -190,12 +190,12 @@ bool Aulib::DecoderAdlmidi::loadEmbeddedBank(int bank_number)
     return true;
 }
 
-const std::vector<std::string>& Aulib::DecoderAdlmidi::getEmbeddedBanks()
+auto Aulib::DecoderAdlmidi::getEmbeddedBanks() -> const std::vector<std::string>&
 {
     return embeddedBanks();
 }
 
-bool Aulib::DecoderAdlmidi::open(SDL_RWops* rwops)
+auto Aulib::DecoderAdlmidi::open(SDL_RWops* rwops) -> bool
 {
     if (isOpen()) {
         return true;
@@ -211,7 +211,7 @@ bool Aulib::DecoderAdlmidi::open(SDL_RWops* rwops)
         return false;
     }
     d->adl_player.reset(adl_init(SAMPLE_RATE));
-    if (d->adl_player == nullptr) {
+    if (not d->adl_player) {
         SDL_SetError("Failed to initialize libADLMIDI: %s", adl_errorString());
         return false;
     }
@@ -221,7 +221,7 @@ bool Aulib::DecoderAdlmidi::open(SDL_RWops* rwops)
     if (d->change_emulator and not d->setEmulator()) {
         return false;
     }
-    if (d->bank_data == nullptr and d->embedded_bank < 0) {
+    if (not d->bank_data and d->embedded_bank < 0) {
         SDL_SetError("No FM patch bank loaded.");
         return false;
     }
@@ -239,19 +239,19 @@ bool Aulib::DecoderAdlmidi::open(SDL_RWops* rwops)
     return true;
 }
 
-int Aulib::DecoderAdlmidi::getChannels() const
+auto Aulib::DecoderAdlmidi::getChannels() const -> int
 {
     return 2;
 }
 
-int Aulib::DecoderAdlmidi::getRate() const
+auto Aulib::DecoderAdlmidi::getRate() const -> int
 {
     return SAMPLE_RATE;
 }
 
-bool Aulib::DecoderAdlmidi::rewind()
+auto Aulib::DecoderAdlmidi::rewind() -> bool
 {
-    if (d->adl_player == nullptr) {
+    if (not isOpen()) {
         return false;
     }
     adl_positionRewind(d->adl_player.get());
@@ -259,14 +259,14 @@ bool Aulib::DecoderAdlmidi::rewind()
     return true;
 }
 
-chrono::microseconds Aulib::DecoderAdlmidi::duration() const
+auto Aulib::DecoderAdlmidi::duration() const -> chrono::microseconds
 {
     return d->duration;
 }
 
-bool Aulib::DecoderAdlmidi::seekToTime(chrono::microseconds pos)
+auto Aulib::DecoderAdlmidi::seekToTime(chrono::microseconds pos) -> bool
 {
-    if (d->adl_player == nullptr) {
+    if (not isOpen()) {
         return false;
     }
     adl_positionSeek(d->adl_player.get(), chrono::duration<double>(pos).count());
@@ -274,10 +274,9 @@ bool Aulib::DecoderAdlmidi::seekToTime(chrono::microseconds pos)
     return true;
 }
 
-int Aulib::DecoderAdlmidi::doDecoding(float buf[], int len, bool& callAgain)
+auto Aulib::DecoderAdlmidi::doDecoding(float buf[], int len, bool& /*callAgain*/) -> int
 {
-    callAgain = false;
-    if (d->adl_player == nullptr or d->eof) {
+    if (d->eof or not isOpen()) {
         return 0;
     }
     constexpr ADLMIDI_AudioFormat adl_format{ADLMIDI_SampleType_F32, sizeof(float),
