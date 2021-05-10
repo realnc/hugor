@@ -114,9 +114,9 @@ void OpcodeParser::parse()
             break;
         }
         pushOutput(OpcodeResult::OK);
-        pushOutput(1);
-        pushOutput(0);
-        pushOutput(99);
+        pushOutput(HUGOR_VERSION_MAJOR);
+        pushOutput(HUGOR_VERSION_MINOR);
+        pushOutput(HUGOR_VERSION_PATCH);
         break;
 
     case Opcode::GET_OS:
