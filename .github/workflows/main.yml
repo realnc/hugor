@@ -11,7 +11,12 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     env:
+      ADLMIDI_VERSION: 1.5.0.1
       CMAKE_GENERATOR: Ninja
+      FSYNTH_VERSION: 2.2.1
+      OPENMPT_VERSION: 0.5.8
+      QT_TAG: qt515
+      QT_VERSION: 5.15.2
 
     steps:
     - uses: actions/checkout@v2
@@ -19,23 +24,32 @@ jobs:
     - if: runner.os == 'Linux'
       name: Add PPAs
       run: |
-        sudo add-apt-repository ppa:beineri/opt-qt-5.12.1-xenial
+        sudo add-apt-repository ppa:beineri/opt-qt-${QT_VERSION}-xenial
         sudo add-apt-repository ppa:jonathonf/vlc-3
+        sudo add-apt-repository ppa:ubuntu-toolchain-r/test
         sudo apt-get update
 
     - if: runner.os == 'Linux'
       name: Install deps
       run: sudo apt-get -y install
+        ${QT_TAG}base
+        g++-9
+        gcc-9
         libboost-dev
         libmpg123-dev
         libsdl2-dev
         libsndfile1-dev
         libvlc-dev
         ninja-build
-        qt512base
 
     - if: runner.os == 'Linux'
-      run: sudo ln -s /usr/local/lib /usr/local/lib64
+      name: Pre-build setup
+      run: |
+        sudo ln -s /usr/local/lib /usr/local/lib64
+        sudo update-alternatives \
+          --install /usr/bin/gcc gcc /usr/bin/gcc-9 60 \
+          --slave /usr/bin/g++ g++ /usr/bin/g++-9
+        sudo update-alternatives --config gcc
 
     - if: runner.os == 'macOS'
       name: Install deps
@@ -56,9 +70,8 @@ jobs:
     - name: Build libADLMIDI
       working-directory: ../
       run: |
-        wget -q 'https://github.com/Wohlstand/libADLMIDI/archive/c19bf11f4b12004051fc76651733e17f3e98143a.tar.gz' \
-          -O- | tar xz
-        cd libADLMIDI-c19bf11f4b12004051fc76651733e17f3e98143a
+        wget -nv "https://github.com/Wohlstand/libADLMIDI/archive/v${ADLMIDI_VERSION}.tar.gz" -O- | tar xz
+        cd "libADLMIDI-${ADLMIDI_VERSION}"
         mkdir build
         cd build
         cmake \
@@ -66,27 +79,27 @@ jobs:
           -DlibADLMIDI_STATIC=off \
           -DEXAMPLE_SDL2_AUDIO=off \
           ..
-        sudo cmake --build . --target install
+        sudo cmake --build . --target install -v
 
     - if: runner.os == 'Linux'
       name: Build FluidSynth
       working-directory: ../
       run: |
-        wget -q 'https://github.com/FluidSynth/fluidsynth/archive/v2.1.1.tar.gz' -O- | tar xz
-        mkdir fluidsynth-2.1.1/build
-        cd fluidsynth-2.1.1/build
+        wget -nv "https://github.com/FluidSynth/fluidsynth/archive/v${FSYNTH_VERSION}.tar.gz" -O- | tar xz
+        mkdir "fluidsynth-${FSYNTH_VERSION}"/build
+        cd "fluidsynth-${FSYNTH_VERSION}"/build
         cmake -Denable-framework=off ..
-        sudo cmake --build . --target install
+        sudo cmake --build . --target install -v
 
     - if: runner.os == 'Linux'
       name: Build libopenmpt
       working-directory: ../
       run: |
-        wget -q 'https://lib.openmpt.org/files/libopenmpt/src/libopenmpt-0.4.11+release.autotools.tar.gz' \
+        wget -q "https://lib.openmpt.org/files/libopenmpt/src/libopenmpt-${OPENMPT_VERSION}+release.autotools.tar.gz" \
           -O- | tar xz
         mkdir openmpt-build
         cd openmpt-build
-        ../libopenmpt-0.4.11+release.autotools/configure \
+        ../libopenmpt-${OPENMPT_VERSION}+release.autotools/configure \
           --enable-silent-rules \
           --disable-dependency-tracking \
           --enable-shared \
@@ -113,7 +126,7 @@ jobs:
     - if: runner.os == 'Linux'
       name: Build
       run: |
-        source /opt/qt512/bin/qt512-env.sh \
+        source /opt/${QT_TAG}/bin/${QT_TAG}-env.sh \
         && qmake -config adlmidi \
         && make -j`nproc` \
         && sudo make install
