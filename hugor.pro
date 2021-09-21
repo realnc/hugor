@@ -27,6 +27,10 @@ contains(QT_MAJOR_VERSION, 5):lessThan(QT_MINOR_VERSION, 5) {
 #QMAKE_CXXFLAGS += $$SANITIZER_FLAGS
 #QMAKE_LFLAGS += $$SANITIZER_FLAGS
 
+!system-boost {
+    INCLUDEPATH += boost
+}
+
 !disable-audio {
     CONFIG(debug, release|debug) {
         DEFINES += AULIB_DEBUG
