@@ -40,6 +40,7 @@ struct Stream_priv final
     int fPlaybackStartTick = 0;
     int fFadeInStartTick = 0;
     int fFadeOutStartTick = 0;
+    bool fStarting = false;
     bool fFadingIn = false;
     bool fFadingOut = false;
     bool fStopAfterFade = false;
@@ -65,7 +66,7 @@ struct Stream_priv final
     static Buffer<float> fStrmBuf;
     static Buffer<float> fProcessorBuf;
 
-    void fProcessFade();
+    auto fProcessFadeAndCheckIfFinished() -> bool;
     void fStop();
 
     static void fSdlCallbackImpl(void* /*unused*/, Uint8 out[], int outLen);
