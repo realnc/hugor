@@ -1,71 +1,44 @@
 name: CI
 
-on: [push, pull_request]
+on: [push, pull_request, workflow_dispatch]
 
 jobs:
-  build:
+  build-linux:
     strategy:
       matrix:
-        os: [ubuntu-16.04, macos-10.15]
+        docker_image: ['realnc/hugor-build:linux-x86', 'realnc/hugor-build:linux-x64']
 
-    runs-on: ${{ matrix.os }}
-
-    env:
-      ADLMIDI_VERSION: 1.5.0.1
-      CMAKE_GENERATOR: Ninja
-      FSYNTH_VERSION: 2.2.1
-      OPENMPT_VERSION: 0.5.8
-      QT_TAG: qt515
-      QT_VERSION: 5.15.2
+    runs-on: ubuntu-latest
+    container: ${{ matrix.docker_image }}
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v1
 
-    - if: runner.os == 'Linux'
-      name: Add PPAs
+    - name: Build
       run: |
-        sudo add-apt-repository ppa:beineri/opt-qt-${QT_VERSION}-xenial
-        sudo add-apt-repository ppa:jonathonf/vlc-3
-        sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-        sudo apt-get update
+        qmake
+        make appimage
 
-    - if: runner.os == 'Linux'
-      name: Install deps
-      run: sudo apt-get -y install
-        ${QT_TAG}base
-        g++-9
-        gcc-9
-        libboost-dev
-        libmpg123-dev
-        libsdl2-dev
-        libsndfile1-dev
-        libvlc-dev
-        ninja-build
+  build-macos:
+    runs-on: macos-10.15
+    env:
+      ADLMIDI_VERSION: 1.5.0.1-1
+      CMAKE_GENERATOR: Ninja
 
-    - if: runner.os == 'Linux'
-      name: Pre-build setup
+    steps:
+    - name: Install deps
       run: |
-        sudo ln -s /usr/local/lib /usr/local/lib64
-        sudo update-alternatives \
-          --install /usr/bin/gcc gcc /usr/bin/gcc-9 60 \
-          --slave /usr/bin/g++ g++ /usr/bin/g++-9
-        sudo update-alternatives --config gcc
-
-    - if: runner.os == 'macOS'
-      name: Install deps
-      run: brew install
-        fluidsynth
-        glib
-        libopenmpt
-        libsndfile
-        mpg123
-        ninja
-        pkg-config
-        qt5
-        sdl2
-
-    - if: runner.os == 'macOS'
-      run: brew link qt5 --force
+        brew install \
+          fluidsynth \
+          glib \
+          libopenmpt \
+          libsndfile \
+          mpg123 \
+          ninja \
+          pkg-config \
+          qt5 \
+          sdl2
+        brew link qt5 --force
 
     - name: Build libADLMIDI
       working-directory: ../
@@ -81,58 +54,9 @@ jobs:
           ..
         sudo cmake --build . --target install -v
 
-    - if: runner.os == 'Linux'
-      name: Build FluidSynth
-      working-directory: ../
-      run: |
-        wget -nv "https://github.com/FluidSynth/fluidsynth/archive/v${FSYNTH_VERSION}.tar.gz" -O- | tar xz
-        mkdir "fluidsynth-${FSYNTH_VERSION}"/build
-        cd "fluidsynth-${FSYNTH_VERSION}"/build
-        cmake -Denable-framework=off ..
-        sudo cmake --build . --target install -v
+    - uses: actions/checkout@v2
 
-    - if: runner.os == 'Linux'
-      name: Build libopenmpt
-      working-directory: ../
-      run: |
-        wget -q "https://lib.openmpt.org/files/libopenmpt/src/libopenmpt-${OPENMPT_VERSION}+release.autotools.tar.gz" \
-          -O- | tar xz
-        mkdir openmpt-build
-        cd openmpt-build
-        ../libopenmpt-${OPENMPT_VERSION}+release.autotools/configure \
-          --enable-silent-rules \
-          --disable-dependency-tracking \
-          --enable-shared \
-          --disable-static \
-          --disable-openmpt123 \
-          --disable-examples \
-          --disable-tests \
-          --disable-doxygen-doc \
-          --without-zlib \
-          --without-mpg123 \
-          --without-ogg \
-          --without-vorbis \
-          --without-vorbisfile \
-          --without-pulseaudio \
-          --without-portaudio \
-          --without-portaudiocpp \
-          --without-sdl2 \
-          --without-sdl \
-          --without-sndfile \
-          --without-flac
-        make -j`nproc`
-        sudo make install
-
-    - if: runner.os == 'Linux'
-      name: Build
-      run: |
-        source /opt/${QT_TAG}/bin/${QT_TAG}-env.sh \
-        && qmake -config adlmidi \
-        && make -j`nproc` \
-        && sudo make install
-
-    - if: runner.os == 'macOS'
-      name: Build
+    - name: Build
       run: |
         qmake -config disable-video -config adlmidi
         make -j`sysctl -n hw.ncpu`
