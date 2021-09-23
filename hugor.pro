@@ -278,3 +278,30 @@ mimefile.path = "$$DATADIR/mime/packages"
 target.path = "$$BINDIR"
 
 INSTALLS += appdataxml desktopfile desktopicon docs fileicons mimefile target
+
+linux {
+    VLC_PREFIX = $$system(pkg-config libvlc --variable=prefix)
+    appimage.target = appimage
+    appimage.commands = \
+        rm -f Hugor.AppImage \
+        && rm -rf AppDir \
+        && "$$QMAKE_QMAKE" PREFIX="$$OUT_PWD"/AppDir/usr -config release -config adlmidi "$$_PRO_FILE_" \
+        && make -j"$$QMAKE_HOST.cpu_count" \
+        && make install \
+        && mkdir -p "$$OUT_PWD"/AppDir/usr/lib/vlc \
+        && cp -a "$$VLC_PREFIX"/lib/libvlc* "$$VLC_PREFIX"/lib/vlc/libvlc* "$$OUT_PWD"/AppDir/usr/lib/ \
+        && cp -a "$$VLC_PREFIX"/lib/vlc/plugins "$$OUT_PWD"/AppDir/usr/lib/vlc/ \
+        && rm -f "$$OUT_PWD"/AppDir/usr/lib/vlc/plugins/plugins.dat \
+        && find "$$OUT_PWD"/AppDir/usr/lib -type f \\( -name "*.la" -o -name "*.a" \\) -exec rm '{}' \; \
+        && patchelf --set-rpath \'\$$ORIGIN/../../../\' "$$OUT_PWD"/AppDir/usr/lib/vlc/plugins/*/* \
+        && "$$VLC_PREFIX"/lib/vlc/vlc-cache-gen "$$OUT_PWD"/AppDir/usr/lib/vlc/plugins \
+        && linuxdeployqt \
+            "$$OUT_PWD"/AppDir/usr/share/applications/nikos.chantziaras.hugor.desktop \
+            -appimage \
+            -no-copy-copyright-files \
+            -no-translations \
+            -qmake="$$QMAKE_QMAKE" \
+            -extra-plugins=iconengines,platformthemes
+
+    QMAKE_EXTRA_TARGETS += appimage
+}
