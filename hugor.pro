@@ -1,4 +1,4 @@
-QT += core widgets
+QT += core svg widgets
 QT_CONFIG -= no-pkg-config
 TEMPLATE = app
 CONFIG += silent warn_on link_pkgconfig strict_c++ c++17 gc_binaries
