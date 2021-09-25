@@ -24,39 +24,39 @@ jobs:
     env:
       ADLMIDI_VERSION: 1.5.0.1-1
       CMAKE_GENERATOR: Ninja
+      ZITA_VERSION: 1.8.0
 
     steps:
-    - name: Install deps
+    - name: Replace homebrew
       run: |
-        brew install \
-          fluidsynth \
-          glib \
-          libopenmpt \
-          libsndfile \
-          mpg123 \
-          ninja \
-          pkg-config \
-          qt5 \
-          sdl2
-        brew link qt5 --force
+        cd ~
+        mkdir newbrew
+        cd newbrew
+        curl -s -S -L 'https://github.com/realnc/stuff/releases/download/stuff/homebrew-10.13.tar.zst' | zstd -d | sudo tar x
+        rm -f bin/brew
+        mkdir ~/oldbrew
+        sudo mv /usr/local/* ~/oldbrew/
+        sudo mv * /usr/local/
 
-    - name: Build libADLMIDI
-      working-directory: ../
+    - name: Download VLC
+      working-directory: /usr/local
       run: |
-        wget -nv "https://github.com/Wohlstand/libADLMIDI/archive/v${ADLMIDI_VERSION}.tar.gz" -O- | tar xz
-        cd "libADLMIDI-${ADLMIDI_VERSION}"
-        mkdir build
-        cd build
-        cmake \
-          -DlibADLMIDI_SHARED=on \
-          -DlibADLMIDI_STATIC=off \
-          -DEXAMPLE_SDL2_AUDIO=off \
-          ..
-        sudo cmake --build . --target install -v
+        curl -s -S -L 'https://github.com/realnc/stuff/releases/download/stuff/vlc-3.0.6-macos.tar.zst' | zstd -d | sudo tar x
+
+    - name: Download Qt
+      working-directory: /opt
+      run: |
+        curl -s -S -L 'https://github.com/realnc/stuff/releases/download/stuff/qt-5.15.2-macos-static.tar.zst' | zstd -d | sudo tar x
+
+    - name: Enable 10.15 SDK
+      run: |
+        sudo mv \
+          "/Applications/Xcode_12.1.1.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk" \
+          "`xcode-select -p`/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk"
 
     - uses: actions/checkout@v2
 
     - name: Build
       run: |
-        qmake -config disable-video -config adlmidi
-        make -j`sysctl -n hw.ncpu`
+        /opt/qt/bin/qmake -after CONFIG-=silent
+        make macdist
