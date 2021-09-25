@@ -305,3 +305,23 @@ linux {
 
     QMAKE_EXTRA_TARGETS += appimage
 }
+
+macx {
+    VLC_LIBDIR = $$system(pkg-config libvlc --variable=libdir)
+    macdist.target = macdist
+    macdist.commands = \
+        rm -rf Hugor.app \
+        && rm -f Hugor.zip \
+        && "$$QMAKE_QMAKE" -config release -config adlmidi "$$_PRO_FILE_" \
+        && make -j"$$QMAKE_HOST.cpu_count" \
+        && mkdir -p Hugor.app/Contents/Frameworks/vlc \
+        && cp -a "$$VLC_LIBDIR"/libvlc*.dylib Hugor.app/Contents/Frameworks/ \
+        && cp -a "$$VLC_LIBDIR"/vlc/plugins Hugor.app/Contents/Frameworks/vlc/ \
+        && rm -f Hugor.app/Contents/Frameworks/vlc/plugins/plugins.dat \
+        && find Hugor.app/Contents/Frameworks/ -type f \\( -name "*.la" -o -name "*.a" \\) -exec rm '{}' \; \
+        && "$$dirname(QMAKE_QMAKE)"/macdeployqt Hugor.app -verbose=2 \
+        && LD_LIBRARY_PATH="$$VLC_LIBDIR" "$$VLC_LIBDIR"/vlc/vlc-cache-gen Hugor.app/Contents/Frameworks/vlc/plugins \
+        && ditto -v -c -k --sequesterRsrc --keepParent --zlibCompressionLevel 9 Hugor.app Hugor.zip \
+
+    QMAKE_EXTRA_TARGETS += macdist
+}
