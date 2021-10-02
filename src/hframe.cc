@@ -90,11 +90,10 @@ void HFrame::updateCursorShape()
     } else if (shape == Settings::TextCursorShape::Underline) {
         cursor_height_ = thickness;
     }
-    auto cur_char = input_buf_[input_current_char_];
-    if (cur_char.isNull()) {
-        cursor_width_ = font_metrics_.width('_');
+    if (input_current_char_ < input_buf_.length()) {
+        cursor_width_ = font_metrics_.width(input_buf_[input_current_char_]);
     } else {
-        cursor_width_ = font_metrics_.width(cur_char);
+        cursor_width_ = font_metrics_.width('_');
     }
 }
 
