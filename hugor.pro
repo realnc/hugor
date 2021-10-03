@@ -1,7 +1,7 @@
 QT += core svg widgets
 QT_CONFIG -= no-pkg-config
 TEMPLATE = app
-CONFIG += silent warn_on link_pkgconfig strict_c++ c++17 gc_binaries
+CONFIG += silent warn_on link_pkgconfig strict_c++ c++1z gc_binaries
 TARGET = hugor
 ICON = mac_icon.icns
 
@@ -18,8 +18,13 @@ DEFINES += \
 lessThan(QT_MAJOR_VERSION, 5) {
     error(Qt 4 is not supported. You need at least Qt 5.5.)
 }
-contains(QT_MAJOR_VERSION, 5):lessThan(QT_MINOR_VERSION, 5) {
-    error(Qt 5.5 or higher is required. You are using Qt "$$QT_MAJOR_VERSION"."$$QT_MINOR_VERSION")
+equals(QT_MAJOR_VERSION, 5) {
+    lessThan(QT_MINOR_VERSION, 5) {
+        error(Qt 5.5 or higher is required. You are using Qt "$$QT_MAJOR_VERSION"."$$QT_MINOR_VERSION")
+    }
+    lessThan(QT_MINOR_VERSION, 6) {
+        QMAKE_CXXFLAGS += -std=c++1z
+    }
 }
 
 #SANITIZER_FLAGS = -fsanitize=undefined,integer -fno-omit-frame-pointer
