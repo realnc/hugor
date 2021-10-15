@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/realnc/SDL_audiolib.git
+	branch = master
+	commit = 5a700ba556d3a5b5c531c2fa1f45fc0c3214a16b
+	parent = 7914861058a50a0576b9ec74d0d99f4970c176db
+	method = merge
+	cmdver = 0.4.3

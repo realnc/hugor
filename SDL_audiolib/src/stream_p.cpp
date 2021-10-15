@@ -133,7 +133,7 @@ void Aulib::Stream_priv::fSdlCallbackImpl(void* /*unused*/, Uint8 out[], int out
         bool has_finished = false;
         bool has_looped = false;
         const int out_offset = [&] {
-            if (not stream->d->fStarting || ticks_since_play_start >= wanted_ticks) {
+            if (!stream->d->fStarting || ticks_since_play_start >= wanted_ticks) {
                 return 0;
             }
 
