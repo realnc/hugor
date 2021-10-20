@@ -1,8 +1,18 @@
 Git
 ================
 
+  - Games with video no longer result in the audio device being opened a second
+    time and showing up as coming from a different application in the operating
+    system's sound mixer UI.
+
+  - The correct version is now reported when games query it through the
+    GET_VERSION  opcode.
+
   - LibVLC is now the only video backend. The GStreamer backend has been
     removed.
+
+  - A relatively modern compiler with C++17 support is now required to build
+    Hugor.
 
 
 2.2 - 2019-04-05
