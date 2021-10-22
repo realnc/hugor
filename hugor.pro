@@ -143,6 +143,9 @@ macx {
         message("*** LSMinimumSystemVersion in the generated Info.plist in")
         message("*** the app bundle after building.")
     }
+    gc_binaries:contains(QT_MAJOR_VERSION, 5):lessThan(QT_MINOR_VERSION, 12) {
+        QMAKE_LFLAGS += -Wl,-dead_strip
+    }
 }
 
 win32 {
@@ -313,6 +316,7 @@ linux {
 
 macx {
     VLC_LIBDIR = $$system(pkg-config libvlc --variable=libdir)
+
     macdist.target = macdist
     macdist.commands = \
         rm -rf Hugor.app \
@@ -326,7 +330,27 @@ macx {
         && find Hugor.app/Contents/Frameworks/ -type f \\( -name "*.la" -o -name "*.a" \\) -exec rm '{}' \; \
         && "$$dirname(QMAKE_QMAKE)"/macdeployqt Hugor.app -verbose=2 \
         && LD_LIBRARY_PATH="$$VLC_LIBDIR" "$$VLC_LIBDIR"/vlc/vlc-cache-gen Hugor.app/Contents/Frameworks/vlc/plugins \
-        && ditto -v -c -k --sequesterRsrc --keepParent --zlibCompressionLevel 9 Hugor.app Hugor.zip \
+        && ditto -v -c -k --sequesterRsrc --keepParent --zlibCompressionLevel 9 Hugor.app Hugor.zip
 
-    QMAKE_EXTRA_TARGETS += macdist
+    legacymacdist.target = legacymacdist
+    legacymacdist.commands = \
+        rm -rf Hugor.app \
+        && rm -f Hugor.zip \
+        && "$$QMAKE_QMAKE" -config release -config adlmidi "$$_PRO_FILE_" \
+        && make -j"$$QMAKE_HOST.cpu_count" \
+        && sed -i \'\' \'s/\$${MACOSX_DEPLOYMENT_TARGET}/10.9/g\' Hugor.app/Contents/Info.plist \
+        && dylibbundler -x Hugor.app/Contents/MacOS/Hugor -b -cd -d Hugor.app/Contents/Frameworks -p '@rpath' -s "$$VLC_LIBDIR" \
+        && install_name_tool -add_rpath '@executable_path/../Frameworks/' Hugor.app/Contents/MacOS/Hugor \
+        && rm -f Hugor.app/Contents/Frameworks/libvlc.* Hugor.app/Contents/Frameworks/libvlccore.* \
+        && mkdir -p Hugor.app/Contents/Frameworks/vlc \
+        && cp -a "$$VLC_LIBDIR"/libvlc*.dylib Hugor.app/Contents/Frameworks/ \
+        && cp -a "$$VLC_LIBDIR"/vlc/plugins Hugor.app/Contents/Frameworks/vlc/ \
+        && rm -f Hugor.app/Contents/Frameworks/vlc/plugins/plugins.dat \
+        && find Hugor.app/Contents/Frameworks/ -type f \\( -name "*.la" -o -name "*.a" \\) -exec rm '{}' \; \
+        && strip Hugor.app/Contents/MacOS/Hugor \
+        && find Hugor.app/Contents/Frameworks/ -type f -name "*.dylib" -exec strip -x '{}' \; \
+        && LD_LIBRARY_PATH="$$VLC_LIBDIR" "$$VLC_LIBDIR"/vlc/vlc-cache-gen Hugor.app/Contents/Frameworks/vlc/plugins \
+        && ditto -v -c -k --sequesterRsrc --keepParent --zlibCompressionLevel 9 Hugor.app Hugor.zip
+
+    QMAKE_EXTRA_TARGETS += macdist legacymacdist
 }
