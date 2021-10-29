@@ -5,37 +5,47 @@
 
 SettingsOverrides::SettingsOverrides(const QString& filename)
 {
-    QSettings sett(filename, QSettings::IniFormat);
+    const QSettings sett(filename, QSettings::IniFormat);
 
-    sett.beginGroup(QString::fromLatin1("identity"));
-    app_name = sett.value(QString::fromLatin1("appName"), QString::fromLatin1("")).toString();
-    author_name = sett.value(QString::fromLatin1("authorName"), QString::fromLatin1("")).toString();
-    sett.endGroup();
-
-    sett.beginGroup(QString::fromLatin1("display"));
-    fullscreen = sett.value(QString::fromLatin1("fullscreen"), false).toBool();
-    hide_menubar = sett.value(QString::fromLatin1("hideMenuBar"), false).toBool();
-    fullscreen_width = sett.value(QString::fromLatin1("fullscreenWidth"), 0).toInt();
-    if (fullscreen_width > 0) {
-        if (fullscreen_width > 100) {
-            fullscreen_width = 100;
-        } else if (fullscreen_width < 10) {
-            fullscreen_width = 10;
+    const auto& all_keys = sett.allKeys();
+    for (const auto& original_key : all_keys) {
+        const auto& key = original_key.toLower();
+        if (key == "identity/appname") {
+            app_name = sett.value(original_key).toString();
+        } else if (key == "identity/authorname") {
+            author_name = sett.value(original_key).toString();
+        } else if (key == "display/fullscreen") {
+            fullscreen = sett.value(original_key).toBool();
+        } else if (key == "display/fullscreenwidth") {
+            fullscreen_width = sett.value(original_key).toInt();
+            if (fullscreen_width > 0) {
+                if (fullscreen_width > 100) {
+                    fullscreen_width = 100;
+                } else if (fullscreen_width < 10) {
+                    fullscreen_width = 10;
+                }
+            }
+        } else if (key == "display/hidemenubar") {
+            hide_menubar = sett.value(original_key).toBool();
+        } else if (key == "display/marginsize") {
+            margin_size = sett.value(original_key).toInt();
+        } else if (key == "display/widthratio") {
+            width_ratio = sett.value(original_key).toInt();
+        } else if (key == "display/heightratio") {
+            height_ratio = sett.value(original_key).toInt();
+        } else if (key == "display/propfontsize") {
+            prop_font_size = sett.value(original_key).toInt();
+        } else if (key == "display/fixedfontsize") {
+            fixed_font_size = sett.value(original_key).toInt();
+        } else if (key == "display/scrollbackfontsize") {
+            scrollback_font_size = sett.value(original_key).toInt();
+        } else if (key == "display/fsmargincolor") {
+            QString namedColor = sett.value(original_key).toString();
+            fs_margin_color.setNamedColor(namedColor);
+        } else if (key == "media/mutewhenminimized") {
+            mute_when_minimized = sett.value(original_key).toBool();
         }
     }
-    margin_size = sett.value(QString::fromLatin1("marginSize"), 0).toInt();
-    width_ratio = sett.value(QString::fromLatin1("widthRatio"), 4).toInt();
-    height_ratio = sett.value(QString::fromLatin1("heightRatio"), 3).toInt();
-    prop_font_size = sett.value(QString::fromLatin1("propFontSize"), 0).toInt();
-    fixed_font_size = sett.value(QString::fromLatin1("fixedFontSize"), 0).toInt();
-    scrollback_font_size = sett.value(QString::fromLatin1("scrollbackFontSize"), 0).toInt();
-    QString namedColor = sett.value(QString::fromLatin1("fsMarginColor"), QString()).toString();
-    fs_margin_color.setNamedColor(namedColor);
-    sett.endGroup();
-
-    sett.beginGroup(QString::fromLatin1("media"));
-    mute_when_minimized = sett.value(QString::fromLatin1("muteWhenMinimized"), true).toBool();
-    sett.endGroup();
 }
 
 /* Copyright (C) 2011-2019 Nikos Chantziaras

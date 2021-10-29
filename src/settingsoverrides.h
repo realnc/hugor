@@ -10,17 +10,17 @@ public:
 
     QString app_name;
     QString author_name;
-    bool fullscreen;
-    int fullscreen_width;
-    bool hide_menubar;
-    int margin_size;
+    bool fullscreen = false;
+    int fullscreen_width = 0;
+    bool hide_menubar = false;
+    int margin_size = 0;
     QColor fs_margin_color;
-    int width_ratio;
-    int height_ratio;
-    int prop_font_size;
-    int fixed_font_size;
-    int scrollback_font_size;
-    bool mute_when_minimized;
+    int width_ratio = 4;
+    int height_ratio = 3;
+    int prop_font_size = 0;
+    int fixed_font_size = 0;
+    int scrollback_font_size = 0;
+    bool mute_when_minimized = true;
 };
 
 /* Copyright (C) 2011-2019 Nikos Chantziaras
