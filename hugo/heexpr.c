@@ -893,6 +893,7 @@ CheckAttribute:
 			if (!inobj)
 				{nattr = 1;
 				codeptr++;}
+			/* fall through */
 		case IN_T:
 		{
 			if (!inobj)
@@ -1164,8 +1165,10 @@ void SetupExpr(void)
 			*/
 			case EOL_T:
 				arrexpr = false;
+				/* fall through */
 			case COMMA_T:
 				multiprop = false;
+				/* fall through */
 			case SEMICOLON_T:
 			case CLOSE_SQUARE_T:
 			case JUMP_T:

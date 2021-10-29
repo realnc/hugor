@@ -177,6 +177,7 @@ char *Rtrim(char a[])
 
 char *itoa(int a, char *buf, int base)
 {
+	(void)base;
 	/* This only works if base is 10 (which it will be) */
 	sprintf(buf, "%d" ,a);
 	return buf;
