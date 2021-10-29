@@ -205,6 +205,15 @@ void Settings::loadFromDisk(SettingsOverrides* ovr)
         sett.endGroup();
 
         sett.beginGroup(SETT_FONTS_GRP);
+        if (not sett.contains(SETT_MAIN_FONT) and not ovr->prop_font.isEmpty()) {
+            prop_font.setFamily(ovr->prop_font);
+        }
+        if (not sett.contains(SETT_FIXED_FONT) and not ovr->fixed_font.isEmpty()) {
+            fixed_font.setFamily(ovr->fixed_font);
+        }
+        if (not sett.contains(SETT_SCROLLBACK_FONT) and not ovr->scrollback_font.isEmpty()) {
+            scrollback_font.setFamily(ovr->scrollback_font);
+        }
         if (not sett.contains(SETT_MAIN_FONT) and ovr->prop_font_size > 0) {
             prop_font.setPointSize(ovr->prop_font_size);
         }

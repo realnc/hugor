@@ -17,6 +17,9 @@ public:
     QColor fs_margin_color;
     int width_ratio = 4;
     int height_ratio = 3;
+    QString prop_font;
+    QString fixed_font;
+    QString scrollback_font;
     int prop_font_size = 0;
     int fixed_font_size = 0;
     int scrollback_font_size = 0;

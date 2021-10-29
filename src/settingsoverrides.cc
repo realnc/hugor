@@ -33,6 +33,12 @@ SettingsOverrides::SettingsOverrides(const QString& filename)
             width_ratio = sett.value(original_key).toInt();
         } else if (key == "display/heightratio") {
             height_ratio = sett.value(original_key).toInt();
+        } else if (key == "display/propfont") {
+            prop_font = sett.value(original_key).toString();
+        } else if (key == "display/fixedfont") {
+            fixed_font = sett.value(original_key).toString();
+        } else if (key == "display/scrollbackfont") {
+            scrollback_font = sett.value(original_key).toString();
         } else if (key == "display/propfontsize") {
             prop_font_size = sett.value(original_key).toInt();
         } else if (key == "display/fixedfontsize") {
