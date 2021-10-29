@@ -44,6 +44,8 @@ SettingsOverrides::SettingsOverrides(const QString& filename)
             fs_margin_color.setNamedColor(namedColor);
         } else if (key == "media/mutewhenminimized") {
             mute_when_minimized = sett.value(original_key).toBool();
+        } else if (key == "bundledfonts/fontpath") {
+            font_dir = sett.value(original_key).toString();
         }
     }
 }

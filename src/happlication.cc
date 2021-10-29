@@ -6,6 +6,7 @@
 #include <QDialogButtonBox>
 #include <QDir>
 #include <QFileDialog>
+#include <QFontDatabase>
 #include <QIcon>
 #include <QLabel>
 #include <QLayout>
@@ -32,6 +33,23 @@ extern "C" {
 
 HApplication* hApp = nullptr;
 
+static void addBundledFonts(const QString& path)
+{
+    QDir dir(QApplication::applicationDirPath());
+    if (not dir.cd(path)) {
+        return;
+    }
+
+    dir.setNameFilters({"*.ttf", "*.ttc", "*.otf"});
+    dir.setFilter(QDir::Files | QDir::Readable);
+    QFontDatabase::removeAllApplicationFonts();
+    const auto& absolute_path = dir.absolutePath() + '/';
+    const auto& font_files = dir.entryList();
+    for (const auto& font_file : font_files) {
+        QFontDatabase::addApplicationFont(absolute_path + font_file);
+    }
+}
+
 HApplication::HApplication(int& argc, char* argv[], const char* appName, const char* appVersion,
                            const char* orgName, const char* orgDomain)
     : QApplication(argc, argv)
@@ -56,6 +74,10 @@ HApplication::HApplication(int& argc, char* argv[], const char* appName, const c
         settOvr = nullptr;
     } else {
         settOvr = new SettingsOverrides(cfgFname);
+    }
+
+    if (settOvr and not settOvr->font_dir.isEmpty()) {
+        addBundledFonts(settOvr->font_dir);
     }
 
     HApplication::setApplicationName(QString::fromLatin1(appName));

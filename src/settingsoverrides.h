@@ -21,6 +21,7 @@ public:
     int fixed_font_size = 0;
     int scrollback_font_size = 0;
     bool mute_when_minimized = true;
+    QString font_dir;
 };
 
 /* Copyright (C) 2011-2019 Nikos Chantziaras
