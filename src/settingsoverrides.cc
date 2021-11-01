@@ -8,13 +8,16 @@ SettingsOverrides::SettingsOverrides(const QString& filename)
     QSettings sett(filename, QSettings::IniFormat);
     sett.setIniCodec("UTF-8");
 
+    // Note: unquoted ini values with commas are treated as QStringList by Qt. So we need treat all
+    // string values as string lists and join them into a single string with a comma as seperator.
+
     const auto& all_keys = sett.allKeys();
     for (const auto& original_key : all_keys) {
         const auto& key = original_key.toLower();
         if (key == "identity/appname") {
-            app_name = sett.value(original_key).toString();
+            app_name = sett.value(original_key).toStringList().join(',');
         } else if (key == "identity/authorname") {
-            author_name = sett.value(original_key).toString();
+            author_name = sett.value(original_key).toStringList().join(',');
         } else if (key == "display/fullscreen") {
             fullscreen = sett.value(original_key).toBool();
         } else if (key == "display/fullscreenwidth") {
@@ -35,11 +38,11 @@ SettingsOverrides::SettingsOverrides(const QString& filename)
         } else if (key == "display/heightratio") {
             height_ratio = sett.value(original_key).toInt();
         } else if (key == "display/propfont") {
-            prop_font = sett.value(original_key).toString();
+            prop_font = sett.value(original_key).toStringList().join(',');
         } else if (key == "display/fixedfont") {
-            fixed_font = sett.value(original_key).toString();
+            fixed_font = sett.value(original_key).toStringList().join(',');
         } else if (key == "display/scrollbackfont") {
-            scrollback_font = sett.value(original_key).toString();
+            scrollback_font = sett.value(original_key).toStringList().join(',');
         } else if (key == "display/propfontsize") {
             prop_font_size = sett.value(original_key).toInt();
         } else if (key == "display/fixedfontsize") {
@@ -47,12 +50,12 @@ SettingsOverrides::SettingsOverrides(const QString& filename)
         } else if (key == "display/scrollbackfontsize") {
             scrollback_font_size = sett.value(original_key).toInt();
         } else if (key == "display/fsmargincolor") {
-            QString namedColor = sett.value(original_key).toString();
+            QString namedColor = sett.value(original_key).toStringList().join(',');
             fs_margin_color.setNamedColor(namedColor);
         } else if (key == "media/mutewhenminimized") {
             mute_when_minimized = sett.value(original_key).toBool();
         } else if (key == "bundledfonts/fontpath") {
-            font_dir = sett.value(original_key).toString();
+            font_dir = sett.value(original_key).toStringList().join(',');
         }
     }
 }
