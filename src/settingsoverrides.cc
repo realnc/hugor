@@ -5,7 +5,8 @@
 
 SettingsOverrides::SettingsOverrides(const QString& filename)
 {
-    const QSettings sett(filename, QSettings::IniFormat);
+    QSettings sett(filename, QSettings::IniFormat);
+    sett.setIniCodec("UTF-8");
 
     const auto& all_keys = sett.allKeys();
     for (const auto& original_key : all_keys) {
