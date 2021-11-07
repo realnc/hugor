@@ -58,6 +58,14 @@ extern "C" {
 #define SETT_START_FULLSCREEN QString::fromLatin1("startFullscreen")
 #define SETT_START_WINDOWED QString::fromLatin1("startWindowed")
 
+static QFont fontForStyleHint(const QFont::StyleHint hint)
+{
+    QFont f;
+    f.setStyleHint(hint);
+    f.setFamily(f.defaultFamily());
+    return f;
+}
+
 void Settings::loadFromDisk(SettingsOverrides* ovr)
 {
     QSettings sett;
@@ -91,39 +99,25 @@ void Settings::loadFromDisk(SettingsOverrides* ovr)
     fs_margin_color = sett.value(SETT_MARGIN_COLOR, hugoColorToQt(DEF_BGCOLOR)).value<QColor>();
     sett.endGroup();
 
-#ifdef Q_OS_MAC
-    const QString& DEFAULT_PROP = QString::fromLatin1("Georgia,15");
-    const QString& DEFAULT_MONO = QString::fromLatin1("Andale Mono,15");
-#else
-#ifdef Q_OS_WIN
-    const QString& DEFAULT_PROP = QString::fromLatin1("Times New Roman,12");
-    const QString& DEFAULT_MONO = QString::fromLatin1("Courier New,12");
-#else
-#ifdef Q_OS_ANDROID
-    const QString& DEFAULT_PROP = QString::fromLatin1("Droid Serif");
-    const QString& DEFAULT_MONO = QString::fromLatin1("Droid Sans Mono");
-#else
-    const QString& DEFAULT_PROP = QString::fromLatin1("serif,12");
-    const QString& DEFAULT_MONO = QString::fromLatin1("monospace,12");
-#endif
-#endif
-#endif
+    const auto default_prop = fontForStyleHint(QFont::SansSerif);
+    const auto default_mono = fontForStyleHint(QFont::Monospace);
+
     sett.beginGroup(SETT_FONTS_GRP);
     QFont::StyleStrategy strat;
     strat = QFont::StyleStrategy(QFont::PreferOutline | QFont::PreferQuality
                                  | QFont::ForceIntegerMetrics);
     prop_font.setStyleStrategy(strat);
     QFont tmp;
-    tmp.fromString(sett.value(SETT_MAIN_FONT, DEFAULT_PROP).toString());
+    tmp.fromString(sett.value(SETT_MAIN_FONT, default_mono).toString());
     prop_font.setFamily(tmp.family());
     prop_font.setPointSize(tmp.pointSize());
     prop_font.setKerning(false);
     fixed_font.setStyleStrategy(strat);
-    tmp.fromString(sett.value(SETT_FIXED_FONT, DEFAULT_MONO).toString());
+    tmp.fromString(sett.value(SETT_FIXED_FONT, default_mono).toString());
     fixed_font.setFamily(tmp.family());
     fixed_font.setPointSize(tmp.pointSize());
     scrollback_font.setStyleStrategy(strat);
-    tmp.fromString(sett.value(SETT_SCROLLBACK_FONT, DEFAULT_PROP).toString());
+    tmp.fromString(sett.value(SETT_SCROLLBACK_FONT, default_mono).toString());
     scrollback_font.setFamily(tmp.family());
     scrollback_font.setPointSize(tmp.pointSize());
     soft_text_scrolling = sett.value(SETT_SOFT_SCROLL, true).toBool();
