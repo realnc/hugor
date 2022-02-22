@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Copyright 2019 Nikos Chantziaras <realnc@gmail.com> -->
+<!-- Copyright 2021 Nikos Chantziaras <realnc@gmail.com> -->
 <component type="desktop-application">
     <id>nikos.chantziaras.hugor</id>
     <metadata_license>FSFAP</metadata_license>

@@ -153,7 +153,7 @@ win32 {
     RC_ICONS = w32_icon.ico
     QMAKE_TARGET_COMPANY = "Nikos Chantziaras"
     QMAKE_TARGET_DESCRIPTION = "Hugor - A Hugo Interpreter"
-    QMAKE_TARGET_COPYRIGHT = "Copyright 2006, Kent Tessman; 2011-2019, Nikos Chantziaras"
+    QMAKE_TARGET_COPYRIGHT = "Copyright 2011, Kent Tessman; 2011-2022, Nikos Chantziaras"
 
     !disable-video {
         qt5-video {

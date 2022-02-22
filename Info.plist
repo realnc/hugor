@@ -31,7 +31,7 @@
     <key>CFBundleVersion</key>
     <string>@FULL_VERSION@</string>
     <key>NSHumanReadableCopyright</key>
-    <string>Copyright © 2006 Kent Tessman, © 2011-2019 Nikos Chantziaras.</string>
+    <string>Copyright © 2011 Kent Tessman, © 2011-2022 Nikos Chantziaras.</string>
 
     <key>CFBundleDocumentTypes</key>
     <array>
