@@ -2325,7 +2325,7 @@ NotinDictionary:
 					{
 						if (wd[i+1]==PeekWord(synptr+3))
 						{
-							strcat(word[i], word[i+1]);
+							memmove(word[i] + strlen(word[i]), word[i+1], strlen(word[i+1]) + 1);
 							wd[i] = FindWord(word[i]);
 							KillWord(i+1);
 						}
