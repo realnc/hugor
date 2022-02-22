@@ -12,7 +12,7 @@ samples and music.
 Hugor runs on all current major operating systems (Linux, MacOS and
 Microsoft Windows).  You can find binaries at:
 
-  http://ifwiki.org/index.php/Hugor
+  https://github.com/realnc/hugor/releases/latest
 
 The source code is hosted at:
 
@@ -25,20 +25,6 @@ If you have questions, you can use the intfiction.org forum:
 or the Jolt Country forum:
 
   https://www.joltcountry.com/phpBB3
-
-
-Installing on Gentoo Linux
-==========================
-
-If you're on Gentoo Linux, or a Gentoo-based distro that supports layman
-overlays, you can install Hugor by enabling the interactive-fiction
-overlay:
-
-  layman -a interactive-fiction
-
-You can then emerge Hugor like any other package:
-
-  emerge -a hugor
 
 
 Compiling from source

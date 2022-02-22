@@ -1,5 +1,11 @@
-Git
+3.0 - 2022-05-08
 ================
+
+  - Fixed a potential crash when parsing inputs containing compounds (like GET
+    OUT OF BED.)
+
+  - Fixed a potential crash when the game sets an application window title that
+    is too long.
 
   - Games with video no longer result in the audio device being opened a second
     time and showing up as coming from a different application in the operating
@@ -12,7 +18,15 @@ Git
     removed.
 
   - A relatively modern compiler with C++17 support is now required to build
-    Hugor.
+    Hugor. GCC 5.4 (shipped by Ubuntu 16.04) is the oldest GCC version that is
+    verified to still work.
+
+  - It is now possible to bundle custom fonts when distributing a game together
+    with the interpreter. See the example.cfg file for more information.
+
+  - Fixed various issues when reading cfg override files. The file is now
+    assumed to be UTF-8 encoded. Entries are now case-insensitive. Entries
+    containing commas are now parsed correctly.
 
 
 2.2 - 2019-04-05
