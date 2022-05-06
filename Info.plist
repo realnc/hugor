@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist SYSTEM "file://localhost/System/Library/DTDs/PropertyList.dtd">
-<plist version="0.9">
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
 <dict>
     <key>CFBundleExecutable</key>
     <string>@EXECUTABLE@</string>
@@ -14,6 +14,8 @@
     <string>APPL</string>
     <key>CFBundleSignature</key>
     <string>????</string>
+    <key>CFBundleInfoDictionaryVersion</key>
+    <string>6.0</string>
     <key>LSMinimumSystemVersion</key>
     <string>${MACOSX_DEPLOYMENT_TARGET}</string>
     <key>NOTE</key>
@@ -44,13 +46,42 @@
             <string></string>
         <key>CFBundleTypeMIMETypes</key>
             <string>application/octet-stream</string>
+        <key>LSItemContentTypes</key>
+        <array>
+            <string>public.hugo</string>
+        </array>
         <key>CFBundleTypeName</key>
-            <string>Hugor</string>
+            <string>Hugo Story</string>
         <key>CFBundleTypeOSTypes</key>
         <array>
             <string>****</string>
         </array>
     </dict>
+    </array>
+    <key>LSApplicationCategoryType</key>
+    <string>public.app-category.games</string>
+    <key>UTImportedTypeDeclarations</key>
+    <array>
+        <dict>
+            <key>UTTypeConformsTo</key>
+            <array>
+                <string>public.content</string>
+                <string>public.data</string>
+            </array>
+            <key>UTTypeDescription</key>
+            <string>Hugo Story</string>
+            <key>UTTypeIdentifier</key>
+            <string>public.hugo</string>
+            <key>UTTypeReferenceURL</key>
+            <string>http://www.generalcoffee.com/hugo/</string>
+            <key>UTTypeTagSpecification</key>
+            <dict>
+                <key>public.filename-extension</key>
+                <array>
+                    <string>hex</string>
+                </array>
+            </dict>
+        </dict>
     </array>
 </dict>
 </plist>
