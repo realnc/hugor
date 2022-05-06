@@ -260,9 +260,7 @@ OTHER_FILES *= \
     .gitignore \
     LICENSE \
     example.cfg \
-    hugo/LICENSE.TXT \
-    scripts/build_appimage.sh \
-    scripts/build_macos.sh
+    hugo/LICENSE.TXT
 
 isEmpty(PREFIX) {
     PREFIX = /usr/local
