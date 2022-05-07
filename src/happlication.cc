@@ -29,13 +29,25 @@ extern "C" {
 #include "hugohandlers.h"
 #include "settings.h"
 #include "settingsoverrides.h"
+#include "util.h"
 #include "videoplayer.h"
 
 HApplication* hApp = nullptr;
 
 static void addBundledFonts(const QString& path)
 {
-    QDir dir(QApplication::applicationDirPath());
+#ifdef Q_OS_MAC
+    QDir dir = getMacosAppBundleDir();
+    dir.cdUp();
+#else
+    QDir dir;
+    const auto appimage_env = qgetenv("APPIMAGE");
+    if (not appimage_env.isEmpty()) {
+        dir.setPath(QFileInfo(appimage_env).absolutePath());
+    } else {
+        dir.setPath(QApplication::applicationDirPath());
+    }
+#endif
     if (not dir.cd(path)) {
         return;
     }
@@ -50,6 +62,15 @@ static void addBundledFonts(const QString& path)
     }
 }
 
+static std::unique_ptr<SettingsOverrides> getConfigOverride()
+{
+    QString cfg_filename = getAutoloadPathPrefix() + ".cfg";
+    if (not QFileInfo::exists(cfg_filename)) {
+        return nullptr;
+    }
+    return std::make_unique<SettingsOverrides>(cfg_filename);
+}
+
 HApplication::HApplication(int& argc, char* argv[], const char* appName, const char* appVersion,
                            const char* orgName, const char* orgDomain)
     : QApplication(argc, argv)
@@ -58,24 +79,7 @@ HApplication::HApplication(int& argc, char* argv[], const char* appName, const c
     // qDebug() << Q_FUNC_INFO;
     Q_ASSERT(hApp == nullptr);
 
-    // Check if a config file with the same basename as ours exists in our directory. If yes, we
-    // will override default settings from it.
-    QString cfgFname = QApplication::applicationDirPath();
-    if (not cfgFname.endsWith('/')) {
-        cfgFname += '/';
-    }
-    cfgFname += QFileInfo(QApplication::applicationFilePath()).baseName();
-    cfgFname += ".cfg";
-    if (not QFileInfo::exists(cfgFname)) {
-        cfgFname.clear();
-    }
-    SettingsOverrides* settOvr;
-    if (cfgFname.isEmpty()) {
-        settOvr = nullptr;
-    } else {
-        settOvr = new SettingsOverrides(cfgFname);
-    }
-
+    auto settOvr = getConfigOverride();
     if (settOvr and not settOvr->font_dir.isEmpty()) {
         addBundledFonts(settOvr->font_dir);
     }
@@ -115,7 +119,7 @@ HApplication::HApplication(int& argc, char* argv[], const char* appName, const c
 #endif
 
     // Load our persistent settings.
-    settings_.loadFromDisk(settOvr);
+    settings_.loadFromDisk(settOvr.get());
 
     // Apply the smart formatting setting.
     smartformatting = settings_.smart_formatting;
@@ -150,7 +154,6 @@ HApplication::HApplication(int& argc, char* argv[], const char* appName, const c
 #ifndef Q_OS_MAC
     HApplication::setWindowIcon(QIcon(":/he_32-bit_48x48.png"));
 #endif
-    delete settOvr;
 }
 
 HApplication::~HApplication()

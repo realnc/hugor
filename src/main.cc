@@ -14,6 +14,7 @@ extern "C" {
 #include "hugodefs.h"
 #include "macos.h"
 #include "settings.h"
+#include "util.h"
 
 // On some platforms, SDL redefines main in order to provide a platform-specific main()
 // implementation. However, Qt handles this too, so things can get weird. We need to make sure main
@@ -44,20 +45,8 @@ int main(int argc, char* argv[])
     initSoundEngine();
     initVideoEngine(argc, argv);
 
-    // Filename of the game to run.
-    QString gameFileName;
-
-    // Check if a game file with the same basename as ours exists in our directory.  If yes, we will
-    // run it.
-    gameFileName = HApplication::applicationDirPath();
-    if (not gameFileName.endsWith('/')) {
-        gameFileName += '/';
-    }
-    gameFileName += QFileInfo(HApplication::applicationFilePath()).baseName();
-    gameFileName += ".hex";
-    if (not QFileInfo::exists(gameFileName)) {
-        gameFileName.clear();
-    }
+    // Assume there's a game file that we should autoload.
+    QString gameFileName = getAutoloadPathPrefix() + ".hex";
 
     const QStringList& args = HApplication::arguments();
     if (args.size() == 2) {
@@ -67,7 +56,10 @@ int main(int argc, char* argv[])
             gameFileName = args.at(1) + QString::fromLatin1(".hex");
         } else {
             qWarning() << "File" << args.at(1) << "not found.";
+            gameFileName.clear();
         }
+    } else if (not QFile::exists(gameFileName)) {
+        gameFileName.clear();
     }
 
     int ret = 0;
