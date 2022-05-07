@@ -4,6 +4,8 @@
 #include <QtGlobal>
 #include <type_traits>
 
+class QDir;
+
 template<typename F>
 static void runInMainThread(F&& fun)
 {
@@ -11,6 +13,16 @@ static void runInMainThread(F&& fun)
     QObject::connect(&tmp, &QObject::destroyed, qApp, std::forward<F>(fun),
                      Qt::BlockingQueuedConnection);
 }
+
+#ifdef Q_OS_MAC
+/* Returns the macOS application bundle directory.
+ */
+QDir getMacosAppBundleDir();
+#endif
+
+/* Returns the full prefix for autoload files.
+ */
+QString getAutoloadPathPrefix();
 
 /* Some missing stuff from >=Qt 5.7 for use when building with older Qt versions.
  *
