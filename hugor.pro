@@ -287,26 +287,27 @@ INSTALLS += appdataxml desktopfile desktopicon docs fileicons mimefile target
 
 linux {
     VLC_PREFIX = $$system(pkg-config libvlc --variable=prefix)
+
     appimage.target = appimage
     appimage.commands = \
         rm -f Hugor.AppImage \
         && rm -rf AppDir \
-        && "$$QMAKE_QMAKE" PREFIX="$$OUT_PWD"/AppDir/usr -config release -config adlmidi "$$_PRO_FILE_" \
+        && $$shell_quote($$QMAKE_QMAKE) PREFIX=$$shell_quote($$OUT_PWD/AppDir/usr) -config release -config adlmidi $$shell_quote($$_PRO_FILE_) \
         && make -j"$$QMAKE_HOST.cpu_count" \
         && make install \
-        && mkdir -p "$$OUT_PWD"/AppDir/usr/lib/vlc \
-        && cp -a "$$VLC_PREFIX"/lib/libvlc* "$$VLC_PREFIX"/lib/vlc/libvlc* "$$OUT_PWD"/AppDir/usr/lib/ \
-        && cp -a "$$VLC_PREFIX"/lib/vlc/plugins "$$OUT_PWD"/AppDir/usr/lib/vlc/ \
-        && rm -f "$$OUT_PWD"/AppDir/usr/lib/vlc/plugins/plugins.dat \
-        && find "$$OUT_PWD"/AppDir/usr/lib -type f \\( -name "*.la" -o -name "*.a" \\) -exec rm '{}' \; \
-        && patchelf --set-rpath \'\$$ORIGIN/../../../\' "$$OUT_PWD"/AppDir/usr/lib/vlc/plugins/*/* \
-        && "$$VLC_PREFIX"/lib/vlc/vlc-cache-gen "$$OUT_PWD"/AppDir/usr/lib/vlc/plugins \
+        && mkdir -p $$shell_quote($$OUT_PWD/AppDir/usr/lib/vlc) \
+        && cp -a $$shell_quote($$VLC_PREFIX/lib)/libvlc* $$shell_quote($$VLC_PREFIX/lib/vlc)/libvlc* $$shell_quote($$OUT_PWD/AppDir/usr/lib/) \
+        && cp -a $$shell_quote($$VLC_PREFIX/lib/vlc/plugins) $$shell_quote($$OUT_PWD/AppDir/usr/lib/vlc/) \
+        && rm -f $$shell_quote($$OUT_PWD/AppDir/usr/lib/vlc/plugins/plugins.dat) \
+        && find $$shell_quote($$OUT_PWD/AppDir/usr/lib) -type f \\( -name $$shell_quote(*.la) -o -name $$shell_quote(*.a) \\) -exec rm $$shell_quote({}) \; \
+        && patchelf --set-rpath $$shell_quote(\$$ORIGIN/../../../) $$shell_quote($$OUT_PWD/AppDir/usr/lib/vlc/plugins)/*/* \
+        && $$shell_quote($$VLC_PREFIX/lib/vlc/vlc-cache-gen) $$shell_quote($$OUT_PWD/AppDir/usr/lib/vlc/plugins) \
         && linuxdeployqt \
-            "$$OUT_PWD"/AppDir/usr/share/applications/nikos.chantziaras.hugor.desktop \
+            $$shell_quote($$OUT_PWD/AppDir/usr/share/applications/nikos.chantziaras.hugor.desktop) \
             -appimage \
             -no-copy-copyright-files \
             -no-translations \
-            -qmake="$$QMAKE_QMAKE" \
+            -qmake=$$shell_quote($$QMAKE_QMAKE) \
             -extra-plugins=iconengines,platformthemes
 
     QMAKE_EXTRA_TARGETS += appimage
@@ -319,35 +320,35 @@ macx {
     macdist.commands = \
         rm -rf Hugor.app \
         && rm -f Hugor.zip \
-        && "$$QMAKE_QMAKE" -config release -config adlmidi "$$_PRO_FILE_" \
+        && $$shell_quote($$QMAKE_QMAKE) -config release -config adlmidi $$shell_quote($$_PRO_FILE_) \
         && make -j"$$QMAKE_HOST.cpu_count" \
         && mkdir -p Hugor.app/Contents/Frameworks/vlc \
-        && cp -a "$$VLC_LIBDIR"/libvlc*.dylib Hugor.app/Contents/Frameworks/ \
-        && cp -a "$$VLC_LIBDIR"/vlc/plugins Hugor.app/Contents/Frameworks/vlc/ \
+        && cp -a $$shell_quote($$VLC_LIBDIR)/libvlc*.dylib Hugor.app/Contents/Frameworks/ \
+        && cp -a $$shell_quote($$VLC_LIBDIR/vlc/plugins) Hugor.app/Contents/Frameworks/vlc/ \
         && rm -f Hugor.app/Contents/Frameworks/vlc/plugins/plugins.dat \
-        && find Hugor.app/Contents/Frameworks/ -type f \\( -name "*.la" -o -name "*.a" \\) -exec rm '{}' \; \
-        && "$$dirname(QMAKE_QMAKE)"/macdeployqt Hugor.app -verbose=2 \
-        && LD_LIBRARY_PATH="$$VLC_LIBDIR" "$$VLC_LIBDIR"/vlc/vlc-cache-gen Hugor.app/Contents/Frameworks/vlc/plugins \
+        && find Hugor.app/Contents/Frameworks/ -type f \\( -name $$shell_quote(*.la) -o -name $$shell_quote(*.a) \\) -exec rm $$shell_quote({}) \; \
+        && $$shell_quote($$dirname(QMAKE_QMAKE)/macdeployqt) Hugor.app -verbose=2 \
+        && LD_LIBRARY_PATH=$$shell_quote($$VLC_LIBDIR) $$shell_quote($$VLC_LIBDIR/vlc/vlc-cache-gen) Hugor.app/Contents/Frameworks/vlc/plugins \
         && ditto -v -c -k --sequesterRsrc --keepParent --zlibCompressionLevel 9 Hugor.app Hugor.zip
 
     legacymacdist.target = legacymacdist
     legacymacdist.commands = \
         rm -rf Hugor.app \
         && rm -f Hugor.zip \
-        && "$$QMAKE_QMAKE" -config release -config adlmidi "$$_PRO_FILE_" \
+        && $$shell_quote($$QMAKE_QMAKE) -config release -config adlmidi $$shell_quote($$_PRO_FILE_) \
         && make -j"$$QMAKE_HOST.cpu_count" \
         && sed -i \'\' \'s/\$${MACOSX_DEPLOYMENT_TARGET}/10.9/g\' Hugor.app/Contents/Info.plist \
-        && dylibbundler -x Hugor.app/Contents/MacOS/Hugor -b -cd -d Hugor.app/Contents/Frameworks -p '@rpath' -s "$$VLC_LIBDIR" \
+        && dylibbundler -x Hugor.app/Contents/MacOS/Hugor -b -cd -d Hugor.app/Contents/Frameworks -p '@rpath' -s $$shell_quote($$VLC_LIBDIR) \
         && install_name_tool -add_rpath '@executable_path/../Frameworks/' Hugor.app/Contents/MacOS/Hugor \
         && rm -f Hugor.app/Contents/Frameworks/libvlc.* Hugor.app/Contents/Frameworks/libvlccore.* \
         && mkdir -p Hugor.app/Contents/Frameworks/vlc \
-        && cp -a "$$VLC_LIBDIR"/libvlc*.dylib Hugor.app/Contents/Frameworks/ \
-        && cp -a "$$VLC_LIBDIR"/vlc/plugins Hugor.app/Contents/Frameworks/vlc/ \
+        && cp -a $$shell_quote($$VLC_LIBDIR)/libvlc*.dylib Hugor.app/Contents/Frameworks/ \
+        && cp -a $$shell_quote($$VLC_LIBDIR/vlc/plugins) Hugor.app/Contents/Frameworks/vlc/ \
         && rm -f Hugor.app/Contents/Frameworks/vlc/plugins/plugins.dat \
-        && find Hugor.app/Contents/Frameworks/ -type f \\( -name "*.la" -o -name "*.a" \\) -exec rm '{}' \; \
+        && find Hugor.app/Contents/Frameworks/ -type f \\( -name $$shell_quote(*.la) -o -name $$shell_quote(*.a) \\) -exec rm $$shell_quote({}) \; \
         && strip Hugor.app/Contents/MacOS/Hugor \
-        && find Hugor.app/Contents/Frameworks/ -type f -name "*.dylib" -exec strip -x '{}' \; \
-        && LD_LIBRARY_PATH="$$VLC_LIBDIR" "$$VLC_LIBDIR"/vlc/vlc-cache-gen Hugor.app/Contents/Frameworks/vlc/plugins \
+        && find Hugor.app/Contents/Frameworks/ -type f -name $$shell_quote(*.dylib) -exec strip -x $$shell_quote({}) \; \
+        && LD_LIBRARY_PATH=$$shell_quote($$VLC_LIBDIR) $$shell_quote($$VLC_LIBDIR/vlc/vlc-cache-gen) Hugor.app/Contents/Frameworks/vlc/plugins \
         && ditto -v -c -k --sequesterRsrc --keepParent --zlibCompressionLevel 9 Hugor.app Hugor.zip
 
     QMAKE_EXTRA_TARGETS += macdist legacymacdist
