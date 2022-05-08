@@ -352,3 +352,28 @@ macx {
 
     QMAKE_EXTRA_TARGETS += macdist legacymacdist
 }
+
+win32 {
+    VLC_LIBDIR = $$(VLC_LIBDIR)
+    isEmpty(VLC_LIBDIR) {
+        message("VLC_LIBDIR environment variable not set or is empty, will use /opt/vlc")
+        VLC_LIBDIR = /opt/vlc
+    }
+
+    windist.target = windist
+    windist.commands = \
+        rm -rf release \
+        && rm -f $$shell_quote(Hugor-$${VERSION_MAJOR}.$${VERSION_MINOR}.zip) \
+        && $$shell_quote($$QMAKE_QMAKE) -config release -config adlmidi $$shell_quote($$_PRO_FILE_) \
+        && make -j"$$QMAKE_HOST.cpu_count" \
+        && mkdir -p $$shell_quote(release/Hugor-$${VERSION_MAJOR}.$${VERSION_MINOR}/plugins) \
+        && cd release \
+        && cp -a $$shell_quote($${VLC_LIBDIR})/*.dll $$shell_quote(Hugor-$${VERSION_MAJOR}.$${VERSION_MINOR}/) \
+        && cp -a $$shell_quote($${VLC_LIBDIR}/plugins) $$shell_quote(Hugor-$${VERSION_MAJOR}.$${VERSION_MINOR}/) \
+        && rm -f $$shell_quote(Hugor-$${VERSION_MAJOR}.$${VERSION_MINOR}/plugins/plugins.dat) \
+        && find $$shell_quote(Hugor-$${VERSION_MAJOR}.$${VERSION_MINOR}/) -type f \\( -name $$shell_quote(*.la) -o -name $$shell_quote(*.a) \\) -exec rm $$shell_quote({}) \; \
+        && cp -a Hugor.exe $$shell_quote(Hugor-$${VERSION_MAJOR}.$${VERSION_MINOR}/) \
+        && zip -r -9 $$shell_quote(../Hugor-$${VERSION_MAJOR}.$${VERSION_MINOR}.zip) $$shell_quote(Hugor-$${VERSION_MAJOR}.$${VERSION_MINOR})
+
+    QMAKE_EXTRA_TARGETS += windist
+}
