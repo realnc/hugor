@@ -19,34 +19,51 @@ jobs:
         qmake
         make appimage
 
+  build-mxe:
+    runs-on: ubuntu-latest
+    container: 'realnc/hugor-build:mxe-x86'
+
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: Build
+      run: |
+        i686-w64-mingw32.static-qmake-qt5
+        make windist
+
   build-macos:
     runs-on: macos-10.15
     env:
-      ADLMIDI_VERSION: 1.5.0.1-1
-      CMAKE_GENERATOR: Ninja
-      ZITA_VERSION: 1.8.0
+      HOMEBREW_PREFIX: /Users/Shared/homebrew-qtads-hugor
+      HOMEBREW_CELLAR: /Users/Shared/homebrew-qtads-hugor/Cellar
+      HOMEBREW_SHELLENV_PREFIX: /Users/Shared/homebrew-qtads-hugor
+      PKG_CONFIG_PATH: /Users/Shared/homebrew-qtads-hugor/opt/readline/lib/pkgconfig
 
     steps:
-    - name: Replace homebrew
+    - run: echo "${HOMEBREW_PREFIX}/bin:${HOMEBREW_PREFIX}/sbin:${PATH}" >> $GITHUB_PATH
+
+    - name: Install custom homebrew
       run: |
-        cd ~
-        mkdir newbrew
-        cd newbrew
-        curl -s -S -L 'https://github.com/realnc/stuff/releases/download/stuff/homebrew-10.13.tar.zst' | zstd -d | sudo tar x
-        rm -f bin/brew
-        mkdir ~/oldbrew
-        sudo mv /usr/local/* ~/oldbrew/
-        sudo mv * /usr/local/
+        rm -rf "${HOMEBREW_PREFIX}"
+        mkdir "${HOMEBREW_PREFIX}"
+        cd "${HOMEBREW_PREFIX}"/..
+        curl -s -S -L 'https://github.com/realnc/stuff/releases/download/stuff/homebrew-qtads-hugor.tar.zst' | zstd -d | tar x
+
+    - name: Remove /usr/local homebrew
+      working-directory: /usr/local
+      run: |
+        sudo mkdir ~/oldbrew
+        sudo mv * ~/oldbrew/
 
     - name: Download VLC
       working-directory: /usr/local
       run: |
-        curl -s -S -L 'https://github.com/realnc/stuff/releases/download/stuff/vlc-3.0.6-macos.tar.zst' | zstd -d | sudo tar x
+        curl -s -S -L 'https://github.com/realnc/stuff/releases/download/stuff/vlc-3.0.16-macos.tar.zst' | zstd -d | sudo tar x
 
     - name: Download Qt
       working-directory: /opt
       run: |
-        curl -s -S -L 'https://github.com/realnc/stuff/releases/download/stuff/qt-5.15.2-macos-static.tar.zst' | zstd -d | sudo tar x
+        curl -s -S -L 'https://github.com/realnc/stuff/releases/download/stuff/qt-5.15-macos-static.tar.zst' | zstd -d | sudo tar x
 
     - name: Enable 10.15 SDK
       run: |
@@ -58,5 +75,11 @@ jobs:
 
     - name: Build
       run: |
-        /opt/qt/bin/qmake -after CONFIG-=silent
+        /opt/qt-5.15/bin/qmake -after CONFIG-=silent
         make macdist
+
+    - name: Restore /usr/local homebrew
+      working-directory: /usr/local
+      run: |
+        sudo rm -rf *
+        sudo mv ~/oldbrew/* .
