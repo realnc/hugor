@@ -303,7 +303,6 @@ linux {
         && rm -f $$shell_quote($$OUT_PWD/AppDir/usr/lib/vlc/plugins/plugins.dat) \
         && find $$shell_quote($$OUT_PWD/AppDir/usr/lib) -type f \\( -name $$shell_quote(*.la) -o -name $$shell_quote(*.a) \\) -exec rm $$shell_quote({}) \; \
         && patchelf --set-rpath $$shell_quote(\$$ORIGIN/../../../) $$shell_quote($$OUT_PWD/AppDir/usr/lib/vlc/plugins)/*/* \
-        && $$shell_quote($$VLC_PREFIX/lib/vlc/vlc-cache-gen) $$shell_quote($$OUT_PWD/AppDir/usr/lib/vlc/plugins) \
         && linuxdeployqt \
             $$shell_quote($$OUT_PWD/AppDir/usr/share/applications/nikos.chantziaras.hugor.desktop) \
             -appimage \
@@ -330,7 +329,6 @@ macx {
         && rm -f Hugor.app/Contents/Frameworks/vlc/plugins/plugins.dat \
         && find Hugor.app/Contents/Frameworks/ -type f \\( -name $$shell_quote(*.la) -o -name $$shell_quote(*.a) \\) -exec rm $$shell_quote({}) \; \
         && $$shell_quote($$dirname(QMAKE_QMAKE)/macdeployqt) Hugor.app -verbose=2 \
-        && LD_LIBRARY_PATH=$$shell_quote($$VLC_LIBDIR) $$shell_quote($$VLC_LIBDIR/vlc/vlc-cache-gen) Hugor.app/Contents/Frameworks/vlc/plugins \
         && ditto -v -c -k --sequesterRsrc --keepParent --zlibCompressionLevel 9 Hugor.app Hugor.zip
 
     legacymacdist.target = legacymacdist
@@ -350,7 +348,6 @@ macx {
         && find Hugor.app/Contents/Frameworks/ -type f \\( -name $$shell_quote(*.la) -o -name $$shell_quote(*.a) \\) -exec rm $$shell_quote({}) \; \
         && strip Hugor.app/Contents/MacOS/Hugor \
         && find Hugor.app/Contents/Frameworks/ -type f -name $$shell_quote(*.dylib) -exec strip -x $$shell_quote({}) \; \
-        && LD_LIBRARY_PATH=$$shell_quote($$VLC_LIBDIR) $$shell_quote($$VLC_LIBDIR/vlc/vlc-cache-gen) Hugor.app/Contents/Frameworks/vlc/plugins \
         && ditto -v -c -k --sequesterRsrc --keepParent --zlibCompressionLevel 9 Hugor.app Hugor.zip
 
     QMAKE_EXTRA_TARGETS += macdist legacymacdist
