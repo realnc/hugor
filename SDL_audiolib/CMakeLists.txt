@@ -95,6 +95,12 @@ option(
 )
 
 option(
+    USE_DEC_FLAC
+    "Enable libFLAC decoder."
+    ON
+)
+
+option(
     USE_DEC_MUSEPACK
     "Enable libmpcdec Musepack decoder."
     ON
@@ -142,11 +148,22 @@ option(
     ON
 )
 
+option(
+    WITH_SYSTEM_FMTLIB
+    "Use system-provided fmtlib instead of bundled one."
+    OFF
+)
+
+include(GNUInstallDirs)
 include(FindPkgConfig)
 include(GenerateExportHeader)
 
+if ("cxx_std_20" IN_LIST CMAKE_CXX_COMPILE_FEATURES)
+    set(CMAKE_CXX_STANDARD 20)
+else()
+    set(CMAKE_CXX_STANDARD 17)
+endif()
 set(CMAKE_CXX_EXTENSIONS OFF)
-set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
@@ -164,10 +181,6 @@ endif()
 
 if("${CMAKE_CXX_COMPILER_ID}" MATCHES "^(GNU|((Apple)?Clang))$")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -W -Wextra -Wpedantic")
-endif()
-
-if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-    add_definitions(-DAULIB_DEBUG)
 endif()
 
 # Headers in include/SDL_Audiolib/
@@ -190,6 +203,7 @@ set(
     include/Aulib/Decoder.h
     include/Aulib/Processor.h
     include/Aulib/Resampler.h
+    include/Aulib/ResamplerSdl.h
     include/Aulib/ResamplerSpeex.h
     include/Aulib/Stream.h
 )
@@ -308,6 +322,14 @@ if (USE_DEC_LIBOPUSFILE)
     set(PKGCONF_REQ_PRIV "${PKGCONF_REQ_PRIV} opusfile")
 endif(USE_DEC_LIBOPUSFILE)
 
+if (USE_DEC_FLAC)
+    set(AULIB_SOURCES ${AULIB_SOURCES} src/DecoderFlac.cpp)
+    set(PUBLIC_HEADERS_AULIB_DIR ${PUBLIC_HEADERS_AULIB_DIR} include/Aulib/DecoderFlac.h)
+    pkg_check_modules(FLAC REQUIRED flac IMPORTED_TARGET)
+    list(APPEND EXTRA_LIBRARIES PkgConfig::FLAC)
+    set(PKGCONF_REQ_PRIV "${PKGCONF_REQ_PRIV} flac")
+endif(USE_DEC_FLAC)
+
 if (USE_DEC_MUSEPACK)
     set(AULIB_SOURCES ${AULIB_SOURCES} src/DecoderMusepack.cpp)
     set(PUBLIC_HEADERS_AULIB_DIR ${PUBLIC_HEADERS_AULIB_DIR} include/Aulib/DecoderMusepack.h)
@@ -349,6 +371,19 @@ if (USE_DEC_ADLMIDI)
     set(PKGCONF_REQ_PRIV "${PKGCONF_REQ_PRIV} libADLMIDI")
 endif(USE_DEC_ADLMIDI)
 
+function(add_bundled_fmtlib)
+    set(BUILD_SHARED_LIBS OFF)
+    set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+    add_subdirectory(3rdparty/fmt)
+endfunction()
+
+if (WITH_SYSTEM_FMTLIB)
+    find_package(FMT REQUIRED)
+    set(PKGCONF_REQ_PRIV "${PKGCONF_REQ_PRIV} fmt")
+else()
+    add_bundled_fmtlib()
+endif()
+
 check_cxx_source_compiles(
     "
     #include <algorithm>
@@ -368,12 +403,14 @@ add_library(
     src/Decoder.cpp
     src/Processor.cpp
     src/Resampler.cpp
+    src/ResamplerSdl.cpp
     src/ResamplerSpeex.cpp
     src/SdlAudioLocker.h
     src/SdlMutex.h
     src/Stream.cpp
     src/aulib.cpp
     src/aulib_debug.h
+    src/aulib_log.h
     src/sampleconv.cpp
     src/sampleconv.h
     src/stream_p.cpp
@@ -398,15 +435,17 @@ add_library(
     README.md
     doxygen/mainpage.dox
     3rdparty/speex_resampler/README
+    .clang-format
     .github/workflows/ci.yml
 )
 
 target_compile_definitions(
     SDL_audiolib
     PRIVATE
-        -DSPX_RESAMPLE_EXPORT=
-        -DOUTSIDE_SPEEX
-        -DRANDOM_PREFIX=SDL_audiolib
+        $<$<CONFIG:Debug>:AULIB_DEBUG>
+        OUTSIDE_SPEEX
+        RANDOM_PREFIX=SDL_audiolib
+        SPX_RESAMPLE_EXPORT=
 )
 
 set_target_properties(
@@ -446,6 +485,7 @@ target_link_libraries(
 
     PRIVATE
         ${EXTRA_LIBRARIES}
+        fmt::fmt
 )
 
 if(MSVC)
@@ -453,21 +493,17 @@ if(MSVC)
     target_compile_options(SDL_audiolib PRIVATE "/permissive-")
 endif()
 
-if(NOT DEFINED CMAKE_INSTALL_LIBDIR)
-    set(CMAKE_INSTALL_LIBDIR lib CACHE PATH "Output directory for libraries.")
-endif(NOT DEFINED CMAKE_INSTALL_LIBDIR)
-
 configure_file(
     ${PROJECT_SOURCE_DIR}/SDL_audiolib.pc.in
     ${PROJECT_BINARY_DIR}/SDL_audiolib.pc
     @ONLY
 )
 
-install(TARGETS SDL_audiolib DESTINATION ${CMAKE_INSTALL_LIBDIR})
+install(TARGETS SDL_audiolib DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR})
 install(FILES ${PUBLIC_HEADERS} ${PUBLIC_HEADERS_GENERATED} DESTINATION include/SDL_audiolib)
 install(FILES ${PUBLIC_HEADERS_AULIB_DIR} DESTINATION include/SDL_audiolib/Aulib)
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/SDL_audiolib.pc
-        DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+        DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}/pkgconfig)
 
 if (ENABLE_SDLMIXER_EMU)
     add_library(
@@ -486,7 +522,7 @@ if (ENABLE_SDLMIXER_EMU)
         SDL_audiolib
     )
 
-    install(TARGETS SDL_mixer-2.0 DESTINATION ${CMAKE_INSTALL_LIBDIR})
+    install(TARGETS SDL_mixer-2.0 DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR})
 endif(ENABLE_SDLMIXER_EMU)
 
 if (BUILD_EXAMPLE)

@@ -43,6 +43,7 @@ equals(QT_MAJOR_VERSION, 5) {
 
     INCLUDEPATH += \
         SDL_audiolib \
+        SDL_audiolib/3rdparty/fmt/include \
         SDL_audiolib/3rdparty/speex_resampler \
         SDL_audiolib/include \
         SDL_audiolib/src
@@ -73,9 +74,10 @@ equals(QT_MAJOR_VERSION, 5) {
 
     DEFINES += \
         AULIB_STATIC_DEFINE \
-        SPX_RESAMPLE_EXPORT= \
+        FMT_HEADER_ONLY \
+        OUTSIDE_SPEEX \
         RANDOM_PREFIX=SDL_audiolib \
-        OUTSIDE_SPEEX
+        SPX_RESAMPLE_EXPORT=
 
     HEADERS += \
         $$files(SDL_audiolib/*.h) \

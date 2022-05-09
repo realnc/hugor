@@ -33,6 +33,10 @@ The provided decoders are:
 
   It can decode Ogg/Opus audio.
 
+- Aulib::DecoderFlac - uses [libFLAC](https://xiph.org/flac)
+
+  It can decode FLAC and Ogg/FLAC audio.
+
 - Aulib::DecoderMusepack - uses [Musepack SV8](http://www.musepack.net)
 
   It can decode Musepack audio.
@@ -95,6 +99,11 @@ it is resampled using one of the available resamplers:
  - Aulib::ResamplerSox
 
    It uses the [SoxR](https://sourceforge.net/p/soxr/wiki/Home) resampler.
+
+ - Aulib::ResamplerSdl
+
+   It uses the built-in resampling functionality of SDL (through the SDL_AudioStream API) and has no
+   external dependencies. Requires at least SDL 2.0.7.
 
 Usage of the library is fairly simple. To play a music.ogg file containing Vorbis audio and having the
 audio automatically resampled by the internal resampler to the sample rate that the audio device is

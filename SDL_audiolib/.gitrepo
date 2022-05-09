@@ -6,7 +6,7 @@
 [subrepo]
 	remote = https://github.com/realnc/SDL_audiolib.git
 	branch = master
-	commit = 5a700ba556d3a5b5c531c2fa1f45fc0c3214a16b
-	parent = 7914861058a50a0576b9ec74d0d99f4970c176db
+	commit = 0087190eb4cec9fae96b36a88369ab1587ca9abc
+	parent = becfe8cf64027ecfbc4a6b17aed23bc828901124
 	method = merge
 	cmdver = 0.4.3
