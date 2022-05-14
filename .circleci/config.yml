@@ -20,9 +20,13 @@ workflows:
       equal: ['build-linux-arm', << pipeline.parameters.GHA_Action >>]
     jobs:
       - build-linux:
-          name: build-linux-arm64v8
+          name: 'Linux arm64v8'
           image_tag: 'linux-arm64v8'
           arch: 'arm64'
+      - build-linux:
+          name: 'Linux arm32v7'
+          image_tag: 'linux-arm32v7'
+          arch: 'arm32v7'
 
 jobs:
   build-linux:
@@ -44,7 +48,7 @@ jobs:
             docker run \
                 -v "$PWD":/build \
                 -w /build \
-                realnc/hugor-build::<< parameters.image_tag >> \
+                realnc/hugor-build:<< parameters.image_tag >> \
                 bash -c '(
                     set -ex
                     qmake
@@ -53,5 +57,5 @@ jobs:
             mv *.AppImage /tmp/Hugor-Linux-<< parameters.arch >>.AppImage
 
       - store_artifacts:
-          path: /tmp/Hugor-Linux-< parameters.arch >>.AppImage
-          destination: Hugor-Linux-< parameters.arch >>.AppImage
+          path: /tmp/Hugor-Linux-<< parameters.arch >>.AppImage
+          destination: Hugor-Linux-<< parameters.arch >>.AppImage
