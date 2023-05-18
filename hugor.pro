@@ -303,13 +303,17 @@ linux {
         && rm -f $$shell_quote($$OUT_PWD/AppDir/usr/lib/vlc/plugins/plugins.dat) \
         && find $$shell_quote($$OUT_PWD/AppDir/usr/lib) -type f \\( -name $$shell_quote(*.la) -o -name $$shell_quote(*.a) \\) -exec rm $$shell_quote({}) \; \
         && patchelf --set-rpath $$shell_quote(\$$ORIGIN/../../../) $$shell_quote($$OUT_PWD/AppDir/usr/lib/vlc/plugins)/*/* \
+        && rm -rf AppDir/usr/share/metainfo \
         && linuxdeployqt \
             $$shell_quote($$OUT_PWD/AppDir/usr/share/applications/nikos.chantziaras.hugor.desktop) \
-            -appimage \
             -no-copy-copyright-files \
             -no-translations \
             -qmake=$$shell_quote($$QMAKE_QMAKE) \
-            -extra-plugins=iconengines,platformthemes
+            -extra-plugins=iconengines,platformthemes \
+            -bundle-non-qt-libs \
+            -exclude-libs=libglib-2.0.so.0 \
+        && rm -f AppDir/usr/lib/libglib-* \
+        && VERSION="$$VERSION" appimagetool AppDir
 
     QMAKE_EXTRA_TARGETS += appimage
 }
